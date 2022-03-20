@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -37,8 +39,9 @@ public class Confirmations {
 	public static final int DEFAULT_CONFIRMATION_TICKS = 25 * 20; // 25 seconds
 
 	private final Plugin plugin;
-	// The type of key that is used to track pending confirmations depends on the type of CommandSender.
-	private final Map<Object, PendingConfirmation> pendingConfirmations = new HashMap<>();
+	// The type of key that is used to track pending confirmations depends on the type of
+	// CommandSender.
+	private final Map<@NonNull Object, @NonNull PendingConfirmation> pendingConfirmations = new HashMap<>();
 
 	public Confirmations(Plugin plugin) {
 		this.plugin = plugin;
@@ -99,7 +102,7 @@ public class Confirmations {
 	}
 
 	// Returns the action that was awaiting confirmation.
-	public Runnable endConfirmation(CommandSender sender) {
+	public @Nullable Runnable endConfirmation(CommandSender sender) {
 		Validate.notNull(sender, "sender is null");
 		PendingConfirmation pendingConfirmation = pendingConfirmations.remove(this.getSenderKey(sender));
 		if (pendingConfirmation != null) {

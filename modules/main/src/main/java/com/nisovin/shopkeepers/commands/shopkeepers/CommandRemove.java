@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.ObjectUtils;
 
 class CommandRemove extends Command {
 
@@ -55,10 +56,9 @@ class CommandRemove extends Command {
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
-		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
+		Player senderPlayer = ObjectUtils.castOrNull(sender, Player.class);
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 
 		// Permission checks:
 		if (shopkeeper instanceof PlayerShopkeeper) {
@@ -81,7 +81,10 @@ class CommandRemove extends Command {
 
 			if (senderPlayer != null) {
 				// Call event:
-				PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, senderPlayer);
+				PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(
+						shopkeeper,
+						senderPlayer
+				);
 				if (deleteEvent.isCancelled()) {
 					TextUtils.sendMessage(sender, Messages.shopRemovalCancelled);
 					return;

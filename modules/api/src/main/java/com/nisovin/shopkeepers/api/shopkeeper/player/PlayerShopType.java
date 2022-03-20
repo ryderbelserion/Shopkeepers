@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.shopkeeper.player;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 
 /**
@@ -8,5 +10,5 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
  * @param <T>
  *            the type of player shopkeeper that is described by this shop type
  */
-public interface PlayerShopType<T extends PlayerShopkeeper> extends ShopType<T> {
+public interface PlayerShopType<T extends @NonNull PlayerShopkeeper> extends ShopType<T> {
 }

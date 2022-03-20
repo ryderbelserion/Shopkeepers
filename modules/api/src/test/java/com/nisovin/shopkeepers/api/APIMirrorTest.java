@@ -11,7 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 
 /**
  * Ensures that {@link ShopkeepersAPI} mirrors the methods of {@link ShopkeepersPlugin}.
@@ -23,23 +26,51 @@ public class APIMirrorTest {
 	 */
 	@Test
 	public void testMatchingMethods() {
-		List<Method> pluginMethods = Arrays.stream(ShopkeepersPlugin.class.getDeclaredMethods()).filter(method -> {
+		List<@NonNull Method> pluginMethods = Arrays.stream(
+				ShopkeepersPlugin.class.getDeclaredMethods()
+		).filter(method -> {
 			return Modifier.isAbstract(method.getModifiers());
-		}).collect(Collectors.toList());
+		}).collect(Collectors.<@NonNull Method>toList());
 		for (Method pluginMethod : pluginMethods) {
 			Method apiMethod = null;
 			try {
-				apiMethod = ShopkeepersAPI.class.getDeclaredMethod(pluginMethod.getName(), pluginMethod.getParameterTypes());
+				Class<?>[] parameters = pluginMethod.getParameterTypes();
+				apiMethod = ShopkeepersAPI.class.getDeclaredMethod(
+						pluginMethod.getName(),
+						parameters
+				);
 			} catch (NoSuchMethodException e) {
 			}
-			assertNotNull(ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName() + "' missing!", apiMethod);
-			assertTrue(ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName() + "' is not static!", Modifier.isStatic(apiMethod.getModifiers()));
-			assertEquals(ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName() + "' mismatching return type!",
-					apiMethod.getReturnType(), pluginMethod.getReturnType());
-			assertEquals(ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName() + "' mismatching deprecation!",
-					apiMethod.isAnnotationPresent(Deprecated.class), pluginMethod.isAnnotationPresent(Deprecated.class));
-			assertArrayEquals(ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName() + "' mismatching exceptions!",
-					apiMethod.getGenericExceptionTypes(), pluginMethod.getGenericExceptionTypes());
+
+			assertNotNull(
+					ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName()
+							+ "' is missing!",
+					Unsafe.nullableAsNonNull(apiMethod)
+			);
+			apiMethod = Unsafe.assertNonNull(apiMethod);
+			assertTrue(
+					ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName()
+							+ "' is not static!",
+					Modifier.isStatic(apiMethod.getModifiers())
+			);
+			assertEquals(
+					ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName()
+							+ "' mismatching return type!",
+					apiMethod.getReturnType(),
+					pluginMethod.getReturnType()
+			);
+			assertEquals(
+					ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName()
+							+ "' mismatching deprecation!",
+					apiMethod.isAnnotationPresent(Deprecated.class),
+					pluginMethod.isAnnotationPresent(Deprecated.class)
+			);
+			assertArrayEquals(
+					ShopkeepersAPI.class.getName() + ": Method '" + pluginMethod.getName()
+							+ "' mismatching exceptions!",
+					apiMethod.getGenericExceptionTypes(),
+					pluginMethod.getGenericExceptionTypes()
+			);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 
 /**
@@ -8,5 +10,6 @@ import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
  * @param <T>
  *            the internal type of {@link ShopType} that is managed by this registry
  */
-public interface ShopTypesRegistry<T extends ShopType<?>> extends SelectableTypeRegistry<T> {
+public interface ShopTypesRegistry<T extends @NonNull ShopType<?>>
+		extends SelectableTypeRegistry<T> {
 }

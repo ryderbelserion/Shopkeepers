@@ -1,12 +1,14 @@
 package com.nisovin.shopkeepers.util.data.container.value;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
- * A simple {@link DataValue} implementation that is not bound to any underlying data structure, but stores the value
- * itself.
+ * A simple {@link DataValue} implementation that is not bound to any underlying data structure, but
+ * stores the value itself.
  */
 public class SimpleDataValue extends AbstractDataValue {
 
-	private Object value;
+	private @Nullable Object value;
 
 	/**
 	 * Creates a new empty {@link SimpleDataValue}.
@@ -21,12 +23,12 @@ public class SimpleDataValue extends AbstractDataValue {
 	 * @param value
 	 *            the initially stored value, or <code>null</code>
 	 */
-	public SimpleDataValue(Object value) {
+	public SimpleDataValue(@Nullable Object value) {
 		this.value = value;
 	}
 
 	@Override
-	public Object getOrDefault(Object defaultValue) {
+	public @Nullable Object getOrDefault(@Nullable Object defaultValue) {
 		return (value != null) ? value : defaultValue;
 	}
 

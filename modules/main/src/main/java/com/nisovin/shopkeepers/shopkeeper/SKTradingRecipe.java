@@ -1,7 +1,10 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -18,8 +21,9 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * <p>
 	 * The recipe is not out of stock.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
-	 * copied before they are stored by the trading recipe. Otherwise, they are first copied.
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
+	 * and therefore not copied before they are stored by the trading recipe. Otherwise, they are
+	 * first copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -28,15 +32,20 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * @param item2
 	 *            the second buy item, can be empty
 	 */
-	public SKTradingRecipe(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {
+	public SKTradingRecipe(
+			@ReadOnly ItemStack resultItem,
+			@ReadOnly ItemStack item1,
+			@ReadOnly @Nullable ItemStack item2
+	) {
 		this(resultItem, item1, item2, false);
 	}
 
 	/**
 	 * Creates a {@link SKTradingRecipe}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
-	 * copied before they are stored by the trading recipe. Otherwise, they are first copied.
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
+	 * and therefore not copied before they are stored by the trading recipe. Otherwise, they are
+	 * first copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -47,10 +56,15 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * @param outOfStock
 	 *            <code>true</code> if the recipe is out of stock
 	 */
-	public SKTradingRecipe(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2, boolean outOfStock) {
+	public SKTradingRecipe(
+			@ReadOnly ItemStack resultItem,
+			@ReadOnly ItemStack item1,
+			@ReadOnly @Nullable ItemStack item2,
+			boolean outOfStock
+	) {
 		this(
-				ItemUtils.unmodifiableCloneIfModifiable(resultItem),
-				ItemUtils.unmodifiableCloneIfModifiable(item1),
+				ItemUtils.nonNullUnmodifiableCloneIfModifiable(resultItem),
+				ItemUtils.nonNullUnmodifiableCloneIfModifiable(item1),
 				ItemUtils.unmodifiableCloneIfModifiable(item2),
 				outOfStock
 		);
@@ -61,8 +75,8 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * <p>
 	 * The recipe is not out of stock.
 	 * <p>
-	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trading
-	 * recipe.
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are
+	 * stored by the trading recipe.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -71,15 +85,19 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * @param item2
 	 *            the second buy item, can be empty
 	 */
-	public SKTradingRecipe(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+	public SKTradingRecipe(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	) {
 		this(resultItem, item1, item2, false);
 	}
 
 	/**
 	 * Creates a {@link SKTradingRecipe}.
 	 * <p>
-	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trading
-	 * recipe.
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are
+	 * stored by the trading recipe.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -90,11 +108,26 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * @param outOfStock
 	 *            <code>true</code> if the recipe is out of stock
 	 */
-	public SKTradingRecipe(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2, boolean outOfStock) {
+	public SKTradingRecipe(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2,
+			boolean outOfStock
+	) {
 		super(resultItem, item1, item2);
 		Validate.isTrue(!ItemUtils.isEmpty(resultItem), "resultItem is empty");
 		Validate.isTrue(!ItemUtils.isEmpty(item1), "item1 is empty");
 		this.outOfStock = outOfStock;
+	}
+
+	@Override
+	public @NonNull UnmodifiableItemStack getResultItem() {
+		return Unsafe.assertNonNull(resultItem);
+	}
+
+	@Override
+	public @NonNull UnmodifiableItemStack getItem1() {
+		return Unsafe.assertNonNull(item1);
 	}
 
 	/**
@@ -136,7 +169,7 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!super.equals(obj)) return false;
 		if (!(obj instanceof SKTradingRecipe)) return false;

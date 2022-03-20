@@ -1,15 +1,18 @@
 package com.nisovin.shopkeepers.commands;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.shopkeepers.ShopkeepersCommand;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class Commands {
 
 	private final SKShopkeepersPlugin plugin;
 	private final Confirmations confirmations;
-	private ShopkeepersCommand shopkeepersCommand;
+
+	private @Nullable ShopkeepersCommand shopkeepersCommand;
 
 	public Commands(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -32,6 +35,6 @@ public class Commands {
 	}
 
 	public ShopkeepersCommand getShopkeepersCommand() {
-		return shopkeepersCommand;
+		return Validate.State.notNull(shopkeepersCommand, "The commands have not yet been set up!");
 	}
 }

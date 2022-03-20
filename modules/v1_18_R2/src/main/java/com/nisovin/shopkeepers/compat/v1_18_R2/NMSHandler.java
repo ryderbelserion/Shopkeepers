@@ -29,11 +29,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.minecraft.nbt.CompoundTag;
@@ -76,7 +79,7 @@ public final class NMSHandler implements NMSCallProvider {
 			GoalSelector goalSelector = mcMob.goalSelector;
 
 			// Clear old goals:
-			Map<?, ?> activeGoals = (Map<?, ?>) activeGoalsField.get(goalSelector);
+			Map<?, ?> activeGoals = Unsafe.castNonNull(activeGoalsField.get(goalSelector));
 			activeGoals.clear();
 			goalSelector.removeAllGoals();
 
@@ -87,7 +90,7 @@ public final class NMSHandler implements NMSCallProvider {
 			GoalSelector targetSelector = mcMob.targetSelector;
 
 			// Clear old target goals:
-			Map<?, ?> targetSelectorActiveGoals = (Map<?, ?>) activeGoalsField.get(targetSelector);
+			Map<?, ?> targetSelectorActiveGoals = Unsafe.castNonNull(activeGoalsField.get(targetSelector));
 			targetSelectorActiveGoals.clear();
 			targetSelector.removeAllGoals();
 		} catch (Exception e) {
@@ -163,10 +166,10 @@ public final class NMSHandler implements NMSCallProvider {
 	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without making a copy of it.
 	// Otherwise, this falls back to using CraftItemStack#asNMSCopy.
 	private net.minecraft.world.item.ItemStack asNMSItemStack(ItemStack itemStack) {
-		if (itemStack == null) return null;
+		assert itemStack != null;
 		if (itemStack instanceof CraftItemStack) {
 			try {
-				return (net.minecraft.world.item.ItemStack) craftItemStackHandleField.get(itemStack);
+				return Unsafe.castNonNull(craftItemStackHandleField.get(itemStack));
 			} catch (Exception e) {
 				Log.severe("Failed to retrieve the underlying Minecraft ItemStack!", e);
 			}
@@ -175,11 +178,14 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public boolean matches(ItemStack provided, ItemStack required) {
+	public boolean matches(@Nullable ItemStack provided, @Nullable ItemStack required) {
 		if (provided == required) return true;
 		// If the required item is empty, then the provided item has to be empty as well:
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
+		assert required != null && provided != null;
+		Unsafe.assertNonNull(required);
+		Unsafe.assertNonNull(provided);
 		if (provided.getType() != required.getType()) return false;
 		net.minecraft.world.item.ItemStack nmsProvided = asNMSItemStack(provided);
 		net.minecraft.world.item.ItemStack nmsRequired = asNMSItemStack(required);
@@ -227,20 +233,27 @@ public final class NMSHandler implements NMSCallProvider {
 		// Master), merchant total experience, is-regular-villager flag (false: hides some gui elements), can-restock
 		// flag (false: hides restock message if out of stock)
 		ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
-		nmsPlayer.sendMerchantOffers(nmsPlayer.containerMenu.containerId, merchantRecipeList, merchantLevel, merchantExperience, regularVillager, canRestock);
+		nmsPlayer.sendMerchantOffers(
+				nmsPlayer.containerMenu.containerId,
+				merchantRecipeList,
+				merchantLevel,
+				merchantExperience,
+				regularVillager,
+				canRestock
+		);
 	}
 
 	@Override
-	public String getItemSNBT(ItemStack itemStack) {
-		if (itemStack == null) return null;
+	public @Nullable String getItemSNBT(@Nullable ItemStack itemStack) {
+		Validate.notNull(itemStack, "itemStack is null");
 		net.minecraft.world.item.ItemStack nmsItem = asNMSItemStack(itemStack);
 		CompoundTag itemNBT = nmsItem.save(new CompoundTag());
 		return itemNBT.toString();
 	}
 
 	@Override
-	public String getItemTypeTranslationKey(Material material) {
-		if (material == null) return null;
+	public @Nullable String getItemTypeTranslationKey(Material material) {
+		Validate.notNull(material, "material is null");
 		net.minecraft.world.item.Item nmsItem = CraftMagicNumbers.getItem(material);
 		if (nmsItem == null) return null;
 		return nmsItem.getDescriptionId();

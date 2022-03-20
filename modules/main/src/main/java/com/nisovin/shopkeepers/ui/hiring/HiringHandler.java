@@ -5,6 +5,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.InventoryView;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.UISession;
@@ -38,11 +39,12 @@ public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	protected boolean isWindow(InventoryView view) {
-		return view != null && view.getTitle().equals(Messages.forHireTitle);
+		Validate.notNull(view, "view is null");
+		return view.getTitle().equals(Messages.forHireTitle);
 	}
 
 	@Override
-	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, @Nullable InventoryCloseEvent closeEvent) {
 		// Nothing to do by default.
 	}
 

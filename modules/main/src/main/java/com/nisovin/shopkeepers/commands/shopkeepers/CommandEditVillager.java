@@ -11,9 +11,9 @@ import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.EntityArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityArgument.TargetEntityFilter;
+import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
-import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
 import com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
@@ -78,7 +78,7 @@ class CommandEditVillager extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		AbstractVillager villager = context.get(ARGUMENT_VILLAGER); // Not null
+		AbstractVillager villager = context.get(ARGUMENT_VILLAGER);
 
 		// Open the villager editor:
 		VillagerEditorHandler villagerEditor = new VillagerEditorHandler(villager);

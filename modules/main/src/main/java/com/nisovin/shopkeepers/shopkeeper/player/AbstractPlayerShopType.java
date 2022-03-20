@@ -6,10 +6,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerCreatePlayerShopkeeperEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.config.Settings;
@@ -18,15 +22,23 @@ import com.nisovin.shopkeepers.dependencies.towny.TownyDependency;
 import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
+import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper> extends AbstractShopType<T> implements PlayerShopType<T> {
+public abstract class AbstractPlayerShopType<T extends @NonNull AbstractPlayerShopkeeper>
+		extends AbstractShopType<T> implements PlayerShopType<T> {
 
-	protected AbstractPlayerShopType(String identifier, List<String> aliases, String permission, Class<T> shopkeeperType) {
+	protected AbstractPlayerShopType(
+			String identifier,
+			List<? extends @NonNull String> aliases,
+			@Nullable String permission,
+			Class<T> shopkeeperType
+	) {
 		super(identifier, aliases, permission, shopkeeperType);
 	}
 
@@ -40,13 +52,12 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 	@Override
 	protected boolean handleSpecificShopkeeperCreation(ShopCreationData shopCreationData) {
-		assert shopCreationData instanceof PlayerShopCreationData; // Shop creation data gets validated first
+		// Shop creation data gets validated before this is invoked:
+		assert shopCreationData instanceof PlayerShopCreationData;
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 
 		// The creator, not null here:
-		Player creator = shopCreationData.getCreator();
-
-		Location spawnLocation = shopCreationData.getSpawnLocation();
+		Player creator = Unsafe.assertNonNull(shopCreationData.getCreator());
 
 		// Validate container block:
 		Block containerBlock = playerShopCreationData.getShopContainer();
@@ -60,37 +71,45 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			return false;
 		}
 
-		// Check if the selected container is too far away:
-		if (!containerBlock.getWorld().equals(spawnLocation.getWorld())
-				|| (int) containerBlock.getLocation().distanceSquared(spawnLocation) > (Settings.maxContainerDistance * Settings.maxContainerDistance)) {
-			TextUtils.sendMessage(creator, Messages.containerTooFarAway);
-			return false;
-		}
-
 		// Check selected container:
-		if (!SKShopkeepersPlugin.getInstance().getShopkeeperCreation().handleCheckContainer(creator, containerBlock)) {
+		ShopkeeperCreation shopkeeperCreation = SKShopkeepersPlugin.getInstance().getShopkeeperCreation();
+		if (!shopkeeperCreation.handleCheckContainer(creator, containerBlock)) {
 			return false;
 		}
 
-		// Check WorldGuard:
-		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardDependency.isShopAllowed(creator, spawnLocation)) {
-				TextUtils.sendMessage(creator, Messages.restrictedArea);
+		Location spawnLocation = shopCreationData.getSpawnLocation();
+		if (spawnLocation != null) {
+			// Check if the selected container is too far away:
+			Location containerLocation = LocationUtils.getBlockCenterLocation(containerBlock);
+			double maxContainerDistanceSq = Settings.maxContainerDistance * Settings.maxContainerDistance;
+			if (LocationUtils.getDistanceSquared(containerLocation, spawnLocation) > maxContainerDistanceSq) {
+				TextUtils.sendMessage(creator, Messages.containerTooFarAway);
 				return false;
 			}
-		}
 
-		// Check Towny:
-		if (Settings.enableTownyRestrictions) {
-			if (!TownyDependency.isCommercialArea(spawnLocation)) {
-				TextUtils.sendMessage(creator, Messages.restrictedArea);
-				return false;
+			// Check WorldGuard:
+			if (Settings.enableWorldGuardRestrictions) {
+				if (!WorldGuardDependency.isShopAllowed(creator, spawnLocation)) {
+					TextUtils.sendMessage(creator, Messages.restrictedArea);
+					return false;
+				}
+			}
+
+			// Check Towny:
+			if (Settings.enableTownyRestrictions) {
+				if (!TownyDependency.isCommercialArea(spawnLocation)) {
+					TextUtils.sendMessage(creator, Messages.restrictedArea);
+					return false;
+				}
 			}
 		}
 
 		int maxShopsLimit = PlayerShopsLimit.getMaxShopsLimit(creator);
 		// Call event:
-		PlayerCreatePlayerShopkeeperEvent createEvent = new PlayerCreatePlayerShopkeeperEvent(shopCreationData, maxShopsLimit);
+		PlayerCreatePlayerShopkeeperEvent createEvent = new PlayerCreatePlayerShopkeeperEvent(
+				shopCreationData,
+				maxShopsLimit
+		);
 		Bukkit.getPluginManager().callEvent(createEvent);
 		if (createEvent.isCancelled()) {
 			Log.debug("PlayerShopkeeperCreateEvent was cancelled!");
@@ -101,7 +120,8 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 		// Count owned shops:
 		if (maxShopsLimit != Integer.MAX_VALUE) {
-			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(creator.getUniqueId()).size();
+			ShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
+			int count = shopkeeperRegistry.getPlayerShopkeepersByOwner(creator.getUniqueId()).size();
 			if (count >= maxShopsLimit) {
 				TextUtils.sendMessage(creator, Messages.tooManyShops);
 				return false;

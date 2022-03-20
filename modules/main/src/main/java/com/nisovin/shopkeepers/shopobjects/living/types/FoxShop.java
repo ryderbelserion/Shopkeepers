@@ -7,7 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Fox;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -26,35 +29,39 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class FoxShop extends SittableShop<Fox> {
+public class FoxShop extends SittableShop<@NonNull Fox> {
 
-	public static final Property<Fox.Type> FOX_TYPE = new BasicProperty<Fox.Type>()
+	public static final Property<Fox.@NonNull Type> FOX_TYPE = new BasicProperty<Fox.@NonNull Type>()
 			.dataKeyAccessor("foxType", EnumSerializers.lenient(Fox.Type.class))
 			.defaultValue(Fox.Type.RED)
 			.build();
 
-	public static final Property<Boolean> SLEEPING = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> SLEEPING = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("sleeping", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	public static final Property<Boolean> CROUCHING = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> CROUCHING = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("crouching", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Fox.Type> foxTypeProperty = new PropertyValue<>(FOX_TYPE)
-			.onValueChanged(this::applyFoxType)
+	private final PropertyValue<Fox.@NonNull Type> foxTypeProperty = new PropertyValue<>(FOX_TYPE)
+			.onValueChanged(Unsafe.initialized(this)::applyFoxType)
 			.build(properties);
-	private final PropertyValue<Boolean> sleepingProperty = new PropertyValue<>(SLEEPING)
-			.onValueChanged(this::applySleeping)
+	private final PropertyValue<@NonNull Boolean> sleepingProperty = new PropertyValue<>(SLEEPING)
+			.onValueChanged(Unsafe.initialized(this)::applySleeping)
 			.build(properties);
-	private final PropertyValue<Boolean> crouchingProperty = new PropertyValue<>(CROUCHING)
-			.onValueChanged(this::applyCrouching)
+	private final PropertyValue<@NonNull Boolean> crouchingProperty = new PropertyValue<>(CROUCHING)
+			.onValueChanged(Unsafe.initialized(this)::applyCrouching)
 			.build(properties);
 
-	public FoxShop(	LivingShops livingShops, SKLivingShopObjectType<FoxShop> livingObjectType,
-					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public FoxShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull FoxShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -87,8 +94,8 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getFoxTypeEditorButton());
 		editorButtons.add(this.getSleepingEditorButton());
 		editorButtons.add(this.getCrouchingEditorButton());
@@ -126,19 +133,25 @@ public class FoxShop extends SittableShop<Fox> {
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonFoxVariant, Messages.buttonFoxVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonFoxVariant,
+				Messages.buttonFoxVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getFoxTypeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getFoxTypeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleFoxType(backwards);
 				return true;
@@ -171,20 +184,27 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	private ItemStack getSleepingEditorItem() {
-		ItemStack iconItem = new ItemStack(this.isSleeping() ? Material.GREEN_BED : Material.RED_BED);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonFoxSleeping, Messages.buttonFoxSleepingLore);
+		Material iconItemType = this.isSleeping() ? Material.GREEN_BED : Material.RED_BED;
+		ItemStack iconItem = new ItemStack(iconItemType);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonFoxSleeping,
+				Messages.buttonFoxSleepingLore
+		);
 		return iconItem;
 	}
 
 	private Button getSleepingEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getSleepingEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleSleeping();
 				this.updateAllIcons(); // Required if crouching got disabled
 				return true;
@@ -217,20 +237,27 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	private ItemStack getCrouchingEditorItem() {
-		ItemStack iconItem = new ItemStack(this.isCrouching() ? Material.GREEN_CARPET : Material.RED_CARPET);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonFoxCrouching, Messages.buttonFoxCrouchingLore);
+		Material iconItemType = this.isCrouching() ? Material.GREEN_CARPET : Material.RED_CARPET;
+		ItemStack iconItem = new ItemStack(iconItemType);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonFoxCrouching,
+				Messages.buttonFoxCrouchingLore
+		);
 		return iconItem;
 	}
 
 	private Button getCrouchingEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getCrouchingEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleCrouching();
 				this.updateAllIcons(); // Required if sleeping got disabled
 				return true;

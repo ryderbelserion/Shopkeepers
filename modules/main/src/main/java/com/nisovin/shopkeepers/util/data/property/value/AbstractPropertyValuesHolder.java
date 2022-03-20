@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -11,8 +13,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public abstract class AbstractPropertyValuesHolder implements PropertyValuesHolder {
 
-	private final List<PropertyValue<?>> propertyValues = new ArrayList<>();
-	private final List<? extends PropertyValue<?>> propertyValuesView = Collections.unmodifiableList(propertyValues);
+	private final List<@NonNull PropertyValue<?>> propertyValues = new ArrayList<>();
+	private final List<? extends @NonNull PropertyValue<?>> propertyValuesView = Collections.unmodifiableList(
+			propertyValues
+	);
 
 	/**
 	 * Creates a new {@link AbstractPropertyValuesHolder}.
@@ -23,26 +27,30 @@ public abstract class AbstractPropertyValuesHolder implements PropertyValuesHold
 	/**
 	 * Adds the given {@link PropertyValue} to this holder.
 	 * <p>
-	 * A {@link PropertyValue} is only added once to exactly one holder and then never removed again.
+	 * A {@link PropertyValue} is only added once to exactly one holder and then never removed
+	 * again.
 	 * 
 	 * @param propertyValue
 	 *            the property value
 	 */
 	final void add(PropertyValue<?> propertyValue) {
 		Validate.notNull(propertyValue, "propertyValue is null");
-		Validate.isTrue(propertyValue.getHolder() == this, "propertyValue has already been added to another holder");
+		Validate.isTrue(propertyValue.getHolder() == this,
+				"propertyValue has already been added to another holder");
 		String propertyName = propertyValue.getProperty().getName();
 		for (PropertyValue<?> otherPropertyValue : propertyValuesView) {
 			if (propertyName.equalsIgnoreCase(otherPropertyValue.getProperty().getName())) {
-				Validate.error("Another PropertyValue with the same property name has already been added: "
-						+ propertyName);
+				Validate.error(
+						"Another PropertyValue with the same property name has already been added: "
+								+ propertyName
+				);
 			}
 		}
 		propertyValues.add(propertyValue);
 	}
 
 	@Override
-	public final List<? extends PropertyValue<?>> getPropertyValues() {
+	public final List<? extends @NonNull PropertyValue<?>> getPropertyValues() {
 		return propertyValuesView;
 	}
 

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -17,12 +19,13 @@ import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link CommandArgument} that requires the command user to explicitly specify this argument by name by using the
- * input format <code>"{argumentName}={argument}"</code>.
+ * A {@link CommandArgument} that requires the command user to explicitly specify this argument by
+ * name by using the input format <code>"{argumentName}={argument}"</code>.
  * <p>
  * This can be useful when there would otherwise be ambiguities between different arguments.
  * <p>
- * Currently this might only function correctly for command arguments that consume exactly one input argument.
+ * Currently this might only function correctly for command arguments that consume exactly one input
+ * argument.
  * 
  * @param <T>
  *            the type of the parsed argument
@@ -65,14 +68,26 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 
 	@FunctionalInterface
 	private static interface Parser<R> {
-		public R parse(CommandInput input, ArgumentsReader argsReader) throws ArgumentParseException;
+		public R parse(
+				CommandInput input,
+				ArgumentsReader argsReader
+		) throws ArgumentParseException;
 	}
 
-	private <R> R parseNamedArgument(CommandInput input, ArgumentsReader argsReader, Parser<R> parser) throws ArgumentParseException {
+	private <R> R parseNamedArgument(
+			CommandInput input,
+			ArgumentsReader argsReader,
+			Parser<R> parser
+	) throws ArgumentParseException {
 		return this.parseNamedArgument(input, argsReader, this.getArgumentPrefix(), parser);
 	}
 
-	private <R> R parseNamedArgument(CommandInput input, ArgumentsReader argsReader, String argPrefix, Parser<R> parser) throws ArgumentParseException {
+	private <R> R parseNamedArgument(
+			CommandInput input,
+			ArgumentsReader argsReader,
+			String argPrefix,
+			Parser<R> parser
+	) throws ArgumentParseException {
 		String arg = argsReader.peekIfPresent();
 		if (arg == null) {
 			throw this.missingArgumentError();
@@ -84,14 +99,19 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 
 		// Strip the naming prefix from the input argument:
 		String namelessArg = arg.substring(argPrefix.length());
-		List<String> adjustedArgs = new ArrayList<>(input.getArguments());
+		List<@NonNull String> adjustedArgs = new ArrayList<>(input.getArguments());
 		for (int i = 0; i < adjustedArgs.size(); ++i) {
 			if (adjustedArgs.get(i).equals(arg)) {
 				adjustedArgs.set(i, namelessArg);
 				break;
 			}
 		}
-		CommandInput adjustedInput = new CommandInput(input.getSender(), input.getCommand(), input.getCommandAlias(), adjustedArgs);
+		CommandInput adjustedInput = new CommandInput(
+				input.getSender(),
+				input.getCommand(),
+				input.getCommandAlias(),
+				adjustedArgs
+		);
 		ArgumentsReader adjustedArgsReader = new ArgumentsReader(adjustedInput);
 		adjustedArgsReader.setCursor(argsReader.getCursor());
 
@@ -106,21 +126,33 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 	}
 
 	@Override
-	public T parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public T parse(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		return this.parseNamedArgument(input, argsReader, (adjustedInput, adjustedArgsReader) -> {
 			return argument.parse(adjustedInput, context, adjustedArgsReader);
 		});
 	}
 
 	@Override
-	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public T parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		return this.parseNamedArgument(input, argsReader, (adjustedInput, adjustedArgsReader) -> {
 			return argument.parseValue(adjustedInput, context, adjustedArgsReader);
 		});
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		String arg = argsReader.peekIfPresent();
 		if (arg == null) {
 			return Collections.emptyList();
@@ -130,19 +162,36 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 		// Prefix might be partially given:
 		String prefix = (argPrefix.startsWith(arg) ? arg : argPrefix);
 		try {
-			return this.parseNamedArgument(input, argsReader, prefix, (adjustedInput, adjustedArgsReader) -> {
-				return argument.complete(adjustedInput, context, adjustedArgsReader);
-			}).stream().map((s) -> argPrefix + s).collect(Collectors.toList());
+			List<? extends @NonNull String> suggestions = this.<List<? extends @NonNull String>>parseNamedArgument(
+					input, argsReader, prefix,
+					(adjustedInput, adjustedArgsReader) -> {
+						return argument.complete(adjustedInput, context, adjustedArgsReader);
+					}
+			);
+			return suggestions.stream()
+					.<@NonNull String>map(suggestion -> argPrefix + suggestion)
+					.collect(Collectors.toList());
 		} catch (ArgumentParseException e) {
 			return Collections.emptyList();
 		}
 	}
 
 	@Override
-	public T parseFallback(CommandInput input, CommandContext context, ArgumentsReader argsReader, FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
+	public T parseFallback(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader,
+			FallbackArgumentException fallbackException,
+			boolean parsingFailed
+	) throws ArgumentParseException {
 		return this.parseNamedArgument(input, argsReader, (adjustedInput, adjustedArgsReader) -> {
 			FallbackArgumentException originalFallback = (FallbackArgumentException) fallbackException.getOriginalException();
-			return ((FallbackArgument<T>) argument).parseFallback(adjustedInput, context, adjustedArgsReader, originalFallback, parsingFailed);
+			return ((FallbackArgument<T>) argument).parseFallback(
+					adjustedInput, context,
+					adjustedArgsReader,
+					originalFallback,
+					parsingFailed
+			);
 		});
 	}
 }

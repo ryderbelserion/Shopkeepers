@@ -6,27 +6,36 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class FixedValuesArgument extends CommandArgument<Object> {
+public class FixedValuesArgument extends CommandArgument<@NonNull Object> {
 
-	private final Map<String, ? extends Object> values;
+	private final Map<? extends @NonNull String, @NonNull ?> values;
 
-	public FixedValuesArgument(String name, Map<String, ?> values) {
+	public FixedValuesArgument(String name, Map<? extends @NonNull String, @NonNull ?> values) {
 		super(name);
 		Validate.notNull(values, "values is null");
-		Validate.isTrue(!values.containsKey(null), "values contains a null key");
-		Validate.isTrue(!values.containsValue(null), "values contains a null value");
+		Validate.isTrue(!CollectionUtils.containsNull(values.keySet()),
+				"values contains a null key");
+		Validate.isTrue(!CollectionUtils.containsNull(values.values()),
+				"values contains a null value");
 		this.values = values;
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public Object parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
@@ -46,12 +55,16 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		if (argsReader.getRemainingSize() != 1) {
 			return Collections.emptyList();
 		}
 
-		List<String> suggestions = new ArrayList<>();
+		List<@NonNull String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		for (String valueKey : values.keySet()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;

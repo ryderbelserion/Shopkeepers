@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
@@ -43,7 +42,8 @@ class CommandSetTradePerm extends Command {
 				TargetShopkeeperFilter.ADMIN
 		));
 		this.addArgument(new FirstOfArgument("permArg", Arrays.asList(
-				new LiteralArgument(ARGUMENT_QUERY_PERMISSION).orDefaultValue(ARGUMENT_QUERY_PERMISSION),
+				new LiteralArgument(ARGUMENT_QUERY_PERMISSION)
+						.orDefaultValue(ARGUMENT_QUERY_PERMISSION),
 				new LiteralArgument(ARGUMENT_REMOVE_PERMISSION),
 				new StringArgument(ARGUMENT_NEW_PERMISSION)
 		), true, true));
@@ -53,12 +53,11 @@ class CommandSetTradePerm extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
-		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null && (shopkeeper instanceof AdminShopkeeper);
+		AdminShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 
-		String newTradePerm = context.get(ARGUMENT_NEW_PERMISSION);
+		String newTradePerm = context.getOrNull(ARGUMENT_NEW_PERMISSION);
 		boolean removePerm = context.has(ARGUMENT_REMOVE_PERMISSION);
-		String currentTradePerm = ((AdminShopkeeper) shopkeeper).getTradePermission();
+		String currentTradePerm = shopkeeper.getTradePermission();
 		if (currentTradePerm == null) currentTradePerm = "-";
 
 		if (removePerm) {
@@ -75,7 +74,7 @@ class CommandSetTradePerm extends Command {
 		}
 
 		// Set trade permission:
-		((AdminShopkeeper) shopkeeper).setTradePermission(newTradePerm);
+		shopkeeper.setTradePermission(newTradePerm);
 
 		// Save:
 		shopkeeper.save();

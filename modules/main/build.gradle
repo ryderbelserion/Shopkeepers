@@ -1,5 +1,6 @@
 plugins {
 	id 'java-library'
+	id 'org.checkerframework'
 	id 'maven-publish'
 	id 'com.github.johnrengelman.shadow'
 }
@@ -19,13 +20,19 @@ configurations {
 	implementation {
 		// Removed from Bukkit in newer versions:
 		exclude group: 'commons-lang', module: 'commons-lang'
+
+		// We use CheckerFramework:
+		exclude group: 'com.google.code.findbugs', module: 'jsr305'
+		// This artifact also includes jsr305, so we exclude it:
+		exclude group: 'com.sk89q.worldedit.worldedit-libs', module: 'core'
 	}
 }
 
 dependencies {
 	api project(':shopkeepers-api')
-	// compileOnly: Omits these dependencies from the transitively inherited apiElements and runtimeElements.
-	// However, we need to manually add these dependencies to our test dependencies if needed.
+	// compileOnly: Omits these dependencies from the transitively inherited apiElements and
+	// runtimeElements. However, we need to manually add these dependencies to our test dependencies
+	// if needed.
 	compileOnly libs.spigot.api // Includes the Bukkit API
 	compileOnly libs.worldguard.bukkit
 	compileOnly libs.towny

@@ -5,56 +5,90 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Accepts an entity specified by some form of input.
  * <p>
- * Currently, this only accepts UUIDs. In the future, additional inputs to specify an entity could be added here (e.g.
- * by name).
+ * Currently, this only accepts UUIDs. In the future, additional inputs to specify an entity could
+ * be added here (e.g. by name).
  */
-public class EntityArgument extends CommandArgument<Entity> {
+public class EntityArgument extends CommandArgument<@NonNull Entity> {
 
-	protected final ArgumentFilter<Entity> filter; // Not null
+	protected final ArgumentFilter<? super @NonNull Entity> filter; // Not null
 	private final EntityByUUIDArgument entityUUIDArgument;
-	private final TypedFirstOfArgument<Entity> firstOfArgument;
+	private final TypedFirstOfArgument<@NonNull Entity> firstOfArgument;
 
 	public EntityArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public EntityArgument(String name, ArgumentFilter<Entity> filter) {
+	public EntityArgument(String name, ArgumentFilter<? super @NonNull Entity> filter) {
 		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public EntityArgument(String name, ArgumentFilter<Entity> filter, int minimumUUIDCompletionInput) {
+	public EntityArgument(
+			String name,
+			ArgumentFilter<? super @NonNull Entity> filter,
+			int minimumUUIDCompletionInput
+	) {
 		super(name);
-		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
-		this.entityUUIDArgument = new EntityByUUIDArgument(name + ":uuid", filter, minimumUUIDCompletionInput) {
+		Validate.notNull(filter, "filter is null");
+		this.filter = filter;
+		this.entityUUIDArgument = new EntityByUUIDArgument(
+				name + ":uuid",
+				filter,
+				minimumUUIDCompletionInput
+		) {
 			@Override
-			protected Iterable<UUID> getCompletionSuggestions(	CommandInput input, CommandContextView context,
-																int minimumCompletionInput, String idPrefix) {
-				return EntityArgument.this.getUUIDCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
+			protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+					CommandInput input,
+					CommandContextView context,
+					int minimumCompletionInput,
+					String idPrefix
+			) {
+				return Unsafe.initialized(EntityArgument.this).getUUIDCompletionSuggestions(
+						input,
+						context,
+						minimumCompletionInput,
+						idPrefix
+				);
 			}
 		};
-		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(entityUUIDArgument), false, false);
+		this.firstOfArgument = new TypedFirstOfArgument<>(
+				name + ":firstOf",
+				Arrays.asList(entityUUIDArgument),
+				false,
+				false
+		);
 		firstOfArgument.setParent(this);
 	}
 
 	@Override
-	public Entity parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public Entity parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		// Also handles argument exceptions:
 		return firstOfArgument.parseValue(input, context, argsReader);
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		return firstOfArgument.complete(input, context, argsReader);
 	}
 
@@ -73,8 +107,18 @@ public class EntityArgument extends CommandArgument<Entity> {
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<UUID> getUUIDCompletionSuggestions(	CommandInput input, CommandContextView context,
-															int minimumCompletionInput, String idPrefix) {
-		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
+	protected Iterable<? extends @NonNull UUID> getUUIDCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String idPrefix
+	) {
+		return EntityUUIDArgument.getDefaultCompletionSuggestions(
+				input,
+				context,
+				minimumCompletionInput,
+				idPrefix,
+				filter
+		);
 	}
 }

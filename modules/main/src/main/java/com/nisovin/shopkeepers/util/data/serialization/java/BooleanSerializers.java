@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.util.data.serialization.java;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -10,9 +13,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class BooleanSerializers {
 
-	private static abstract class BooleanSerializer implements DataSerializer<Boolean> {
+	private static abstract class BooleanSerializer implements DataSerializer<@NonNull Boolean> {
 		@Override
-		public Object serialize(Boolean value) {
+		public @Nullable Object serialize(Boolean value) {
 			Validate.notNull(value, "value is null");
 			return value;
 		}
@@ -21,15 +24,16 @@ public final class BooleanSerializers {
 	/**
 	 * A {@link DataSerializer} for {@link Boolean} values.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} considers any data
-	 * that is not of type {@link Boolean} to be invalid.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} considers any data that is not of type {@link Boolean} to be invalid.
 	 */
-	public static final DataSerializer<Boolean> STRICT = new BooleanSerializer() {
+	public static final DataSerializer<@NonNull Boolean> STRICT = new BooleanSerializer() {
 		@Override
 		public Boolean deserialize(Object data) throws InvalidDataException {
 			Validate.notNull(data, "data is null");
 			if (!(data instanceof Boolean)) {
-				throw new InvalidDataException("Data is not of type Boolean, but " + data.getClass().getName() + "!");
+				throw new InvalidDataException("Data is not of type Boolean, but "
+						+ data.getClass().getName() + "!");
 			}
 			return (Boolean) data;
 		}
@@ -38,10 +42,11 @@ public final class BooleanSerializers {
 	/**
 	 * A {@link DataSerializer} for {@link Boolean} values.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} accounts for
-	 * various alternative representations when trying to convert the given data to a {@link Boolean} value.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} accounts for various alternative representations when trying to
+	 * convert the given data to a {@link Boolean} value.
 	 */
-	public static final DataSerializer<Boolean> LENIENT = new BooleanSerializer() {
+	public static final DataSerializer<@NonNull Boolean> LENIENT = new BooleanSerializer() {
 		@Override
 		public Boolean deserialize(Object data) throws InvalidDataException {
 			Validate.notNull(data, "data is null");

@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.migration;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -7,7 +9,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Applies data migrations to a given {@link ShopkeeperData}.
  * <p>
- * {@link Migration}s can be registered via {@link ShopkeeperDataMigrator#registerMigration(Migration)}.
+ * {@link Migration}s can be registered via
+ * {@link ShopkeeperDataMigrator#registerMigration(Migration)}.
  */
 public abstract class Migration {
 
@@ -50,10 +53,11 @@ public abstract class Migration {
 	/**
 	 * Applies the data migrations to the given shopkeeper data.
 	 * <p>
-	 * This operation does not check if the given data is complete or if all of it is valid: Some missing or invalid
-	 * data may be silently ignored, whereas invalid data that is relevant to the migration may cause the migration to
-	 * fail with an {@link InvalidDataException}. However, missing data should never result in the migration to fail,
-	 * but rather cause the affected migrations to be silently skipped.
+	 * This operation does not check if the given data is complete or if all of it is valid: Some
+	 * missing or invalid data may be silently ignored, whereas invalid data that is relevant to the
+	 * migration may cause the migration to fail with an {@link InvalidDataException}. However,
+	 * missing data should never result in the migration to fail, but rather cause the affected
+	 * migrations to be silently skipped.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -63,7 +67,10 @@ public abstract class Migration {
 	 * @throws InvalidDataException
 	 *             if the data is invalid and cannot be migrated
 	 */
-	public abstract boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException;
+	public abstract boolean migrate(
+			ShopkeeperData shopkeeperData,
+			String logPrefix
+	) throws InvalidDataException;
 
 	@Override
 	public final int hashCode() {
@@ -75,7 +82,7 @@ public abstract class Migration {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public final boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof Migration)) return false;
 		Migration other = (Migration) obj;

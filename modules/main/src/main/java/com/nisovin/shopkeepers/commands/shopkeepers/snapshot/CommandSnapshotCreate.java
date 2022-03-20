@@ -38,8 +38,8 @@ class CommandSnapshotCreate extends Command {
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		));
-		// Snapshot names can consist of multiple words (i.e. contain spaces), but only when created programmatically
-		// via the API. Via command, the snapshot name cannot contain spaces.
+		// Snapshot names can consist of multiple words (i.e. contain spaces), but only when created
+		// programmatically via the API. Via command, the snapshot name cannot contain spaces.
 		this.addArgument(new StringArgument(ARGUMENT_SNAPSHOT_NAME));
 	}
 
@@ -47,9 +47,8 @@ class CommandSnapshotCreate extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 		String snapshotName = context.get(ARGUMENT_SNAPSHOT_NAME);
-		assert snapshotName != null && !snapshotName.isEmpty();
+		assert !snapshotName.isEmpty();
 
 		if (snapshotName.length() > ShopkeeperSnapshot.getMaxNameLength()) {
 			TextUtils.sendMessage(sender, Messages.snapshotNameTooLong,
@@ -77,7 +76,9 @@ class CommandSnapshotCreate extends Command {
 		TextUtils.sendMessage(sender, Messages.snapshotCreated,
 				"name", snapshotName,
 				"id", shopkeeper.getSnapshots().size(),
-				"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(snapshot.getTimestamp())
+				"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(
+						snapshot.getTimestamp()
+				)
 		);
 	}
 }

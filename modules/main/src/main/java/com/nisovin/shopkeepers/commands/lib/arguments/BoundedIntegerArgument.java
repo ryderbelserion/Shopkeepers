@@ -21,7 +21,11 @@ public class BoundedIntegerArgument extends IntegerArgument {
 	// TODO More descriptive error messages
 
 	@Override
-	public Integer parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public Integer parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		Integer value = super.parseValue(input, context, argsReader);
 		assert value != null;
 		if (value < min || value > max) {

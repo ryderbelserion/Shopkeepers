@@ -16,9 +16,9 @@ import com.nisovin.shopkeepers.config.lib.value.ValueType;
  * <p>
  * The specified value type has to provide a no-args constructor.
  * <p>
- * Default value types specified by this annotation are inherited to subclasses and can be overridden there by other
- * annotations for the same field type. If multiple default value types are specified for the same field type, the first
- * one is used.
+ * Default value types specified by this annotation are inherited to subclasses and can be
+ * overridden there by other annotations for the same field type. If multiple default value types
+ * are specified for the same field type, the first one is used.
  */
 @Target(ElementType.TYPE)
 @Repeatable(WithDefaultValueTypes.class)

@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.config.lib;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.container.DelegateDataContainer;
 
@@ -8,7 +10,7 @@ import com.nisovin.shopkeepers.util.data.container.DelegateDataContainer;
  */
 public class SimpleConfigData extends DelegateDataContainer implements ConfigData {
 
-	private DataContainer defaults = null;
+	private @Nullable DataContainer defaults = null;
 
 	/**
 	 * Creates a new {@link SimpleConfigData}.
@@ -21,12 +23,12 @@ public class SimpleConfigData extends DelegateDataContainer implements ConfigDat
 	}
 
 	@Override
-	public DataContainer getDefaults() {
+	public @Nullable DataContainer getDefaults() {
 		return defaults;
 	}
 
 	@Override
-	public void setDefaults(DataContainer defaults) {
+	public void setDefaults(@Nullable DataContainer defaults) {
 		this.defaults = defaults;
 	}
 }

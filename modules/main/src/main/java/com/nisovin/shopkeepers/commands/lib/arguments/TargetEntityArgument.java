@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -16,16 +16,19 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.java.ObjectUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link CommandArgument} that returns the targeted entity without consuming any arguments.
  * <p>
- * If the sender is not a player, a 'requires a player' error message is thrown. If no entity is targeted or the
- * targeted entity is not accepted, the filter's corresponding error message is used.
+ * If the sender is not a player, a 'requires a player' error message is thrown. If no entity is
+ * targeted or the targeted entity is not accepted, the filter's corresponding error message is
+ * used.
  */
-public class TargetEntityArgument extends CommandArgument<Entity> {
+public class TargetEntityArgument extends CommandArgument<@NonNull Entity> {
 
-	public interface TargetEntityFilter extends Predicate<Entity> {
+	public interface TargetEntityFilter extends Predicate<@NonNull Entity> {
 
 		public static final TargetEntityFilter ANY = new TargetEntityFilter() {
 			@Override
@@ -49,7 +52,7 @@ public class TargetEntityArgument extends CommandArgument<Entity> {
 		public abstract Text getInvalidTargetErrorMsg(Entity entity);
 	}
 
-	private final TargetEntityFilter filter; // not null
+	private final TargetEntityFilter filter; // Not null
 
 	public TargetEntityArgument(String name) {
 		this(name, TargetEntityFilter.ANY);
@@ -57,7 +60,8 @@ public class TargetEntityArgument extends CommandArgument<Entity> {
 
 	public TargetEntityArgument(String name, TargetEntityFilter filter) {
 		super(name);
-		this.filter = (filter == null) ? TargetEntityFilter.ANY : filter;
+		Validate.notNull(filter, "filter is null");
+		this.filter = filter;
 	}
 
 	@Override
@@ -66,13 +70,16 @@ public class TargetEntityArgument extends CommandArgument<Entity> {
 	}
 
 	@Override
-	public Entity parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		CommandSender sender = input.getSender();
-		if (!(sender instanceof Player)) {
+	public Entity parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
+		Player player = ObjectUtils.castOrNull(input.getSender(), Player.class);
+		if (player == null) {
 			throw this.requiresPlayerError();
 		}
 
-		Player player = (Player) sender;
 		Entity targetedEntity = EntityUtils.getTargetedEntity(player);
 		if (targetedEntity == null) {
 			throw new ArgumentParseException(this, filter.getNoTargetErrorMsg());
@@ -83,7 +90,11 @@ public class TargetEntityArgument extends CommandArgument<Entity> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		return Collections.emptyList();
 	}
 }

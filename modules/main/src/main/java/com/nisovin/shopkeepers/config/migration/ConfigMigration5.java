@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.config.migration;
 
+import static com.nisovin.shopkeepers.config.migration.ConfigMigrationHelper.*;
+
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
@@ -10,7 +12,7 @@ public class ConfigMigration5 implements ConfigMigration {
 	@Override
 	public void apply(DataContainer configData) {
 		// Remove the no longer used zero-currency-item and zero-high-currency-item settings:
-		ConfigMigrationHelper.removeSetting(configData, "zero-currency-item");
-		ConfigMigrationHelper.removeSetting(configData, "zero-high-currency-item");
+		removeSetting(configData, "zero-currency-item");
+		removeSetting(configData, "zero-high-currency-item");
 	}
 }

@@ -5,8 +5,10 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.base.Preconditions;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 
 /**
  * Stores positional information about a chunk, i.e. its world name and coordinates.
@@ -26,6 +28,8 @@ public class ChunkCoords {
 
 	/**
 	 * Checks if the given {@link Location locations} are located inside the same chunk.
+	 * <p>
+	 * This returns <code>false</code> if either of the given locations is <code>null</code>.
 	 * 
 	 * @param location1
 	 *            the first location
@@ -33,7 +37,7 @@ public class ChunkCoords {
 	 *            the second location
 	 * @return <code>true</code> if both locations are located within the same chunk
 	 */
-	public static boolean isSameChunk(Location location1, Location location2) {
+	public static boolean isSameChunk(@Nullable Location location1, @Nullable Location location2) {
 		if (location1 == null || location2 == null) return false;
 		World world1 = location1.getWorld();
 		World world2 = location2.getWorld();
@@ -52,17 +56,28 @@ public class ChunkCoords {
 
 	/**
 	 * Checks if the chunk at the given {@link Location} is loaded.
+	 * <p>
+	 * This returns <code>false</code> if the given location is <code>null</code>.
 	 * 
 	 * @param location
 	 *            the location
 	 * @return <code>true</code> if the chunk is loaded
 	 */
-	public static boolean isChunkLoaded(Location location) {
+	public static boolean isChunkLoaded(@Nullable Location location) {
 		if (location == null) return false;
-		if (!location.isWorldLoaded()) return false;
-		World world = location.getWorld();
-		assert world != null; // Checked above
-		return world.isChunkLoaded(fromBlock(location.getBlockX()), fromBlock(location.getBlockZ()));
+		World world;
+		try {
+			// Can return null if this location contains no world:
+			world = location.getWorld();
+		} catch (IllegalArgumentException e) {
+			// The location's world has been unloaded.
+			return false;
+		}
+		if (world == null) return false;
+		return world.isChunkLoaded(
+				fromBlock(location.getBlockX()),
+				fromBlock(location.getBlockZ())
+		);
 	}
 
 	/**
@@ -131,8 +146,18 @@ public class ChunkCoords {
 	 *            the location, not <code>null</code>
 	 */
 	public ChunkCoords(Location location) {
-		// Throws an exception if the Location is null or does not provide a world:
-		this(location.getWorld().getName(), fromBlock(location.getBlockX()), fromBlock(location.getBlockZ()));
+		this(
+				getWorldName(location),
+				fromBlock(location.getBlockX()),
+				fromBlock(location.getBlockZ())
+		);
+	}
+
+	private static String getWorldName(Location location) {
+		Preconditions.checkNotNull(location, "location is null");
+		World world = location.getWorld(); // Throws an exception if the world is no longer loaded
+		Preconditions.checkNotNull(world, "location's world is null");
+		return Unsafe.assertNonNull(world).getName();
 	}
 
 	/**
@@ -205,11 +230,12 @@ public class ChunkCoords {
 	}
 
 	/**
-	 * Gets the {@link World} this {@link ChunkCoords} is located in, or <code>null</code> if the world is not loaded.
+	 * Gets the {@link World} this {@link ChunkCoords} is located in, or <code>null</code> if the
+	 * world is not loaded.
 	 * 
 	 * @return the world, or <code>null</code> if it is not loaded
 	 */
-	public World getWorld() {
+	public @Nullable World getWorld() {
 		return Bukkit.getWorld(worldName);
 	}
 
@@ -231,7 +257,7 @@ public class ChunkCoords {
 	 * 
 	 * @return the chunk if it is loaded, or <code>null</code>
 	 */
-	public Chunk getChunk() {
+	public @Nullable Chunk getChunk() {
 		World world = this.getWorld();
 		if (world != null && world.isChunkLoaded(chunkX, chunkZ)) {
 			return world.getChunkAt(chunkX, chunkZ);
@@ -250,7 +276,7 @@ public class ChunkCoords {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof ChunkCoords)) return false;
 		ChunkCoords other = (ChunkCoords) obj;
@@ -268,7 +294,7 @@ public class ChunkCoords {
 	 *            the chunk's z-coordinate
 	 * @return <code>true</code> if the world name and chunk coordinates match
 	 */
-	public boolean matches(String worldName, int chunkX, int chunkZ) {
+	public boolean matches(@Nullable String worldName, int chunkX, int chunkZ) {
 		if (this.chunkX != chunkX) return false;
 		if (this.chunkZ != chunkZ) return false;
 		// Checked last for performance reasons:
@@ -283,7 +309,7 @@ public class ChunkCoords {
 	 *            the chunk
 	 * @return <code>true</code> if the world name and chunk coordinates match
 	 */
-	public boolean matches(Chunk chunk) {
+	public boolean matches(@Nullable Chunk chunk) {
 		if (chunk == null) return false;
 		return this.matches(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 	}

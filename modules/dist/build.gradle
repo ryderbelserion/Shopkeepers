@@ -22,11 +22,12 @@ configurations {
 
 dependencies {
 	api project(':shopkeepers-main') // Includes the Shopkeepers API
-	// Separate 'shaded' configuration: Omits these dependencies from the transitively inherited apiElements and runtimeElements
-	// (as well as from the generated POM).
-	// We cannot use compileOnly for this, because the java-library plugin would then cause this module to depend on the compiled
-	// classes (compileJava task) instead of the final jar (jar task). This would affect the order in which these dependency
-	// tasks are executed during a build, and would also cause the shadowJar task to bundle the non-remapped classes instead of
+	// Separate 'shaded' configuration: Omits these dependencies from the transitively inherited
+	// apiElements and runtimeElements (as well as from the generated POM).
+	// We cannot use compileOnly for this, because the java-library plugin would then cause this
+	// module to depend on the compiled classes (compileJava task) instead of the final jar (jar
+	// task). This would affect the order in which these dependency tasks are executed during a
+	// build, and would also cause the shadowJar task to bundle the non-remapped classes instead of
 	// the remapped ones.
 	nmsModules.each { module ->
 		shaded project(module)

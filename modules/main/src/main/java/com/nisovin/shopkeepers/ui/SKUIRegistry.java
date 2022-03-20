@@ -13,10 +13,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryEvent;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerOpenUIEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperOpenUIEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.ui.UISession;
@@ -27,19 +30,22 @@ import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implements UIRegistry<AbstractUIType> {
+public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
+		implements UIRegistry<@NonNull AbstractUIType> {
 
 	private final ShopkeepersPlugin plugin;
 	private final UIListener uiListener;
 
 	// Player id -> UI session
-	private final Map<UUID, SKUISession> uiSessions = new HashMap<>();
-	private final Collection<SKUISession> uiSessionsView = Collections.unmodifiableCollection(uiSessions.values());
+	private final Map<@NonNull UUID, @NonNull SKUISession> uiSessions = new HashMap<>();
+	private final Collection<? extends @NonNull SKUISession> uiSessionsView = Collections.unmodifiableCollection(
+			uiSessions.values()
+	);
 
 	public SKUIRegistry(ShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
-		this.uiListener = new UIListener(plugin, this);
+		this.uiListener = new UIListener(plugin, Unsafe.initialized(this));
 	}
 
 	public void onEnable() {
@@ -60,13 +66,14 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	public boolean requestUI(UIType uiType, AbstractShopkeeper shopkeeper, Player player) {
 		Validate.notNull(uiType, "uiHandler is null");
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		// Player is validated in the following.
+		Validate.notNull(player, "player is null");
 
 		String uiIdentifier = uiType.getIdentifier();
 		UIHandler uiHandler = shopkeeper.getUIHandler(uiType);
 		if (uiHandler == null) {
-			Log.debug(() -> shopkeeper.getLogPrefix() + "Cannot open UI '" + uiIdentifier + "' for player "
-					+ player.getName() + ": This shopkeeper does not support this type of UI.");
+			Log.debug(() -> shopkeeper.getLogPrefix() + "Cannot open UI '" + uiIdentifier
+					+ "' for player " + player.getName()
+					+ ": This shopkeeper does not support this type of UI.");
 			return false;
 		}
 		return this.requestUI(uiHandler, player);
@@ -95,7 +102,8 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		SKUISession oldSession = this.getUISession(player);
 		// Filter out duplicate open requests:
 		if (oldSession != null && oldSession.getUIHandler().equals(uiHandler)) {
-			Log.debug(() -> "UI '" + uiIdentifier + "'" + " is already open for player " + playerName + ".");
+			Log.debug(() -> "UI '" + uiIdentifier + "'" + " is already open for player "
+					+ playerName + ".");
 			return false;
 		}
 
@@ -108,23 +116,25 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		}
 		Bukkit.getPluginManager().callEvent(openUIEvent);
 		if (openUIEvent.isCancelled()) {
-			Log.debug(() -> "A plugin cancelled the opening of UI '" + uiIdentifier + "' for player " + playerName + ".");
+			Log.debug(() -> "A plugin cancelled the opening of UI '" + uiIdentifier
+					+ "' for player " + playerName + ".");
 			return false;
 		}
 
 		// Opening a window should automatically trigger a close of the previous window.
-		// However, we do this manually here just in case, because we cannot be sure what the UI handler is actually
-		// doing inside openWindow.
+		// However, we do this manually here just in case, because we cannot be sure what the UI
+		// handler is actually doing inside openWindow.
 		// Close previous window:
 		if (oldSession != null) {
-			Log.debug(() -> "Closing previous UI '" + uiIdentifier + "' for player " + playerName + ".");
+			Log.debug(() -> "Closing previous UI '" + uiIdentifier + "' for player "
+					+ playerName + ".");
 			// This will call a PlayerCloseInventoryEvent, which will end the current UI session:
 			player.closeInventory();
 		}
 		assert this.getUISession(player) == null;
 
 		// Register event handlers for any not yet handled types of inventory events:
-		Set<Class<? extends InventoryEvent>> additionalInventoryEvents = uiHandler.getAdditionalInventoryEvents();
+		Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> additionalInventoryEvents = uiHandler.getAdditionalInventoryEvents();
 		assert additionalInventoryEvents != null;
 		additionalInventoryEvents.forEach(uiListener::registerEventType);
 
@@ -145,14 +155,14 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	@Override
-	public Collection<? extends SKUISession> getUISessions() {
+	public Collection<? extends @NonNull SKUISession> getUISessions() {
 		return uiSessionsView;
 	}
 
 	@Override
-	public Collection<? extends SKUISession> getUISessions(Shopkeeper shopkeeper) {
+	public Collection<? extends @NonNull SKUISession> getUISessions(Shopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		List<SKUISession> sessions = new ArrayList<>();
+		List<@NonNull SKUISession> sessions = new ArrayList<>();
 		uiSessionsView.forEach(uiSession -> {
 			if (uiSession.getShopkeeper() == shopkeeper) {
 				sessions.add(uiSession);
@@ -162,10 +172,13 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	@Override
-	public Collection<? extends SKUISession> getUISessions(Shopkeeper shopkeeper, UIType uiType) {
+	public Collection<? extends @NonNull SKUISession> getUISessions(
+			Shopkeeper shopkeeper,
+			UIType uiType
+	) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		Validate.notNull(uiType, "uiType is null");
-		List<SKUISession> sessions = new ArrayList<>();
+		List<@NonNull SKUISession> sessions = new ArrayList<>();
 		uiSessionsView.forEach(uiSession -> {
 			if (uiSession.getShopkeeper() == shopkeeper && uiSession.getUIType() == uiType) {
 				sessions.add(uiSession);
@@ -175,9 +188,9 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	@Override
-	public Collection<? extends UISession> getUISessions(UIType uiType) {
+	public Collection<? extends @NonNull UISession> getUISessions(UIType uiType) {
 		Validate.notNull(uiType, "uiType is null");
-		List<SKUISession> sessions = new ArrayList<>();
+		List<@NonNull SKUISession> sessions = new ArrayList<>();
 		uiSessionsView.forEach(uiSession -> {
 			if (uiSession.getUIType() == uiType) {
 				sessions.add(uiSession);
@@ -187,7 +200,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	@Override
-	public SKUISession getUISession(Player player) {
+	public @Nullable SKUISession getUISession(Player player) {
 		Validate.notNull(player, "player is null");
 		return uiSessions.get(player.getUniqueId());
 	}
@@ -202,18 +215,19 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		UISession session = this.getUISession(player);
 		if (session == null) return;
 
-		Log.debug(() -> "Player " + player.getName() + " closed UI '" + session.getUIType().getIdentifier() + "'.");
+		Log.debug(() -> "Player " + player.getName() + " closed UI '"
+				+ session.getUIType().getIdentifier() + "'.");
 		this.endUISession(player, closeEvent);
 	}
 
 	public void onPlayerQuit(Player player) {
-		// TODO This might have no effect, because CraftBukkit triggers an inventory close event prior to the player
-		// quitting.
+		// TODO This might have no effect, because CraftBukkit triggers an inventory close event
+		// prior to the player quitting.
 		this.endUISession(player, null);
 	}
 
 	// closeEvent can be null.
-	void endUISession(Player player, InventoryCloseEvent closeEvent) {
+	void endUISession(Player player, @Nullable InventoryCloseEvent closeEvent) {
 		assert player != null;
 		SKUISession session = uiSessions.remove(player.getUniqueId());
 		if (session == null) return;
@@ -222,14 +236,14 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	private void onSessionStarted(SKUISession session) {
-		Log.debug(() -> "UI session '" + session.getUIType().getIdentifier() + "' started for player "
-				+ session.getPlayer().getName() + ".");
+		Log.debug(() -> "UI session '" + session.getUIType().getIdentifier()
+				+ "' started for player " + session.getPlayer().getName() + ".");
 	}
 
 	// closeEvent can be null.
-	private void onSessionEnded(SKUISession session, InventoryCloseEvent closeEvent) {
-		Log.debug(() -> "UI session '" + session.getUIType().getIdentifier() + "' ended for player "
-				+ session.getPlayer().getName() + ".");
+	private void onSessionEnded(SKUISession session, @Nullable InventoryCloseEvent closeEvent) {
+		Log.debug(() -> "UI session '" + session.getUIType().getIdentifier()
+				+ "' ended for player " + session.getPlayer().getName() + ".");
 		session.onSessionEnd(); // Inform session
 		session.getUIHandler().onInventoryClose(session, closeEvent); // Inform UI handler
 	}

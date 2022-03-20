@@ -7,6 +7,8 @@ spigot = "1.14.4-R0.1-SNAPSHOT"
 # Individual NMS modules can use other CraftBukkit versions.
 craftbukkit = "1.14.4-R0.1-SNAPSHOT"
 
+checkerframework = "3.21.2"
+
 worldguard = "7.0.0"
 towny = "0.96.2.0"
 citizens = "2.0.29-SNAPSHOT"
@@ -21,6 +23,9 @@ asm = "9.1"
 bukkit = { module = "org.bukkit:bukkit", version.ref = "bukkit" }
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
 craftbukkit = { module = "org.bukkit:craftbukkit", version.ref = "craftbukkit" }
+
+checkerframework-qual = { module = "org.checkerframework:checker-qual", version.ref = "checkerframework" }
+checkerframework-checker = { module = "org.checkerframework:checker", version.ref = "checkerframework" }
 
 worldguard-bukkit = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
 towny = { module = "com.github.TownyAdvanced:Towny", version.ref = "towny" }

@@ -6,12 +6,16 @@ import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -22,7 +26,8 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<PriceOffer> {
+	private static class TradingRecipesAdapter
+			extends DefaultTradingRecipesAdapter<@NonNull PriceOffer> {
 
 		private final SKBuyingPlayerShopkeeper shopkeeper;
 
@@ -32,26 +37,31 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		public List<TradingRecipeDraft> getTradingRecipes() {
+		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
 			// Add the shopkeeper's offers:
-			List<? extends PriceOffer> offers = shopkeeper.getOffers();
-			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+			List<? extends @NonNull PriceOffer> offers = shopkeeper.getOffers();
+			// With heuristic initial capacity:
+			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
+			Currency baseCurrency = Currencies.getBase();
 			offers.forEach(offer -> {
 				UnmodifiableItemStack tradedItem = offer.getItem();
-				UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Currencies.getBase().getItemData().createItemStack(offer.getPrice()));
+				UnmodifiableItemStack currencyItem = baseCurrency.getItemData().createUnmodifiableItemStack(offer.getPrice());
 				TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, tradedItem, null);
 				recipes.add(recipe);
 			});
 
 			// Add new empty recipe drafts for items from the container without existing offer:
 			// We only add one recipe per similar item:
-			List<ItemStack> newRecipes = new ArrayList<>();
-			ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+			List<@NonNull ItemStack> newRecipes = new ArrayList<>();
+			// Empty if the container is not found:
+			@Nullable ItemStack[] containerContents = shopkeeper.getContainerContents();
 			for (ItemStack containerItem : containerContents) {
-				if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+				// Ignore empty ItemStacks:
+				if (containerItem == null) continue;
+				if (ItemUtils.isEmpty(containerItem)) continue;
 
 				// Replace placeholder item, if this is one:
-				containerItem = PlaceholderItems.replace(containerItem);
+				containerItem = PlaceholderItems.replaceNonNull(containerItem);
 
 				// Ignore currency items:
 				if (Currencies.matchesAny(containerItem)) {
@@ -68,34 +78,32 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 					continue;
 				}
 
-				// Add new empty recipe:
-				containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
+				// Add a new empty recipe:
+				containerItem = ItemUtils.copySingleItem(containerItem);
 				TradingRecipeDraft recipe = new TradingRecipeDraft(null, containerItem, null);
 				recipes.add(recipe);
 				newRecipes.add(containerItem);
 			}
-
 			return recipes;
 		}
 
 		@Override
-		protected List<? extends PriceOffer> getOffers() {
+		protected List<? extends @NonNull PriceOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<PriceOffer> newOffers) {
+		protected void setOffers(List<? extends @NonNull PriceOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 
 		@Override
-		protected PriceOffer createOffer(TradingRecipeDraft recipe) {
+		protected @Nullable PriceOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
 			assert recipe.getItem2() == null; // Cannot be set via the editor
 
 			// We can reuse the trading recipe draft's items without copying them first.
-			UnmodifiableItemStack priceItem = recipe.getResultItem();
-			assert priceItem != null;
+			UnmodifiableItemStack priceItem = Unsafe.assertNonNull(recipe.getResultItem());
 			// Make sure that the item is actually currency, this just in case:
 			if (priceItem.getType() != Settings.currencyItem.getType()) {
 				return null; // Invalid recipe
@@ -103,10 +111,9 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			assert priceItem.getAmount() > 0;
 			int price = priceItem.getAmount();
 
-			UnmodifiableItemStack tradedItem = recipe.getItem1();
-			assert tradedItem != null;
+			UnmodifiableItemStack tradedItem = Unsafe.assertNonNull(recipe.getItem1());
 			// Replace placeholder item, if this is one:
-			tradedItem = PlaceholderItems.replace(tradedItem);
+			tradedItem = PlaceholderItems.replaceNonNull(tradedItem);
 
 			return PriceOffer.create(tradedItem, price);
 		}

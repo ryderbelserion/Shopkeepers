@@ -1,8 +1,10 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
- * This exception is thrown when the {@link ShopkeeperRegistry#createShopkeeper(ShopCreationData) creation} of a new
- * shopkeeper fails for some reason.
+ * This exception is thrown when the {@link ShopkeeperRegistry#createShopkeeper(ShopCreationData)
+ * creation} of a new shopkeeper fails for some reason.
  */
 public class ShopkeeperCreateException extends Exception {
 
@@ -14,7 +16,7 @@ public class ShopkeeperCreateException extends Exception {
 	 * @param message
 	 *            the detail message
 	 */
-	public ShopkeeperCreateException(String message) {
+	public ShopkeeperCreateException(@Nullable String message) {
 		super(message);
 	}
 
@@ -26,7 +28,7 @@ public class ShopkeeperCreateException extends Exception {
 	 * @param cause
 	 *            the cause
 	 */
-	public ShopkeeperCreateException(String message, Throwable cause) {
+	public ShopkeeperCreateException(@Nullable String message, @Nullable Throwable cause) {
 		super(message, cause);
 	}
 }

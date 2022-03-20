@@ -3,8 +3,12 @@ package com.nisovin.shopkeepers.commands.lib.context;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
- * Stores parsed command arguments.
+ * Stores information that is relevant for a particular command execution, such as parsed command
+ * arguments.
  */
 public interface CommandContext {
 
@@ -19,47 +23,62 @@ public interface CommandContext {
 	public void put(String key, Object value);
 
 	/**
-	 * Retrieves a stored value for the given key.
+	 * Gets the value for the given key.
+	 * <p>
+	 * The value is expected to be present.
 	 * 
 	 * @param <T>
-	 *            the value type
+	 *            the expected type of value
 	 * @param key
 	 *            the key
-	 * @return the value, <code>null</code> if no value is stored for the given key
+	 * @return the value, not <code>null</code>
+	 * @throws IllegalStateException
+	 *             if there is no value for the given key
 	 */
-	public <T> T get(String key);
+	public <T> @NonNull T get(String key);
 
 	/**
-	 * Gets the stored value for the given key, or returns the specified default value in case there is no value stored.
+	 * Gets the value for the given key, or returns <code>null</code> if there is no such value.
 	 * 
 	 * @param <T>
-	 *            the value type
+	 *            the expected type of value
+	 * @param key
+	 *            the key
+	 * @return the value, or <code>null</code> if there is no value for the given key
+	 */
+	public <T> @Nullable T getOrNull(String key);
+
+	/**
+	 * Gets the value for the given key, or returns the specified default value if there is no such
+	 * value.
+	 * 
+	 * @param <T>
+	 *            the expected type of value
 	 * @param key
 	 *            the key
 	 * @param defaultValue
-	 *            the default value
-	 * @return the stored value, or the default value (can be <code>null</code> if the default value is
-	 *         <code>null</code>)
+	 *            the default value, can be <code>null</code>
+	 * @return the value, or the given default value if there is no value for the given key
 	 */
-	public <T> T getOrDefault(String key, T defaultValue);
+	public <T> @Nullable T getOrDefault(String key, @Nullable T defaultValue);
 
 	/**
-	 * Gets the stored value for the given key, or returns a default value created by the given {@link Supplier} in case
-	 * there is no value stored.
+	 * Gets the value for the given key, or returns the default value provided by the given
+	 * {@link Supplier} if there is no such value.
 	 * 
 	 * @param <T>
-	 *            the value type
+	 *            the expected type of value
 	 * @param key
 	 *            the key
 	 * @param defaultValueSupplier
-	 *            the default value supplier
-	 * @return the stored value, or the default value (can be <code>null</code> if the default value supplier is
-	 *         <code>null</code> or returned <code>null</code>)
+	 *            the default value supplier, not <code>null</code>
+	 * @return the value, or the supplied default value if there is no value for the given key (can
+	 *         be <code>null</code>)
 	 */
-	public <T> T getOrDefault(String key, Supplier<T> defaultValueSupplier);
+	public <T> @Nullable T getOrDefault(String key, Supplier<@Nullable T> defaultValueSupplier);
 
 	/**
-	 * Checks if a value is stored for the given key.
+	 * Checks if this {@link CommandContext} contains a value for the given key.
 	 * 
 	 * @param key
 	 *            the key
@@ -68,11 +87,11 @@ public interface CommandContext {
 	public boolean has(String key);
 
 	/**
-	 * Gets an unmodifiable map view on the contents of the command context.
+	 * Gets an unmodifiable map view on the contents of this command context.
 	 * 
-	 * @return an unmodifiable map view on the contents of the command context
+	 * @return an unmodifiable map view on the contents of this command context
 	 */
-	public Map<String, Object> getMapView();
+	public Map<? extends @NonNull String, @NonNull ?> getMapView();
 
 	/**
 	 * Gets an unmodifiable view on this command context.
@@ -88,6 +107,6 @@ public interface CommandContext {
 	 */
 	public CommandContext copy();
 
-	// Note on hashCode and equals: Contexts are compared by identity, which is quick and sufficient for our needs.
-	// Content based comparison can be achieved via #getMapView().
+	// Note on hashCode and equals: Contexts are compared by identity, which is quick and sufficient
+	// for our needs. Content based comparisons can be achieved via #getMapView().
 }

@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
@@ -18,68 +22,67 @@ public final class StringUtils {
 
 	private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
-	public static boolean isEmpty(String string) {
+	public static boolean isEmpty(@Nullable String string) {
 		return (string == null) || string.isEmpty();
 	}
 
 	/**
-	 * Makes sure that the given string is not empty.
+	 * Makes sure that the given String is not empty.
 	 * 
 	 * @param string
-	 *            the string
-	 * @return the string itself, or <code>null</code> if it is empty
+	 *            the String
+	 * @return the String itself, or <code>null</code> if it is empty
 	 */
-	public static String getNotEmpty(String string) {
+	public static @Nullable String getNotEmpty(@Nullable String string) {
 		return isEmpty(string) ? null : string;
 	}
 
 	/**
-	 * Makes sure that the given string is not <code>null</code>.
+	 * Makes sure that the given String is not <code>null</code>.
 	 * 
 	 * @param string
-	 *            the string
-	 * @return the string itself, or an empty string if it is <code>null</code>
+	 *            the String
+	 * @return the String itself, or an empty String if it is <code>null</code>
 	 */
-	public static String getOrEmpty(String string) {
+	public static String getOrEmpty(@Nullable String string) {
 		return (string == null) ? "" : string;
 	}
 
 	/**
 	 * Converts the given {@link Object} to a String via its {@link #toString()} method.
 	 * <p>
-	 * If the object is <code>null</code>, or if its {@link #toString()} method returns <code>null</code>, this returns
-	 * an empty String.
+	 * If the object is <code>null</code>, or if its {@link #toString()} method returns
+	 * <code>null</code>, this returns an empty String.
 	 * 
 	 * @param object
 	 *            the object
 	 * @return the String, not <code>null</code>
 	 */
-	public static String toStringOrEmpty(Object object) {
+	public static String toStringOrEmpty(@Nullable Object object) {
 		if (object == null) return "";
-		String string = object.toString();
-		return (string != null) ? string : "";
+		return getOrEmpty(object.toString());
 	}
 
 	/**
 	 * Converts the given {@link Object} to a String via its {@link #toString()} method.
 	 * <p>
-	 * Returns <code>null</code> if the object is <code>null</code>, or if its {@link #toString()} method returns
-	 * <code>null</code>.
+	 * Returns <code>null</code> if the object is <code>null</code>, or if its {@link #toString()}
+	 * method returns <code>null</code>.
 	 * 
 	 * @param object
 	 *            the object
 	 * @return the String, possibly <code>null</code>
 	 */
-	public static String toStringOrNull(Object object) {
+	public static @Nullable String toStringOrNull(@Nullable Object object) {
 		if (object == null) return null;
-		return object.toString();
+		return object.toString(); // Incorrect implementations might return null here
 	}
 
 	/**
 	 * Checks if the given {@link String} contains the specified character.
 	 * <p>
-	 * This is a shortcut for invoking {@link String#indexOf(int)} and checking if the return value does not equal
-	 * {@code -1}.
+	 * This is a shortcut for invoking {@link String#indexOf(int)} and checking if the return value
+	 * does not equal {@code -1}.
 	 * 
 	 * @param string
 	 *            the String
@@ -87,51 +90,45 @@ public final class StringUtils {
 	 *            the character
 	 * @return <code>true</code> if the String contains the given character
 	 */
-	public static boolean contains(String string, int character) {
-		return string != null && string.indexOf(character) != -1;
+	public static boolean contains(@Nullable String string, int character) {
+		return (string != null) && string.indexOf(character) != -1;
 	}
 
 	/**
 	 * Normalizes the given identifier.
 	 * <p>
-	 * This trims leading and trailing whitespace and converts all remaining whitespace and underscores to dashes
-	 * ('{@code -}').
-	 * <p>
-	 * This returns {@code null} for a {@code null} input identifier.
+	 * This trims leading and trailing whitespace and converts all remaining whitespace and
+	 * underscores to dashes ('{@code -}').
 	 * 
 	 * @param identifier
-	 *            the identifier
+	 *            the identifier, not <code>null</code>
 	 * @return the normalized identifier
 	 */
 	public static String normalizeKeepCase(String identifier) {
-		if (identifier == null) return null;
-		identifier = identifier.trim();
-		identifier = identifier.replace('_', '-');
-		identifier = replaceWhitespace(identifier, "-");
-		return identifier;
+		Validate.notNull(identifier, "identifier is null");
+		@NonNull String normalized = identifier.trim();
+		normalized = normalized.replace('_', '-');
+		normalized = replaceWhitespace(normalized, "-");
+		return normalized;
 	}
 
 	/**
 	 * Normalizes the given identifier.
 	 * <p>
-	 * This trims leading and trailing whitespace, converts all remaining whitespace and underscores to dashes
-	 * ('{@code -}') and converts all characters to lower case.
-	 * <p>
-	 * This returns {@code null} for a {@code null} input identifier.
+	 * This trims leading and trailing whitespace, converts all remaining whitespace and underscores
+	 * to dashes ('{@code -}') and converts all characters to lower case.
 	 * 
 	 * @param identifier
-	 *            the identifier
+	 *            the identifier, not <code>null</code>
 	 * @return the normalized identifier
 	 */
 	public static String normalize(String identifier) {
-		if (identifier == null) return null;
-		identifier = normalizeKeepCase(identifier);
-		return identifier.toLowerCase(Locale.ROOT);
+		String normalized = normalizeKeepCase(identifier);
+		return normalized.toLowerCase(Locale.ROOT);
 	}
 
-	public static List<String> normalize(List<String> identifiers) {
-		if (identifiers == null) return null;
-		List<String> normalized = new ArrayList<>(identifiers.size());
+	public static List<@NonNull String> normalize(List<? extends @NonNull String> identifiers) {
+		List<@NonNull String> normalized = new ArrayList<>(identifiers.size());
 		for (String identifier : identifiers) {
 			normalized.add(normalize(identifier));
 		}
@@ -139,16 +136,19 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Checks if the given strings contains whitespace characters.
+	 * Checks if the given String contains whitespace characters.
 	 * 
 	 * @param string
-	 *            the string
-	 * @return <code>true</code> if the given string is not empty and contains at least one whitespace character
+	 *            the String
+	 * @return <code>true</code> if the given String is not empty and contains at least one
+	 *         whitespace character
 	 */
-	public static boolean containsWhitespace(String string) {
+	public static boolean containsWhitespace(@Nullable String string) {
 		if (isEmpty(string)) {
 			return false;
 		}
+		assert string != null;
+		Unsafe.assertNonNull(string);
 
 		int length = string.length();
 		for (int i = 0; i < length; i++) {
@@ -160,37 +160,39 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Removes all whitespace characters from the given string.
+	 * Removes all whitespace characters inside the given source String.
 	 * 
 	 * @param source
-	 *            the source string
-	 * @return the source string itself if it is empty, otherwise the string without any whitespace characters
+	 *            the source String, not <code>null</code>
+	 * @return the String without any whitespace characters
 	 */
 	public static String removeWhitespace(String source) {
 		return replaceWhitespace(source, "");
 	}
 
 	/**
-	 * Replaces all whitespace characters from the given string.
+	 * Replaces all whitespace characters inside the given source String.
 	 * 
 	 * @param source
-	 *            the source string
+	 *            the source String, not <code>null</code>
 	 * @param replacement
-	 *            the replacement string
-	 * @return the source string itself if it is empty, otherwise the string with any whitespace characters replaced
+	 *            the replacement String, not <code>null</code>
+	 * @return the String with any whitespace characters replaced
 	 */
 	public static String replaceWhitespace(String source, String replacement) {
-		if (isEmpty(source)) {
+		Validate.notNull(source, "source is null");
+		if (source.isEmpty()) {
 			return source;
 		}
-		if (replacement == null) {
-			replacement = "";
-		}
-		return WHITESPACE_PATTERN.matcher(source).replaceAll(replacement);
+		Validate.notNull(replacement, "replacement is null");
+		String replaced = WHITESPACE_PATTERN.matcher(source).replaceAll(replacement);
+		assert replaced != null;
+		return replaced;
 	}
 
 	public static String capitalizeAll(String source) {
-		if (source == null || source.isEmpty()) {
+		Validate.notNull(source, "source is null");
+		if (source.isEmpty()) {
 			return source;
 		}
 		int sourceLength = source.length();
@@ -218,12 +220,12 @@ public final class StringUtils {
 	private static final Pattern ALL_TRAILING_NEWLINES_PATTERN = Pattern.compile("\\R+$");
 
 	// Includes empty and trailing empty lines:
-	public static String[] splitLines(String source) {
+	public static @NonNull String[] splitLines(String source) {
 		return splitLines(source, false);
 	}
 
 	// Includes empty and trailing empty lines:
-	public static String[] splitLines(String source, boolean splitLiteralNewlines) {
+	public static @NonNull String[] splitLines(String source, boolean splitLiteralNewlines) {
 		if (splitLiteralNewlines) {
 			return NEWLINE_OR_LITERAL_PATTERN.split(source, -1);
 		} else {
@@ -233,10 +235,12 @@ public final class StringUtils {
 
 	public static String stripTrailingNewlines(String string) {
 		Validate.notNull(string, "string is null");
-		return ALL_TRAILING_NEWLINES_PATTERN.matcher(string).replaceFirst("");
+		String stripped = ALL_TRAILING_NEWLINES_PATTERN.matcher(string).replaceFirst("");
+		assert stripped != null;
+		return stripped;
 	}
 
-	public static boolean containsNewline(String string) {
+	public static boolean containsNewline(@Nullable String string) {
 		if (string == null) return false;
 		int length = string.length();
 		for (int i = 0; i < length; i++) {
@@ -258,7 +262,7 @@ public final class StringUtils {
 	}
 
 	public static String escapeNewlinesAndBackslash(String string) {
-		if (string == null) return null;
+		Validate.notNull(string, "string is null");
 		int length = string.length();
 		StringBuilder sb = new StringBuilder(length * 2);
 		for (int i = 0; i < length; i++) {
@@ -299,8 +303,8 @@ public final class StringUtils {
 
 	// Throws NPE if source, target, or replacement are null.
 	// Returns the source String (same instance) if there is no match.
-	// Performance is okay for replacing a single argument, but for multiple arguments prefer using replaceArguments
-	// rather than invoking this multiple times.
+	// Performance is okay for replacing a single argument, but for multiple arguments prefer using
+	// replaceArguments rather than invoking this multiple times.
 	public static String replaceFirst(String source, String target, CharSequence replacement) {
 		int index = source.indexOf(target);
 		if (index == -1) return source; // No match
@@ -316,17 +320,22 @@ public final class StringUtils {
 		return result.toString();
 	}
 
-	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer(); // Singleton for reuse
-	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+	// Singleton for reuse:
+	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer();
+	private static final Map<@NonNull String, @NonNull Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
 	private static final MessageArguments TEMP_ARGUMENTS = MessageArguments.ofMap(TEMP_ARGUMENTS_MAP);
 
 	// Arguments format: [key1, value1, key2, value2, ...]
 	// The keys are expected to be of type String.
 	// The replaced keys use the format {key} (braces are not specified in the argument keys).
-	public static <T> void addArgumentsToMap(Map<String, Object> argumentsMap, Object... argumentPairs) {
+	public static <T> void addArgumentsToMap(
+			Map<@NonNull String, @NonNull Object> argumentsMap,
+			@NonNull Object... argumentPairs
+	) {
 		Validate.notNull(argumentsMap, "argumentsMap is null");
 		Validate.notNull(argumentPairs, "argumentPairs is null");
-		Validate.isTrue(argumentPairs.length % 2 == 0, "Length of argumentPairs is not a multiple of 2");
+		Validate.isTrue(argumentPairs.length % 2 == 0,
+				"Length of argumentPairs is not a multiple of 2");
 		int argumentsKeyLimit = argumentPairs.length - 1;
 		for (int i = 0; i < argumentsKeyLimit; i += 2) {
 			String key = (String) argumentPairs[i];
@@ -335,7 +344,7 @@ public final class StringUtils {
 		}
 	}
 
-	public static String replaceArguments(String source, Object... argumentPairs) {
+	public static String replaceArguments(String source, @NonNull Object... argumentPairs) {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
 			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
@@ -348,7 +357,10 @@ public final class StringUtils {
 	// The replaced keys use the format {key} (braces are not specified in the argument keys).
 	// Uses the String representation of the given arguments.
 	// If an argument is a Supplier, it gets invoked to obtain the actual argument.
-	public static String replaceArguments(String source, Map<String, ?> arguments) {
+	public static String replaceArguments(
+			String source,
+			Map<? extends @NonNull String, @NonNull ?> arguments
+	) {
 		return replaceArguments(source, MessageArguments.ofMap(arguments));
 	}
 
@@ -356,7 +368,10 @@ public final class StringUtils {
 		return ARGUMENTS_REPLACER.replaceArguments(source, arguments); // Checks arguments
 	}
 
-	public static List<String> replaceArguments(Collection<String> messages, Object... argumentPairs) {
+	public static List<@NonNull String> replaceArguments(
+			Collection<? extends @NonNull String> messages,
+			@NonNull Object... argumentPairs
+	) {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
 			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
@@ -367,9 +382,12 @@ public final class StringUtils {
 	}
 
 	// Creates and returns a new List:
-	public static List<String> replaceArguments(Collection<String> sources, Map<String, ?> arguments) {
+	public static List<@NonNull String> replaceArguments(
+			Collection<@NonNull String> sources,
+			Map<? extends @NonNull String, @NonNull ?> arguments
+	) {
 		Validate.notNull(sources, "sources is null");
-		List<String> replaced = new ArrayList<>(sources.size());
+		List<@NonNull String> replaced = new ArrayList<>(sources.size());
 		for (String source : sources) {
 			replaced.add(replaceArguments(source, arguments)); // Checks arguments
 		}
@@ -389,35 +407,45 @@ public final class StringUtils {
 		public static final char DEFAULT_KEY_PREFIX_CHAR = '{';
 		public static final char DEFAULT_KEY_SUFFIX_CHAR = '}';
 
-		private String source;
+		private @Nullable String source;
 		private int sourceLength;
 		private char keyPrefixChar;
 		private char keySuffixChar;
-		private MessageArguments arguments;
+		private @Nullable MessageArguments arguments;
 
 		// Current search state:
-		private int searchPos = 0; // Index of where to start the search for the next key in the source String
+		// Index of where to start the search for the next key in the source String:
+		private int searchPos = 0;
 		private int keyPrefixIndex = -1; // Index of last found key prefix char
 		private int keySuffixIndex = -1; // Index of last found key suffix char
 		private int keyStartIndex = -1; // Inclusive: points to first key char (after prefix char)
 		private int keyEndIndex = -1; // Exclusive (= keySuffixIndex)
-		protected String key = null; // The current key
-		protected Object argument = null; // The current argument
+		protected @Nullable String key = null; // The current key
+		protected @Nullable Object argument = null; // The current argument
 
 		// Current result state:
-		protected StringBuilder resultBuilder = null;
+		protected @Nullable StringBuilder resultBuilder = null;
 		// Start index of remaining source text that still needs to be included in the result:
 		private int resultSourcePos = 0;
-		private String result = null;
+		private @Nullable String result = null;
 
 		public ArgumentsReplacer() {
 		}
 
 		public String replaceArguments(String source, MessageArguments arguments) {
-			return this.replaceArguments(source, DEFAULT_KEY_PREFIX_CHAR, DEFAULT_KEY_SUFFIX_CHAR, arguments);
+			return this.replaceArguments(
+					source,
+					DEFAULT_KEY_PREFIX_CHAR, DEFAULT_KEY_SUFFIX_CHAR,
+					arguments
+			);
 		}
 
-		public String replaceArguments(String source, char keyPrefixChar, char keySuffixChar, MessageArguments arguments) {
+		public String replaceArguments(
+				String source,
+				char keyPrefixChar,
+				char keySuffixChar,
+				MessageArguments arguments
+		) {
 			// Setup:
 			this.setup(source, keyPrefixChar, keySuffixChar, arguments); // Validates input
 
@@ -425,16 +453,22 @@ public final class StringUtils {
 			this.replaceArguments();
 
 			// Capture result:
-			String result = this.result;
+			String result = Unsafe.assertNonNull(this.result);
 
-			// Clean up (avoids accidental memory leaks in case this ArgumentReplacer is kept around for later reuse):
+			// Clean up (avoids accidental memory leaks in case this ArgumentReplacer is kept around
+			// for later reuse):
 			this.cleanUp();
 
 			// Return result:
 			return result;
 		}
 
-		protected void setup(String source, char keyPrefixChar, char keySuffixChar, MessageArguments arguments) {
+		protected void setup(
+				String source,
+				char keyPrefixChar,
+				char keySuffixChar,
+				MessageArguments arguments
+		) {
 			Validate.notNull(source, "source is null");
 			Validate.notNull(arguments, "arguments is null");
 
@@ -456,9 +490,11 @@ public final class StringUtils {
 			// Current result state:
 			result = null;
 			if (resultBuilder != null) {
-				resultBuilder.setLength(0); // We reuse the previous StringBuilder (note: keeps the current capacity)
+				// We reuse the previous StringBuilder (Note: keeps the current capacity):
+				resultBuilder.setLength(0);
 			}
-			resultSourcePos = 0; // Start index of remaining source text that still needs to be included in the result
+			// Start index of remaining source text that still needs to be included in the result:
+			resultSourcePos = 0;
 
 			// Initial:
 			if (sourceLength <= 2) {
@@ -475,7 +511,8 @@ public final class StringUtils {
 			argument = null;
 			result = null;
 			if (resultBuilder != null) {
-				resultBuilder.setLength(0); // We reuse the previous StringBuilder (Note: Keeps the current capacity)
+				// We reuse the previous StringBuilder (Note: Keeps the current capacity):
+				resultBuilder.setLength(0);
 			}
 		}
 
@@ -483,20 +520,24 @@ public final class StringUtils {
 			assert result == null; // We don't have a result yet
 			while (this.findNextKey()) {
 				// Find replacement argument for the current key:
+				String key = Unsafe.assertNonNull(this.key);
 				argument = this.resolveArgument(key);
 
 				// Append replacement:
 				if (argument != null) {
 					this.appendPrefix();
 					this.appendArgument();
-				} // Else: No argument found for the current key. -> Continue the search for the next key.
+				}
+				// Else: No argument found for the current key. -> Continue the search for the next
+				// key.
 			}
 
 			// Append remaining suffix (if any):
 			if (resultSourcePos <= 0) {
-				// There has been no argument replacement, otherwise we would have included a prefix to the result
-				// already. -> The 'suffix' matches the complete source String.
-				// We skip copying the suffix to the result builder and instead use the source directly as result.
+				// There has been no argument replacement, otherwise we would have included a prefix
+				// to the result already. -> The 'suffix' matches the complete source String.
+				// We skip copying the suffix to the result builder and instead use the source
+				// directly as result.
 				result = source;
 				resultSourcePos = sourceLength; // Update resultSourcePos
 				return;
@@ -512,7 +553,12 @@ public final class StringUtils {
 
 		// Returns true if a next key has been found.
 		private boolean findNextKey() {
-			if (searchPos >= sourceLength) return false; // We already searched through the whole source String
+			if (searchPos >= sourceLength) {
+				// We already searched through the whole source String.
+				return false;
+			}
+
+			String source = Unsafe.assertNonNull(this.source);
 
 			// Search key prefix character:
 			keyPrefixIndex = source.indexOf(keyPrefixChar, searchPos);
@@ -521,7 +567,7 @@ public final class StringUtils {
 			}
 			keyStartIndex = keyPrefixIndex + 1;
 
-			// search key suffix character:
+			// Search key suffix character:
 			keySuffixIndex = source.indexOf(keySuffixChar, keyStartIndex);
 			if (keySuffixIndex < 0) {
 				return false; // No suffix char found. -> No more keys.
@@ -535,8 +581,8 @@ public final class StringUtils {
 		}
 
 		// The argument to replace the current key:
-		protected Object resolveArgument(String key) {
-			Object argument = arguments.get(key);
+		protected @Nullable Object resolveArgument(String key) {
+			Object argument = Unsafe.assertNonNull(arguments).get(key);
 			if (argument instanceof Supplier) {
 				return ((Supplier<?>) argument).get(); // Can be null
 			} else {
@@ -550,6 +596,7 @@ public final class StringUtils {
 				// Heuristic: Expecting at most 25% increase in size.
 				resultBuilder = new StringBuilder(sourceLength + sourceLength / 4);
 			}
+			assert resultBuilder != null;
 
 			// Append prefix (not yet included chars in front of key):
 			resultBuilder.append(source, resultSourcePos, keyPrefixIndex);
@@ -557,22 +604,21 @@ public final class StringUtils {
 		}
 
 		protected void appendArgument() {
-			assert resultBuilder != null; // We have already appended the prefix
-			assert argument != null;
 			// Append argument:
-			String argumentString = argument.toString();
-			resultBuilder.append(argumentString);
+			String argumentString = Unsafe.assertNonNull(argument).toString();
+			// Not null: We have already appended the prefix.
+			Unsafe.assertNonNull(resultBuilder).append(argumentString);
 		}
 
 		protected void appendSuffix() {
 			assert resultSourcePos > 0 && resultSourcePos < sourceLength && resultBuilder != null;
-			resultBuilder.append(source, resultSourcePos, sourceLength); // Append suffix
+			// Append suffix:
+			Unsafe.assertNonNull(resultBuilder).append(source, resultSourcePos, sourceLength);
 			resultSourcePos = sourceLength; // Update resultSourcePos
 		}
 
 		protected void prepareResult() {
-			assert resultBuilder != null;
-			result = resultBuilder.toString();
+			result = Unsafe.assertNonNull(resultBuilder).toString();
 		}
 	}
 

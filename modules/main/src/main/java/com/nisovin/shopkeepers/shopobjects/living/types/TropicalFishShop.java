@@ -7,7 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -27,33 +30,37 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
+public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> {
 
-	public static final Property<TropicalFish.Pattern> PATTERN = new BasicProperty<TropicalFish.Pattern>()
+	public static final Property<TropicalFish.@NonNull Pattern> PATTERN = new BasicProperty<TropicalFish.@NonNull Pattern>()
 			.dataKeyAccessor("pattern", EnumSerializers.lenient(TropicalFish.Pattern.class))
 			.defaultValue(TropicalFish.Pattern.KOB)
 			.build();
-	public static final Property<DyeColor> BODY_COLOR = new BasicProperty<DyeColor>()
+	public static final Property<@NonNull DyeColor> BODY_COLOR = new BasicProperty<@NonNull DyeColor>()
 			.dataKeyAccessor("bodyColor", EnumSerializers.lenient(DyeColor.class))
 			.defaultValue(DyeColor.WHITE)
 			.build();
-	public static final Property<DyeColor> PATTERN_COLOR = new BasicProperty<DyeColor>()
+	public static final Property<@NonNull DyeColor> PATTERN_COLOR = new BasicProperty<@NonNull DyeColor>()
 			.dataKeyAccessor("patternColor", EnumSerializers.lenient(DyeColor.class))
 			.defaultValue(DyeColor.WHITE)
 			.build();
 
-	private final PropertyValue<TropicalFish.Pattern> patternProperty = new PropertyValue<>(PATTERN)
-			.onValueChanged(this::applyPattern)
+	private final PropertyValue<TropicalFish.@NonNull Pattern> patternProperty = new PropertyValue<>(PATTERN)
+			.onValueChanged(Unsafe.initialized(this)::applyPattern)
 			.build(properties);
-	private final PropertyValue<DyeColor> bodyColorProperty = new PropertyValue<>(BODY_COLOR)
-			.onValueChanged(this::applyBodyColor)
+	private final PropertyValue<@NonNull DyeColor> bodyColorProperty = new PropertyValue<>(BODY_COLOR)
+			.onValueChanged(Unsafe.initialized(this)::applyBodyColor)
 			.build(properties);
-	private final PropertyValue<DyeColor> patternColorProperty = new PropertyValue<>(PATTERN_COLOR)
-			.onValueChanged(this::applyPatternColor)
+	private final PropertyValue<@NonNull DyeColor> patternColorProperty = new PropertyValue<>(PATTERN_COLOR)
+			.onValueChanged(Unsafe.initialized(this)::applyPatternColor)
 			.build(properties);
 
-	public TropicalFishShop(LivingShops livingShops, SKLivingShopObjectType<TropicalFishShop> livingObjectType,
-							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public TropicalFishShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull TropicalFishShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -82,8 +89,8 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPatternEditorButton());
 		editorButtons.add(this.getBodyColorEditorButton());
 		editorButtons.add(this.getPatternColorEditorButton());
@@ -101,7 +108,13 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 	}
 
 	public void cyclePattern(boolean backwards) {
-		this.setPattern(EnumUtils.cycleEnumConstant(TropicalFish.Pattern.class, this.getPattern(), backwards));
+		this.setPattern(
+				EnumUtils.cycleEnumConstant(
+						TropicalFish.Pattern.class,
+						this.getPattern(),
+						backwards
+				)
+		);
 	}
 
 	private void applyPattern() {
@@ -114,8 +127,14 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 		ItemStack iconItem = new ItemStack(Material.TROPICAL_FISH);
 		// TODO Provide translations for the pattern name?
 		String patternName = EnumUtils.formatEnumName(this.getPattern().name());
-		String displayName = StringUtils.replaceArguments(Messages.buttonTropicalFishPattern, "pattern", patternName);
-		List<String> lore = StringUtils.replaceArguments(Messages.buttonTropicalFishPatternLore, "pattern", patternName);
+		String displayName = StringUtils.replaceArguments(
+				Messages.buttonTropicalFishPattern,
+				"pattern", patternName
+		);
+		List<@NonNull String> lore = StringUtils.replaceArguments(
+				Messages.buttonTropicalFishPatternLore,
+				"pattern", patternName
+		);
 		ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
@@ -123,12 +142,15 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 	private Button getPatternEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getPatternEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cyclePattern(backwards);
 				return true;
@@ -147,7 +169,9 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 	}
 
 	public void cycleBodyColor(boolean backwards) {
-		this.setBodyColor(EnumUtils.cycleEnumConstant(DyeColor.class, this.getBodyColor(), backwards));
+		this.setBodyColor(
+				EnumUtils.cycleEnumConstant(DyeColor.class, this.getBodyColor(), backwards)
+		);
 	}
 
 	private void applyBodyColor() {
@@ -158,19 +182,25 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 
 	private ItemStack getBodyColorEditorItem() {
 		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(this.getBodyColor()));
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonTropicalFishBodyColor, Messages.buttonTropicalFishBodyColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonTropicalFishBodyColor,
+				Messages.buttonTropicalFishBodyColorLore
+		);
 		return iconItem;
 	}
 
 	private Button getBodyColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getBodyColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleBodyColor(backwards);
 				return true;
@@ -189,7 +219,9 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 	}
 
 	public void cyclePatternColor(boolean backwards) {
-		this.setPatternColor(EnumUtils.cycleEnumConstant(DyeColor.class, this.getPatternColor(), backwards));
+		this.setPatternColor(
+				EnumUtils.cycleEnumConstant(DyeColor.class, this.getPatternColor(), backwards)
+		);
 	}
 
 	private void applyPatternColor() {
@@ -200,19 +232,25 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 
 	private ItemStack getPatternColorEditorItem() {
 		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(this.getPatternColor()));
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonTropicalFishPatternColor, Messages.buttonTropicalFishPatternColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonTropicalFishPatternColor,
+				Messages.buttonTropicalFishPatternColorLore
+		);
 		return iconItem;
 	}
 
 	private Button getPatternColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getPatternColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cyclePatternColor(backwards);
 				return true;

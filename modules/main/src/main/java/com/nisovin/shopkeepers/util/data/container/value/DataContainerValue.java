@@ -1,10 +1,13 @@
 package com.nisovin.shopkeepers.util.data.container.value;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link DataValue} that provides a view on the value of a {@link DataContainer} for a particular key.
+ * A {@link DataValue} that provides a view on the value of a {@link DataContainer} for a particular
+ * key.
  * <p>
  * The {@link DataValue} reads and writes through to the underlying entry of the data container.
  */
@@ -29,7 +32,7 @@ public class DataContainerValue extends AbstractDataValue {
 	}
 
 	@Override
-	public Object getOrDefault(Object defaultValue) {
+	public @Nullable Object getOrDefault(@Nullable Object defaultValue) {
 		return dataContainer.getOrDefault(dataKey, defaultValue);
 	}
 

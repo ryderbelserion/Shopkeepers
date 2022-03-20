@@ -16,7 +16,9 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -38,7 +40,7 @@ class ContainerProtectionListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		Block block = event.getClickedBlock();
+		Block block = Unsafe.assertNonNull(event.getClickedBlock());
 		Player player = event.getPlayer();
 		if (protectedContainers.isProtectedContainer(block, player)) {
 			// TODO Always allow access to own shop containers, even if cancelled by other plugins?
@@ -53,8 +55,8 @@ class ContainerProtectionListener implements Listener {
 		Block block = event.getBlock();
 		Player player = event.getPlayer();
 		if (protectedContainers.isProtectedContainer(block, player)) {
-			Log.debug(() -> "Cancelled breaking of container block by '" + player.getName() + "' at '"
-					+ TextUtils.getLocationString(block) + "': Protected container.");
+			Log.debug(() -> "Cancelled breaking of container block by '" + player.getName()
+					+ "' at '" + TextUtils.getLocationString(block) + "': Protected container.");
 			event.setCancelled(true);
 		}
 	}
@@ -68,25 +70,30 @@ class ContainerProtectionListener implements Listener {
 		if (ItemUtils.isChest(type)) {
 			// Note: Unconnected chests can be placed.
 			if (protectedContainers.isProtectedContainer(block, player)) {
-				Log.debug(() -> "Cancelled placing of (double) chest block by '" + player.getName() + "' at '"
-						+ TextUtils.getLocationString(block) + "': Protected chest nearby.");
+				Log.debug(() -> "Cancelled placing of (double) chest block by '" + player.getName()
+						+ "' at '" + TextUtils.getLocationString(block)
+						+ "': Protected chest nearby.");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.HOPPER) {
-			// Prevent placement of hoppers that could be used to extract or inject items from/into a protected
+			// Prevent placement of hoppers that could be used to extract or inject items from/into
+			// a protected
 			// container:
 			Block upperBlock = block.getRelative(BlockFace.UP);
 			if (protectedContainers.isProtectedContainer(upperBlock, player)
 					|| protectedContainers.isProtectedContainer(this.getFacedBlock(block), player)) {
-				Log.debug(() -> "Cancelled placing of hopper block by '" + player.getName() + "' at '"
-						+ TextUtils.getLocationString(block) + "': Protected container nearby.");
+				Log.debug(() -> "Cancelled placing of hopper block by '" + player.getName()
+						+ "' at '" + TextUtils.getLocationString(block)
+						+ "': Protected container nearby.");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.DROPPER) {
-			// Prevent placement of droppers that could be used to inject items into a protected container:
+			// Prevent placement of droppers that could be used to inject items into a protected
+			// container:
 			if (protectedContainers.isProtectedContainer(this.getFacedBlock(block), player)) {
-				Log.debug(() -> "Cancelled placing of dropper block by '" + player.getName() + "' at '"
-						+ TextUtils.getLocationString(block) + "': Protected container nearby.");
+				Log.debug(() -> "Cancelled placing of dropper block by '" + player.getName()
+						+ "' at '" + TextUtils.getLocationString(block)
+						+ "': Protected container nearby.");
 				event.setCancelled(true);
 			}
 		} else if (ItemUtils.isRail(type)) {
@@ -107,16 +114,18 @@ class ContainerProtectionListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		this.removeProtectedChests(event.blockList());
+		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		this.removeProtectedChests(blockList);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		this.removeProtectedChests(event.blockList());
+		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		this.removeProtectedChests(blockList);
 	}
 
 	// Block list has to be modifiable.
-	private void removeProtectedChests(List<Block> blockList) {
+	private void removeProtectedChests(List<? extends @NonNull Block> blockList) {
 		blockList.removeIf(protectedContainers::isProtectedContainer);
 	}
 }

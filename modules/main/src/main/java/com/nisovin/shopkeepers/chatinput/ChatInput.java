@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -19,18 +21,19 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Manages requests for chat input from players.
  * <p>
- * Ideally, the plugin should only use a single instance of this class because in the presence of multiple instances it
- * would no longer be clear which request the player's next chat input is meant for. However, even then the same kind of
- * conflict can also occur between different plugins that request chat inputs if they do not coordinate. This class does
- * not provide a solution for that.
+ * Ideally, the plugin should only use a single instance of this class because in the presence of
+ * multiple instances it would no longer be clear which request the player's next chat input is
+ * meant for. However, even then the same kind of conflict can also occur between different plugins
+ * that request chat inputs if they do not coordinate. This class does not provide a solution for
+ * that.
  */
 public class ChatInput implements Listener {
 
 	/**
 	 * Callback for requested chat input.
 	 */
-	// Note: If a requester requires a reference to the player or other context, it has to keep track of that itself
-	// within the Request implementation.
+	// Note: If a requester requires a reference to the player or other context, it has to keep
+	// track of that itself within the Request implementation.
 	@FunctionalInterface
 	public interface Request {
 
@@ -47,7 +50,7 @@ public class ChatInput implements Listener {
 
 	private final Plugin plugin;
 	// ConcurrentHashMap: Chat events can occur asynchronously.
-	private final Map<UUID, Request> pendingRequests = new ConcurrentHashMap<>();
+	private final Map<@NonNull UUID, @NonNull Request> pendingRequests = new ConcurrentHashMap<>();
 
 	public ChatInput(Plugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -57,8 +60,9 @@ public class ChatInput implements Listener {
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		// Ensure that our chat event handler is always executed first:
-		// Otherwise, we might run into conflicts with other chat plugins that also use the lowest event priority and
-		// that might modify the chat message before we were able to process it (for example by injecting color codes).
+		// Otherwise, we might run into conflicts with other chat plugins that also use the lowest
+		// event priority and that might modify the chat message before we were able to process it
+		// (for example by injecting color codes).
 		EventUtils.enforceExecuteFirst(AsyncPlayerChatEvent.class, EventPriority.LOWEST, this);
 	}
 
@@ -69,7 +73,8 @@ public class ChatInput implements Listener {
 	/**
 	 * Request a chat input from the given player.
 	 * <p>
-	 * The next received chat message sent by the player will be passed to the given {@link Request}.
+	 * The next received chat message sent by the player will be passed to the given
+	 * {@link Request}.
 	 * <p>
 	 * Any already pending chat input request is replaced by this request.
 	 * 
@@ -91,7 +96,7 @@ public class ChatInput implements Listener {
 	 *            the player
 	 * @return the request, or <code>null</code> if there is no request
 	 */
-	public Request getRequest(Player player) {
+	public @Nullable Request getRequest(Player player) {
 		Validate.notNull(player, "player is null");
 		return pendingRequests.get(player.getUniqueId());
 	}
@@ -112,8 +117,9 @@ public class ChatInput implements Listener {
 	 * <p>
 	 * This has no effect if there is no pending request.
 	 * <p>
-	 * If you want to abort a specific type of request, make sure that the {@link #getRequest(Player) current request}
-	 * is still of that type before you abort it with this method.
+	 * If you want to abort a specific type of request, make sure that the
+	 * {@link #getRequest(Player) current request} is still of that type before you abort it with
+	 * this method.
 	 * 
 	 * @param player
 	 *            the player, not <code>null</code>
@@ -130,14 +136,16 @@ public class ChatInput implements Listener {
 	 *            the player
 	 * @return the request, or <code>null</code> if there has been no request
 	 */
-	private Request getAndRemoveRequest(Player player) {
+	private @Nullable Request getAndRemoveRequest(Player player) {
 		assert player != null;
 		return pendingRequests.remove(player.getUniqueId());
 	}
 
-	// Not ignoring cancelled chat: We process the chat event in all cases (even if the player has been muted, etc.).
-	// Priority LOWEST: We intend to cancel the event as early as possible, so that other plugins can ignore it. We also
-	// want to retrieve the chat message without other plugins modifying it first.
+	// Not ignoring cancelled chat: We process the chat event in all cases (even if the player has
+	// been muted, etc.).
+	// Priority LOWEST: We intend to cancel the event as early as possible, so that other plugins
+	// can ignore it. We also want to retrieve the chat message without other plugins modifying it
+	// first.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onChat(AsyncPlayerChatEvent event) {
 		// Check if there is a request for chat input from the player:

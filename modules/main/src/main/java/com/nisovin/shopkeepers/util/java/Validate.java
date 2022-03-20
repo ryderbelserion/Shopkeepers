@@ -3,51 +3,81 @@ package com.nisovin.shopkeepers.util.java;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+
 public final class Validate {
 
 	// ARGUMENTS
 
 	public static void error(String errorMessage) {
-		throw new IllegalArgumentException(errorMessage);
+		throw illegalArgumentException(errorMessage);
+	}
+
+	public static void error(Supplier<String> errorMessageSupplier) {
+		throw illegalArgumentException(errorMessageSupplier);
+	}
+
+	private static IllegalArgumentException illegalArgumentException(String errorMessage) {
+		return new IllegalArgumentException(errorMessage);
 	}
 
 	// Note: Throws a NPE if the supplier is null, similar to how Logger throws a NPE.
-	public static void error(Supplier<String> errorMessageSupplier) {
-		throw new IllegalArgumentException(errorMessageSupplier.get());
+	private static IllegalArgumentException illegalArgumentException(
+			Supplier<String> errorMessageSupplier
+	) {
+		return new IllegalArgumentException(errorMessageSupplier.get());
 	}
 
-	public static <T> T notNull(T object) {
+	@EnsuresNonNull("#1")
+	public static <T> @NonNull T notNull(@UnknownInitialization @Nullable T object) {
 		return notNull(object, "object is null");
 	}
 
-	public static <T> T notNull(T object, String errorMessage) {
+	@EnsuresNonNull("#1")
+	public static <T> @NonNull T notNull(
+			@UnknownInitialization @Nullable T object,
+			String errorMessage
+	) {
 		if (object == null) {
-			error(errorMessage);
+			throw illegalArgumentException(errorMessage);
+		} else {
+			return Unsafe.initialized(object);
 		}
-		return object;
 	}
 
-	public static <T> T notNull(T object, Supplier<String> errorMessageSupplier) {
+	@EnsuresNonNull("#1")
+	public static <T> @NonNull T notNull(
+			@UnknownInitialization @Nullable T object,
+			Supplier<String> errorMessageSupplier
+	) {
 		if (object == null) {
-			error(errorMessageSupplier);
+			throw illegalArgumentException(errorMessageSupplier);
 		}
-		return object;
+		return Unsafe.initialized(object);
 	}
 
-	public static String notEmpty(String string) {
+	@EnsuresNonNull("#1")
+	public static String notEmpty(@Nullable String string) {
 		return notEmpty(string, "string is null or empty");
 	}
 
-	public static String notEmpty(String string, String errorMessage) {
+	@EnsuresNonNull("#1")
+	public static String notEmpty(@Nullable String string, String errorMessage) {
 		if (string == null || string.isEmpty()) {
-			error(errorMessage);
+			throw illegalArgumentException(errorMessage);
 		}
 		return string;
 	}
 
-	public static String notEmpty(String string, Supplier<String> errorMessageSupplier) {
+	@EnsuresNonNull("#1")
+	public static String notEmpty(@Nullable String string, Supplier<String> errorMessageSupplier) {
 		if (string == null || string.isEmpty()) {
-			error(errorMessageSupplier);
+			throw illegalArgumentException(errorMessageSupplier);
 		}
 		return string;
 	}
@@ -58,7 +88,7 @@ public final class Validate {
 
 	public static boolean isTrue(boolean expression, String errorMessage) {
 		if (!expression) {
-			error(errorMessage);
+			throw illegalArgumentException(errorMessage);
 		}
 		return expression;
 	}
@@ -70,18 +100,22 @@ public final class Validate {
 		return expression;
 	}
 
-	public static <T> T isTrue(T value, Predicate<T> predicate) {
+	public static <@Nullable T> T isTrue(T value, Predicate<T> predicate) {
 		return isTrue(value, predicate, "predicate evaluates to false");
 	}
 
-	public static <T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
+	public static <@Nullable T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
 		if (!predicate.test(value)) {
 			error(errorMessage);
 		}
 		return value;
 	}
 
-	public static <T> T isTrue(T value, Predicate<T> predicate, Supplier<String> errorMessageSupplier) {
+	public static <@Nullable T> T isTrue(
+			T value,
+			Predicate<T> predicate,
+			Supplier<String> errorMessageSupplier
+	) {
 		if (!predicate.test(value)) {
 			error(errorMessageSupplier);
 		}
@@ -160,20 +194,26 @@ public final class Validate {
 		return value;
 	}
 
-	public static <T extends Iterable<?>> T noNullElements(T iterable, String errorMessage) {
-		notNull(iterable, errorMessage);
-		for (Object object : iterable) {
+	public static <T extends Iterable<?>> @NonNull T noNullElements(
+			@Nullable T iterable,
+			String errorMessage
+	) {
+		@NonNull T nonNullIterable = notNull(iterable, errorMessage);
+		for (Object object : nonNullIterable) {
 			notNull(object, errorMessage);
 		}
-		return iterable;
+		return nonNullIterable;
 	}
 
-	public static <T extends Iterable<?>> T noNullElements(T iterable, Supplier<String> errorMessageSupplier) {
-		notNull(iterable, errorMessageSupplier);
-		for (Object object : iterable) {
+	public static <T extends Iterable<?>> @NonNull T noNullElements(
+			@Nullable T iterable,
+			Supplier<String> errorMessageSupplier
+	) {
+		@NonNull T nonNullIterable = notNull(iterable, errorMessageSupplier);
+		for (Object object : nonNullIterable) {
 			notNull(object, errorMessageSupplier);
 		}
-		return iterable;
+		return nonNullIterable;
 	}
 
 	// STATE
@@ -181,46 +221,71 @@ public final class Validate {
 	public static final class State {
 
 		public static void error(String errorMessage) {
-			throw new IllegalStateException(errorMessage);
+			throw illegalStateException(errorMessage);
+		}
+
+		public static void error(Supplier<String> errorMessageSupplier) {
+			throw illegalStateException(errorMessageSupplier);
+		}
+
+		private static IllegalStateException illegalStateException(String errorMessage) {
+			return new IllegalStateException(errorMessage);
 		}
 
 		// Note: Throws a NPE if the supplier is null, similar to how Logger throws a NPE.
-		public static void error(Supplier<String> errorMessageSupplier) {
-			throw new IllegalStateException(errorMessageSupplier.get());
+		private static IllegalStateException illegalStateException(
+				Supplier<String> errorMessageSupplier
+		) {
+			return new IllegalStateException(errorMessageSupplier.get());
 		}
 
-		public static <T> T notNull(T object) {
+		@EnsuresNonNull("#1")
+		public static <T> @NonNull T notNull(@UnknownInitialization @Nullable T object) {
 			return notNull(object, "object is null");
 		}
 
-		public static <T> T notNull(T object, String errorMessage) {
+		@EnsuresNonNull("#1")
+		public static <T> @NonNull T notNull(
+				@UnknownInitialization @Nullable T object,
+				String errorMessage
+		) {
 			if (object == null) {
-				error(errorMessage);
+				throw illegalStateException(errorMessage);
 			}
-			return object;
+			return Unsafe.initialized(object);
 		}
 
-		public static <T> T notNull(T object, Supplier<String> errorMessageSupplier) {
+		@EnsuresNonNull("#1")
+		public static <T> @NonNull T notNull(
+				@UnknownInitialization @Nullable T object,
+				Supplier<String> errorMessageSupplier
+		) {
 			if (object == null) {
-				error(errorMessageSupplier);
+				throw illegalStateException(errorMessageSupplier);
 			}
-			return object;
+			return Unsafe.initialized(object);
 		}
 
-		public static String notEmpty(String string) {
+		@EnsuresNonNull("#1")
+		public static String notEmpty(@Nullable String string) {
 			return notEmpty(string, "string is null or empty");
 		}
 
-		public static String notEmpty(String string, String errorMessage) {
+		@EnsuresNonNull("#1")
+		public static String notEmpty(@Nullable String string, String errorMessage) {
 			if (string == null || string.isEmpty()) {
-				error(errorMessage);
+				throw illegalStateException(errorMessage);
 			}
 			return string;
 		}
 
-		public static String notEmpty(String string, Supplier<String> errorMessageSupplier) {
+		@EnsuresNonNull("#1")
+		public static String notEmpty(
+				@Nullable String string,
+				Supplier<String> errorMessageSupplier
+		) {
 			if (string == null || string.isEmpty()) {
-				error(errorMessageSupplier);
+				throw illegalStateException(errorMessageSupplier);
 			}
 			return string;
 		}
@@ -243,18 +308,22 @@ public final class Validate {
 			return expression;
 		}
 
-		public static <T> T isTrue(T value, Predicate<T> predicate) {
+		public static <@Nullable T> T isTrue(T value, Predicate<T> predicate) {
 			return isTrue(value, predicate, "predicate evaluates to false");
 		}
 
-		public static <T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
+		public static <@Nullable T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
 			if (!predicate.test(value)) {
 				error(errorMessage);
 			}
 			return value;
 		}
 
-		public static <T> T isTrue(T value, Predicate<T> predicate, Supplier<String> errorMessageSupplier) {
+		public static <@Nullable T> T isTrue(
+				T value,
+				Predicate<T> predicate,
+				Supplier<String> errorMessageSupplier
+		) {
 			if (!predicate.test(value)) {
 				error(errorMessageSupplier);
 			}
@@ -333,20 +402,26 @@ public final class Validate {
 			return value;
 		}
 
-		public static <T extends Iterable<?>> T noNullElements(T iterable, String errorMessage) {
-			notNull(iterable, errorMessage);
-			for (Object object : iterable) {
+		public static <T extends Iterable<?>> @NonNull T noNullElements(
+				@Nullable T iterable,
+				String errorMessage
+		) {
+			@NonNull T nonNullIterable = notNull(iterable, errorMessage);
+			for (Object object : nonNullIterable) {
 				notNull(object, errorMessage);
 			}
-			return iterable;
+			return nonNullIterable;
 		}
 
-		public static <T extends Iterable<?>> T noNullElements(T iterable, Supplier<String> errorMessageSupplier) {
-			notNull(iterable, errorMessageSupplier);
-			for (Object object : iterable) {
+		public static <T extends Iterable<?>> @NonNull T noNullElements(
+				@Nullable T iterable,
+				Supplier<String> errorMessageSupplier
+		) {
+			@NonNull T nonNullIterable = notNull(iterable, errorMessageSupplier);
+			for (Object object : nonNullIterable) {
 				notNull(object, errorMessageSupplier);
 			}
-			return iterable;
+			return nonNullIterable;
 		}
 
 		private State() {

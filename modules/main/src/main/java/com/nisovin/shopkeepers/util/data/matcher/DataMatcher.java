@@ -8,7 +8,10 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.path.DataPath;
@@ -30,30 +33,38 @@ public class DataMatcher {
 	public static class Result {
 
 		/**
-		 * A shared {@link Result} instance that represents the state of no mismatch having been found.
+		 * A shared {@link Result} instance that represents the state of no mismatch having been
+		 * found.
 		 */
 		public static final Result NO_MISMATCH = new Result();
 
 		/**
 		 * Creates a new {@link Result} that represents a mismatch.
+		 * <p>
+		 * The mismatching left and right objects can each be <code>null</code>, but they cannot
+		 * both be <code>null</code>.
 		 * 
 		 * @param path
 		 *            the path to the mismatching elements, not <code>null</code>
 		 * @param leftObject
-		 *            the left mismatching object, not <code>null</code>
+		 *            the left mismatching object, can be <code>null</code>
 		 * @param rightObject
-		 *            the right mismatching object, not <code>null</code>
+		 *            the right mismatching object, can be <code>null</code>
 		 * @return the {@link Result}, not <code>null</code>
 		 */
-		public static Result mismatch(DataPath path, Object leftObject, Object rightObject) {
+		public static Result mismatch(
+				DataPath path,
+				@Nullable Object leftObject,
+				@Nullable Object rightObject
+		) {
 			Validate.notNull(path, "path is null");
 			return new Result(path, leftObject, rightObject);
 		}
 
 		// These fields are all null if no mismatch was found:
-		private DataPath path;
-		private final Object leftObject;
-		private final Object rightObject;
+		private @Nullable DataPath path;
+		private final @Nullable Object leftObject;
+		private final @Nullable Object rightObject;
 
 		/**
 		 * Creates a new {@link Result} that represents the state of no mismatch having been found.
@@ -64,21 +75,31 @@ public class DataMatcher {
 
 		/**
 		 * Creates a new {@link Result}.
+		 * <p>
+		 * The mismatching left and right objects can each be <code>null</code>, but they cannot
+		 * both be <code>null</code> at the same time.
 		 * 
 		 * @param path
-		 *            the path to the mismatching elements, or <code>null</code> if no mismatch was found
+		 *            the path to the mismatching elements, or <code>null</code> if no mismatch was
+		 *            found
 		 * @param leftObject
-		 *            the left mismatching object, or <code>null</code> if no mismatch was found
+		 *            the left mismatching object, can be <code>null</code>, <code>null</code> if no
+		 *            mismatch was found
 		 * @param rightObject
-		 *            the right mismatching object, or <code>null</code> if no mismatch was found
+		 *            the right mismatching object, can be <code>null</code>, <code>null</code> if
+		 *            no mismatch was found
 		 */
-		public Result(DataPath path, Object leftObject, Object rightObject) {
+		public Result(
+				@Nullable DataPath path,
+				@Nullable Object leftObject,
+				@Nullable Object rightObject
+		) {
 			if (path == null) {
 				Validate.isTrue(leftObject == null, "path is null, but leftObject is not null");
 				Validate.isTrue(rightObject == null, "path is null, but rightObject is not null");
 			} else {
-				Validate.notNull(leftObject, "leftObject is null");
-				Validate.notNull(rightObject, "rightObject is null");
+				Validate.isTrue(leftObject != null || rightObject != null,
+						"mismatch but the leftObject and rightObject are both null");
 			}
 
 			this.path = path;
@@ -100,41 +121,45 @@ public class DataMatcher {
 		 * 
 		 * @return the path, or <code>null</code> if no mismatch was found
 		 */
-		public final DataPath getPath() {
+		public final @Nullable DataPath getPath() {
 			return path;
 		}
 
 		/**
-		 * Gets the element on the left side that was found to mismatch a corresponding object on the right side.
+		 * Gets the element on the left side that was found to mismatch a corresponding object on
+		 * the right side.
 		 * 
-		 * @return the left mismatching object, or <code>null</code> if no mismatch was found
+		 * @return the left mismatching object, can be <code>null</code>, <code>null</code> if no
+		 *         mismatch was found
 		 */
-		public final Object getLeftObject() {
+		public final @Nullable Object getLeftObject() {
 			return leftObject;
 		}
 
 		/**
-		 * Gets the element on the right side that was found to mismatch a corresponding object on the left side.
+		 * Gets the element on the right side that was found to mismatch a corresponding object on
+		 * the left side.
 		 * 
-		 * @return the right mismatching object, or <code>null</code> if no mismatch was found
+		 * @return the right mismatching object, can be <code>null</code>, <code>null</code> if no
+		 *         mismatch was found
 		 */
-		public final Object getRightObject() {
+		public final @Nullable Object getRightObject() {
 			return rightObject;
 		}
 	}
 
 	/**
-	 * A {@link DataMatcher} that compares data objects and their recursively contained elements using their respective
-	 * {@link Object#equals(Object)} implementations.
+	 * A {@link DataMatcher} that compares data objects and their recursively contained elements
+	 * using their respective {@link Object#equals(Object)} implementations.
 	 * <p>
-	 * However, unlike {@link Objects#equals(Object, Object)}, this {@link DataMatcher} may consider different types of
-	 * {@link DataContainer} data sources as equal.
+	 * However, unlike {@link Objects#equals(Object, Object)}, this {@link DataMatcher} may consider
+	 * different types of {@link DataContainer} data sources as equal.
 	 */
 	public static final DataMatcher EQUALITY = new DataMatcher();
 
 	/**
-	 * A {@link DataMatcher} that behaves like {@link DataMatcher#EQUALITY}, but compares {@link Number}s
-	 * {@link MathUtils#fuzzyEquals(double, double) fuzzily}.
+	 * A {@link DataMatcher} that behaves like {@link DataMatcher#EQUALITY}, but compares
+	 * {@link Number}s {@link MathUtils#fuzzyEquals(double, double) fuzzily}.
 	 */
 	public static final DataMatcher FUZZY_NUMBERS = new DataMatcher() {
 		@Override
@@ -162,7 +187,7 @@ public class DataMatcher {
 	 *            the right data object, can be <code>null</code>
 	 * @return <code>true</code> if no mismatch is found
 	 */
-	public final boolean matches(Object leftObject, Object rightObject) {
+	public final boolean matches(@Nullable Object leftObject, @Nullable Object rightObject) {
 		return !this.match(leftObject, rightObject).isMismatch();
 	}
 
@@ -175,15 +200,16 @@ public class DataMatcher {
 	 *            the right data object, can be <code>null</code>
 	 * @return the {@link Result}, not <code>null</code>
 	 */
-	public final Result match(Object leftObject, Object rightObject) {
+	public final Result match(@Nullable Object leftObject, @Nullable Object rightObject) {
 		return this.match(DataPath.EMPTY, leftObject, rightObject);
 	}
 
 	/**
 	 * Checks if the given objects match.
 	 * <p>
-	 * This checks if the given objects match because they are either the same instance or both <code>null</code>, and
-	 * otherwise delegates the matching to {@link #matchObjects(List, Object, Object)}.
+	 * This checks if the given objects match because they are either the same instance or both
+	 * <code>null</code>, and otherwise delegates the matching to
+	 * {@link #matchObjects(DataPath, Object, Object)}.
 	 * 
 	 * @param path
 	 *            the current path, not <code>null</code> or empty
@@ -193,7 +219,11 @@ public class DataMatcher {
 	 *            the right object, can be <code>null</code>
 	 * @return the {@link Result}, not <code>null</code>
 	 */
-	protected final Result match(DataPath path, Object leftObject, Object rightObject) {
+	protected final Result match(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
 		if (leftObject == rightObject) return Result.NO_MISMATCH;
 		return this.matchObjects(path, leftObject, rightObject);
@@ -202,11 +232,12 @@ public class DataMatcher {
 	/**
 	 * Matches the given objects.
 	 * <p>
-	 * This is invoked by {@link #match(List, Object, Object)} when the objects are neither the same instance nor both
-	 * <code>null</code>.
+	 * This is invoked by {@link #match(DataPath, Object, Object)} when the objects are neither the
+	 * same instance nor both <code>null</code>.
 	 * <p>
-	 * This delegates the matching to other methods depending on the types of the objects. Subclasses can override this
-	 * or any of the type specific matching methods to implement different matching rules for specific types of objects.
+	 * This delegates the matching to other methods depending on the types of the objects.
+	 * Subclasses can override this or any of the type specific matching methods to implement
+	 * different matching rules for specific types of objects.
 	 * 
 	 * @param path
 	 *            the current path, not <code>null</code> or empty
@@ -216,14 +247,18 @@ public class DataMatcher {
 	 *            the right object, can be <code>null</code>
 	 * @return the {@link Result}, not <code>null</code>
 	 */
-	protected Result matchObjects(DataPath path, Object leftObject, Object rightObject) {
+	protected Result matchObjects(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
-		// Note: We don't check if one of the objects is null here and then indicate a mismatch, because subclasses may
-		// want to match null objects with non-null objects.
+		// Note: We don't check if one of the objects is null here and then indicate a mismatch,
+		// because subclasses may want to match null objects with non-null objects.
 		// TODO Account for cyclic object references.
-		// TODO Take object instances into account rather than only comparing object states. I.e. if the left object has
-		// two references to the same object instance, then the right object needs to also have two references to the
-		// same corresponding object on the right side.
+		// TODO Take object instances into account rather than only comparing object states. I.e. if
+		// the left object has two references to the same object instance, then the right object
+		// needs to also have two references to the same corresponding object on the right side.
 
 		Result result = this.checkMatchDataContainers(path, leftObject, rightObject);
 		if (result != null) return result;
@@ -243,8 +278,8 @@ public class DataMatcher {
 	/**
 	 * Checks if the given objects are matching {@link DataContainer}s.
 	 * <p>
-	 * By default, if the given objects are both {@link DataContainer}s, the actual matching is delegated to
-	 * {@link #matchDataContainers(List, DataContainer, DataContainer)}.
+	 * By default, if the given objects are both {@link DataContainer}s, the actual matching is
+	 * delegated to {@link #matchDataContainers(DataPath, DataContainer, DataContainer)}.
 	 * 
 	 * @param path
 	 *            the current path, not <code>null</code> or empty
@@ -252,15 +287,21 @@ public class DataMatcher {
 	 *            the left object, can be <code>null</code>
 	 * @param rightObject
 	 *            the right object, can be <code>null</code>
-	 * @return a {@link Result}, or <code>null</code> if undecided (by default, if none of the objects is a
-	 *         {@link DataContainer})
+	 * @return a {@link Result}, or <code>null</code> if undecided (by default, if none of the
+	 *         objects is a {@link DataContainer})
 	 */
-	protected Result checkMatchDataContainers(DataPath path, Object leftObject, Object rightObject) {
+	protected @Nullable Result checkMatchDataContainers(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
 		boolean leftIsDataContainer = DataContainer.isDataContainer(leftObject);
 		boolean rightIsDataContainer = DataContainer.isDataContainer(rightObject);
 		if (leftIsDataContainer && rightIsDataContainer) {
-			return this.matchDataContainers(path, DataContainer.of(leftObject), DataContainer.of(rightObject));
+			DataContainer leftContainer = DataContainer.ofNonNull(Unsafe.assertNonNull(leftObject));
+			DataContainer rightContainer = DataContainer.ofNonNull(Unsafe.assertNonNull(rightObject));
+			return this.matchDataContainers(path, leftContainer, rightContainer);
 		} else if (leftIsDataContainer ^ rightIsDataContainer) {
 			return Result.mismatch(path, leftObject, rightObject);
 		} else {
@@ -280,17 +321,21 @@ public class DataMatcher {
 	 *            the right data container, not <code>null</code>
 	 * @return the {@link Result}, not <code>null</code>
 	 */
-	protected Result matchDataContainers(DataPath path, DataContainer leftDataContainer, DataContainer rightDataContainer) {
+	protected Result matchDataContainers(
+			DataPath path,
+			DataContainer leftDataContainer,
+			DataContainer rightDataContainer
+	) {
 		assert path != null && leftDataContainer != null && rightDataContainer != null;
-		Map<String, ?> leftValues = leftDataContainer.getValues();
-		Map<String, ?> rightValues = rightDataContainer.getValues();
+		Map<? extends @NonNull String, @NonNull ?> leftValues = leftDataContainer.getValues();
+		Map<? extends @NonNull String, @NonNull ?> rightValues = rightDataContainer.getValues();
 		if (leftValues.size() != rightValues.size()) {
 			return Result.mismatch(path, leftValues, rightValues);
 		}
 
-		Iterator<? extends Entry<String, ?>> leftValuesIterator = leftValues.entrySet().iterator();
+		Iterator<? extends @NonNull Entry<? extends @NonNull String, @NonNull ?>> leftValuesIterator = leftValues.entrySet().iterator();
 		while (leftValuesIterator.hasNext()) {
-			Entry<String, ?> entry = leftValuesIterator.next();
+			Entry<? extends @NonNull String, @NonNull ?> entry = leftValuesIterator.next();
 			String key = entry.getKey();
 			Object leftValue = entry.getValue();
 			assert key != null && leftValue != null;
@@ -309,7 +354,7 @@ public class DataMatcher {
 	 * Checks if the given objects are matching {@link List}s.
 	 * <p>
 	 * By default, if the given objects are both {@link List}s, the actual matching is delegated to
-	 * {@link #matchLists(List, List, List)}.
+	 * {@link #matchLists(DataPath, List, List)}.
 	 * 
 	 * @param path
 	 *            the current path, not <code>null</code> or empty
@@ -317,14 +362,23 @@ public class DataMatcher {
 	 *            the left object, can be <code>null</code>
 	 * @param rightObject
 	 *            the right object, can be <code>null</code>
-	 * @return a {@link Result}, or <code>null</code> if undecided (by default, if none of the objects is a list)
+	 * @return a {@link Result}, or <code>null</code> if undecided (by default, if none of the
+	 *         objects is a list)
 	 */
-	protected Result checkMatchLists(DataPath path, Object leftObject, Object rightObject) {
+	protected @Nullable Result checkMatchLists(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
 		boolean leftIsList = (leftObject instanceof List);
 		boolean rightIsList = (rightObject instanceof List);
 		if (leftIsList && rightIsList) {
-			return this.matchLists(path, (List<?>) leftObject, (List<?>) rightObject);
+			return this.matchLists(
+					path,
+					Unsafe.castNonNull(leftObject),
+					Unsafe.castNonNull(rightObject)
+			);
 		} else if (leftIsList ^ rightIsList) {
 			return Result.mismatch(path, leftObject, rightObject);
 		} else {
@@ -373,12 +427,12 @@ public class DataMatcher {
 	 * By default, this {@link ConfigUtils#serialize(ConfigurationSerializable) serializes} each
 	 * {@link ConfigurationSerializable} object and then tries to match them as
 	 * {@link #checkMatchDataContainers(DataPath, Object, Object) DataContainers}. We also allow a
-	 * {@link ConfigurationSerializable} object on one side to match a {@link DataContainer} with matching contents
-	 * (including the serialized type alias) on the other side.
+	 * {@link ConfigurationSerializable} object on one side to match a {@link DataContainer} with
+	 * matching contents (including the serialized type alias) on the other side.
 	 * <p>
 	 * Matching the serialized states of the given objects, instead of comparing them directly via
-	 * {@link Object#equals(Object)}, ensures that we also apply our custom matching rules to the internal data of these
-	 * objects.
+	 * {@link Object#equals(Object)}, ensures that we also apply our custom matching rules to the
+	 * internal data of these objects.
 	 * 
 	 * @param path
 	 *            the current path, not <code>null</code> or empty
@@ -388,24 +442,30 @@ public class DataMatcher {
 	 *            the right object, can be <code>null</code>
 	 * @return a {@link Result}, or <code>null</code> if undecided
 	 */
-	protected Result checkMatchConfigurationSerializables(DataPath path, Object leftObject, Object rightObject) {
+	protected @Nullable Result checkMatchConfigurationSerializables(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
+		Object leftSerialized = leftObject;
 		if (leftObject instanceof ConfigurationSerializable) {
-			// Note: This also includes and compares the serialized type aliases of the given objects.
-			leftObject = ConfigUtils.serialize((ConfigurationSerializable) leftObject);
+			// Note: This also includes and compares the serialized type aliases of the given
+			// objects.
+			leftSerialized = ConfigUtils.serialize((ConfigurationSerializable) leftObject);
 		}
+		Object rightSerialized = rightObject;
 		if (rightObject instanceof ConfigurationSerializable) {
-			rightObject = ConfigUtils.serialize((ConfigurationSerializable) rightObject);
+			rightSerialized = ConfigUtils.serialize((ConfigurationSerializable) rightObject);
 		}
-
-		return this.checkMatchDataContainers(path, leftObject, rightObject);
+		return this.checkMatchDataContainers(path, leftSerialized, rightSerialized);
 	}
 
 	/**
 	 * Checks if the given objects are matching {@link Number}s.
 	 * <p>
-	 * By default, if the given objects are both {@link Number}s, the actual matching is delegated to
-	 * {@link #matchNumbers(List, Number, Number)}.
+	 * By default, if the given objects are both {@link Number}s, the actual matching is delegated
+	 * to {@link #matchNumbers(DataPath, Number, Number)}.
 	 * 
 	 * @param path
 	 *            the current path, not <code>null</code> or empty
@@ -413,14 +473,23 @@ public class DataMatcher {
 	 *            the left object, can be <code>null</code>
 	 * @param rightObject
 	 *            the right object, can be <code>null</code>
-	 * @return a {@link Result}, or <code>null</code> if undecided (by default, if none of the objects is a number)
+	 * @return a {@link Result}, or <code>null</code> if undecided (by default, if none of the
+	 *         objects is a number)
 	 */
-	protected Result checkMatchNumbers(DataPath path, Object leftObject, Object rightObject) {
+	protected @Nullable Result checkMatchNumbers(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
 		boolean leftIsNumber = (leftObject instanceof Number);
 		boolean rightIsNumber = (rightObject instanceof Number);
 		if (leftIsNumber && rightIsNumber) {
-			return this.matchNumbers(path, (Number) leftObject, (Number) rightObject);
+			return this.matchNumbers(
+					path,
+					Unsafe.castNonNull(leftObject),
+					Unsafe.castNonNull(rightObject)
+			);
 		} else if (leftIsNumber ^ rightIsNumber) {
 			return Result.mismatch(path, leftObject, rightObject);
 		} else {
@@ -458,7 +527,11 @@ public class DataMatcher {
 	 *            the right object, can be <code>null</code>
 	 * @return the {@link Result}, not <code>null</code>
 	 */
-	protected final Result matchObjectsExact(DataPath path, Object leftObject, Object rightObject) {
+	protected final Result matchObjectsExact(
+			DataPath path,
+			@Nullable Object leftObject,
+			@Nullable Object rightObject
+	) {
 		assert path != null;
 		if (Objects.equals(leftObject, rightObject)) {
 			return Result.NO_MISMATCH;

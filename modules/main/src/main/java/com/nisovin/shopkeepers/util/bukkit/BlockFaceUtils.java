@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -19,22 +20,56 @@ public final class BlockFaceUtils {
 	 */
 	public enum BlockFaceDirections {
 		// Order matters for operations like yaw to BlockFace.
-		BLOCK_SIDES(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST, BlockFace.UP, BlockFace.DOWN)),
-		CARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST)),
+		BLOCK_SIDES(
+				Arrays.<@NonNull BlockFace>asList(
+						BlockFace.SOUTH,
+						BlockFace.WEST,
+						BlockFace.NORTH,
+						BlockFace.EAST,
+						BlockFace.UP,
+						BlockFace.DOWN
+				)),
+		CARDINAL(
+				Arrays.<@NonNull BlockFace>asList(
+						BlockFace.SOUTH,
+						BlockFace.WEST,
+						BlockFace.NORTH,
+						BlockFace.EAST
+				)),
 		INTERCARDINAL(
-				Arrays.asList(
-						BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST,
-						BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST)),
+				Arrays.<@NonNull BlockFace>asList(
+						BlockFace.SOUTH,
+						BlockFace.SOUTH_WEST,
+						BlockFace.WEST,
+						BlockFace.NORTH_WEST,
+						BlockFace.NORTH,
+						BlockFace.NORTH_EAST,
+						BlockFace.EAST,
+						BlockFace.SOUTH_EAST
+				)),
 		SECONDARY_INTERCARDINAL(
-				Arrays.asList(
-						BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
-						BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST,
-						BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
-						BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST));
+				Arrays.<@NonNull BlockFace>asList(
+						BlockFace.SOUTH,
+						BlockFace.SOUTH_SOUTH_WEST,
+						BlockFace.SOUTH_WEST,
+						BlockFace.WEST_SOUTH_WEST,
+						BlockFace.WEST,
+						BlockFace.WEST_NORTH_WEST,
+						BlockFace.NORTH_WEST,
+						BlockFace.NORTH_NORTH_WEST,
+						BlockFace.NORTH,
+						BlockFace.NORTH_NORTH_EAST,
+						BlockFace.NORTH_EAST,
+						BlockFace.EAST_NORTH_EAST,
+						BlockFace.EAST,
+						BlockFace.EAST_SOUTH_EAST,
+						BlockFace.SOUTH_EAST,
+						BlockFace.SOUTH_SOUTH_EAST
+				));
 
-		private final List<BlockFace> blockFaces;
+		private final List<? extends @NonNull BlockFace> blockFaces;
 
-		private BlockFaceDirections(List<BlockFace> blockFaces) {
+		private BlockFaceDirections(List<? extends @NonNull BlockFace> blockFaces) {
 			this.blockFaces = Collections.unmodifiableList(blockFaces);
 		}
 
@@ -43,7 +78,7 @@ public final class BlockFaceUtils {
 		 * 
 		 * @return the block faces
 		 */
-		public final List<BlockFace> getBlockFaces() {
+		public final List<? extends @NonNull BlockFace> getBlockFaces() {
 			return blockFaces;
 		}
 
@@ -59,7 +94,8 @@ public final class BlockFaceUtils {
 		}
 
 		/**
-		 * Gets the {@link BlockFace} within this set that corresponds most closely to the given yaw angle.
+		 * Gets the {@link BlockFace} within this set that corresponds most closely to the given yaw
+		 * angle.
 		 * 
 		 * @param yaw
 		 *            the yaw angle
@@ -67,7 +103,8 @@ public final class BlockFaceUtils {
 		 */
 		public BlockFace fromYaw(float yaw) {
 			if (this == BLOCK_SIDES) {
-				// BLOCK_SIDES is CARDINAL with UP and DOWN, which are not relevant for yaw conversions.
+				// BLOCK_SIDES is CARDINAL with UP and DOWN, which are not relevant for yaw
+				// conversions.
 				return CARDINAL.fromYaw(yaw);
 			}
 
@@ -84,7 +121,7 @@ public final class BlockFaceUtils {
 	 * 
 	 * @return the block faces that correspond to the sides of a block
 	 */
-	public static List<BlockFace> getBlockSides() {
+	public static List<? extends @NonNull BlockFace> getBlockSides() {
 		return BlockFaceDirections.BLOCK_SIDES.getBlockFaces();
 	}
 
@@ -108,7 +145,7 @@ public final class BlockFaceUtils {
 	 */
 	public static float getYaw(BlockFace blockFace) {
 		Validate.notNull(blockFace, "blockFace is null");
-		List<BlockFace> horizontalBlockFaces = BlockFaceDirections.SECONDARY_INTERCARDINAL.getBlockFaces();
+		List<? extends @NonNull BlockFace> horizontalBlockFaces = BlockFaceDirections.SECONDARY_INTERCARDINAL.getBlockFaces();
 		int blockFaceIndex = horizontalBlockFaces.indexOf(blockFace);
 		Validate.isTrue(blockFaceIndex != -1, "blockFace is not horizontal: " + blockFace);
 
@@ -173,8 +210,8 @@ public final class BlockFaceUtils {
 	 * <p>
 	 * If {@code modY} is zero, only horizontally facing block faces are considered.
 	 * <p>
-	 * This method takes into account that the values for EAST/WEST and NORTH/SOUTH were switched in some past version
-	 * of Bukkit. So it should also properly work with older Bukkit versions.
+	 * This method takes into account that the values for EAST/WEST and NORTH/SOUTH were switched in
+	 * some past version of Bukkit. So it should also properly work with older Bukkit versions.
 	 * 
 	 * @param modX
 	 *            the x direction

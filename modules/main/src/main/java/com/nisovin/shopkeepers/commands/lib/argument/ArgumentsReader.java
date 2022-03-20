@@ -3,6 +3,9 @@ package com.nisovin.shopkeepers.commands.lib.argument;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -12,17 +15,18 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class ArgumentsReader {
 
 	// Directly references to the underlying (unmodifiable) input arguments:
-	private final List<String> args;
+	private final List<? extends @NonNull String> args;
 	private int cursor = -1; // 0 points to the first argument
 
 	public ArgumentsReader(CommandInput commandInput) {
 		Validate.notNull(commandInput, "commandInput is null");
-		// CommandInput guarantees: Not null, does not contain null, unmodifiable, arguments don't change during command
-		// processing, always returns the same list instance (important for identity-based checks).
+		// CommandInput guarantees: Not null, does not contain null, unmodifiable, arguments don't
+		// change during command processing, always returns the same list instance (important for
+		// identity-based checks).
 		this.args = commandInput.getArguments();
 	}
 
-	protected ArgumentsReader(List<String> args) {
+	protected ArgumentsReader(List<? extends @NonNull String> args) {
 		this.args = args;
 	}
 
@@ -31,7 +35,7 @@ public class ArgumentsReader {
 	 * 
 	 * @return an unmodifiable view on all arguments
 	 */
-	public List<String> getArgs() {
+	public List<? extends @NonNull String> getArgs() {
 		return args;
 	}
 
@@ -45,7 +49,8 @@ public class ArgumentsReader {
 	}
 
 	/**
-	 * Gets the number of remaining arguments, which can be retrieved by subsequent calls to {@link #next()}.
+	 * Gets the number of remaining arguments, which can be retrieved by subsequent calls to
+	 * {@link #next()}.
 	 * 
 	 * @return the number of remaining arguments
 	 */
@@ -56,8 +61,8 @@ public class ArgumentsReader {
 	/**
 	 * Gets the cursor's current position.
 	 * <p>
-	 * The first argument is at index <code>0</code>. The cursor initially starts at position <code>-1</code> and points
-	 * at no argument.
+	 * The first argument is at index <code>0</code>. The cursor initially starts at position
+	 * <code>-1</code> and points at no argument.
 	 * 
 	 * @return the cursor's current position
 	 */
@@ -68,10 +73,12 @@ public class ArgumentsReader {
 	/**
 	 * Sets the cursor's current position.
 	 * <p>
-	 * This affects which argument is returned by a subsequent call to {@link #current()} or {@link #next()}.
+	 * This affects which argument is returned by a subsequent call to {@link #current()} or
+	 * {@link #next()}.
 	 * <p>
-	 * The first argument is at index <code>0</code>. The cursor initially starts at position <code>-1</code> and points
-	 * at no argument. The valid range for the cursor is <code>[-1, {@link #getSize() size})</code>.
+	 * The first argument is at index <code>0</code>. The cursor initially starts at position
+	 * <code>-1</code> and points at no argument. The valid range for the cursor is
+	 * <code>[-1, {@link #getSize() size})</code>.
 	 * 
 	 * @param cursor
 	 *            the new cursor position
@@ -122,7 +129,7 @@ public class ArgumentsReader {
 	 * 
 	 * @return the current argument, or <code>null</code> if there is none
 	 */
-	public String currentIfPresent() {
+	public @Nullable String currentIfPresent() {
 		if (!this.hasCurrent()) {
 			return null;
 		}
@@ -162,7 +169,7 @@ public class ArgumentsReader {
 	 * 
 	 * @return the next argument, or <code>null</code> if there is none
 	 */
-	public String nextIfPresent() {
+	public @Nullable String nextIfPresent() {
 		if (!this.hasNext()) {
 			return null;
 		}
@@ -187,7 +194,7 @@ public class ArgumentsReader {
 	 * 
 	 * @return the next argument, or <code>null</code> if there is none
 	 */
-	public String peekIfPresent() {
+	public @Nullable String peekIfPresent() {
 		if (!this.hasNext()) {
 			return null;
 		}
@@ -197,7 +204,8 @@ public class ArgumentsReader {
 	/**
 	 * Creates an {@link ArgumentsReader} that copies the current state of this ArgumentsReader.
 	 * <p>
-	 * This can be used to later reset the state of this ArgumentsReader via {@link #setState(ArgumentsReader)}.
+	 * This can be used to later reset the state of this ArgumentsReader via
+	 * {@link #setState(ArgumentsReader)}.
 	 * <p>
 	 * Note: The copy references the same underlying input arguments.
 	 * 
@@ -235,7 +243,8 @@ public class ArgumentsReader {
 		return builder.toString();
 	}
 
-	// Comparisons use the identity of the args list: This should be quick and sufficient for our needs.
+	// Comparisons use the identity of the args list: This should be quick and sufficient for our
+	// needs.
 
 	@Override
 	public int hashCode() {
@@ -247,7 +256,7 @@ public class ArgumentsReader {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (!(obj instanceof ArgumentsReader)) return false;

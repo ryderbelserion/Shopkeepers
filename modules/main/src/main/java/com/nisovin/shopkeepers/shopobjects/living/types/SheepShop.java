@@ -7,7 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -26,27 +29,31 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class SheepShop extends BabyableShop<Sheep> {
+public class SheepShop extends BabyableShop<@NonNull Sheep> {
 
-	public static final Property<DyeColor> COLOR = new BasicProperty<DyeColor>()
+	public static final Property<@NonNull DyeColor> COLOR = new BasicProperty<@NonNull DyeColor>()
 			.dataKeyAccessor("color", EnumSerializers.lenient(DyeColor.class))
 			.defaultValue(DyeColor.WHITE)
 			.build();
 
-	public static final Property<Boolean> SHEARED = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> SHEARED = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("sheared", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<DyeColor> colorProperty = new PropertyValue<>(COLOR)
-			.onValueChanged(this::applyColor)
+	private final PropertyValue<@NonNull DyeColor> colorProperty = new PropertyValue<>(COLOR)
+			.onValueChanged(Unsafe.initialized(this)::applyColor)
 			.build(properties);
-	private final PropertyValue<Boolean> shearedProperty = new PropertyValue<>(SHEARED)
-			.onValueChanged(this::applySheared)
+	private final PropertyValue<@NonNull Boolean> shearedProperty = new PropertyValue<>(SHEARED)
+			.onValueChanged(Unsafe.initialized(this)::applySheared)
 			.build(properties);
 
-	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public SheepShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull SheepShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -72,8 +79,8 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getShearedEditorButton());
 		return editorButtons;
@@ -101,19 +108,26 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	private ItemStack getColorEditorItem() {
 		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(this.getColor()));
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSheepColor, Messages.buttonSheepColorLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonSheepColor,
+				Messages.buttonSheepColorLore
+		);
 		return iconItem;
 	}
 
 	private Button getColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleColor(backwards);
 				return true;
@@ -143,19 +157,26 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	private ItemStack getShearedEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SHEARS);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSheepSheared, Messages.buttonSheepShearedLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonSheepSheared,
+				Messages.buttonSheepShearedLore
+		);
 		return iconItem;
 	}
 
 	private Button getShearedEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getShearedEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleSheared();
 				return true;
 			}

@@ -22,17 +22,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.tradelog.TradeLogger;
 import com.nisovin.shopkeepers.tradelog.data.PlayerRecord;
 import com.nisovin.shopkeepers.tradelog.data.ShopRecord;
 import com.nisovin.shopkeepers.tradelog.data.TradeRecord;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.SingletonTask;
 import com.nisovin.shopkeepers.util.csv.CsvFormatter;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.FileUtils;
 import com.nisovin.shopkeepers.util.java.Retry;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -49,20 +54,36 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private static final String TRADE_LOGS_FOLDER = "trade-logs";
 	private static final String FILE_NAME_PREFIX = "trades-";
-	private static final List<String> CSV_HEADER = Arrays.asList(
-			"time", "player_uuid", "player_name",
-			"shop_uuid", "shop_type", "shop_world", "shop_x", "shop_y", "shop_z",
-			"shop_owner_uuid", "shop_owner_name",
-			"item1_type", "item1_amount", "item1_metadata",
-			"item2_type", "item2_amount", "item2_metadata",
-			"result_item_type", "result_item_amount", "result_item_metadata",
+	private static final List<? extends @NonNull String> CSV_HEADER = Collections.unmodifiableList(Arrays.asList(
+			"time",
+			"player_uuid",
+			"player_name",
+			"shop_uuid",
+			"shop_type",
+			"shop_world",
+			"shop_x",
+			"shop_y",
+			"shop_z",
+			"shop_owner_uuid",
+			"shop_owner_name",
+			"item1_type",
+			"item1_amount",
+			"item1_metadata",
+			"item2_type",
+			"item2_amount",
+			"item2_metadata",
+			"result_item_type",
+			"result_item_amount",
+			"result_item_metadata",
 			"trade_count"
-	);
+	));
 
-	// TODO This uses the system locale and timezone currently. Config option(s) to change the locale and timezone? Or
-	// always store in UTC?
-	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
-	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+	// TODO This uses the system locale and timezone currently. Config option(s) to change the
+	// locale and timezone? Or always store in UTC?
+	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+			.withZone(Unsafe.assertNonNull(ZoneId.systemDefault()));
+	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss")
+			.withZone(Unsafe.assertNonNull(ZoneId.systemDefault()));
 	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
 
 	private static final int SAVE_MAX_ATTEMPTS = 20;
@@ -71,26 +92,29 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private final Plugin plugin;
 	private final Path tradeLogsFolder;
-	// Note: Even though the CSV format allows quoted fields to span across multiple lines, we want each CSV record to
-	// only span a single line. However, even though we do not want fields to contain unescaped newlines, we do not
-	// escape these newlines via the CSV formatter. Instead, we expect that any data that we pass to the CSV formatter
-	// has its newlines already escaped. This ensures that we do not redundantly escape backslashes twice. Instead, the
-	// CSV formatter will log a warning if it encounters newlines in the data nevertheless.
+	// Note: Even though the CSV format allows quoted fields to span across multiple lines, we want
+	// each CSV record to only span a single line. However, even though we do not want fields to
+	// contain unescaped newlines, we do not escape these newlines via the CSV formatter. Instead,
+	// we expect that any data that we pass to the CSV formatter has its newlines already escaped.
+	// This ensures that we do not redundantly escape backslashes twice. Instead, the CSV formatter
+	// will log a warning if it encounters newlines in the data nevertheless.
 	private final CsvFormatter csv = new CsvFormatter()
 			.escapeNewlines(false)
 			.warnOnNewlines();
-	private List<TradeRecord> pending = new ArrayList<>();
+	private List<@NonNull TradeRecord> pending = new ArrayList<>();
 	private final SaveTask saveTask;
-	private BukkitTask delayedSaveTask = null;
-	// This is reset to the current configuration value prior to every save. This ensures that the value of this setting
-	// remains constant during the save and does not differ for the items of the trades that are being saved as part of
-	// the same batch.
+	private @Nullable BukkitTask delayedSaveTask = null;
+	// This is reset to the current configuration value prior to every save. This ensures that the
+	// value of this setting remains constant during the save and does not differ for the items of
+	// the trades that are being saved as part of the same batch.
 	private boolean logItemMetadata;
 
 	public CsvTradeLogger(Plugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
-		this.tradeLogsFolder = plugin.getDataFolder().toPath().resolve(TRADE_LOGS_FOLDER);
+		this.tradeLogsFolder = Unsafe.assertNonNull(
+				plugin.getDataFolder().toPath().resolve(TRADE_LOGS_FOLDER)
+		);
 		this.saveTask = new SaveTask(plugin);
 	}
 
@@ -98,8 +122,8 @@ public class CsvTradeLogger implements TradeLogger {
 	public void logTrade(TradeRecord trade) {
 		pending.add(trade);
 
-		// We do not trigger a save right away, because it is likely for there to be more trades to log in the immediate
-		// future:
+		// We do not trigger a save right away, because it is likely for there to be more trades to
+		// log in the immediate future:
 		this.savePendingDelayed();
 	}
 
@@ -123,7 +147,11 @@ public class CsvTradeLogger implements TradeLogger {
 			return;
 		}
 
-		delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(plugin, new DelayedSaveTask(), DELAYED_SAVE_TICKS);
+		delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(
+				plugin,
+				new DelayedSaveTask(),
+				DELAYED_SAVE_TICKS
+		);
 	}
 
 	private class DelayedSaveTask implements Runnable {
@@ -151,8 +179,8 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private class SaveTask extends SingletonTask {
 
-		private List<TradeRecord> saving = new ArrayList<>();
-		private SaveContext saveContext = null;
+		private List<@NonNull TradeRecord> saving = new ArrayList<>();
+		private @Nullable SaveContext saveContext = null;
 		private boolean saveSucceeded = false;
 		private long lastSaveErrorMsgMillis = 0L;
 
@@ -186,23 +214,26 @@ public class CsvTradeLogger implements TradeLogger {
 
 			// Swap the pending and saving lists of trades:
 			assert saving.isEmpty();
-			List<TradeRecord> temp = saving;
+			List<@NonNull TradeRecord> temp = saving;
 			saving = pending;
 			pending = temp;
 
 			// Setup new SaveContext:
 			assert saveContext == null;
-			saveContext = new SaveContext(saving);
+			this.saveContext = new SaveContext(saving);
 		}
 
 		@Override
 		protected void execute() {
+			SaveContext saveContext = Unsafe.assertNonNull(this.saveContext);
 			saveSucceeded = writeTradesToDisk(saveContext);
 			assert saveSucceeded ? !saveContext.hasUnsavedTrades() : saveContext.hasUnsavedTrades();
 		}
 
 		@Override
 		protected void syncCallback() {
+			SaveContext saveContext = Unsafe.assertNonNull(this.saveContext);
+
 			this.printDebugInfo();
 
 			if (!saveSucceeded) {
@@ -212,17 +243,20 @@ public class CsvTradeLogger implements TradeLogger {
 				pending.addAll(0, saveContext.getUnsavedTrades());
 
 				// Attempt the save again after a short delay:
-				// However, during the final save attempt during plugin disable, this is skipped and data might be lost.
+				// However, during the final save attempt during plugin disable, this is skipped and
+				// data might be lost.
 				savePendingDelayed();
 
 				// Inform admins about the issue (throttled to once every 5 minutes):
 				long nowMillis = System.currentTimeMillis();
 				if (Math.abs(nowMillis - lastSaveErrorMsgMillis) > SAVE_ERROR_MSG_THROTTLE_MILLIS) {
 					lastSaveErrorMsgMillis = nowMillis;
-					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Logging trades to the CSV trade log failed!"
+					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED
+							+ "Logging trades to the CSV trade log failed!"
 							+ " Please check the server logs and look into the issue!";
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.hasPermission(ShopkeepersPlugin.ADMIN_PERMISSION)) {
+						assert player != null;
+						if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.ADMIN_PERMISSION)) {
 							player.sendMessage(errorMsg);
 						}
 					}
@@ -230,12 +264,14 @@ public class CsvTradeLogger implements TradeLogger {
 			}
 
 			// Reset:
-			saveContext = null;
+			this.saveContext = null;
 			saving.clear();
 		}
 
 		private void printDebugInfo() {
 			Log.debug(() -> {
+				SaveContext saveContext = Unsafe.assertNonNull(this.saveContext);
+
 				StringBuilder sb = new StringBuilder();
 				sb.append("Logged trades to the CSV trade log (");
 
@@ -244,7 +280,9 @@ public class CsvTradeLogger implements TradeLogger {
 
 				// Number of trade records that we failed to log:
 				if (saveContext.hasUnsavedTrades()) {
-					sb.append(", ").append(saveContext.getUnsavedTrades().size()).append(" failed to log");
+					sb.append(", ")
+							.append(saveContext.getUnsavedTrades().size())
+							.append(" failed to log");
 				}
 
 				// Timing summary:
@@ -266,11 +304,11 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private static class SaveContext {
 
-		private final List<TradeRecord> trades;
+		private final List<? extends @NonNull TradeRecord> trades;
 		private int nextUnsaved = 0;
 
-		SaveContext(List<TradeRecord> trades) {
-			assert trades != null && !trades.contains(null);
+		SaveContext(List<? extends @NonNull TradeRecord> trades) {
+			assert trades != null && !CollectionUtils.containsNull(trades);
 			this.trades = trades;
 		}
 
@@ -280,13 +318,13 @@ public class CsvTradeLogger implements TradeLogger {
 
 		// Returns null if there are no more unsaved trades.
 		// Does not move the cursor forward until onTradeSuccessfullySaved() has been called.
-		public TradeRecord getNextUnsavedTrade() {
+		public @Nullable TradeRecord getNextUnsavedTrade() {
 			if (!this.hasUnsavedTrades()) return null;
 			return trades.get(nextUnsaved);
 		}
 
 		// May return a sublist view:
-		public List<TradeRecord> getUnsavedTrades() {
+		public List<? extends @NonNull TradeRecord> getUnsavedTrades() {
 			if (!this.hasUnsavedTrades()) {
 				return Collections.emptyList();
 			} else {
@@ -301,28 +339,33 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private Path getLogFile(Instant timestamp) {
 		assert timestamp != null;
-		return tradeLogsFolder.resolve(FILE_NAME_PREFIX + DATE_FORMAT.format(timestamp) + ".csv");
+		String fileName = FILE_NAME_PREFIX + DATE_FORMAT.format(timestamp) + ".csv";
+		return Unsafe.assertNonNull(tradeLogsFolder.resolve(fileName));
 	}
 
-	// Note: We log the item metadata in Yaml format. Since this is what Bukkit natively supports for serializing and
-	// deserializing ItemStacks, this ensures that we are able to load the data again and recreate the original
-	// ItemStack (if we ever wish to).
-	// An alternative would be to log it in Json format, which may have better library support across languages.
-	// However, Gson (the Json library included with the Minecraft server and Bukkit) will not properly preserve certain
-	// data types by default (at least not if we don't provide detailed custom deserializers for every type of data that
-	// we may want to deserialize, or a deserializer that replicates Yaml's parsing of certain primitive types, which is
-	// actually not that easily possible): For instance, if the numeric data type of a loaded Json number is unknown,
-	// Gson loads it as a double by default (without there being an easy way to change that). But since some parts of
-	// Bukkit's ItemStack deserialization have strict expectations regarding the type of data to deserialize, the
-	// deserialization from Json may fail for this data.
+	// Note: We log the item metadata in Yaml format. Since this is what Bukkit natively supports
+	// for serializing and deserializing ItemStacks, this ensures that we are able to load the data
+	// again and recreate the original ItemStack (if we ever wish to).
+	// An alternative would be to log it in Json format, which may have better library support
+	// across languages.
+	// However, Gson (the Json library included with the Minecraft server and Bukkit) will not
+	// properly preserve certain data types by default (at least not if we don't provide detailed
+	// custom deserializers for every type of data that we may want to deserialize, or a
+	// deserializer that replicates Yaml's parsing of certain primitive types, which is actually not
+	// that easily possible): For instance, if the numeric data type of a loaded Json number is
+	// unknown, Gson loads it as a double by default (without there being an easy way to change
+	// that). But since some parts of Bukkit's ItemStack deserialization have strict expectations
+	// regarding the type of data to deserialize, the deserialization from Json may fail for this
+	// data.
 	private String getItemMetadata(UnmodifiableItemStack itemStack) {
 		assert itemStack != null;
 		if (!logItemMetadata) return ""; // Disabled
 
-		// If the logging of item metadata is enabled, we not only store the item's ItemMeta (if it has any), but also
-		// its data version. We therefore serialize the complete item stack here, but then remove the item's type and
-		// amount again, since these properties are already getting stored separately.
-		Map<String, Object> itemData = itemStack.serialize(); // Assert: The returned Map is modifiable.
+		// If the logging of item metadata is enabled, we not only store the item's ItemMeta (if it
+		// has any), but also its data version. We therefore serialize the complete item stack here,
+		// but then remove the item's type and amount again, since these properties are already
+		// getting stored separately.
+		Map<String, Object> itemData = itemStack.serialize(); // Assert: Modifiable map.
 		itemData.remove("type");
 		itemData.remove("amount");
 		// In order to ensure single-line CSV records, we format the Yaml compactly:
@@ -356,22 +399,28 @@ public class CsvTradeLogger implements TradeLogger {
 			item2Metadata = this.getItemMetadata(item2);
 		}
 
-		// "time", "player_uuid", "player_name",
-		// "shop_uuid", "shop_type", "shop_world", "shop_x", "shop_y", "shop_z",
-		// "shop_owner_uuid", "shop_owner_name",
-		// "item1_type", "item1_amount", "item1_metadata",
-		// "item2_type", "item2_amount", "item2_metadata",
-		// "result_item_type", "result_item_amount", "result_item_metadata",
-		// "trade_count"
 		return csv.formatRecord(Arrays.asList(
-				TIME_FORMAT.format(timestamp), player.getUniqueId(), player.getName(),
-				shop.getUniqueId(), shop.getTypeId(), worldName, shop.getX(), shop.getY(), shop.getZ(),
-				shopOwnerId, shopOwnerName,
-				item1.getType().name(), item1.getAmount(), this.getItemMetadata(item1),
-				item2Type, item2Amount, item2Metadata,
-				resultItem.getType().name(), resultItem.getAmount(), this.getItemMetadata(resultItem),
-				trade.getTradeCount()
-
+				TIME_FORMAT.format(timestamp), // time
+				player.getUniqueId(), // player_uuid
+				player.getName(), // player_name
+				shop.getUniqueId(), // shop_uuid
+				shop.getTypeId(), // shop_type
+				worldName, // shop_world
+				shop.getX(), // shop_x
+				shop.getY(), // shop_y
+				shop.getZ(), // shop_z
+				shopOwnerId, // shop_owner_uuid
+				shopOwnerName, // shop_owner_name
+				item1.getType().name(), // item1_type
+				item1.getAmount(), // item1_amount
+				this.getItemMetadata(item1), // item1_metadata
+				item2Type, // item2_type
+				item2Amount, // item2_amount
+				item2Metadata, // item2_metadata
+				resultItem.getType().name(), // result_item_type
+				resultItem.getAmount(), // result_item_amount
+				this.getItemMetadata(resultItem), // result_item_metadata
+				trade.getTradeCount() // trade_count
 		));
 	}
 
@@ -384,9 +433,11 @@ public class CsvTradeLogger implements TradeLogger {
 			}, SAVE_MAX_ATTEMPTS, (attemptNumber, exception, retry) -> {
 				// Trade logging failed:
 				assert exception != null;
-				// Don't spam with errors and stacktraces: Only print them once for the first failed saving attempt
-				// (and again for the last failed attempt), and otherwise log a compact description of the issue:
-				String errorMsg = "Failed to log trades to the CSV trade log (attempt " + attemptNumber + ")";
+				// Don't spam with errors and stacktraces: Only print them once for the first failed
+				// saving attempt (and again for the last failed attempt), and otherwise log a
+				// compact description of the issue:
+				String errorMsg = "Failed to log trades to the CSV trade log (attempt "
+						+ attemptNumber + ")";
 				if (attemptNumber == 1) {
 					Log.severe(errorMsg, exception);
 				} else {
@@ -399,49 +450,71 @@ public class CsvTradeLogger implements TradeLogger {
 					try {
 						Thread.sleep(SAVE_RETRY_DELAY_MILLIS);
 					} catch (InterruptedException e) {
-						// Restore the interrupt status for anyone interested in it, but otherwise ignore the interrupt
-						// here, because we prefer to keep retrying to still save the data to disk after all:
+						// Restore the interrupt status for anyone interested in it, but otherwise
+						// ignore the interrupt here, because we prefer to keep retrying to still
+						// save the data to disk after all:
 						Thread.currentThread().interrupt();
 					}
 				}
 			});
 			return true;
 		} catch (Exception e) {
-			Log.severe("Failed to log trades to the CSV trade log! Data might have been lost! :(", e);
+			Log.severe(
+					"Failed to log trades to the CSV trade log! Data might have been lost! :(",
+					e
+			);
 			return false;
 		}
 	}
 
-	/*
+	/**
+	 * Writes the pending trades to disk.
+	 * <p>
 	 * Goals:
-	 * - Reliably log all trades.
-	 * - Log trades in the order in which they occurred.
-	 * - Log trades atomically, i.e. not partially, intertwined, or duplicated (e.g. if we retry failed log attempts).
+	 * <ul>
+	 * <li>Reliably log all trades.
+	 * <li>Log trades in the order in which they occurred.
+	 * <li>Log trades atomically, i.e. not partially, intertwined, or duplicated (e.g. if we retry
+	 * failed log attempts).
+	 * </ul>
 	 * 
 	 * Measures:
-	 * - We write to the log files via a single thread only, and assume that no other processes write to them
-	 *   (concurrent reads should not be an issue).
-	 * - We use synchronous IO to ensure that each trade is actually persisted to the storage before we assume it
-	 *   to have been successfully logged.
-	 * - If the logging of a trade fails for some reasons, we retry it until it succeeds. However, for this to not
-	 *   result in trades being partially logged, or logged multiple times, the logging has to be atomic. I.e. it has
-	 *   to either succeed completely, or fail completely. See the notes on that below.
-	 * - We assume that appending to the log file is atomic, i.e. that each trade that is logged via a single write
-	 *   is either successfully logged completely, or not at all. In practice, depending on the OS and file system,
-	 *   this may only apply for writes that are smaller than a certain threshold.
-	 * - In order to keep each write small, and therefore hopefully atomic, we use an unbuffered writer and a single
-	 *   write call to log each trade. Also, using a buffer would incur the risk of a write that is meant to be atomic
-	 *   (i.e. a trade that is being logged) to actually be split across multiple writes to the underlying file, and
-	 *   then no longer be atomic.
+	 * <ul>
+	 * <li>We write to the log files via a single thread only, and assume that no other processes
+	 * write to them (concurrent reads should not be an issue).
+	 * <li>We use synchronous IO to ensure that each trade is actually persisted to the storage
+	 * before we assume it to have been successfully logged.
+	 * <li>If the logging of a trade fails for some reasons, we retry it until it succeeds. However,
+	 * for this to not result in trades being partially logged, or logged multiple times, the
+	 * logging has to be atomic. I.e. it has to either succeed completely, or fail completely. See
+	 * the notes on that below.
+	 * <li>We assume that appending to the log file is atomic, i.e. that each trade that is logged
+	 * via a single write is either successfully logged completely, or not at all. In practice,
+	 * depending on the OS and file system, this may only apply for writes that are smaller than a
+	 * certain threshold.
+	 * <li>In order to keep each write small, and therefore hopefully atomic, we use an unbuffered
+	 * writer and a single write call to log each trade. Also, using a buffer would incur the risk
+	 * of a write that is meant to be atomic (i.e. a trade that is being logged) to actually be
+	 * split across multiple writes to the underlying file, and then no longer be atomic.
+	 * </ul>
 	 * 
 	 * References regarding atomicity of file appends:
-	 * - https://www.notthewizard.com/2014/06/17/are-files-appends-really-atomic/
-	 * - https://nblumhardt.com/2016/08/atomic-shared-log-file-writes/
+	 * <ul>
+	 * <li>https://www.notthewizard.com/2014/06/17/are-files-appends-really-atomic/
+	 * <li>https://nblumhardt.com/2016/08/atomic-shared-log-file-writes/
+	 * </ul>
+	 * <p>
+	 * This may be invoked asynchronously.
+	 * <p>
+	 * Depending on their timestamps, the trades may need to be logged to different log files. This
+	 * writes all consecutive trades that need to be logged to the same log file, and then
+	 * recursively invokes itself to write the remaining trades to other log files.
+	 * 
+	 * @param saveContext
+	 *            the save context
+	 * @throws IOException
+	 *             if saving fails
 	 */
-	// May be invoked asynchronously.
-	// Depending on their timestamps, the trades may need to be logged to different log files. This writes all
-	// consecutive trades that need to be logged to the same log file, and then recursively invokes itself to write the
-	// remaining trades to other log files.
 	private void writeTradesToLogFile(SaveContext saveContext) throws IOException {
 		TradeRecord trade = saveContext.getNextUnsavedTrade();
 		if (trade == null) return; // There are no unsaved trades
@@ -452,12 +525,15 @@ public class CsvTradeLogger implements TradeLogger {
 		FileUtils.createParentDirectories(logFile);
 
 		// Check the write permission for the parent directory:
-		FileUtils.checkIsDirectoryWritable(logFile.getParent());
+		Path parent = logFile.getParent();
+		if (parent != null) {
+			FileUtils.checkIsDirectoryWritable(parent);
+		}
 
 		// Check if the file already exists:
 		boolean isNew = !Files.exists(logFile);
-		// Check if the file is empty: This may for example occur if we were able to create the file during a previous
-		// log attempt, but then failed to write to it.
+		// Check if the file is empty: This may for example occur if we were able to create the file
+		// during a previous log attempt, but then failed to write to it.
 		boolean isEmpty = (isNew || Files.size(logFile) == 0L);
 
 		// Check the write permission for the log file, if it already exists:
@@ -467,55 +543,63 @@ public class CsvTradeLogger implements TradeLogger {
 
 		OpenOption[] openOptions;
 		if (isNew) {
-			// Create the new file, but fail if the assumption that the file does not yet exist turns out to no longer
-			// hold when we actually attempt to create the file:
+			// Create the new file, but fail if the assumption that the file does not yet exist
+			// turns out to no longer hold when we actually attempt to create the file:
 			openOptions = new OpenOption[] {
-				StandardOpenOption.CREATE_NEW, // Create new file, fail if it already exists
-				StandardOpenOption.WRITE, // Open for write access
-				StandardOpenOption.APPEND, // Append to the end of the file
-				StandardOpenOption.DSYNC // Ensure that each write is persisted to storage before we continue
+					StandardOpenOption.CREATE_NEW, // Create a new file, fail if it already exists
+					StandardOpenOption.WRITE, // Open for write access
+					StandardOpenOption.APPEND, // Append to the end of the file
+					// Ensure that each write is persisted to storage before we continue:
+					StandardOpenOption.DSYNC
 			};
 		} else {
 			// Fails if the file no longer exists when the attempt to open it:
 			openOptions = new OpenOption[] {
-				StandardOpenOption.WRITE,
-				StandardOpenOption.APPEND,
-				StandardOpenOption.DSYNC
+					StandardOpenOption.WRITE,
+					StandardOpenOption.APPEND,
+					StandardOpenOption.DSYNC
 			};
-			// Note: Opening the file for writing will also fail if the file is actually a directory instead of a
-			// regular file.
+			// Note: Opening the file for writing will also fail if the file is actually a directory
+			// instead of a regular file.
 		}
 
 		// TODO Use the file encoding specified inside the config? Or add a separate setting?
 		boolean done = false;
-		try (Writer writer = FileUtils.newUnbufferedWriter(logFile, StandardCharsets.UTF_8, openOptions)) {
-			// Even though we use an unbuffered writer, we flush after every write just in case, and to make our intent
-			// more clear.
-			// TODO What if we receive an IOException during a flush? Has the trade been logged or not at that point?
+		try (Writer writer = FileUtils.newUnbufferedWriter(
+				logFile,
+				Unsafe.assertNonNull(StandardCharsets.UTF_8),
+				openOptions
+		)) {
+			// Even though we use an unbuffered writer, we flush after every write just in case, and
+			// to make our intent more clear.
+			// TODO What if we receive an IOException during a flush? Has the trade been logged or
+			// not at that point?
 
 			if (isNew) {
-				// Fsync the parent directory to ensure that the newly created log file has been successfully persisted.
-				// We do this prior to writing to the new file, so that we can be sure that nothing has been written to
-				// the file yet if this operation fails for some reason.
+				// Fsync the parent directory to ensure that the newly created log file has been
+				// successfully persisted.
+				// We do this prior to writing to the new file, so that we can be sure that nothing
+				// has been written to the file yet if this operation fails for some reason.
 				FileUtils.fsyncParentDirectory(logFile);
 			}
 
 			// If the file is new or empty, write the CSV header:
 			if (isEmpty) {
-				// Note: A BOM should not be required for UTF-8, and it is actually recommended omitting it.
+				// Note: A BOM should not be required for UTF-8, and it is actually recommended
+				// omitting it.
 				writer.write(csv.formatRecord(CSV_HEADER));
 				writer.flush();
 			}
 
-			// Instead of closing and reopening the log file for each trade, we log all consecutive trades that need to
-			// be logged to the same log file before we close it again:
+			// Instead of closing and reopening the log file for each trade, we log all consecutive
+			// trades that need to be logged to the same log file before we close it again:
 			do {
 				// Write the new trade record:
 				writer.write(this.toCSVRecord(trade));
 				writer.flush();
 
-				// If we did not throw an IOException up until this point, we assume that the trade has been
-				// successfully written to the trade log.
+				// If we did not throw an IOException up until this point, we assume that the trade
+				// has been successfully written to the trade log.
 				saveContext.onTradeSuccessfullySaved();
 
 				// Get the next trade to save:
@@ -534,9 +618,10 @@ public class CsvTradeLogger implements TradeLogger {
 			if (!done) {
 				throw e;
 			} else {
-				// Since the previous writes reported to have been successful, we assume that the trades have been
-				// successfully logged. We therefore ignore any exceptions raised during the closing of the writer: They
-				// are still logged, but they don't trigger a retry of the trade log attempt.
+				// Since the previous writes reported to have been successful, we assume that the
+				// trades have been successfully logged. We therefore ignore any exceptions raised
+				// during the closing of the writer: They are still logged, but they don't trigger a
+				// retry of the trade log attempt.
 				Log.severe("Failed to close the CSV trade log file!", e);
 			}
 		}

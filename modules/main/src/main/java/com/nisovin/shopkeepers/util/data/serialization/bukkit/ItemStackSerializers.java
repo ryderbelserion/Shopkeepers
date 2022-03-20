@@ -1,6 +1,8 @@
 package com.nisovin.shopkeepers.util.data.serialization.bukkit;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
@@ -16,9 +18,9 @@ public final class ItemStackSerializers {
 	/**
 	 * A {@link DataSerializer} for {@link ItemStack} values.
 	 */
-	public static final DataSerializer<ItemStack> DEFAULT = new DataSerializer<ItemStack>() {
+	public static final DataSerializer<@NonNull ItemStack> DEFAULT = new DataSerializer<@NonNull ItemStack>() {
 		@Override
-		public Object serialize(ItemStack value) {
+		public @Nullable Object serialize(ItemStack value) {
 			Validate.notNull(value, "value is null");
 			return value;
 		}
@@ -31,25 +33,23 @@ public final class ItemStackSerializers {
 						+ data.getClass().getName() + "!");
 			}
 			ItemStack itemStack = (ItemStack) data;
-			itemStack = DataUtils.deserializeItemStack(itemStack);
-			return itemStack;
+			return DataUtils.deserializeNonNullItemStack(itemStack);
 		}
 	};
 
 	/**
 	 * A {@link DataSerializer} for {@link UnmodifiableItemStack} values.
 	 */
-	public static final DataSerializer<UnmodifiableItemStack> UNMODIFIABLE = new DataSerializer<UnmodifiableItemStack>() {
+	public static final DataSerializer<@NonNull UnmodifiableItemStack> UNMODIFIABLE = new DataSerializer<@NonNull UnmodifiableItemStack>() {
 		@Override
-		public Object serialize(UnmodifiableItemStack value) {
+		public @Nullable Object serialize(UnmodifiableItemStack value) {
 			Validate.notNull(value, "value is null");
 			return DataUtils.serializeItemStack(value);
 		}
 
 		@Override
 		public UnmodifiableItemStack deserialize(Object data) throws InvalidDataException {
-			ItemStack itemStack = DEFAULT.deserialize(data);
-			return UnmodifiableItemStack.of(itemStack);
+			return UnmodifiableItemStack.ofNonNull(DEFAULT.deserialize(data));
 		}
 	};
 

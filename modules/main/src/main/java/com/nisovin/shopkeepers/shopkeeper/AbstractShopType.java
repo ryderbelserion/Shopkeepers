@@ -7,9 +7,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerCreateShopkeeperEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -24,18 +27,25 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {
+public abstract class AbstractShopType<T extends @NonNull AbstractShopkeeper>
+		extends AbstractSelectableType implements ShopType<T> {
 
 	private final Class<T> shopkeeperClass;
 
-	protected AbstractShopType(String identifier, List<String> aliases, String permission, Class<T> shopkeeperClass) {
+	protected AbstractShopType(
+			String identifier,
+			List<? extends @NonNull String> aliases,
+			@Nullable String permission,
+			Class<T> shopkeeperClass
+	) {
 		super(identifier, aliases, permission);
 		Validate.notNull(shopkeeperClass, "shopkeeperClass is null");
 		this.shopkeeperClass = shopkeeperClass;
 	}
 
 	/**
-	 * Gets the concrete and most specific class of the shopkeepers that are created by this {@link ShopType}.
+	 * Gets the concrete and most specific class of the shopkeepers that are created by this
+	 * {@link ShopType}.
 	 * 
 	 * @return the concrete shopkeeper class, not <code>null</code>
 	 */
@@ -62,21 +72,24 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	}
 
 	/**
-	 * Creates a new and not yet {@link AbstractShopkeeper#isInitialized() initialized} shopkeeper of this type.
+	 * Creates a new and not yet {@link AbstractShopkeeper#isInitialized() initialized} shopkeeper
+	 * of this type.
 	 * 
 	 * @return the new shopkeeper, not <code>null</code>
 	 */
-	private final T createShopkeeper() {
+	private final @NonNull T createShopkeeper() {
 		T shopkeeper = this.createNewShopkeeper();
 
 		// Validate the created shopkeeper:
-		if (shopkeeper == null) {
-			throw new RuntimeException("ShopType '" + this.getClass().getName() + "' created null shopkeeper!");
+		if (Unsafe.cast(shopkeeper) == null) {
+			throw new RuntimeException("ShopType '" + this.getClass().getName()
+					+ "' created null shopkeeper!");
 		}
 		if (shopkeeper.getType() != this) {
 			throw new RuntimeException("ShopType '" + this.getClass().getName()
-					+ "' created a shopkeeper of a different type (expected: " + this.getIdentifier()
-					+ ", got: " + shopkeeper.getType().getIdentifier() + ")!");
+					+ "' created a shopkeeper of a different type (expected: "
+					+ this.getIdentifier() + ", got: "
+					+ shopkeeper.getType().getIdentifier() + ")!");
 		}
 		if (shopkeeper.getClass() != this.getShopkeeperClass()) {
 			throw new RuntimeException("ShopType '" + this.getClass().getName()
@@ -93,12 +106,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	}
 
 	/**
-	 * Creates a new and not yet {@link AbstractShopkeeper#isInitialized() initialized} shopkeeper of this type.
+	 * Creates a new and not yet {@link AbstractShopkeeper#isInitialized() initialized} shopkeeper
+	 * of this type.
 	 * 
 	 * @return the new shopkeeper, not <code>null</code>
 	 * @see #createShopkeeper()
 	 */
-	protected abstract T createNewShopkeeper();
+	protected abstract @NonNull T createNewShopkeeper();
 
 	/**
 	 * Creates a new shopkeeper of this type based on the given {@link ShopCreationData}.
@@ -111,7 +125,10 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper cannot be created (e.g. due to invalid or missing data)
 	 */
-	public final T createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	public final @NonNull T createShopkeeper(
+			int id,
+			ShopCreationData shopCreationData
+	) throws ShopkeeperCreateException {
 		T shopkeeper = this.createShopkeeper();
 		assert shopkeeper != null;
 		shopkeeper.initOnCreation(id, shopCreationData);
@@ -119,14 +136,16 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	}
 
 	/**
-	 * Recreates a shopkeeper of this type by loading its previously saved state from the given {@link ShopkeeperData}.
+	 * Recreates a shopkeeper of this type by loading its previously saved state from the given
+	 * {@link ShopkeeperData}.
 	 * <p>
 	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
-	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements (such as for example
-	 * item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the loaded
-	 * shopkeeper, nor in contexts outside the loaded shopkeeper. If the loaded shopkeeper can guarantee not to modify
-	 * these data elements, it is allowed to directly store them without copying them first.
+	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements
+	 * (such as for example item stacks, etc.) and collections of data elements are assumed to not
+	 * be modified, neither by the loaded shopkeeper, nor in contexts outside the loaded shopkeeper.
+	 * If the loaded shopkeeper can guarantee not to modify these data elements, it is allowed to
+	 * directly store them without copying them first.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -134,7 +153,9 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * @throws InvalidDataException
 	 *             if the shopkeeper cannot be loaded (e.g. due to invalid or missing data)
 	 */
-	public final T loadShopkeeper(ShopkeeperData shopkeeperData) throws InvalidDataException {
+	public final @NonNull T loadShopkeeper(
+			ShopkeeperData shopkeeperData
+	) throws InvalidDataException {
 		T shopkeeper = this.createShopkeeper();
 		assert shopkeeper != null;
 		shopkeeper.initOnLoad(shopkeeperData);
@@ -144,9 +165,9 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	/**
 	 * Checks if the given {@link ShopCreationData} is compatible with this shop type.
 	 * <p>
-	 * This checks the common basic pre-requirements, such as whether the given shop creation data is of the expected
-	 * type. This may not necessarily check if the given shop creation data contains all the information required to
-	 * create a valid shopkeeper.
+	 * This checks the common basic pre-requirements, such as whether the given shop creation data
+	 * is of the expected type. This may not necessarily check if the given shop creation data
+	 * contains all the information required to create a valid shopkeeper.
 	 * 
 	 * @param shopCreationData
 	 *            the shop creation data
@@ -166,13 +187,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 	// Handles the shopkeeper creation by players.
 	// Returns null in case of failure.
-	public T handleShopkeeperCreation(ShopCreationData shopCreationData) {
+	public @Nullable T handleShopkeeperCreation(ShopCreationData shopCreationData) {
 		this.validateCreationData(shopCreationData);
 		SKShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
 
 		// The creator, can not be null when creating a shopkeeper via this method:
 		Player creator = shopCreationData.getCreator();
-		Validate.notNull(creator, "Creator of shopCreationData is null");
+		creator = Validate.notNull(creator, "Creator of shopCreationData is null");
 
 		AbstractShopType<?> shopType = this;
 		AbstractShopObjectType<?> shopObjectType = (AbstractShopObjectType<?>) shopCreationData.getShopObjectType();
@@ -183,7 +204,9 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 		if (!shopType.isEnabled()) {
-			TextUtils.sendMessage(creator, Messages.shopTypeDisabled, "type", shopType.getIdentifier());
+			TextUtils.sendMessage(creator, Messages.shopTypeDisabled,
+					"type", shopType.getIdentifier()
+			);
 			return null;
 		}
 
@@ -193,11 +216,14 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 		if (!shopObjectType.isEnabled()) {
-			TextUtils.sendMessage(creator, Messages.shopObjectTypeDisabled, "type", shopObjectType.getIdentifier());
+			TextUtils.sendMessage(creator, Messages.shopObjectTypeDisabled,
+					"type", shopObjectType.getIdentifier()
+			);
 			return null;
 		}
 
-		Location spawnLocation = shopCreationData.getSpawnLocation(); // Can be null for virtual shops
+		// Can be null for virtual shops:
+		Location spawnLocation = shopCreationData.getSpawnLocation();
 		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace(); // Can be null
 
 		// Validate the spawn location:
@@ -207,9 +233,11 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		}
 
 		// Check if the location is already used by another shopkeeper:
-		if (spawnLocation != null && !shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
-			TextUtils.sendMessage(creator, Messages.locationAlreadyInUse);
-			return null;
+		if (spawnLocation != null) {
+			if (!shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+				TextUtils.sendMessage(creator, Messages.locationAlreadyInUse);
+				return null;
+			}
 		}
 
 		try {
@@ -219,9 +247,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			}
 
 			// Create and spawn the shopkeeper:
-			@SuppressWarnings("unchecked")
-			T shopkeeper = (T) shopkeeperRegistry.createShopkeeper(shopCreationData);
-			assert shopkeeper != null;
+			T shopkeeper = Unsafe.castNonNull(shopkeeperRegistry.createShopkeeper(shopCreationData));
 
 			// Send creation message to creator:
 			TextUtils.sendMessage(creator, this.getCreatedMessage());
@@ -233,7 +259,8 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		} catch (ShopkeeperCreateException e) {
 			// Some issue identified during shopkeeper creation (possibly hinting to a bug):
 			// TODO Translation?
-			TextUtils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: " + e.getMessage());
+			TextUtils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: "
+					+ e.getMessage());
 			return null;
 		}
 	}

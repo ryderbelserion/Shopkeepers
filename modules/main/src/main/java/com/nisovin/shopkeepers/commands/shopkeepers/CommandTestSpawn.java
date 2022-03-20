@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -23,7 +24,8 @@ import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.TimeUtils;
 
 /**
- * Measures the time it takes to despawn and respawn the active shopkeepers within the current chunk.
+ * Measures the time it takes to despawn and respawn the active shopkeepers within the current
+ * chunk.
  */
 class CommandTestSpawn extends PlayerCommand {
 
@@ -39,13 +41,17 @@ class CommandTestSpawn extends PlayerCommand {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// Set description:
-		this.setDescription(Text.of("Measures the time it takes to respawn the active shopkeepers within the current chunk."));
+		this.setDescription(Text.of("Measures the time it takes to respawn the active shopkeepers "
+				+ "within the current chunk."));
 
 		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
 
 		// Arguments:
-		this.addArgument(new BoundedIntegerArgument(ARGUMENT_REPETITIONS, 1, 1000).orDefaultValue(10));
+		this.addArgument(
+				new BoundedIntegerArgument(ARGUMENT_REPETITIONS, 1, 1000)
+						.orDefaultValue(10)
+		);
 	}
 
 	@Override
@@ -56,7 +62,7 @@ class CommandTestSpawn extends PlayerCommand {
 
 		// Get the shopkeepers of the current chunk:
 		ChunkCoords chunkCoords = new ChunkCoords(player.getLocation());
-		Collection<? extends AbstractShopkeeper> chunkShopkeepers = plugin.getShopkeeperRegistry().getShopkeepersInChunk(chunkCoords);
+		Collection<? extends @NonNull AbstractShopkeeper> chunkShopkeepers = plugin.getShopkeeperRegistry().getShopkeepersInChunk(chunkCoords);
 		if (chunkShopkeepers.isEmpty()) {
 			player.sendMessage(ChatColor.RED + "There are no shopkeepers in this chunk ("
 					+ chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ() + ")!");
@@ -64,7 +70,7 @@ class CommandTestSpawn extends PlayerCommand {
 		}
 
 		// We only despawn and spawn the shopkeepers that are currently spawned and active:
-		List<AbstractShopkeeper> activeShopkeepers = new ArrayList<>(chunkShopkeepers.size());
+		List<@NonNull AbstractShopkeeper> activeShopkeepers = new ArrayList<>(chunkShopkeepers.size());
 		chunkShopkeepers.forEach(shopkeeper -> {
 			if (shopkeeper.getShopObject().isActive()) {
 				activeShopkeepers.add(shopkeeper);
@@ -78,7 +84,8 @@ class CommandTestSpawn extends PlayerCommand {
 			return;
 		}
 
-		player.sendMessage(ChatColor.GREEN + "Measuring the time it takes to respawn the active shopkeepers within this chunk ...");
+		player.sendMessage(ChatColor.GREEN + "Measuring the time it takes to respawn the active "
+				+ "shopkeepers within this chunk ...");
 
 		long startTimeNanos = System.nanoTime();
 
@@ -92,19 +99,39 @@ class CommandTestSpawn extends PlayerCommand {
 			failedToSpawn += result.failedToSpawn;
 		}
 
-		double avgDespawnTimeMillis = TimeUtils.convert(MathUtils.average(despawnTimesNanos), TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double avgDespawnTimeMillis = TimeUtils.convert(
+				MathUtils.average(despawnTimesNanos),
+				TimeUnit.NANOSECONDS,
+				TimeUnit.MILLISECONDS
+		);
 		double avgDespawnTimePerShopkeeperMillis = avgDespawnTimeMillis / activeShopkeepers.size();
 
-		double maxDespawnTimeMillis = TimeUtils.convert(MathUtils.max(despawnTimesNanos), TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double maxDespawnTimeMillis = TimeUtils.convert(
+				MathUtils.max(despawnTimesNanos),
+				TimeUnit.NANOSECONDS,
+				TimeUnit.MILLISECONDS
+		);
 		double maxDespawnTimePerShopkeeperMillis = maxDespawnTimeMillis / activeShopkeepers.size();
 
-		double avgSpawnTimeMillis = TimeUtils.convert(MathUtils.average(spawnTimesNanos), TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double avgSpawnTimeMillis = TimeUtils.convert(
+				MathUtils.average(spawnTimesNanos),
+				TimeUnit.NANOSECONDS,
+				TimeUnit.MILLISECONDS
+		);
 		double avgSpawnTimePerShopkeeperMillis = avgSpawnTimeMillis / activeShopkeepers.size();
 
-		double maxSpawnTimeMillis = TimeUtils.convert(MathUtils.max(spawnTimesNanos), TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double maxSpawnTimeMillis = TimeUtils.convert(
+				MathUtils.max(spawnTimesNanos),
+				TimeUnit.NANOSECONDS,
+				TimeUnit.MILLISECONDS
+		);
 		double maxSpawnTimePerShopkeeperMillis = maxSpawnTimeMillis / activeShopkeepers.size();
 
-		double totalDurationMillis = TimeUtils.convert(System.nanoTime() - startTimeNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double totalDurationMillis = TimeUtils.convert(
+				System.nanoTime() - startTimeNanos,
+				TimeUnit.NANOSECONDS,
+				TimeUnit.MILLISECONDS
+		);
 
 		// Result summary:
 		player.sendMessage(ChatColor.GREEN + "Shopkeepers: " + ChatColor.YELLOW + activeShopkeepers.size()
@@ -142,7 +169,7 @@ class CommandTestSpawn extends PlayerCommand {
 		int failedToSpawn = 0;
 	}
 
-	private static Result testSpawn(Collection<? extends AbstractShopkeeper> shopkeepers) {
+	private static Result testSpawn(Collection<? extends @NonNull AbstractShopkeeper> shopkeepers) {
 		Result result = new Result();
 
 		// Despawn the shopkeepers:

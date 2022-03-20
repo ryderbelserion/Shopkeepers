@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers.tradelog.data;
 
 import java.time.Instant;
+import java.util.Objects;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -10,8 +13,9 @@ import com.nisovin.shopkeepers.util.trading.MergedTrades;
 /**
  * An immutable snapshot of the information about one or multiple equal trades that took place.
  * <p>
- * In order to represent trades more compactly, a single {@link TradeRecord} may represent a number of consecutive
- * trades that involve the same player, the same shopkeeper, and the same traded items.
+ * In order to represent trades more compactly, a single {@link TradeRecord} may represent a number
+ * of consecutive trades that involve the same player, the same shopkeeper, and the same traded
+ * items.
  */
 public class TradeRecord {
 
@@ -33,7 +37,15 @@ public class TradeRecord {
 		UnmodifiableItemStack item1 = trades.getOfferedItem1();
 		UnmodifiableItemStack item2 = trades.getOfferedItem2();
 		int tradeCount = trades.getTradeCount();
-		return new TradeRecord(timestamp, playerRecord, shopRecord, resultItem, item1, item2, tradeCount);
+		return new TradeRecord(
+				timestamp,
+				playerRecord,
+				shopRecord,
+				resultItem,
+				item1,
+				item2,
+				tradeCount
+		);
 	}
 
 	/**
@@ -58,17 +70,24 @@ public class TradeRecord {
 	private final Instant timestamp; // Not null
 	private final PlayerRecord player; // Not null
 	private final ShopRecord shop; // Not null
-	// The items provided by the player that match the first and second items required by the trade. These items might
-	// not necessarily be equal the items required by the trade (they only have to 'match' / be accepted). Their amounts
-	// match those of the trading recipe.
+	// The items provided by the player that match the first and second items required by the trade.
+	// These items might not necessarily be equal the items required by the trade (they only have to
+	// 'match' / be accepted). Their amounts match those of the trading recipe.
 	// The order in which the player provided the items in the trading interface is not recorded.
 	private final UnmodifiableItemStack resultItem; // Not null
 	private final UnmodifiableItemStack item1; // Not null
-	private final UnmodifiableItemStack item2; // Can be null
-	private final int tradeCount;
+	private final @Nullable UnmodifiableItemStack item2; // Can be null
+	private final int tradeCount; // > 0
 
-	private TradeRecord(Instant timestamp, PlayerRecord player, ShopRecord shop, UnmodifiableItemStack resultItem,
-						UnmodifiableItemStack item1, UnmodifiableItemStack item2, int tradeCount) {
+	private TradeRecord(
+			Instant timestamp,
+			PlayerRecord player,
+			ShopRecord shop,
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2,
+			int tradeCount
+	) {
 		Validate.notNull(timestamp, "timestamp is null");
 		Validate.notNull(player, "player is null");
 		Validate.notNull(shop, "shop is null");
@@ -114,8 +133,8 @@ public class TradeRecord {
 	/**
 	 * Gets the result item.
 	 * <p>
-	 * In order to avoid excessive item copying, this returns the item stored by this record without copying it first.
-	 * However, it is only meant for read-only purposes. Do not modify it!
+	 * In order to avoid excessive item copying, this returns the item stored by this record without
+	 * copying it first. However, it is only meant for read-only purposes. Do not modify it!
 	 * 
 	 * @return an unmodifiable view on the result item, not <code>null</code>
 	 */
@@ -126,8 +145,8 @@ public class TradeRecord {
 	/**
 	 * Gets the first item provided by the player.
 	 * <p>
-	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the corresponding item of
-	 * the used trading recipe.
+	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the
+	 * corresponding item of the used trading recipe.
 	 * 
 	 * @return an unmodifiable view on the first item involved in the trade, not <code>null</code>
 	 */
@@ -138,12 +157,13 @@ public class TradeRecord {
 	/**
 	 * Gets the second item provided by the player.
 	 * <p>
-	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the corresponding item of
-	 * the used trading recipe.
+	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the
+	 * corresponding item of the used trading recipe.
 	 * 
-	 * @return an unmodifiable view on the second item involved in the trade, can be <code>null</code>
+	 * @return an unmodifiable view on the second item involved in the trade, can be
+	 *         <code>null</code>
 	 */
-	public UnmodifiableItemStack getItem2() {
+	public @Nullable UnmodifiableItemStack getItem2() {
 		return item2;
 	}
 
@@ -186,13 +206,13 @@ public class TradeRecord {
 		result = prime * result + shop.hashCode();
 		result = prime * result + resultItem.hashCode();
 		result = prime * result + item1.hashCode();
-		result = prime * result + ((item2 == null) ? 0 : item2.hashCode());
+		result = prime * result + Objects.hashCode(item2);
 		result = prime * result + tradeCount;
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof TradeRecord)) return false;
 		TradeRecord other = (TradeRecord) obj;
@@ -202,9 +222,7 @@ public class TradeRecord {
 		if (!shop.equals(other.shop)) return false;
 		if (!resultItem.equals(other.resultItem)) return false;
 		if (!item1.equals(other.item1)) return false;
-		if (item2 == null) {
-			if (other.item2 != null) return false;
-		} else if (!item2.equals(other.item2)) return false;
+		if (!Objects.equals(item2, other.item2)) return false;
 		return true;
 	}
 }

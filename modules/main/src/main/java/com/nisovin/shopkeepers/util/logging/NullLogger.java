@@ -4,6 +4,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A {@link Logger} that logs nothing.
  */
@@ -21,12 +23,12 @@ public final class NullLogger extends Logger {
 	}
 
 	@Override
-	public void setLevel(Level level) {
+	public void setLevel(@Nullable Level level) {
 		throw new UnsupportedOperationException("This logger cannot be modified!");
 	}
 
 	@Override
-	public void log(LogRecord logRecord) {
+	public void log(@Nullable LogRecord logRecord) {
 		assert logRecord != null;
 		// Does not log anything.
 	}

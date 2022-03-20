@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.activation;
 
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -8,13 +9,14 @@ import com.nisovin.shopkeepers.util.java.Validate;
 final class ChunkData {
 
 	private final ChunkCoords chunkCoords;
-	// This flag differs from the chunk's current activation state during the processing of a request to
-	// de-/activate a chunk and its actual de-/activation. It does NOT indicate a pending delayed activation.
+	// This flag differs from the chunk's current activation state during the processing of a
+	// request to de-/activate a chunk and its actual de-/activation. It does NOT indicate a pending
+	// delayed activation.
 	private boolean shouldBeActive;
 	private boolean active;
-	// TODO Use one task (or a small number of tasks) for all pending delayed chunk activations, instead of one task
-	// per chunk?
-	private BukkitTask delayedActivationTask = null;
+	// TODO Use one task (or a small number of tasks) for all pending delayed chunk activations,
+	// instead of one task per chunk?
+	private @Nullable BukkitTask delayedActivationTask = null;
 
 	ChunkData(ChunkCoords chunkCoords) {
 		Validate.notNull(chunkCoords, "chunkCoords is null");
@@ -48,7 +50,7 @@ final class ChunkData {
 		return (delayedActivationTask != null);
 	}
 
-	void setDelayedActivationTask(BukkitTask delayedActivationTask) {
+	void setDelayedActivationTask(@Nullable BukkitTask delayedActivationTask) {
 		this.delayedActivationTask = delayedActivationTask;
 	}
 
@@ -61,7 +63,8 @@ final class ChunkData {
 
 	// Checks if the chunk is loaded, but not yet active or pending activation:
 	boolean needsActivation() {
-		// Check if the chunk is already active or pending activation (avoids unnecessary isChunkLoaded calls):
+		// Check if the chunk is already active or pending activation (avoids unnecessary
+		// isChunkLoaded calls):
 		if (this.isActive() || this.isShouldBeActive() || this.isActivationDelayed()) {
 			return false;
 		}

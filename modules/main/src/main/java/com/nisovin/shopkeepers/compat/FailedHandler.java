@@ -9,7 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.bukkit.ServerUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -47,11 +49,19 @@ public final class FailedHandler implements NMSCallProvider {
 		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("s"); // getTag
 
 		nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
-		nmsEntitySetOnGroundMethod = nmsEntityClass.getDeclaredMethod("c", boolean.class); // setOnGround
+		nmsEntitySetOnGroundMethod = nmsEntityClass.getDeclaredMethod(
+				"c", // setOnGround
+				boolean.class
+		);
 
 		nmsGameProfileSerializerClass = Class.forName("net.minecraft.nbt.GameProfileSerializer");
 		nmsNBTBaseClass = Class.forName("net.minecraft.nbt.NBTBase");
-		nmsAreNBTMatchingMethod = nmsGameProfileSerializerClass.getDeclaredMethod("a", nmsNBTBaseClass, nmsNBTBaseClass, boolean.class);
+		nmsAreNBTMatchingMethod = nmsGameProfileSerializerClass.getDeclaredMethod(
+				"a",
+				nmsNBTBaseClass,
+				nmsNBTBaseClass,
+				boolean.class
+		);
 
 		// CraftBukkit
 		obcCraftItemStackClass = Class.forName(obcPackageString + "inventory.CraftItemStack");
@@ -62,9 +72,15 @@ public final class FailedHandler implements NMSCallProvider {
 
 		// Bukkit
 		// Only available on Bukkit 1.15.1 and upwards:
-		raiderSetCanJoinRaidMethod = Raider.class.getDeclaredMethod("setCanJoinRaid", boolean.class);
+		raiderSetCanJoinRaidMethod = Raider.class.getDeclaredMethod(
+				"setCanJoinRaid",
+				boolean.class
+		);
 		// Only available in later versions of Bukkit 1.16.5 and upwards:
-		wanderingTraderSetDespawnDelayMethod = WanderingTrader.class.getDeclaredMethod("setDespawnDelay", int.class);
+		wanderingTraderSetDespawnDelayMethod = WanderingTrader.class.getDeclaredMethod(
+				"setDespawnDelay",
+				int.class
+		);
 	}
 
 	@Override
@@ -78,7 +94,8 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public boolean supportsCustomMobAI() {
-		// Not supported. Mobs will be stationary and not react towards nearby players due to the NoAI flag.
+		// Not supported. Mobs will be stationary and not react towards nearby players due to the
+		// NoAI flag.
 		return false;
 	}
 
@@ -90,7 +107,7 @@ public final class FailedHandler implements NMSCallProvider {
 	@Override
 	public void setOnGround(Entity entity, boolean onGround) {
 		try {
-			Object mcEntity = obcGetHandleMethod.invoke(entity);
+			Object mcEntity = Unsafe.assertNonNull(obcGetHandleMethod.invoke(entity));
 			nmsEntitySetOnGroundMethod.invoke(mcEntity, onGround);
 		} catch (Exception e) {
 			// Ignoring, since this is not that important if it doesn't work.
@@ -99,7 +116,8 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void setNoclip(Entity entity) {
-		// Not supported, but also not necessarily required (just provides a small performance benefit).
+		// Not supported, but also not necessarily required (just provides a small performance
+		// benefit).
 	}
 
 	@Override
@@ -116,26 +134,39 @@ public final class FailedHandler implements NMSCallProvider {
 		try {
 			wanderingTraderSetDespawnDelayMethod.invoke(wanderingTrader, despawnDelay);
 		} catch (Exception e) {
-			// Not supported. The wandering trader might periodically despawn, but is then respawned shortly afterwards.
+			// Not supported. The wandering trader might periodically despawn, but is then respawned
+			// shortly afterwards.
 		}
 	}
 
 	@Override
-	public boolean matches(ItemStack provided, ItemStack required) {
+	public boolean matches(@Nullable ItemStack provided, @Nullable ItemStack required) {
 		if (provided == required) return true;
 		// If the required item is empty, then the provided item has to be empty as well:
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
+		assert required != null && provided != null;
+		Unsafe.assertNonNull(provided);
+		Unsafe.assertNonNull(required);
 		if (provided.getType() != required.getType()) return false;
 		try {
-			Object nmsProvided = obcAsNMSCopyMethod.invoke(null, provided);
-			Object nmsRequired = obcAsNMSCopyMethod.invoke(null, required);
+			Object nmsProvided = Unsafe.assertNonNull(
+					obcAsNMSCopyMethod.invoke(Unsafe.uncheckedNull(), provided)
+			);
+			Object nmsRequired = Unsafe.assertNonNull(
+					obcAsNMSCopyMethod.invoke(Unsafe.uncheckedNull(), required)
+			);
 			Object providedTag = nmsGetTagMethod.invoke(nmsProvided);
 			Object requiredTag = nmsGetTagMethod.invoke(nmsRequired);
-			return (Boolean) nmsAreNBTMatchingMethod.invoke(null, requiredTag, providedTag, false);
+			return Unsafe.castNonNull(nmsAreNBTMatchingMethod.invoke(
+					Unsafe.uncheckedNull(),
+					Unsafe.nullableAsNonNull(requiredTag),
+					Unsafe.nullableAsNonNull(providedTag),
+					false
+			));
 		} catch (Exception e) {
-			// Fallback: Check for metadata equality. In this case the behavior of this method is no longer equivalent
-			// to Minecraft's item comparison behavior!
+			// Fallback: Check for metadata equality. In this case the behavior of this method is no
+			// longer equivalent to Minecraft's item comparison behavior!
 			// The direction of this check is important, because the required item stack might be an
 			// UnmodifiableItemStack.
 			return required.isSimilar(provided);
@@ -148,12 +179,12 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public String getItemSNBT(ItemStack itemStack) {
+	public @Nullable String getItemSNBT(ItemStack itemStack) {
 		return null; // Not supported.
 	}
 
 	@Override
-	public String getItemTypeTranslationKey(Material material) {
+	public @Nullable String getItemTypeTranslationKey(Material material) {
 		return null; // Not supported.
 	}
 }

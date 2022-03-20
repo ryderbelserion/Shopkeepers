@@ -11,7 +11,11 @@ import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
@@ -52,18 +56,18 @@ public abstract class Command {
 			.color(ChatColor.DARK_AQUA).placeholder("description")
 			.buildRoot();
 	private static final Text HELP_ENTRY_FORMAT = Text
-			.placeholder("usage") // the usage format
-			.placeholder("description") // the description format
+			.placeholder("usage") // The usage format
+			.placeholder("description") // The description format
 			.buildRoot();
 
 	private final String name;
-	private final List<String> aliases; // unmodifiable
+	private final List<? extends @NonNull String> aliases; // Unmodifiable
 	private Text description = Text.EMPTY;
 	// Null if no permission is required:
-	private String permission = null;
-	private final List<CommandArgument<?>> arguments = new ArrayList<>();
-	private Command parent = null;
-	private final CommandRegistry childCommands = new CommandRegistry(this);
+	private @Nullable String permission = null;
+	private final List<@NonNull CommandArgument<?>> arguments = new ArrayList<>();
+	private @Nullable Command parent = null;
+	private final CommandRegistry childCommands = Unsafe.initialized(new CommandRegistry(this));
 
 	// Hides this command from the help page:
 	private boolean hiddenInParentHelp = false;
@@ -75,39 +79,41 @@ public abstract class Command {
 	private final MessageArguments commonMessageArgs;
 	{
 		// Dynamically evaluated:
-		Map<String, Supplier<?>> commonMessageArgs = new HashMap<>();
-		commonMessageArgs.put("name", this::getName);
-		commonMessageArgs.put("description", this::getDescription);
-		commonMessageArgs.put("command", this::getCommandFormat);
-		commonMessageArgs.put("usage", this::getUsageFormat);
-		commonMessageArgs.put("arguments", this::getArgumentsFormat);
+		Map<@NonNull String, @NonNull Supplier<@NonNull ?>> commonMessageArgs = new HashMap<>();
+		commonMessageArgs.put("name", Unsafe.initialized(this)::getName);
+		commonMessageArgs.put("description", Unsafe.initialized(this)::getDescription);
+		commonMessageArgs.put("command", Unsafe.initialized(this)::getCommandFormat);
+		commonMessageArgs.put("usage", Unsafe.initialized(this)::getUsageFormat);
+		commonMessageArgs.put("arguments", Unsafe.initialized(this)::getArgumentsFormat);
 		this.commonMessageArgs = MessageArguments.ofMap(commonMessageArgs);
 	}
 
 	// Formatting (null results in the parent's formatting to be used):
-	private Text helpTitleFormat = null;
-	private Text helpUsageFormat = null;
-	private Text helpDescFormat = null;
-	private Text helpChildUsageFormat = null;
-	private Text helpChildDescFormat = null;
+	private @Nullable Text helpTitleFormat = null;
+	private @Nullable Text helpUsageFormat = null;
+	private @Nullable Text helpDescFormat = null;
+	private @Nullable Text helpChildUsageFormat = null;
+	private @Nullable Text helpChildDescFormat = null;
 
 	public Command(String name) {
-		this(name, null);
+		this(name, Collections.emptyList());
 	}
 
-	public Command(String name, List<String> aliases) {
+	public Command(String name, List<? extends @NonNull String> aliases) {
 		Validate.notEmpty(name, "name is null or empty");
+		Validate.notNull(aliases, "aliases is null");
 		this.name = name;
 
 		// Validate and copy aliases:
-		if (aliases == null || aliases.isEmpty()) {
+		if (aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
-			List<String> aliasesCopy = new ArrayList<>(aliases);
+			List<@NonNull String> aliasesCopy = new ArrayList<>(aliases);
 			// Validate aliases:
 			for (String alias : aliasesCopy) {
 				Validate.notEmpty(alias, "aliases contains null or empty alias");
-				Validate.isTrue(!StringUtils.containsWhitespace(alias), "aliases contains alias with whitespace");
+				Validate.isTrue(!StringUtils.containsWhitespace(alias),
+						"aliases contains alias with whitespace");
 			}
 			this.aliases = Collections.unmodifiableList(aliasesCopy);
 		}
@@ -116,10 +122,11 @@ public abstract class Command {
 	/**
 	 * Gets the name of this command.
 	 * <p>
-	 * For {@link BaseCommand base commands} this name is supposed to be unique among the commands of the same plugin.
-	 * However, there can be conflicts with the commands of other plugins.
+	 * For {@link BaseCommand base commands} this name is supposed to be unique among the commands
+	 * of the same plugin. However, there can be conflicts with the commands of other plugins.
 	 * <p>
-	 * For child commands this name is supposed to be unique among the child commands of the same parent command.
+	 * For child commands this name is supposed to be unique among the child commands of the same
+	 * parent command.
 	 * 
 	 * @return the name
 	 */
@@ -130,11 +137,12 @@ public abstract class Command {
 	/**
 	 * Gets all the aliases of this command.
 	 * <p>
-	 * Depending on the names and aliases of other commands, not all aliases might actually be active for this command.
+	 * Depending on the names and aliases of other commands, not all aliases might actually be
+	 * active for this command.
 	 * 
 	 * @return an unmodifiable view on the aliases, might be empty (but not <code>null</code>)
 	 */
-	public final List<String> getAliases() {
+	public final List<? extends @NonNull String> getAliases() {
 		return aliases;
 	}
 
@@ -143,8 +151,8 @@ public abstract class Command {
 	 * <p>
 	 * Might be used in command listings and the command help.
 	 * 
-	 * @return the short description, might be {@link Text#isPlainTextEmpty() empty} to indicate that no description is
-	 *         available
+	 * @return the short description, might be {@link Text#isPlainTextEmpty() empty} to indicate
+	 *         that no description is available
 	 */
 	public final Text getDescription() {
 		return description;
@@ -157,21 +165,24 @@ public abstract class Command {
 	 *            the description
 	 * @see #getDescription()
 	 */
-	protected final void setDescription(Text description) {
+	protected final void setDescription(
+			@UnknownInitialization Command this,
+			@Nullable Text description
+	) {
 		this.description = (description == null) ? Text.EMPTY : description;
 	}
 
 	/**
-	 * Gets the permission which is required for executing this command.
+	 * Gets the permission that is required for executing this command.
 	 * <p>
-	 * This only affects execution of this specific command, and not those of the child commands. Each child command has
-	 * to specify its requirements and behavior separately.
+	 * This only affects execution of this specific command, and not those of the child commands.
+	 * Each child command has to specify its requirements and behavior separately.
 	 * <p>
 	 * This permission is for example used by {@link #testPermission(CommandSender)}.
 	 * 
-	 * @return the required permission, <code>null</code> if no required permission is set
+	 * @return the required permission, or <code>null</code> if no required permission is set
 	 */
-	public final String getPermission() {
+	public final @Nullable String getPermission() {
 		return permission;
 	}
 
@@ -182,35 +193,42 @@ public abstract class Command {
 	 *            the permission
 	 * @see #getPermission()
 	 */
-	protected final void setPermission(String permission) {
+	protected final void setPermission(
+			@UnknownInitialization Command this,
+			@Nullable String permission
+	) {
 		this.permission = permission;
 	}
 
 	/**
-	 * Checks whether the given {@link CommandSender} is potentially allowed to execute this command.
+	 * Checks whether the given {@link CommandSender} is potentially allowed to execute this
+	 * command.
 	 * <p>
-	 * This only affects execution of this specific command, and not those of the child commands. Each child command has
-	 * to specify its requirements and behavior separately.
+	 * This only affects execution of this specific command, and not those of the child commands.
+	 * Each child command has to specify its requirements and behavior separately.
 	 * <p>
-	 * By default the implementation checks the permission returned by {@link #getPermission()}, but it may be
-	 * overridden to check for additional {@link CommandSender} specific conditions. If implementations are unsure if
-	 * the {@link CommandSender} can execute this command, <code>true</code> should be returned.
+	 * By default the implementation checks the permission returned by {@link #getPermission()}, but
+	 * it may be overridden to check for additional {@link CommandSender} specific conditions. If
+	 * implementations are unsure if the {@link CommandSender} can execute this command,
+	 * <code>true</code> should be returned.
 	 * <p>
-	 * The result of this method may be used to determine whether this command is listed in command listings for the
-	 * given {@link CommandSender}.
+	 * The result of this method may be used to determine whether this command is listed in command
+	 * listings for the given {@link CommandSender}.
 	 * 
 	 * @param sender
 	 *            the sender
-	 * @return <code>true</code> if the given {@link CommandSender} might be allowed to execute this command
+	 * @return <code>true</code> if the given {@link CommandSender} might be allowed to execute this
+	 *         command
 	 */
 	public boolean testPermission(CommandSender sender) {
 		Validate.notNull(sender, "sender is null");
-		return permission == null || PermissionUtils.hasPermission(sender, permission);
+		return (permission != null) ? PermissionUtils.hasPermission(sender, permission) : true;
 	}
 
 	/**
-	 * Similar to {@link Command#testPermission(CommandSender)}, but throws an exception with feedback message in case
-	 * the given {@link CommandSender} is not allowed to execute this command.
+	 * Similar to {@link Command#testPermission(CommandSender)}, but throws an exception with
+	 * feedback message in case the given {@link CommandSender} is not allowed to execute this
+	 * command.
 	 * 
 	 * @param sender
 	 *            the sender
@@ -235,7 +253,10 @@ public abstract class Command {
 	 * @throws NoPermissionException
 	 *             if the sender does not have the permission
 	 */
-	public void checkPermission(CommandSender sender, String permission) throws NoPermissionException {
+	public void checkPermission(
+			CommandSender sender,
+			@Nullable String permission
+	) throws NoPermissionException {
 		Validate.notNull(sender, "sender is null");
 		if (permission != null && !PermissionUtils.hasPermission(sender, permission)) {
 			throw this.noPermissionException();
@@ -249,11 +270,12 @@ public abstract class Command {
 	/**
 	 * Checks whether the given type of {@link CommandSender} is accepted to execute this command.
 	 * <p>
-	 * This only affects execution of this specific command, and not those of the child commands. Each child command has
-	 * to specify its requirements and behavior separately.
+	 * This only affects execution of this specific command, and not those of the child commands.
+	 * Each child command has to specify its requirements and behavior separately.
 	 * <p>
-	 * If overridden, it is recommended to also override {@link #checkCommandSource(CommandSender)} in order to use a
-	 * more specific error message there in case the command sender cannot use the command.
+	 * If overridden, it is recommended to also override {@link #checkCommandSource(CommandSender)}
+	 * in order to use a more specific error message there in case the command sender cannot use the
+	 * command.
 	 * 
 	 * @param sender
 	 *            the command sender
@@ -270,8 +292,8 @@ public abstract class Command {
 	/**
 	 * Checks whether the given type of {@link CommandSender} is accepted to execute this command.
 	 * <p>
-	 * If the {@link CommandSender} is not accepted, the thrown {@link CommandSourceRejectedException} contains a
-	 * user-friendly rejection message.
+	 * If the {@link CommandSender} is not accepted, the thrown
+	 * {@link CommandSourceRejectedException} contains a user-friendly rejection message.
 	 * 
 	 * @param sender
 	 *            the sender, receives feedback
@@ -288,18 +310,20 @@ public abstract class Command {
 	/**
 	 * Gets the command format of this command.
 	 * <p>
-	 * The command format depends on the chain of parent commands and does not include this command's arguments.<br>
-	 * Example: For a command {@code '/mail send <player> <message>'} this would be {@code '/mail send'}.
+	 * The command format depends on the chain of parent commands and does not include this
+	 * command's arguments.<br>
+	 * Example: For a command {@code '/mail send <player> <message>'} this would be
+	 * {@code '/mail send'}.
 	 * 
 	 * @return the command format
 	 */
 	public final String getCommandFormat() {
-		if (parent == null) {
-			// This is a base command:
-			return COMMAND_PREFIX + this.getName();
-		} else {
+		if (parent != null) {
 			// Append primary alias to the format of the parent:
 			return parent.getCommandFormat() + ARGUMENTS_SEPARATOR + this.getName();
+		} else {
+			// This is a base command:
+			return COMMAND_PREFIX + this.getName();
 		}
 	}
 
@@ -308,7 +332,7 @@ public abstract class Command {
 	 * 
 	 * @return an unmodifiable view on the arguments of this command
 	 */
-	public final List<CommandArgument<?>> getArguments() {
+	public final List<? extends @NonNull CommandArgument<?>> getArguments() {
 		return Collections.unmodifiableList(arguments);
 	}
 
@@ -319,7 +343,10 @@ public abstract class Command {
 	 *            the argument name
 	 * @return the argument, or <code>null</code> if there is no such argument
 	 */
-	public final CommandArgument<?> getArgument(String name) {
+	public final @Nullable CommandArgument<?> getArgument(
+			@UnknownInitialization(Command.class) Command this,
+			String name
+	) {
 		for (CommandArgument<?> argument : arguments) {
 			if (argument.getName().equals(name)) {
 				return argument;
@@ -334,9 +361,13 @@ public abstract class Command {
 	 * @param argument
 	 *            the argument
 	 */
-	protected final void addArgument(CommandArgument<?> argument) {
+	protected final void addArgument(
+			@UnknownInitialization(Command.class) Command this,
+			CommandArgument<?> argument
+	) {
 		Validate.notNull(argument, "argument is null");
-		Validate.isTrue(this.getArgument(argument.getName()) == null, "There is already another argument with this name: " + argument.getName());
+		Validate.isTrue(this.getArgument(argument.getName()) == null,
+				"There is already another argument with this name: " + argument.getName());
 		Validate.isTrue(argument.getParent() == null, "argument already has a parent");
 		// Make sure that no parent can be set once the argument has been added:
 		argument.setParent(null); // Parent can only be set once
@@ -346,12 +377,13 @@ public abstract class Command {
 	/**
 	 * Gets the arguments format of this command.
 	 * <p>
-	 * Example: For a command {@code '/message <player> <message>'}, this would be {@code '<player> <message>'}.<br>
-	 * If this command is a child-command, the argument format is meant to only contain the arguments for this
-	 * child-command.
+	 * Example: For a command {@code '/message <player> <message>'}, this would be
+	 * {@code '<player> <message>'}.<br>
+	 * If this command is a child-command, the argument format is meant to only contain the
+	 * arguments for this child-command.
 	 * <p>
-	 * The returned format is empty if this command does not use any arguments, if all arguments are hidden, or if this
-	 * command only acts as parent for other commands.
+	 * The returned format is empty if this command does not use any arguments, if all arguments are
+	 * hidden, or if this command only acts as parent for other commands.
 	 * 
 	 * @return the arguments format, possibly empty
 	 */
@@ -406,12 +438,12 @@ public abstract class Command {
 		return commonMessageArgs;
 	}
 
-	public final Command getParent() {
+	public final @Nullable Command getParent() {
 		return parent;
 	}
 
 	// Gets set by the parent command during registration of this command as child-command:
-	final void setParent(Command parent) {
+	final void setParent(@Nullable Command parent) {
 		this.parent = parent;
 	}
 
@@ -428,7 +460,9 @@ public abstract class Command {
 		}
 	}
 
-	public final CommandRegistry getChildCommands() {
+	public final CommandRegistry getChildCommands(
+			@UnknownInitialization(Command.class) Command this
+	) {
 		return childCommands;
 	}
 
@@ -441,7 +475,7 @@ public abstract class Command {
 	 *            the ArgumentsReader, not <code>null</code>
 	 * @return the child command, or <code>null</code> if none was found
 	 */
-	protected Command getChildCommand(ArgumentsReader argsReader) {
+	protected @Nullable Command getChildCommand(ArgumentsReader argsReader) {
 		String childCommandAlias = argsReader.peekIfPresent();
 		if (childCommandAlias != null) {
 			Command childcommand = this.getChildCommands().getCommand(childCommandAlias);
@@ -458,8 +492,8 @@ public abstract class Command {
 	/**
 	 * Processes the given inputs and then executes this command.
 	 * <p>
-	 * Unlike {@link #processCommand(CommandInput)} this includes handling of errors that occur during command
-	 * processing.
+	 * Unlike {@link #processCommand(CommandInput)} this includes handling of errors that occur
+	 * during command processing.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
@@ -492,13 +526,17 @@ public abstract class Command {
 			Log.debug(DebugOptions.commands, () -> "ArgumentsReader: " + argsReader);
 		} catch (Exception e) {
 			// An unexpected exception was caught:
-			TextUtils.sendMessage(sender, Text.color(ChatColor.RED).text("An error occurred during command handling! Check the console log."));
+			TextUtils.sendMessage(
+					sender,
+					Text.color(ChatColor.RED)
+							.text("An error occurred during command handling! Check the console log.")
+			);
 			Log.severe("An error occurred during command handling!", e);
 			Log.severe("Context: " + context);
 		}
 	}
 
-	private String getArgumentChain(CommandArgument<?> argument) {
+	private String getArgumentChain(@Nullable CommandArgument<?> argument) {
 		if (argument == null) return "-";
 		String delimiter = " < ";
 		StringBuilder sb = new StringBuilder();
@@ -524,7 +562,8 @@ public abstract class Command {
 	 */
 	public void processCommand(CommandInput input) throws CommandException {
 		Validate.notNull(input, "input is null");
-		Validate.isTrue(input.getCommand() == this.getRootCommand(), "input is meant for a different command");
+		Validate.isTrue(input.getCommand() == this.getRootCommand(),
+				"input is meant for a different command");
 
 		CommandContext context = new SimpleCommandContext();
 		ArgumentsReader argsReader = new ArgumentsReader(input);
@@ -540,7 +579,8 @@ public abstract class Command {
 	 * <li>Checking if the {@link CommandSender} is accepted.
 	 * <li>Checking the command permission for the {@link CommandSender}.
 	 * <li>Parsing the command arguments.
-	 * <li>And finally executing this command via {@link #execute(CommandInput, CommandContextView)}.
+	 * <li>And finally executing this command via
+	 * {@link #execute(CommandInput, CommandContextView)}.
 	 * </ul>
 	 * 
 	 * @param input
@@ -548,10 +588,16 @@ public abstract class Command {
 	 * @throws CommandException
 	 *             if command execution failed
 	 */
-	protected void processCommand(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws CommandException {
+	protected void processCommand(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader
+	) throws CommandException {
 		assert input != null && context != null && argsReader != null;
-		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
-		assert (argsReader.getArgs() == input.getArguments()); // ArgumentsReader is consistent with the input
+		// The input is meant for this command:
+		assert (input.getCommand() == this.getRootCommand());
+		// ArgumentsReader is consistent with the input:
+		assert (argsReader.getArgs() == input.getArguments());
 
 		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
@@ -587,18 +633,25 @@ public abstract class Command {
 		public final int argumentsCount;
 
 		public int currentArgumentIndex = 0;
-		public ArgumentParseException currentParseException = null;
+		public @Nullable ArgumentParseException currentParseException = null;
 
 		// Latest fallback. Recursively holds references to earlier fallbacks.
-		public Fallback pendingFallback = null;
-		// If present and parsing fails, this exception overrides any other exception that would otherwise be thrown.
-		// This exception is usually associated with an earlier command argument that initially failed to parse but was
-		// later able to restart the parsing due to a successful fallback. This exception is usually expected to be a
-		// more relevant root cause of why the parsing eventually failed.
-		private ArgumentParseException overrideParseException = null;
+		public @Nullable Fallback pendingFallback = null;
+		// If present and parsing fails, this exception overrides any other exception that would
+		// otherwise be thrown.
+		// This exception is usually associated with an earlier command argument that initially
+		// failed to parse but was later able to restart the parsing due to a successful fallback.
+		// This exception is usually expected to be a more relevant root cause of why the parsing
+		// eventually failed.
+		private @Nullable ArgumentParseException overrideParseException = null;
 		private int overrideParseExceptionArgumentIndex = -1;
 
-		protected ParsingContext(CommandInput input, CommandContext context, ArgumentsReader argsReader, int argumentsCount) {
+		protected ParsingContext(
+				CommandInput input,
+				CommandContext context,
+				ArgumentsReader argsReader,
+				int argumentsCount
+		) {
 			assert input != null && context != null && argsReader != null && argumentsCount >= 0;
 			this.input = input;
 			this.context = context;
@@ -610,7 +663,7 @@ public abstract class Command {
 			return (pendingFallback != null);
 		}
 
-		public Fallback getPendingFallback() {
+		public @Nullable Fallback getPendingFallback() {
 			return pendingFallback;
 		}
 
@@ -618,8 +671,12 @@ public abstract class Command {
 			return (currentArgumentIndex < (argumentsCount - 1));
 		}
 
-		public void setOverrideParseException(int argumentIndex, ArgumentParseException overrideParseException) {
-			// The currently set override parse exception cannot be replaced by later command arguments.
+		public void setOverrideParseException(
+				int argumentIndex,
+				@Nullable ArgumentParseException overrideParseException
+		) {
+			// The currently set override parse exception cannot be replaced by later command
+			// arguments.
 			if (this.overrideParseException != null && argumentIndex > overrideParseExceptionArgumentIndex) {
 				return;
 			}
@@ -630,15 +687,20 @@ public abstract class Command {
 
 	protected static class Fallback {
 
-		protected final Fallback previousPendingFallback; // can be null
+		protected final @Nullable Fallback previousPendingFallback;
 		protected final int argumentIndex;
 
 		private final FallbackArgumentException exception;
 		private final BufferedCommandContext bufferedContext;
 		private final ArgumentsReader originalArgsReader; // Snapshot from before the fallback
 
-		protected Fallback(	Fallback previousPendingFallback, int argumentIndex, FallbackArgumentException exception,
-							BufferedCommandContext bufferedContext, ArgumentsReader originalArgsReader) {
+		protected Fallback(
+				@Nullable Fallback previousPendingFallback,
+				int argumentIndex,
+				FallbackArgumentException exception,
+				BufferedCommandContext bufferedContext,
+				ArgumentsReader originalArgsReader
+		) {
 			assert exception != null && bufferedContext != null && originalArgsReader != null;
 			this.previousPendingFallback = previousPendingFallback;
 			this.argumentIndex = argumentIndex;
@@ -657,7 +719,8 @@ public abstract class Command {
 		}
 
 		/**
-		 * Gets the {@link FallbackArgument} that created the exception and may be able to provide a fallback.
+		 * Gets the {@link FallbackArgument} that created the exception and may be able to provide a
+		 * fallback.
 		 * 
 		 * @return the fallback argument
 		 */
@@ -666,8 +729,8 @@ public abstract class Command {
 		}
 
 		/**
-		 * Gets the {@link BufferedCommandContext} that tracks context changes that happen while the fallback is
-		 * pending.
+		 * Gets the {@link BufferedCommandContext} that tracks context changes that happen while the
+		 * fallback is pending.
 		 * 
 		 * @return the buffered command context
 		 */
@@ -679,8 +742,9 @@ public abstract class Command {
 		 * Gets the original {@link CommandContext} from before the fallback.
 		 * <p>
 		 * This uses the {@link #getBufferedContext() buffered context's}
-		 * {@link BufferedCommandContext#getParentContext() parent context} and therefore only matches the original
-		 * state as long as the buffered context's buffer has not yet been applied.
+		 * {@link BufferedCommandContext#getParentContext() parent context} and therefore only
+		 * matches the original state as long as the buffered context's buffer has not yet been
+		 * applied.
 		 * 
 		 * @return the original context
 		 */
@@ -710,10 +774,19 @@ public abstract class Command {
 	 * @throws ArgumentParseException
 	 *             if a required argument cannot be parsed or there are unparsed remaining arguments
 	 */
-	protected void parseArguments(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+	protected void parseArguments(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		// Setup parsing context:
 		int argumentsCount = arguments.size();
-		ParsingContext parsingContext = new ParsingContext(input, context, argsReader, argumentsCount);
+		ParsingContext parsingContext = new ParsingContext(
+				input,
+				context,
+				argsReader,
+				argumentsCount
+		);
 
 		// Parse all arguments:
 		for (; parsingContext.currentArgumentIndex < argumentsCount; ++parsingContext.currentArgumentIndex) {
@@ -742,7 +815,8 @@ public abstract class Command {
 			// On success this stores any parsed values inside the context:
 			argument.parse(parsingContext.input, context, argsReader);
 		} catch (FallbackArgumentException e) {
-			Log.debug(DebugOptions.commands, () -> "Fallback for argument '" + argument.getName() + "': " + e.getMessage());
+			Log.debug(DebugOptions.commands,
+					() -> "Fallback for argument '" + argument.getName() + "': " + e.getMessage());
 			argsReader.setState(argsReaderState); // Restore previous args reader state
 
 			// Keep track of context changes while continuing with the pending fallback:
@@ -750,14 +824,21 @@ public abstract class Command {
 			parsingContext.context = bufferedContext;
 
 			// Set pending fallback (also remembers the previous pending fallback):
-			Fallback fallback = new Fallback(parsingContext.pendingFallback, parsingContext.currentArgumentIndex, e, bufferedContext, argsReaderState);
+			Fallback fallback = new Fallback(
+					parsingContext.pendingFallback,
+					parsingContext.currentArgumentIndex,
+					e,
+					bufferedContext,
+					argsReaderState
+			);
 			parsingContext.pendingFallback = fallback;
 		} catch (ArgumentParseException e) { // Parsing failed
 			argsReader.setState(argsReaderState); // Restore previous args reader state
 			parseException = e;
 		}
 		assert !(parseException instanceof FallbackArgumentException);
-		parsingContext.currentParseException = parseException; // Resets to null on success or fallback
+		// Resets to null on success or fallback:
+		parsingContext.currentParseException = parseException;
 	}
 
 	protected void handleFallbacks(ParsingContext parsingContext) throws ArgumentParseException {
@@ -779,21 +860,24 @@ public abstract class Command {
 			}
 		}
 
-		// Note: We attempt to fully parse all command arguments after the fallback before evaluating the fallback.
-		// Evaluating the fallback right after the first subsequent command argument either failed or was able to parse
-		// arguments is not sufficient.
-		// Consider for example the command "/list [player] [page]" with inputs "/list 2" and "/list 123 2":
-		// If the first argument in the input doesn't match any online player, a fallback is used to check if the
-		// argument matches a page number instead (first case) and then the executing player is used as convenient
-		// fallback value.
-		// However, this heuristic fails in the second case, because numbers can (in the unlikely case) also be valid
-		// player names. In order to keep using the heuristic fallback mechanism (which works fine most of the time),
-		// but still be able to correctly parse the second example, where both arguments are specified explicitly, we
-		// need to continue parsing past the page argument and detect the 'unexpected argument'. We can then use a
-		// fallback that accepts any input for the player name.
+		// Note: We attempt to fully parse all command arguments after the fallback before
+		// evaluating the fallback.
+		// Evaluating the fallback right after the first subsequent command argument either failed
+		// or was able to parse arguments is not sufficient.
+		// Consider for example the command "/list [player] [page]" with inputs "/list 2" and "/list
+		// 123 2": If the first argument in the input doesn't match any online player, a fallback is
+		// used to check if the argument matches a page number instead (first case) and then the
+		// executing player is used as convenient fallback value.
+		// However, this heuristic fails in the second case, because numbers can (in the unlikely
+		// case) also be valid player names. In order to keep using the heuristic fallback mechanism
+		// (which works fine most of the time), but still be able to correctly parse the second
+		// example, where both arguments are specified explicitly, we need to continue parsing past
+		// the page argument and detect the 'unexpected argument'. We can then use a fallback that
+		// accepts any input for the player name.
 
-		// Evaluate the pending fallback if parsing of the current command argument failed (without providing a fallback
-		// itself), or if there are no more command arguments to parse. Otherwise continue parsing:
+		// Evaluate the pending fallback if parsing of the current command argument failed (without
+		// providing a fallback itself), or if there are no more command arguments to parse.
+		// Otherwise continue parsing:
 		boolean currentParsingFailed = (parseException != null);
 		boolean hasUnparsedCommandArguments = parsingContext.hasUnparsedCommandArguments();
 		if (!currentParsingFailed && hasUnparsedCommandArguments) {
@@ -801,8 +885,8 @@ public abstract class Command {
 		} // Else: Continue here, evaluating the pending fallback.
 		assert currentParsingFailed || !hasUnparsedCommandArguments;
 
-		// Parsing past the fallback failed if either the current command argument failed, or if there are unparsed
-		// remaining arguments:
+		// Parsing past the fallback failed if either the current command argument failed, or if
+		// there are unparsed remaining arguments:
 		ArgumentsReader argsReader = parsingContext.argsReader;
 		boolean parsingFailed = (currentParsingFailed || argsReader.hasNext());
 
@@ -812,33 +896,44 @@ public abstract class Command {
 		// Reset context to state before fallback:
 		parsingContext.context = fallback.getOriginalContext();
 
-		// Note: If some command argument after the fallback was able to parse something, the args reader might no
-		// longer match the state from before the fallback. If parsing past the fallback failed, reset the args reader
-		// to the state from before the fallback:
-		ArgumentsReader prevArgsState = argsReader.createSnapshot(); // Capture current args reader state
+		// Note: If some command argument after the fallback was able to parse something, the args
+		// reader might no longer match the state from before the fallback. If parsing past the
+		// fallback failed, reset the args reader to the state from before the fallback:
+		// Capture current args reader state:
+		ArgumentsReader prevArgsState = argsReader.createSnapshot();
 		if (parsingFailed) {
 			argsReader.setState(fallback.getOriginalArgsReader());
 		} else {
-			// Parsing past the fallback succeeded. -> There are no remaining arguments for the fallback argument to
-			// consume.
+			// Parsing past the fallback succeeded. -> There are no remaining arguments for the
+			// fallback argument to consume.
 			assert !currentParsingFailed && !hasUnparsedCommandArguments && !argsReader.hasNext();
 		}
 
-		// Reset the override parse exception if the index of the current fallback argument is smaller than the index of
-		// the command argument that previously set the override parse exception:
+		// Reset the override parse exception if the index of the current fallback argument is
+		// smaller than the index of the command argument that previously set the override parse
+		// exception:
 		parsingContext.setOverrideParseException(fallback.argumentIndex, null);
 
 		// Parse fallback:
 		FallbackArgument<?> fallbackArgument = fallback.getFallbackArgument();
 		ArgumentParseException fallbackError = null;
-		// hasRemainingArgs: Only the case if args got reset and there were remaining args originally as well.
+		// hasRemainingArgs: Only the case if args got reset and there were remaining args
+		// originally as well.
 		boolean hasRemainingArgs = argsReader.hasNext();
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		try {
 			// On success this stores any parsed values inside the context:
-			fallbackArgument.parseFallback(parsingContext.input, parsingContext.context, argsReader, fallback.exception, parsingFailed);
-		} catch (FallbackArgumentException e) { // Fallback is not allowed to throw another fallback exception here
-			Validate.State.error("Argument '" + fallbackArgument.getName() + "' threw another FallbackArgumentException while parsing fallback: " + e);
+			fallbackArgument.parseFallback(
+					parsingContext.input,
+					parsingContext.context,
+					argsReader,
+					fallback.exception,
+					parsingFailed
+			);
+		} catch (FallbackArgumentException e) {
+			// Fallback is not allowed to throw another fallback exception here.
+			Validate.State.error("Argument '" + fallbackArgument.getName()
+					+ "' threw another FallbackArgumentException while parsing fallback: " + e);
 		} catch (ArgumentParseException e) { // Fallback failed
 			argsReader.setState(argsReaderState); // Restore previous args reader state
 			fallbackError = e;
@@ -849,31 +944,39 @@ public abstract class Command {
 
 		if (hasRemainingArgs && !fallbackConsumedArgs) {
 			// There are arguments remaining but the fallback did not consume any of them.
-			// Unless the fallback succeeded and restarting the parsing from the current argument would now succeed as
-			// well, it is very likely that continuing would either use the fallback error (if the fallback failed), or
-			// the parsing error that lead to the evaluation of the current fallback (otherwise there would be no
-			// remaining args).
-			// In most cases, however, we will want to use the original (root) parsing error of the current fallback
-			// argument instead. Consider for example the command "/list [player, default: self] [page, default: 1]"
-			// with input "/list a 2", 'a' being an invalid player name: The player name fallback is evaluated as result
-			// of an 'invalid page argument' error, and the fallback will produce 'self' as the default value. Simply
-			// restarting the parsing from here would result in the 'invalid page argument' error to be propagated.
-			// Instead, by remembering the original root parsing exception and using it if the following page argument
-			// still fails to parse, we get the expected 'invalid player' error in this case.
+			// Unless the fallback succeeded and restarting the parsing from the current argument
+			// would now succeed as well, it is very likely that continuing would either use the
+			// fallback error (if the fallback failed), or the parsing error that lead to the
+			// evaluation of the current fallback (otherwise there would be no remaining args).
+			// In most cases, however, we will want to use the original (root) parsing error of the
+			// current fallback argument instead. Consider for example the command "/list [player,
+			// default: self] [page, default: 1]" with input "/list a 2", 'a' being an invalid
+			// player name: The player name fallback is evaluated as result of an 'invalid page
+			// argument' error, and the fallback will produce 'self' as the default value. Simply
+			// restarting the parsing from here would result in the 'invalid page argument' error to
+			// be propagated.
+			// Instead, by remembering the original root parsing exception and using it if the
+			// following page argument still fails to parse, we get the expected 'invalid player'
+			// error in this case.
 
-			// However, simply aborting the parsing here right away with the root parsing exception is not an option:
-			// There are cases in which the following command arguments depend on context provided by the current
-			// fallback. So if the fallback succeeded, even if it did not consume any arguments, we need to restart the
-			// parsing in order to check if the following command arguments are now able to successfully parse the
-			// remaining arguments.
+			// However, simply aborting the parsing here right away with the root parsing exception
+			// is not an option:
+			// There are cases in which the following command arguments depend on context provided
+			// by the current fallback. So if the fallback succeeded, even if it did not consume any
+			// arguments, we need to restart the parsing in order to check if the following command
+			// arguments are now able to successfully parse the remaining arguments.
 
 			if (fallbackError != null) {
 				// Use the original root exception in place of the fallback error:
 				fallbackError = fallback.exception.getRootException();
 			} else {
-				// Remember the original root exception before we restart the parsing. If the parsing still ends up
-				// failing, this root exception will replace any other parsing exception that would otherwise be thrown.
-				parsingContext.setOverrideParseException(fallback.argumentIndex, fallback.exception.getRootException());
+				// Remember the original root exception before we restart the parsing. If the
+				// parsing still ends up failing, this root exception will replace any other parsing
+				// exception that would otherwise be thrown.
+				parsingContext.setOverrideParseException(
+						fallback.argumentIndex,
+						fallback.exception.getRootException()
+				);
 			}
 		}
 
@@ -881,33 +984,38 @@ public abstract class Command {
 			// Fallback argument failed.
 			parsingContext.currentArgumentIndex = fallback.argumentIndex;
 			parsingContext.currentParseException = fallbackError;
-			// If there is another pending fallback, evaluate it. Otherwise, parsing fails with this fallback error.
+			// If there is another pending fallback, evaluate it. Otherwise, parsing fails with this
+			// fallback error.
 			this.handleFallbacks(parsingContext);
 			return;
 		} else {
 			// The fallback successfully parsed something.
-			// Heuristic: If the following arguments did previously already successfully parse with no arguments
-			// remaining, we assume that they do not depend on the new context provided by the current fallback and that
-			// restarting the parsing would result in the same outcome as before. We can therefore apply the previously
-			// captured state and skip parsing these arguments again.
-			// TODO One can easily construct examples in which this heuristic fails (e.g. if the context is optional,
-			// but would result in a different outcome when present). Remove this heuristic?
+			// Heuristic: If the following arguments did previously already successfully parse with
+			// no arguments remaining, we assume that they do not depend on the new context provided
+			// by the current fallback and that restarting the parsing would result in the same
+			// outcome as before. We can therefore apply the previously captured state and skip
+			// parsing these arguments again.
+			// TODO One can easily construct examples in which this heuristic fails (e.g. if the
+			// context is optional, but would result in a different outcome when present). Remove
+			// this heuristic?
 			if (!parsingFailed) {
 				// Apply buffered context changes that happened after the fallback argument:
 				fallback.getBufferedContext().applyBuffer();
 				// Restore the previous args state (from before the evaluation of this fallback):
 				argsReader.setState(prevArgsState);
 
-				// If there are other pending fallbacks, evaluate them. Otherwise, this leads to parsing success.
+				// If there are other pending fallbacks, evaluate them. Otherwise, this leads to
+				// parsing success.
 				this.handleFallbacks(parsingContext);
 				return;
 			}
 
 			// Freshly restart the parsing from the next command argument after the fallback.
-			// Any buffered context changes that happened after the fallback argument are disregarded.
-			// Note: Even if the fallback did not consume any arguments and parsing of the following command arguments
-			// previously failed, the parsing might succeed now if the following command arguments depend on context
-			// that is provided by the current fallback.
+			// Any buffered context changes that happened after the fallback argument are
+			// disregarded.
+			// Note: Even if the fallback did not consume any arguments and parsing of the following
+			// command arguments previously failed, the parsing might succeed now if the following
+			// command arguments depend on context that is provided by the current fallback.
 			parsingContext.currentArgumentIndex = fallback.argumentIndex;
 			parsingContext.currentParseException = null;
 			return;
@@ -924,18 +1032,20 @@ public abstract class Command {
 		}
 
 		// Remaining unexpected/unparsed arguments:
-		String firstUnparsedArg = argsReader.peek();
+		@NonNull String firstUnparsedArg = argsReader.peek();
 		if (!this.getChildCommands().getCommands().isEmpty()) {
 			// Has child commands: Throw an 'unknown command' exception.
 			// TODO Only use this exception if no arguments got parsed by this command?
 			throw new ArgumentParseException(null, this.getUnknownCommandMessage(firstUnparsedArg));
 		} else {
-			// Throw an 'invalid argument' exception for the first unparsed argument after the last parsed argument:
+			// Throw an 'invalid argument' exception for the first unparsed argument after the last
+			// parsed argument:
 			CommandContext context = parsingContext.context;
 			CommandArgument<?> firstUnparsedArgument = null;
-			ListIterator<CommandArgument<?>> argumentsIter = arguments.listIterator(arguments.size());
+			ListIterator<@NonNull CommandArgument<?>> argumentsIter = arguments.listIterator(arguments.size());
 			while (argumentsIter.hasPrevious()) {
-				CommandArgument<?> argument = argumentsIter.previous();
+				@Nullable CommandArgument<?> argument = argumentsIter.previous();
+				assert argument != null;
 				if (!context.has(argument.getName())) {
 					firstUnparsedArgument = argument;
 				} else {
@@ -947,7 +1057,7 @@ public abstract class Command {
 			} else {
 				// Throw an 'unexpected argument' exception:
 				Text errorMsg = Messages.commandArgumentUnexpected;
-				errorMsg.setPlaceholderArguments(Collections.singletonMap("argument", firstUnparsedArg));
+				errorMsg.setPlaceholderArguments("argument", firstUnparsedArg);
 				throw new ArgumentParseException(null, errorMsg);
 			}
 		}
@@ -955,7 +1065,7 @@ public abstract class Command {
 
 	protected Text getUnknownCommandMessage(String command) {
 		Text text = Messages.commandUnknown;
-		text.setPlaceholderArguments(Collections.singletonMap("command", command));
+		text.setPlaceholderArguments("command", command);
 		return text;
 	}
 
@@ -964,8 +1074,8 @@ public abstract class Command {
 	/**
 	 * Executes this specific command.
 	 * <p>
-	 * By default this simply calls {@link #sendHelp(CommandSender)} when executed. Override this method for custom
-	 * command behavior.
+	 * By default this simply calls {@link #sendHelp(CommandSender)} when executed. Override this
+	 * method for custom command behavior.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
@@ -980,16 +1090,18 @@ public abstract class Command {
 	}
 
 	/**
-	 * Gets tab completion suggestions for the last (possibly partial or empty) argument of the given input.
+	 * Gets tab completion suggestions for the last (possibly partial or empty) argument of the
+	 * given input.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
-	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
-	 *         <code>null</code> and not containing <code>null</code>)
+	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions'
+	 *         (not <code>null</code> and not containing <code>null</code>)
 	 */
-	public List<String> handleTabCompletion(CommandInput input) {
+	public List<? extends @NonNull String> handleTabCompletion(CommandInput input) {
 		Validate.notNull(input, "input is null");
-		Validate.isTrue(input.getCommand() == this.getRootCommand(), "input is meant for a different command");
+		Validate.isTrue(input.getCommand() == this.getRootCommand(),
+				"input is meant for a different command");
 
 		CommandContext commandContext = new SimpleCommandContext();
 		ArgumentsReader argsReader = new ArgumentsReader(input);
@@ -997,7 +1109,8 @@ public abstract class Command {
 	}
 
 	/**
-	 * Gets tab completion suggestions for the last (possibly partial or empty) argument of the given input.
+	 * Gets tab completion suggestions for the last (possibly partial or empty) argument of the
+	 * given input.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
@@ -1005,13 +1118,19 @@ public abstract class Command {
 	 *            the context, not <code>null</code>
 	 * @param argsReader
 	 *            the ArgumentsReader, not <code>null</code>
-	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
-	 *         <code>null</code> and not containing <code>null</code>)
+	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions'
+	 *         (not <code>null</code> and not containing <code>null</code>)
 	 */
-	protected List<String> handleTabCompletion(CommandInput input, CommandContext context, ArgumentsReader argsReader) {
+	protected List<? extends @NonNull String> handleTabCompletion(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader
+	) {
 		assert input != null && context != null && argsReader != null;
-		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
-		assert (argsReader.getArgs() == input.getArguments()); // ArgumentsReader is consistent with the input
+		// The input is meant for this command:
+		assert (input.getCommand() == this.getRootCommand());
+		// ArgumentsReader is consistent with the input:
+		assert (argsReader.getArgs() == input.getArguments());
 
 		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
@@ -1034,13 +1153,13 @@ public abstract class Command {
 			return Collections.emptyList();
 		}
 
-		List<String> suggestions = new ArrayList<>();
+		List<@NonNull String> suggestions = new ArrayList<>();
 		if (argsReader.getRemainingSize() == 1) {
 			String finalArgument = CommandUtils.normalize(argsReader.peek());
 			// Include matching child-command aliases (max one per command):
 			// Asserts that the aliases-map provides all aliases for the same command in succession.
 			Command lastMatchingCommand = null;
-			for (Entry<String, Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
+			for (Entry<? extends @NonNull String, ? extends @NonNull Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
 				String alias = aliasEntry.getKey(); // Normalized
 				Command aliasCommand = aliasEntry.getValue();
 				if (lastMatchingCommand != null && lastMatchingCommand == aliasCommand) {
@@ -1082,7 +1201,8 @@ public abstract class Command {
 				// Successfully parsed:
 				if (!argsReader.hasNext()) {
 					// This consumed the last argument:
-					// Reset args reader and provide alternative completions for the last argument instead:
+					// Reset args reader and provide alternative completions for the last argument
+					// instead:
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
 					break;
@@ -1092,15 +1212,17 @@ public abstract class Command {
 					// Include suggestions (if it has any), but continue:
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
 
-					// Reset args reader and then let the following arguments also try to complete the same arg(s):
+					// Reset args reader and then let the following arguments also try to complete
+					// the same arg(s):
 					argsReader.setState(argsReaderState);
 					continue;
 				}
 			} catch (FallbackArgumentException e) {
 				// Parsing failed, but registered a fallback:
 				// Check for completions, but continue parsing.
-				// TODO Also include suggestions for the following arguments with the fallback evaluated? (E.g. if the
-				// following arguments depend on context provided by the fallback argument).
+				// TODO Also include suggestions for the following arguments with the fallback
+				// evaluated? (E.g. if the following arguments depend on context provided by the
+				// fallback argument).
 				argsReader.setState(argsReaderState);
 				suggestions.addAll(argument.complete(input, contextView, argsReader));
 				argsReader.setState(argsReaderState);
@@ -1117,9 +1239,10 @@ public abstract class Command {
 					// -> Check for and include suggestions.
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
-					// Parsing might also have failed because of an invalid argument inside the sequence of arguments.
-					// -> Skip later arguments (current argument will not provide suggestions in that case, because
-					// it isn't using up the last argument).
+					// Parsing might also have failed because of an invalid argument inside the
+					// sequence of arguments.
+					// -> Skip later arguments (current argument will not provide suggestions in
+					// that case, because it isn't using up the last argument).
 					break;
 				}
 			}
@@ -1131,7 +1254,8 @@ public abstract class Command {
 	// Help page related:
 
 	/**
-	 * Checks whether the child-commands of this {@link Command} are included in the parent's help content.
+	 * Checks whether the child-commands of this {@link Command} are included in the parent's help
+	 * content.
 	 * <p>
 	 * By default only direct child commands are included in the help content.
 	 * 
@@ -1142,21 +1266,27 @@ public abstract class Command {
 	}
 
 	/**
-	 * Sets whether the child-commands of this {@link Command} are included in the parent's help content.
+	 * Sets whether the child-commands of this {@link Command} are included in the parent's help
+	 * content.
 	 * <p>
 	 * By default only direct child commands are included in the help content.
 	 * 
 	 * @param includeChilds
-	 *            <code>true</code> to include the child commands of this command in the parent's help content
+	 *            <code>true</code> to include the child commands of this command in the parent's
+	 *            help content
 	 */
-	protected final void setIncludeChildsInParentHelp(boolean includeChilds) {
+	protected final void setIncludeChildsInParentHelp(
+			@UnknownInitialization Command this,
+			boolean includeChilds
+	) {
 		this.includeChildsInParentHelp = includeChilds;
 	}
 
 	/**
 	 * Checks whether this {@link Command} is hidden in the parent's help contents.
 	 * <p>
-	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by this.
+	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by
+	 * this.
 	 * 
 	 * @return <code>true</code> if this command is hidden in the parent's help contents
 	 */
@@ -1167,19 +1297,24 @@ public abstract class Command {
 	/**
 	 * Sets whether this {@link Command} is hidden in the parent's help contents.
 	 * <p>
-	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by this.
+	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by
+	 * this.
 	 * 
 	 * @param hiddenInParentHelp
 	 *            <code>true</code> to exclude this command in the parent's help contents
 	 */
-	protected final void setHiddenInParentHelp(boolean hiddenInParentHelp) {
+	protected final void setHiddenInParentHelp(
+			@UnknownInitialization Command this,
+			boolean hiddenInParentHelp
+	) {
 		this.hiddenInParentHelp = hiddenInParentHelp;
 	}
 
 	/**
 	 * Checks whether this {@link Command} is hidden in its own help page.
 	 * <p>
-	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by this.
+	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by
+	 * this.
 	 * 
 	 * @return <code>true</code> if this command is hidden in its own help page
 	 */
@@ -1190,78 +1325,93 @@ public abstract class Command {
 	/**
 	 * Sets whether this {@link Command} is hidden in its own help page.
 	 * <p>
-	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by this.
+	 * Hidden commands won't show up on the help pages. Tab completion however is not affected by
+	 * this.
 	 * 
 	 * @param hiddenInOwnHelp
 	 *            <code>true</code> to exclude this command in its own help contents
 	 */
-	protected final void setHiddenInOwnHelp(boolean hiddenInOwnHelp) {
+	protected final void setHiddenInOwnHelp(
+			@UnknownInitialization Command this,
+			boolean hiddenInOwnHelp
+	) {
 		this.hiddenInOwnHelp = hiddenInOwnHelp;
 	}
 
 	// Help page formatting:
 
 	/**
-	 * Sets the format to use for the title when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Sets the format to use for the title when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * <p>
 	 * See {@link #getCommonMessageArgs()} for the available placeholders.
 	 * <p>
-	 * If the format is {@link Text#isPlainTextEmpty() empty}, no title will be used in the help pages. If the format is
-	 * <code>null</code>, the format of the parent command gets used. If no parent is available or the parent
-	 * format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no title will be used in the help
+	 * pages. If the format is <code>null</code>, the format of the parent command gets used. If no
+	 * parent is available or the parent format is {@link Text#isPlainTextEmpty() empty}, a default
+	 * format gets used.
 	 * 
 	 * @param helpTitleFormat
 	 *            the format
 	 */
-	protected void setHelpTitleFormat(Text helpTitleFormat) {
+	protected void setHelpTitleFormat(@UnknownInitialization Command this, Text helpTitleFormat) {
 		this.helpTitleFormat = helpTitleFormat;
 	}
 
 	/**
-	 * Sets the format to use for this command's usage when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Sets the format to use for this command's usage when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * <p>
 	 * See {@link #getCommonMessageArgs()} for the available placeholders.
 	 * <p>
-	 * If the format is {@link Text#isPlainTextEmpty() empty}, no command usage will be printed in the help pages. If
-	 * the format is <code>null</code>, the format of the parent command gets used. If no parent is available or the
-	 * parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no command usage will be printed in
+	 * the help pages. If the format is <code>null</code>, the format of the parent command gets
+	 * used. If no parent is available or the parent format is {@link Text#isPlainTextEmpty()
+	 * empty}, a default format gets used.
 	 * 
 	 * @param helpUsageFormat
 	 *            the format
 	 */
-	protected void setHelpUsageFormat(Text helpUsageFormat) {
+	protected void setHelpUsageFormat(@UnknownInitialization Command this, Text helpUsageFormat) {
 		this.helpUsageFormat = helpUsageFormat;
 	}
 
 	/**
-	 * Sets the format to use for this command's description when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Sets the format to use for this command's description when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * <p>
 	 * See {@link #getCommonMessageArgs()} for the available placeholders.
 	 * <p>
-	 * If the format is {@link Text#isPlainTextEmpty() empty}, no command description will be printed in the help pages.
-	 * If the format is <code>null</code>, the format of the parent command gets used. If no parent is available or the
-	 * parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no command description will be
+	 * printed in the help pages. If the format is <code>null</code>, the format of the parent
+	 * command gets used. If no parent is available or the parent format is
+	 * {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpDescFormat
 	 *            the format
 	 */
-	protected void setHelpDescFormat(Text helpDescFormat) {
+	protected void setHelpDescFormat(@UnknownInitialization Command this, Text helpDescFormat) {
 		this.helpDescFormat = helpDescFormat;
 	}
 
 	/**
-	 * Sets the format to use for a child-command's usage when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Sets the format to use for a child-command's usage when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * <p>
 	 * See {@link #getCommonMessageArgs()} for the available placeholders.
 	 * <p>
-	 * If the format is {@link Text#isPlainTextEmpty() empty}, no child commands will be included in the help pages. If
-	 * the format is <code>null</code>, the format of the parent command gets used. If no parent is available or the
-	 * parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no child commands will be included in
+	 * the help pages. If the format is <code>null</code>, the format of the parent command gets
+	 * used. If no parent is available or the parent format is {@link Text#isPlainTextEmpty()
+	 * empty}, a default format gets used.
 	 * 
 	 * @param helpChildUsageFormat
 	 *            the format
 	 */
-	protected void setHelpChildUsageFormat(Text helpChildUsageFormat) {
+	protected void setHelpChildUsageFormat(
+			@UnknownInitialization Command this,
+			Text helpChildUsageFormat
+	) {
 		this.helpChildUsageFormat = helpChildUsageFormat;
 	}
 
@@ -1271,19 +1421,24 @@ public abstract class Command {
 	 * <p>
 	 * See {@link #getCommonMessageArgs()} for the available placeholders.
 	 * <p>
-	 * If the format is {@link Text#isPlainTextEmpty() empty}, no child command descriptions will be included in the
-	 * help pages. If the format is <code>null</code>, the format of the parent command gets used. If no parent is
-	 * available or the parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no child command descriptions will be
+	 * included in the help pages. If the format is <code>null</code>, the format of the parent
+	 * command gets used. If no parent is available or the parent format is
+	 * {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpChildDescFormat
 	 *            the format
 	 */
-	protected void setHelpChildDescFormat(Text helpChildDescFormat) {
+	protected void setHelpChildDescFormat(
+			@UnknownInitialization Command this,
+			Text helpChildDescFormat
+	) {
 		this.helpChildDescFormat = helpChildDescFormat;
 	}
 
 	/**
-	 * Gets the format to use for the title when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Gets the format to use for the title when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
 	 * @see #setHelpTitleFormat(Text)
@@ -1304,7 +1459,8 @@ public abstract class Command {
 	}
 
 	/**
-	 * Gets the format to use for this command's usage when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Gets the format to use for this command's usage when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
 	 * @see #setHelpUsageFormat(Text)
@@ -1325,7 +1481,8 @@ public abstract class Command {
 	}
 
 	/**
-	 * Gets the format to use for this command's description when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Gets the format to use for this command's description when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
 	 * @see #setHelpDescFormat(Text)
@@ -1346,7 +1503,8 @@ public abstract class Command {
 	}
 
 	/**
-	 * Gets the format to use for a child-command's usage when sending the help via {@link #sendHelp(CommandSender)}.
+	 * Gets the format to use for a child-command's usage when sending the help via
+	 * {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
 	 * @see #setHelpChildUsageFormat(Text)
@@ -1392,7 +1550,8 @@ public abstract class Command {
 	/**
 	 * Checks if the recipient has the permission to view the help of this command.
 	 * <p>
-	 * This checks if the recipient has the permission to execute this command or any of the child commands.
+	 * This checks if the recipient has the permission to execute this command or any of the child
+	 * commands.
 	 * 
 	 * @param recipient
 	 *            the recipient
@@ -1407,7 +1566,8 @@ public abstract class Command {
 	}
 
 	/**
-	 * Sends usage information about this command and its child-commands to the given {@link CommandSender}.
+	 * Sends usage information about this command and its child-commands to the given
+	 * {@link CommandSender}.
 	 * 
 	 * @param recipient
 	 *            the recipient, not <code>null</code>
@@ -1431,15 +1591,16 @@ public abstract class Command {
 			TextUtils.sendMessage(recipient, titleFormat, commonMsgArgs);
 		}
 
-		// Skip info about the command if it is hidden or the recipient does not have the required permission:
+		// Skip info about the command if it is hidden or the recipient does not have the required
+		// permission:
 		if (!this.isHiddenInOwnHelp() && this.testPermission(recipient)) {
 			// Command usage:
-			Text usageFormat = this.getHelpUsageFormat();
+			@NonNull Text usageFormat = this.getHelpUsageFormat();
 			assert usageFormat != null;
 			usageFormat.setPlaceholderArguments(commonMsgArgs);
 
 			// Command description:
-			Text descriptionFormat;
+			@NonNull Text descriptionFormat;
 			Text description = this.getDescription();
 			if (description.isPlainTextEmpty()) {
 				descriptionFormat = Text.EMPTY;
@@ -1467,7 +1628,12 @@ public abstract class Command {
 		this.sendChildCommandsHelp(recipient, childUsageFormat, childDescFormat, this);
 	}
 
-	protected void sendChildCommandsHelp(CommandSender recipient, Text childUsageFormat, Text childDescFormat, Command command) {
+	protected void sendChildCommandsHelp(
+			CommandSender recipient,
+			@Nullable Text childUsageFormat,
+			@Nullable Text childDescFormat,
+			Command command
+	) {
 		Validate.notNull(recipient, "recipient is null");
 		if (childUsageFormat == null || childUsageFormat.isPlainTextEmpty()) {
 			// Not including child commands at all:
@@ -1477,7 +1643,8 @@ public abstract class Command {
 
 		// Print usage and description of child-commands:
 		for (Command childCommand : command.getChildCommands().getCommands()) {
-			// Skip info about the command if it is hidden or the recipient does not have the required permission:
+			// Skip info about the command if it is hidden or the recipient does not have the
+			// required permission:
 			if (!childCommand.isHiddenInParentHelp() && childCommand.testPermission(recipient)) {
 				MessageArguments childCommonMsgArgs = childCommand.getCommonMessageArgs();
 
@@ -1485,16 +1652,18 @@ public abstract class Command {
 				childUsageFormat.setPlaceholderArguments(childCommonMsgArgs);
 
 				// Command description:
-				Text childDescriptionFormat = childDescFormat;
+				Text childDescriptionFormat;
 				Text childDescription = childCommand.getDescription();
 				if (childDescFormatEmpty || childDescription.isPlainTextEmpty()) {
 					childDescriptionFormat = Text.EMPTY;
 				} else {
+					childDescriptionFormat = Unsafe.assertNonNull(childDescFormat);
 					childDescriptionFormat.setPlaceholderArguments(childCommonMsgArgs);
 				}
 
 				Text helpEntryFormat = HELP_ENTRY_FORMAT;
-				helpEntryFormat.setPlaceholderArguments(MapUtils.createMap(
+				assert childUsageFormat != null;
+				helpEntryFormat.setPlaceholderArguments(MapUtils.<@NonNull String, @NonNull Object>createMap(
 						"usage", childUsageFormat,
 						"description", childDescriptionFormat
 				));
@@ -1504,7 +1673,12 @@ public abstract class Command {
 
 			// Optionally include the child-command's child-commands in help content:
 			if (childCommand.isIncludeChildsInParentHelp()) {
-				this.sendChildCommandsHelp(recipient, childUsageFormat, childDescFormat, childCommand);
+				this.sendChildCommandsHelp(
+						recipient,
+						childUsageFormat,
+						childDescFormat,
+						childCommand
+				);
 			}
 		}
 	}

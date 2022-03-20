@@ -11,7 +11,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
  * <p>
  * Depending on the type of shop object, the shopkeeper may or may not already be spawned.
  * <p>
- * The {@link Cause} can be used to differentiate between the different reasons for which a shopkeeper can be added.
+ * The {@link Cause} can be used to differentiate between the different reasons for which a
+ * shopkeeper can be added.
  */
 public class ShopkeeperAddedEvent extends ShopkeeperEvent {
 

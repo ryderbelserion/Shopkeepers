@@ -17,7 +17,10 @@ class ShopkeeperSpawnerWorldListener implements Listener {
 	private final ShopkeeperSpawner spawner;
 	private final WorldSaveDespawner worldSaveDespawner;
 
-	ShopkeeperSpawnerWorldListener(ShopkeeperSpawner spawner, WorldSaveDespawner worldSaveDespawner) {
+	ShopkeeperSpawnerWorldListener(
+			ShopkeeperSpawner spawner,
+			WorldSaveDespawner worldSaveDespawner
+	) {
 		Validate.notNull(spawner, "spawner is null");
 		Validate.notNull(worldSaveDespawner, "worldSaveDespawner is null");
 		this.spawner = spawner;

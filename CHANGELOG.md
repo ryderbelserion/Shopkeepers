@@ -52,7 +52,10 @@ Date format: (YYYY-MM-DD)
 
 **API changes:**
 * The ShopkeeperRemoveEvent is now called earlier during the shopkeeper removal, before the shopkeeper is deactivated (i.e. despawned, UIs closed, ticking stopped, etc.).
-* Minor javadoc adjustments, for example to clarify behavior related to shop object spawning.
+* Added nullness annotations.
+* Some methods are more strict now and no longer accept null as input.
+* For consistency, the return types of various methods that return unmodifiable collections have been changed to use wildcards to indicate that the returned collections are unmodifiable.
+* Various minor javadoc changes, for example to clarify behavior related to shop object spawning.
 
 **Internal changes:**  
 * Refactors related to the deletion of shopkeepers that are owned by inactive players.
@@ -81,7 +84,21 @@ Date format: (YYYY-MM-DD)
 * Refactors and preparations to support more than two currency items.
 * Minor internal command library refactors.
 * Reduced the frequency with which we check for remaining async tasks during plugin shutdown.
+* Added nullness annotations and the Checker Framework.
+  * In order to also satisfy the Eclipse null annotation checker all packages have been annotated with a custom NonNullByDefault annotation, and the use of some Checker Framework specific features has been avoided.
+  * Several non-null variants of existing methods have been added.
+  * Added a utility class 'Unsafe' with various utility methods to perform unchecked casts or suppress false-positive nullness related warnings.
+  * Various methods are more strict now and no longer accept null as input.
+  * Fixed: When we verify that a given collection does not contain null, we now account for non-null collections that may throw a NPE for this containment check.
+  * CommandContext#get can no longer be used for nullable arguments. Instead, a new #getOrNull method has been added.
+  * Property validators no longer have access to the property. This resolved some nullness related type checking difficulty. But ideally this access should not be required anyway.
+  * Some compound properties (e.g. the container property of player shopkeepers) better account for null values now.
+  * Added SKUser#EMPTY, which is for example used as the temporary initial value for the owner of player shops.
+  * Fixed a nullness related issue in DataMatcher#Result: The left and right objects can each be null, but they cannot both be null.
+  * DataAccessor has been split into two separate interfaces: DataSaver and DataLoader. This allows the use of different type parameter bounds for each interface.
+  * There are some cases in which DataSerializer#serialize can return null, so we need to account for that. The internal documentation on that has been updated.
 * Various other internal refactors and documentation changes.
+* Various code formatting changes.
 
 **Message changes:**  
 * Slightly changed the default `must-target-container` message.

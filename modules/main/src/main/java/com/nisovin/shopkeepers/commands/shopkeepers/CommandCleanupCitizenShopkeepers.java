@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
+import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
 import com.nisovin.shopkeepers.text.Text;
 
 class CommandCleanupCitizenShopkeepers extends Command {
@@ -31,10 +32,11 @@ class CommandCleanupCitizenShopkeepers extends Command {
 		CommandSender sender = input.getSender();
 
 		// Find and delete invalid Citizen shopkeepers:
-		int deleted = SKShopkeepersPlugin.getInstance().getCitizensShops().validateCitizenShopkeepers(true, false);
+		CitizensShops citizensShops = SKShopkeepersPlugin.getInstance().getCitizensShops();
+		int deleted = citizensShops.validateCitizenShopkeepers(true, false);
 
 		// Inform command executor:
-		sender.sendMessage(ChatColor.GREEN + "Deleted " + ChatColor.YELLOW + deleted + ChatColor.GREEN
-				+ " invalid Citizen shopkeepers!");
+		sender.sendMessage(ChatColor.GREEN + "Deleted " + ChatColor.YELLOW + deleted
+				+ ChatColor.GREEN + " invalid Citizen shopkeepers!");
 	}
 }

@@ -2,13 +2,16 @@ package com.nisovin.shopkeepers.api.shopkeeper.player.trade;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
 /**
  * Trades arbitrary items.
  * <p>
- * Unlike the buying or selling shopkeepers, this type of shopkeeper is not limited to trading currency items.
+ * Unlike the buying or selling shopkeepers, this type of shopkeeper is not limited to trading
+ * currency items.
  */
 public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -21,7 +24,7 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<? extends TradeOffer> getOffers();
+	public List<? extends @NonNull TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -36,13 +39,13 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<? extends TradeOffer> offers);
+	public void setOffers(List<? extends @NonNull TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
 	 * <p>
-	 * The offer gets added to the end of the current offers. If you want to insert, replace or reorder offers, use
-	 * {@link #setOffers(List)} instead.
+	 * The offer gets added to the end of the current offers. If you want to insert, replace or
+	 * reorder offers, use {@link #setOffers(List)} instead.
 	 * 
 	 * @param offer
 	 *            the offer to add
@@ -52,11 +55,11 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	/**
 	 * Adds the given offers to the shopkeeper.
 	 * <p>
-	 * The offers get added to the end of the current offers. If you want to insert, replace or reorder offers, use
-	 * {@link #setOffers(List)} instead.
+	 * The offers get added to the end of the current offers. If you want to insert, replace or
+	 * reorder offers, use {@link #setOffers(List)} instead.
 	 * 
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<? extends TradeOffer> offers);
+	public void addOffers(List<? extends @NonNull TradeOffer> offers);
 }

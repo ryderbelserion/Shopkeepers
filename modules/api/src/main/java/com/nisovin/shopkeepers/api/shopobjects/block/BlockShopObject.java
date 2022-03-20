@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.api.shopobjects.block;
 
 import org.bukkit.block.Block;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
@@ -15,5 +16,5 @@ public interface BlockShopObject extends ShopObject {
 	 * 
 	 * @return the block, or <code>null</code> if the shop object is not spawned currently
 	 */
-	public Block getBlock();
+	public @Nullable Block getBlock();
 }

@@ -1,9 +1,11 @@
 package com.nisovin.shopkeepers.spigot;
 
-public class SpigotFeatures {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public final class SpigotFeatures {
 
 	// Null if not yet checked:
-	private static Boolean SPIGOT_AVAILABLE = null;
+	private static @Nullable Boolean SPIGOT_AVAILABLE = null;
 
 	public static boolean isSpigotAvailable() {
 		if (SPIGOT_AVAILABLE == null) {
@@ -15,6 +17,7 @@ public class SpigotFeatures {
 				SPIGOT_AVAILABLE = false;
 			}
 		}
+		assert SPIGOT_AVAILABLE != null;
 		return SPIGOT_AVAILABLE;
 	}
 

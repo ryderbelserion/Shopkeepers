@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.compat;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class CompatVersion {
@@ -9,9 +11,9 @@ public class CompatVersion {
 	private final String mappingsVersion;
 
 	public CompatVersion(String compatVersion, String minecraftVersion, String mappingsVersion) {
-		Validate.notEmpty(compatVersion);
-		Validate.notEmpty(minecraftVersion);
-		Validate.notEmpty(mappingsVersion);
+		Validate.notEmpty(compatVersion, "compatVersion is empty");
+		Validate.notEmpty(minecraftVersion, "minecraftVersion is empty");
+		Validate.notEmpty(mappingsVersion, "mappingsVersion is empty");
 		this.compatVersion = compatVersion;
 		this.minecraftVersion = minecraftVersion;
 		this.mappingsVersion = mappingsVersion;
@@ -55,7 +57,7 @@ public class CompatVersion {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof CompatVersion)) return false;
 		CompatVersion other = (CompatVersion) obj;

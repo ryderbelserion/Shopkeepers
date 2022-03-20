@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * This exception is thrown when a shopkeeper fails to load its state from a given data source.
  */
@@ -13,7 +15,7 @@ public class ShopkeeperLoadException extends Exception {
 	 * @param message
 	 *            the detail message
 	 */
-	public ShopkeeperLoadException(String message) {
+	public ShopkeeperLoadException(@Nullable String message) {
 		super(message);
 	}
 
@@ -25,7 +27,7 @@ public class ShopkeeperLoadException extends Exception {
 	 * @param cause
 	 *            the cause
 	 */
-	public ShopkeeperLoadException(String message, Throwable cause) {
+	public ShopkeeperLoadException(@Nullable String message, @Nullable Throwable cause) {
 		super(message, cause);
 	}
 }

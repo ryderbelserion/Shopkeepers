@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.PufferFish;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -27,22 +30,26 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class PufferFishShop extends SKLivingShopObject<PufferFish> {
+public class PufferFishShop extends SKLivingShopObject<@NonNull PufferFish> {
 
 	public static final int MIN_PUFF_STATE = 0;
 	public static final int MAX_PUFF_STATE = 2;
-	public static final Property<Integer> PUFF_STATE = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> PUFF_STATE = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("puffState", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.bounded(MIN_PUFF_STATE, MAX_PUFF_STATE))
 			.defaultValue(0)
 			.build();
 
-	private final PropertyValue<Integer> puffStateProperty = new PropertyValue<>(PUFF_STATE)
-			.onValueChanged(this::applyPuffState)
+	private final PropertyValue<@NonNull Integer> puffStateProperty = new PropertyValue<>(PUFF_STATE)
+			.onValueChanged(Unsafe.initialized(this)::applyPuffState)
 			.build(properties);
 
-	public PufferFishShop(	LivingShops livingShops, SKLivingShopObjectType<PufferFishShop> livingObjectType,
-							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public PufferFishShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull PufferFishShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -65,8 +72,8 @@ public class PufferFishShop extends SKLivingShopObject<PufferFish> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPuffStateEditorButton());
 		return editorButtons;
 	}
@@ -108,8 +115,14 @@ public class PufferFishShop extends SKLivingShopObject<PufferFish> {
 			puffState = "\u25A0\u25A0";
 			break;
 		}
-		String displayName = StringUtils.replaceArguments(Messages.buttonPufferFishPuffState, "puffState", puffState);
-		List<String> lore = StringUtils.replaceArguments(Messages.buttonPufferFishPuffStateLore, "puffState", puffState);
+		String displayName = StringUtils.replaceArguments(
+				Messages.buttonPufferFishPuffState,
+				"puffState", puffState
+		);
+		List<@NonNull String> lore = StringUtils.replaceArguments(
+				Messages.buttonPufferFishPuffStateLore,
+				"puffState", puffState
+		);
 		ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
@@ -117,12 +130,15 @@ public class PufferFishShop extends SKLivingShopObject<PufferFish> {
 	private Button getPuffStateEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getPuffStateEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cyclePuffState(backwards);
 				return true;

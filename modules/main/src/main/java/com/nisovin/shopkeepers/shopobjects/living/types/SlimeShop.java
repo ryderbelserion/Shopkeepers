@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Slime;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -27,25 +30,30 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class SlimeShop extends SKLivingShopObject<Slime> {
+public class SlimeShop extends SKLivingShopObject<@NonNull Slime> {
 
-	// Note: Minecraft actually allows slimes with sizes up to 256 (internally stored as 0 - 255). However, at these
-	// sizes the slime is not properly rendered anymore, cannot be interacted with, and it becomes laggy.
+	// Note: Minecraft actually allows slimes with sizes up to 256 (internally stored as 0 - 255).
+	// However, at these sizes the slime is not properly rendered anymore, cannot be interacted
+	// with, and it becomes laggy.
 	// We limit it to 10 since this seems to be a more reasonable limit.
 	public static final int MIN_SIZE = 1;
 	public static final int MAX_SIZE = 10;
-	public static final Property<Integer> SIZE = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> SIZE = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("slimeSize", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.bounded(MIN_SIZE, MAX_SIZE))
 			.defaultValue(1)
 			.build();
 
-	private final PropertyValue<Integer> sizeProperty = new PropertyValue<>(SIZE)
-			.onValueChanged(this::applySize)
+	private final PropertyValue<@NonNull Integer> sizeProperty = new PropertyValue<>(SIZE)
+			.onValueChanged(Unsafe.initialized(this)::applySize)
 			.build(properties);
 
-	public SlimeShop(	LivingShops livingShops, SKLivingShopObjectType<SlimeShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public SlimeShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull SlimeShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -68,8 +76,8 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSizeEditorButton());
 		return editorButtons;
 	}
@@ -99,15 +107,20 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	private void applySize() {
 		Slime entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		// Note: Minecraft will also adjust some of the slime's attributes, but these should not affect us.
+		// Note: Minecraft will also adjust some of the slime's attributes, but these should not
+		// affect us.
 		entity.setSize(this.getSize());
 	}
 
 	private ItemStack getSizeEditorItem() {
 		int size = this.getSize();
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = StringUtils.replaceArguments(Messages.buttonSlimeSize, "size", size);
-		List<String> lore = StringUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", size);
+		String displayName = StringUtils.replaceArguments(Messages.buttonSlimeSize,
+				"size", size
+		);
+		List<@NonNull String> lore = StringUtils.replaceArguments(Messages.buttonSlimeSizeLore,
+				"size", size
+		);
 		ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
@@ -115,12 +128,15 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	private Button getSizeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getSizeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleSize(backwards);
 				return true;

@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
-public class BooleanValue extends ValueType<Boolean> {
+public class BooleanValue extends ValueType<@NonNull Boolean> {
 
 	public static final BooleanValue INSTANCE = new BooleanValue();
 
@@ -13,7 +16,7 @@ public class BooleanValue extends ValueType<Boolean> {
 	}
 
 	@Override
-	public Boolean load(Object configValue) throws ValueLoadException {
+	public @Nullable Boolean load(@Nullable Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		Boolean value = ConversionUtils.toBoolean(configValue);
 		if (value == null) {
@@ -23,7 +26,7 @@ public class BooleanValue extends ValueType<Boolean> {
 	}
 
 	@Override
-	public Object save(Boolean value) {
+	public @Nullable Object save(@Nullable Boolean value) {
 		return value;
 	}
 

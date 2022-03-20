@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObjectType;
@@ -13,7 +15,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
-public final class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCitizensShopObject> implements CitizensShopObjectType<SKCitizensShopObject> {
+public final class SKCitizensShopObjectType
+		extends AbstractEntityShopObjectType<@NonNull SKCitizensShopObject>
+		implements CitizensShopObjectType<@NonNull SKCitizensShopObject> {
 
 	private final CitizensShops citizensShops;
 
@@ -38,9 +42,13 @@ public final class SKCitizensShopObjectType extends AbstractEntityShopObjectType
 	}
 
 	@Override
-	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
-		// A reduced set of checks, compared to the default:
-		if (spawnLocation == null || spawnLocation.getWorld() == null) {
+	public boolean validateSpawnLocation(
+			@Nullable Player creator,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
+		// A reduced set of checks compared to the default:
+		if (spawnLocation == null || !spawnLocation.isWorldLoaded()) {
 			if (creator != null) {
 				TextUtils.sendMessage(creator, Messages.missingSpawnLocation);
 			}
@@ -50,7 +58,10 @@ public final class SKCitizensShopObjectType extends AbstractEntityShopObjectType
 	}
 
 	@Override
-	public SKCitizensShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public SKCitizensShopObject createObject(
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		return new SKCitizensShopObject(citizensShops, shopkeeper, creationData);
 	}
 }

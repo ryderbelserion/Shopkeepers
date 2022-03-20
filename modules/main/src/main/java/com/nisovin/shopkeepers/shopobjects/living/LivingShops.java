@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.MC_1_16;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -23,13 +24,23 @@ public class LivingShops {
 
 	static {
 		// Register shopkeeper data migrations:
-		ShopkeeperDataMigrator.registerMigration(new Migration("living-shop-object-types", MigrationPhase.EARLY) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"living-shop-object-types",
+				MigrationPhase.EARLY
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
-				ShopObjectData shopObjectData = shopkeeperData.getOrNullIfMissing(AbstractShopkeeper.SHOP_OBJECT_DATA);
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
+				ShopObjectData shopObjectData = shopkeeperData.getOrNullIfMissing(
+						AbstractShopkeeper.SHOP_OBJECT_DATA
+				);
 				if (shopObjectData == null) return false;
 
-				String objectTypeId = shopObjectData.getOrNullIfMissing(AbstractShopObject.SHOP_OBJECT_TYPE_ID);
+				String objectTypeId = shopObjectData.getOrNullIfMissing(
+						AbstractShopObject.SHOP_OBJECT_TYPE_ID
+				);
 				if (objectTypeId == null) {
 					return false; // Shop object type is missing. -> Skip migration.
 				}
@@ -72,7 +83,9 @@ public class LivingShops {
 	}
 
 	private final SKShopkeepersPlugin plugin;
-	private final SKLivingShopObjectTypes livingShopObjectTypes = new SKLivingShopObjectTypes(this);
+	private final SKLivingShopObjectTypes livingShopObjectTypes = new SKLivingShopObjectTypes(
+			Unsafe.initialized(this)
+	);
 	private final LivingEntityAI livingEntityAI;
 	private final LivingEntityShopListener livingEntityShopListener;
 	private final CreatureForceSpawnListener creatureForceSpawnListener = new CreatureForceSpawnListener();

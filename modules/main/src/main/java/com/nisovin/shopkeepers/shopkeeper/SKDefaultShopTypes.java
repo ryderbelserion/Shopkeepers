@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.shopkeeper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.admin.regular.RegularAdminShopType;
@@ -23,8 +25,8 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 	}
 
 	@Override
-	public List<AbstractShopType<?>> getAll() {
-		List<AbstractShopType<?>> shopTypes = new ArrayList<>();
+	public List<? extends @NonNull AbstractShopType<?>> getAll() {
+		List<@NonNull AbstractShopType<?>> shopTypes = new ArrayList<>();
 		shopTypes.add(adminShopType);
 		shopTypes.add(sellingPlayerShopType);
 		shopTypes.add(buyingPlayerShopType);

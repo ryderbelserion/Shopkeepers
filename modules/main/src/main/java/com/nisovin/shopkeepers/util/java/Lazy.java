@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.function.Supplier;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+
 /**
  * A lazily calculated value.
  *
@@ -10,19 +12,20 @@ import java.util.function.Supplier;
  */
 public final class Lazy<T> {
 
-	private final Supplier<T> supplier;
+	private final Supplier<? extends T> supplier;
 	private boolean calculated = false;
-	private T value = null;
+	private T value = Unsafe.uncheckedNull();
 
 	/**
 	 * Creates a new {@link Lazy}.
 	 * <p>
-	 * The value is lazily calculated by the provided {@link Supplier} the first time it is requested.
+	 * The value is lazily calculated by the provided {@link Supplier} the first time it is
+	 * requested.
 	 * 
 	 * @param supplier
 	 *            the supplier that calculates the value, not <code>null</code>
 	 */
-	public Lazy(Supplier<T> supplier) {
+	public Lazy(Supplier<? extends T> supplier) {
 		Validate.notNull(supplier, "supplier is null");
 		this.supplier = supplier;
 	}
@@ -37,7 +40,7 @@ public final class Lazy<T> {
 			value = supplier.get(); // Can be null
 			calculated = true;
 		}
-		return value;
+		return Unsafe.cast(value);
 	}
 
 	@Override
@@ -51,6 +54,7 @@ public final class Lazy<T> {
 		return builder.toString();
 	}
 
-	// Note on hashCode and equals: Lazy instances are compared based on their identity and not their current value,
-	// because it makes no sense for Lazy instances to be considered equal if they have not yet been calculated.
+	// Note on hashCode and equals: Lazy instances are compared based on their identity and not
+	// their current value, because it makes no sense for Lazy instances to be considered equal if
+	// they have not yet been calculated.
 }

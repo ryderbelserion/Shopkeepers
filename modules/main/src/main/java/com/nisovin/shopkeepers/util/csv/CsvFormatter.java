@@ -5,6 +5,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Lazy;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -16,12 +20,16 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 public class CsvFormatter {
 
+	private static String quoteReplacement(String replacement) {
+		return Unsafe.assertNonNull(Matcher.quoteReplacement(replacement));
+	}
+
 	private String fieldSeparator = ",";
 	private String recordSeparator = "\n";
 	private boolean recordSeparatorContainsNewline = true;
 	private String quote = "\""; // Can be empty
 	private Pattern quotePattern = Pattern.compile(quote, Pattern.LITERAL);
-	private String escapedQuote = Matcher.quoteReplacement("\"\"");
+	private String escapedQuote = quoteReplacement("\"\"");
 	private boolean quoteAllFields = true;
 	private boolean escapeNewlines = true;
 	private boolean warnOnNewlines = false;
@@ -37,16 +45,17 @@ public class CsvFormatter {
 	 * <li>Quote all fields.
 	 * <li>Use double quotes to quote fields.
 	 * <li>Use two double quotes to escape double quotes within fields.
-	 * <li>Escape newline characters (and backslashes) within fields. This ensures that each record spans a single line.
+	 * <li>Escape newline characters (and backslashes) within fields. This ensures that each record
+	 * spans a single line.
 	 * <li>Use an empty String to represent <code>null</code> fields.
 	 * </ul>
 	 * <p>
-	 * Except for the escaping of newlines, this default configuration conforms to the CSV format described by
-	 * {@code https://tools.ietf.org/html/rfc4180}.
+	 * Except for the escaping of newlines, this default configuration conforms to the CSV format
+	 * described by {@code https://tools.ietf.org/html/rfc4180}.
 	 * <p>
-	 * The default configuration can be changed after construction. However, some configurations may result in output
-	 * that is usually no longer considered to be valid CSV. Such output may be difficult to parse, ambiguous, or not
-	 * parsable at all.
+	 * The default configuration can be changed after construction. However, some configurations may
+	 * result in output that is usually no longer considered to be valid CSV. Such output may be
+	 * difficult to parse, ambiguous, or not parsable at all.
 	 */
 	public CsvFormatter() {
 	}
@@ -115,7 +124,7 @@ public class CsvFormatter {
 	 */
 	public CsvFormatter escapedQuote(String escapedQuote) {
 		Validate.notNull(escapedQuote, "escapedQuote is null");
-		this.escapedQuote = Matcher.quoteReplacement(escapedQuote);
+		this.escapedQuote = quoteReplacement(escapedQuote);
 		return this;
 	}
 
@@ -162,7 +171,8 @@ public class CsvFormatter {
 	/**
 	 * Sets whether to escape newline characters (and backslashes) in fields.
 	 * <p>
-	 * When lines breaks are otherwise only used as record separator, this ensures that records only span a single line.
+	 * When lines breaks are otherwise only used as record separator, this ensures that records only
+	 * span a single line.
 	 * <p>
 	 * The default is <code>true</code>.
 	 * 
@@ -207,7 +217,8 @@ public class CsvFormatter {
 	 * The default is an empty String.
 	 * 
 	 * @param nullField
-	 *            the String to use for <code>null</code> fields, not <code>null</code>, but can be empty
+	 *            the String to use for <code>null</code> fields, not <code>null</code>, but can be
+	 *            empty
 	 * @return this formatter
 	 */
 	public CsvFormatter nullField(String nullField) {
@@ -219,16 +230,17 @@ public class CsvFormatter {
 	// FORMATTING
 
 	/**
-	 * Formats the given fields like a CSV record according to this formatter's configuration, but omits the
-	 * {@link #recordSeparator(String) record separator} at the end.
+	 * Formats the given fields like a CSV record according to this formatter's configuration, but
+	 * omits the {@link #recordSeparator(String) record separator} at the end.
 	 * <p>
-	 * The fields are converted to Strings via their {@link #toString()} method. <code>null</code> objects are replaced
-	 * with the configured {@link #nullField(String) null field value}.
+	 * The fields are converted to Strings via their {@link #toString()} method. <code>null</code>
+	 * objects are replaced with the configured {@link #nullField(String) null field value}.
 	 * <p>
-	 * The fields are escaped via {@link #escapeField(String)} and then joined by {@link #fieldSeparator(String) field
-	 * separators}.
+	 * The fields are escaped via {@link #escapeField(String)} and then joined by
+	 * {@link #fieldSeparator(String) field separators}.
 	 * <p>
-	 * Use {@link #formatRecord(Object[])} to include the {@link #recordSeparator(String) record separator} at the end.
+	 * Use {@link #formatRecord(Object[])} to include the {@link #recordSeparator(String) record
+	 * separator} at the end.
 	 * <p>
 	 * This can also be used for the header of a CSV file.
 	 * 
@@ -236,22 +248,23 @@ public class CsvFormatter {
 	 *            the fields, not <code>null</code>
 	 * @return the CSV-formatted fields
 	 */
-	public String formatFields(Object[] fields) {
+	public String formatFields(@Nullable Object[] fields) {
 		Validate.notNull(fields, "fields is null");
-		return this.formatFields(Stream.of(fields));
+		return this.formatFields(Stream.<@Nullable Object>of(fields));
 	}
 
 	/**
-	 * Formats the given fields like a CSV record according to this formatter's configuration, but omits the
-	 * {@link #recordSeparator(String) record separator} at the end.
+	 * Formats the given fields like a CSV record according to this formatter's configuration, but
+	 * omits the {@link #recordSeparator(String) record separator} at the end.
 	 * <p>
-	 * The fields are converted to Strings via their {@link #toString()} method. <code>null</code> objects are replaced
-	 * with the configured {@link #nullField(String) null field value}.
+	 * The fields are converted to Strings via their {@link #toString()} method. <code>null</code>
+	 * objects are replaced with the configured {@link #nullField(String) null field value}.
 	 * <p>
-	 * The fields are escaped via {@link #escapeField(String)} and then joined by {@link #fieldSeparator(String) field
-	 * separators}.
+	 * The fields are escaped via {@link #escapeField(String)} and then joined by
+	 * {@link #fieldSeparator(String) field separators}.
 	 * <p>
-	 * Use {@link #formatRecord(Iterable)} to include the {@link #recordSeparator(String) record separator} at the end.
+	 * Use {@link #formatRecord(Iterable)} to include the {@link #recordSeparator(String) record
+	 * separator} at the end.
 	 * <p>
 	 * This can also be used for the header of a CSV file.
 	 * 
@@ -261,11 +274,13 @@ public class CsvFormatter {
 	 */
 	public String formatFields(Iterable<?> fields) {
 		Validate.notNull(fields, "fields is null");
-		return this.formatFields(CollectionUtils.stream(fields));
+		// TODO Cast: Required due to a limitation of CheckerFramework
+		return this.formatFields(CollectionUtils.stream(Unsafe.castNonNull(fields)));
 	}
 
 	/**
-	 * Formats the given fields as described by {@link #formatFields(Object[])} and {@link #formatFields(Iterable)}.
+	 * Formats the given fields as described by {@link #formatFields(Object[])} and
+	 * {@link #formatFields(Iterable)}.
 	 * 
 	 * @param fields
 	 *            the fields, not <code>null</code>
@@ -274,7 +289,7 @@ public class CsvFormatter {
 	private String formatFields(Stream<?> fields) {
 		assert fields != null;
 		return fields
-				.map(StringUtils::toStringOrNull)
+				.<@Nullable String>map(StringUtils::toStringOrNull)
 				.map(this::escapeField)
 				.collect(Collectors.joining(fieldSeparator));
 	}
@@ -289,7 +304,7 @@ public class CsvFormatter {
 	 *            the fields, not <code>null</code>
 	 * @return the CSV record
 	 */
-	public String formatRecord(Object[] fields) {
+	public String formatRecord(@Nullable Object[] fields) {
 		return this.formatFields(fields) + recordSeparator;
 	}
 
@@ -310,43 +325,47 @@ public class CsvFormatter {
 	/**
 	 * Escapes the given field data according to the configuration of this formatter.
 	 * <p>
-	 * If the field is <code>null</code>, it is replaced with the {@link #nullField(String) null field value}. If
-	 * {@link #escapeNewlines() enabled}, newlines and backslashes are escaped. Then, if the configured
-	 * {@link #quote(String) quote} is not empty, the field data is quoted if at least one of the following applies:
+	 * If the field is <code>null</code>, it is replaced with the {@link #nullField(String) null
+	 * field value}. If {@link #escapeNewlines() enabled}, newlines and backslashes are escaped.
+	 * Then, if the configured {@link #quote(String) quote} is not empty, the field data is quoted
+	 * if at least one of the following applies:
 	 * <ul>
 	 * <li>Quoting of {@link #quoteAllFields() all fields} is enabled.
 	 * <li>The field contains the {@link #quote(String) quote}.
 	 * <li>The field contains {@link #escapeNewlines() unescaped} newlines.
 	 * <li>The field contains the {@link #fieldSeparator(String) field separator}.
-	 * <li>The {@link #recordSeparator(String) record separator} does not contain a newline and the field contains the
-	 * {@link #recordSeparator(String) record separator}.
+	 * <li>The {@link #recordSeparator(String) record separator} does not contain a newline and the
+	 * field contains the {@link #recordSeparator(String) record separator}.
 	 * </ul>
 	 * Any occurrences of the (non-empty) {@link #quote(String) quote} are replaced with the
 	 * {@link #escapedQuote(String) escaped quote}.
 	 * 
 	 * @param field
-	 *            the field data
-	 * @return the escaped field data
+	 *            the field data, can be <code>null</code>
+	 * @return the escaped field data, not <code>null</code>
 	 */
-	public String escapeField(String field) {
+	public String escapeField(@Nullable String field) {
 		String nonNullField = (field != null) ? field : nullField;
 		String escaped = nonNullField;
 
 		// Note: This also checks the nullField for newlines.
-		Lazy<Boolean> containsNewline = new Lazy<>(() -> StringUtils.containsNewline(nonNullField));
+		Lazy<@NonNull Boolean> containsNewline = new Lazy<>(
+				() -> StringUtils.containsNewline(nonNullField)
+		);
 		if (warnOnNewlines && containsNewline.get()) {
 			Log.warning("CSV field contains a newline character! " + escaped);
 		}
 
 		if (escapeNewlines && (containsNewline.get() || escaped.contains("\\"))) {
-			// Note: Even if the field's newlines were already escaped externally, possibly even using the same
-			// backslash escape sequences, we still have to escape backslashes another time here. Otherwise, a CSV
-			// parser that unescapes these characters again, because it assumes that they were originally escaped by the
-			// CSV formatter, will not be able to reproduce the field's original data, which may cause issues downstream
-			// if this field data is expected to not contain newlines.
-			// This is for example the case if the field data is in the Json format: The Json format requires newline
-			// characters to be escaped. If a CSV reader unescapes these characters, the resulting Json data will no
-			// longer be valid.
+			// Note: Even if the field's newlines were already escaped externally, possibly even
+			// using the same backslash escape sequences, we still have to escape backslashes
+			// another time here. Otherwise, a CSV parser that unescapes these characters again,
+			// because it assumes that they were originally escaped by the CSV formatter, will not
+			// be able to reproduce the field's original data, which may cause issues downstream if
+			// this field data is expected to not contain newlines.
+			// This is for example the case if the field data is in the Json format: The Json format
+			// requires newline characters to be escaped. If a CSV reader unescapes these
+			// characters, the resulting Json data will no longer be valid.
 			escaped = StringUtils.escapeNewlinesAndBackslash(escaped);
 		}
 

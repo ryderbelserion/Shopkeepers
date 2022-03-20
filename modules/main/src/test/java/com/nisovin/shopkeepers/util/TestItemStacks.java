@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Campfire;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -25,16 +24,17 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
 
 /**
  * ItemStack definitions for test cases.
- *
  */
 public class TestItemStacks {
 
-	public static List<ItemStack> createAllItemStacks() {
+	public static List<? extends @Nullable ItemStack> createAllItemStacks() {
 		return Arrays.asList(
 				createItemStackNull(),
 				createItemStackAir(),
@@ -43,13 +43,14 @@ public class TestItemStacks {
 				createItemStackBasicTool(),
 				createItemStackDisplayName(),
 				createItemStackComplete(),
-				// TODO This might be broken in Bukkit: Serializing and deserializing this item will produce non-equal
-				// ItemStacks with different BlockData (false vs 0b). See
+				// TODO This might be broken in Bukkit: Serializing and deserializing this item will
+				// produce non-equal ItemStacks with different BlockData (false vs 0b). See
 				// https://hub.spigotmc.org/jira/browse/SPIGOT-6257
 				// createItemStackBlockData(),
 				createItemStackUncommonMeta(),
-				// TODO The deserialization of the text data of books is broken in Bukkit 1.14 and should be fixed in
-				// late versions of 1.16. See https://hub.spigotmc.org/jira/browse/SPIGOT-3206
+				// TODO The deserialization of the text data of books is broken in Bukkit 1.14 and
+				// should be fixed in late versions of 1.16. See
+				// https://hub.spigotmc.org/jira/browse/SPIGOT-3206
 				// createItemStackWritableBook(),
 				// createItemStackWrittenBook(),
 				createItemStackBasicTileEntity(),
@@ -57,7 +58,7 @@ public class TestItemStacks {
 		);
 	}
 
-	public static ItemStack createItemStackNull() {
+	public static @Nullable ItemStack createItemStackNull() {
 		return null;
 	}
 
@@ -80,7 +81,7 @@ public class TestItemStacks {
 
 	public static ItemStack createItemStackDisplayName() {
 		ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
-		ItemMeta itemMeta = itemStack.getItemMeta();
+		ItemMeta itemMeta = Unsafe.assertNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
@@ -88,43 +89,79 @@ public class TestItemStacks {
 
 	public static ItemStack createItemStackComplete() {
 		ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
-		ItemMeta itemMeta = itemStack.getItemMeta();
+		ItemMeta itemMeta = Unsafe.assertNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setLore(Arrays.asList(ChatColor.GREEN + "lore1", "lore2"));
-		itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-		itemMeta.addEnchant(Enchantment.DAMAGE_ALL, 2, true);
+		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.DURABILITY), 1, true);
+		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.DAMAGE_ALL), 2, true);
 		itemMeta.setCustomModelData(1);
 		itemMeta.setLocalizedName("loc name");
 		itemMeta.setUnbreakable(true);
 		itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(new UUID(1L, 1L), "attack speed bonus", 2, Operation.ADD_NUMBER, EquipmentSlot.HAND));
-		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(new UUID(2L, 2L), "attack speed bonus 2", 0.5, Operation.MULTIPLY_SCALAR_1, EquipmentSlot.OFF_HAND));
-		itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(new UUID(3L, 3L), "attack speed bonus", 2, Operation.ADD_NUMBER, EquipmentSlot.HAND));
+		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED,
+				new AttributeModifier(
+						new UUID(1L, 1L),
+						"attack speed bonus",
+						2,
+						Operation.ADD_NUMBER,
+						EquipmentSlot.HAND
+				)
+		);
+		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED,
+				new AttributeModifier(
+						new UUID(2L, 2L),
+						"attack speed bonus 2",
+						0.5,
+						Operation.MULTIPLY_SCALAR_1,
+						EquipmentSlot.OFF_HAND
+				)
+		);
+		itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH,
+				new AttributeModifier(
+						new UUID(3L, 3L),
+						"attack speed bonus",
+						2,
+						Operation.ADD_NUMBER,
+						EquipmentSlot.HAND
+				)
+		);
 		((Damageable) itemMeta).setDamage(2);
 		((Repairable) itemMeta).setRepairCost(3);
 		// Note: This data ends up getting stored in an arbitrary order internally.
 		PersistentDataContainer customTags = itemMeta.getPersistentDataContainer();
-		customTags.set(NamespacedKeyUtils.create("some_plugin", "some-key"), PersistentDataType.STRING, "some value");
+		customTags.set(
+				NamespacedKeyUtils.create("some_plugin", "some-key"),
+				Unsafe.assertNonNull(PersistentDataType.STRING),
+				"some value"
+		);
 		PersistentDataContainer customContainer = customTags.getAdapterContext().newPersistentDataContainer();
-		customContainer.set(NamespacedKeyUtils.create("inner_plugin", "inner-key"), PersistentDataType.FLOAT, 0.3F);
-		customTags.set(NamespacedKeyUtils.create("some_plugin", "some-other-key"), PersistentDataType.TAG_CONTAINER, customContainer);
+		customContainer.set(
+				NamespacedKeyUtils.create("inner_plugin", "inner-key"),
+				Unsafe.assertNonNull(PersistentDataType.FLOAT),
+				0.3F
+		);
+		customTags.set(
+				NamespacedKeyUtils.create("some_plugin", "some-other-key"),
+				Unsafe.assertNonNull(PersistentDataType.TAG_CONTAINER),
+				customContainer
+		);
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
 
 	public static ItemStack createItemStackBlockData() {
 		ItemStack itemStack = new ItemStack(Material.CAMPFIRE);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		BlockData data = Material.CAMPFIRE.createBlockData();
-		((Campfire) data).setLit(false);
-		((BlockDataMeta) itemMeta).setBlockData(data);
+		BlockDataMeta itemMeta = Unsafe.castNonNull(itemStack.getItemMeta());
+		Campfire blockData = (Campfire) Material.CAMPFIRE.createBlockData();
+		blockData.setLit(false);
+		itemMeta.setBlockData(blockData);
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
 
 	public static ItemStack createItemStackUncommonMeta() {
 		ItemStack itemStack = new ItemStack(Material.LEATHER_CHESTPLATE);
-		LeatherArmorMeta itemMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+		LeatherArmorMeta itemMeta = Unsafe.castNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setColor(Color.BLUE);
 		itemStack.setItemMeta(itemMeta);
@@ -133,7 +170,7 @@ public class TestItemStacks {
 
 	public static ItemStack createItemStackWritableBook() {
 		ItemStack itemStack = new ItemStack(Material.WRITABLE_BOOK);
-		BookMeta itemMeta = (BookMeta) itemStack.getItemMeta();
+		BookMeta itemMeta = Unsafe.castNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setTitle("Finding Diamonds");
 		itemMeta.setAuthor("D. Whining Rod");
@@ -148,7 +185,7 @@ public class TestItemStacks {
 
 	public static ItemStack createItemStackWrittenBook() {
 		ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK);
-		BookMeta itemMeta = (BookMeta) itemStack.getItemMeta();
+		BookMeta itemMeta = Unsafe.castNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setTitle("Finding Diamonds");
 		itemMeta.setAuthor("D. Whining Rod");
@@ -168,7 +205,7 @@ public class TestItemStacks {
 
 	public static ItemStack createItemStackTileEntityDisplayName() {
 		ItemStack itemStack = new ItemStack(Material.CHEST);
-		ItemMeta itemMeta = itemStack.getItemMeta();
+		ItemMeta itemMeta = Unsafe.assertNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;

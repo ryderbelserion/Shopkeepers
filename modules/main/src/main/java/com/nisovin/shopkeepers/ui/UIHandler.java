@@ -13,6 +13,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.InventoryView;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.UISession;
@@ -73,8 +75,8 @@ public abstract class UIHandler {
 	/**
 	 * Opens the interface window for the player of the given {@link UISession}.
 	 * <p>
-	 * Generally {@link #canOpen(Player, boolean)} should be checked before calling this method. However, this method
-	 * should not rely on that.
+	 * Generally {@link #canOpen(Player, boolean)} should be checked before calling this method.
+	 * However, this method should not rely on that.
 	 * <p>
 	 * If opening the window fails, the given {@link UISession} will be ended.
 	 * 
@@ -87,14 +89,16 @@ public abstract class UIHandler {
 	/**
 	 * Checks whether the given inventory view is managed by this UI handler.
 	 * <p>
-	 * The UI registry already keeps track of a player's currently open UI. This additional check verifies,
-	 * heuristically, in a best-effort manner, that the inventory view the player is interacting with actually
-	 * corresponds to the inventory view expected by this UI handler. The result of this method is checked before any
-	 * inventory events are passed through to this handler.
+	 * The UI registry already keeps track of a player's currently open UI. This additional check
+	 * verifies, heuristically, in a best-effort manner, that the inventory view the player is
+	 * interacting with actually corresponds to the inventory view expected by this UI handler. The
+	 * result of this method is checked before any inventory events are passed through to this
+	 * handler.
 	 * 
 	 * @param view
-	 *            an inventory view
-	 * @return <code>true</code> if the given inventory view has been opened and is handled by this UI handler
+	 *            an inventory view, not <code>null</code>
+	 * @return <code>true</code> if the given inventory view has been opened and is handled by this
+	 *         UI handler
 	 */
 	protected abstract boolean isWindow(InventoryView view);
 
@@ -114,18 +118,19 @@ public abstract class UIHandler {
 	/**
 	 * This is called when an {@link UISession} handled by this {@link UIHandler} has ended.
 	 * <p>
-	 * If the {@link UISession} has ended not due to a received {@link InventoryCloseEvent} but for another reason (e.g.
-	 * due to a call to {@link UISession#abort()}), the provided inventory close event argument is <code>null</code>.
+	 * If the {@link UISession} has ended not due to a received {@link InventoryCloseEvent} but for
+	 * another reason (e.g. due to a call to {@link UISession#abort()}), the provided inventory
+	 * close event argument is <code>null</code>.
 	 * <p>
-	 * This is also called when the UI session has ended because {@link #openWindow(UISession)} could not successfully
-	 * open the UI window.
+	 * This is also called when the UI session has ended because {@link #openWindow(UISession)}
+	 * could not successfully open the UI window.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
 	 * @param closeEvent
 	 *            the corresponding inventory close event, can be <code>null</code>
 	 */
-	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, @Nullable InventoryCloseEvent closeEvent) {
 		// Callback for subclasses.
 	}
 
@@ -134,22 +139,24 @@ public abstract class UIHandler {
 	/**
 	 * Additionally requested types of {@link InventoryEvent}s.
 	 * <p>
-	 * By default, only {@link InventoryClickEvent}, {@link InventoryDragEvent}, and {@link InventoryCloseEvent} are
-	 * forwarded to {@link UIHandler}s. This method can be overridden by {@link UIHandler}s to request callbacks for
-	 * additional types of inventory events via {@link #onInventoryEventEarly(UISession, InventoryEvent)} and
+	 * By default, only {@link InventoryClickEvent}, {@link InventoryDragEvent}, and
+	 * {@link InventoryCloseEvent} are forwarded to {@link UIHandler}s. This method can be
+	 * overridden by {@link UIHandler}s to request callbacks for additional types of inventory
+	 * events via {@link #onInventoryEventEarly(UISession, InventoryEvent)} and
 	 * {@link #onInventoryEventLate(UISession, InventoryEvent)}.
 	 * <p>
-	 * It is only effective to request event types for which a corresponding normally registered event handler would
-	 * also be able to receive respective events. For example, it has no effect to request the base type
-	 * {@link InventoryEvent}, because the various subtypes use their own {@link HandlerList}s to keep track of
-	 * registered event handlers. The way the Bukkit event system works is that any called event is only forwarded to
-	 * event handlers that have been registered at the closest {@link HandlerList} in the event's type hierarchy.
+	 * It is only effective to request event types for which a corresponding normally registered
+	 * event handler would also be able to receive respective events. For example, it has no effect
+	 * to request the base type {@link InventoryEvent}, because the various subtypes use their own
+	 * {@link HandlerList}s to keep track of registered event handlers. The way the Bukkit event
+	 * system works is that any called event is only forwarded to event handlers that have been
+	 * registered at the closest {@link HandlerList} in the event's type hierarchy.
 	 * <p>
 	 * The returned Set of requested event types is expected to not change over time but be fixed.
 	 * 
 	 * @return the additionally requested inventory event types, not <code>null</code>
 	 */
-	protected Set<Class<? extends InventoryEvent>> getAdditionalInventoryEvents() {
+	protected Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> getAdditionalInventoryEvents() {
 		return Collections.emptySet();
 	}
 
@@ -166,14 +173,15 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early ({@link EventPriority#HIGH}) for handled {@link InventoryEvent}s for inventory views that are
-	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * Called early ({@link EventPriority#HIGH}) for handled {@link InventoryEvent}s for inventory
+	 * views that are {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * <p>
-	 * This method is only guaranteed to be called for inventory events that are either handled by default, or that have
-	 * been explicitly requested by this {@link UIHandler} via {@link #getAdditionalInventoryEvents()}. However, it is
-	 * possible that this method may also be called for inventory events that have not been explicitly requested by this
-	 * {@link UIHandler}. The {@link UIHandler} should therefore take care to ignore any unexpected types of inventory
-	 * events.
+	 * This method is only guaranteed to be called for inventory events that are either handled by
+	 * default, or that have been explicitly requested by this {@link UIHandler} via
+	 * {@link #getAdditionalInventoryEvents()}. However, it is possible that this method may also be
+	 * called for inventory events that have not been explicitly requested by this
+	 * {@link UIHandler}. The {@link UIHandler} should therefore take care to ignore any unexpected
+	 * types of inventory events.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
@@ -198,14 +206,15 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW}) for handled {@link InventoryEvent}s for inventory views that are
-	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * Called early ({@link EventPriority#LOW}) for handled {@link InventoryEvent}s for inventory
+	 * views that are {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * <p>
-	 * This method is only guaranteed to be called for inventory events that are either handled by default, or that have
-	 * been explicitly requested by this {@link UIHandler} via {@link #getAdditionalInventoryEvents()}. However, it is
-	 * possible that this method may also be called for inventory events that have not been explicitly requested by this
-	 * {@link UIHandler}. The {@link UIHandler} should therefore take care to ignore any unexpected types of inventory
-	 * events.
+	 * This method is only guaranteed to be called for inventory events that are either handled by
+	 * default, or that have been explicitly requested by this {@link UIHandler} via
+	 * {@link #getAdditionalInventoryEvents()}. However, it is possible that this method may also be
+	 * called for inventory events that have not been explicitly requested by this
+	 * {@link UIHandler}. The {@link UIHandler} should therefore take care to ignore any unexpected
+	 * types of inventory events.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
@@ -218,23 +227,26 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Returns whether the currently handled inventory click is, according to our heuristic, an automatically triggered
-	 * shift left-click due to a shift double left-click by the player.
+	 * Returns whether the currently handled inventory click is, according to our heuristic, an
+	 * automatically triggered shift left-click due to a shift double left-click by the player.
 	 * <p>
-	 * Shift double left-clicks are supposed to move all matching items to the other inventory. Minecraft implements
-	 * this by triggering a shift left-click with {@link InventoryAction#MOVE_TO_OTHER_INVENTORY} for all inventory
-	 * slots that contain a matching item. Plugins cannot differentiate between these automatically triggered clicks and
+	 * Shift double left-clicks are supposed to move all matching items to the other inventory.
+	 * Minecraft implements this by triggering a shift left-click with
+	 * {@link InventoryAction#MOVE_TO_OTHER_INVENTORY} for all inventory slots that contain a
+	 * matching item. Plugins cannot differentiate between these automatically triggered clicks and
 	 * regular shift left-clicks by the player.
 	 * <p>
-	 * We use a heuristic to detect (and then possibly ignore) these automatically triggered clicks: We assume that any
-	 * shift left-clicks that occur within {@link UIHandler#AUTOMATIC_SHIFT_LEFT_CLICK_NANOS} on a slot different to the
-	 * previously clicked slot are automatically triggered.
+	 * We use a heuristic to detect (and then possibly ignore) these automatically triggered clicks:
+	 * We assume that any shift left-clicks that occur within
+	 * {@link UIHandler#AUTOMATIC_SHIFT_LEFT_CLICK_NANOS} on a slot different to the previously
+	 * clicked slot are automatically triggered.
 	 * <p>
-	 * Limitations (TODO): We cannot use a much lower time span (e.g. limiting it to 1 or 2 ticks), because the
-	 * automatically triggered clicks may arrive quite some time later (up to 150 ms later on a local server and
-	 * possibly more with network delay involved). Also, this does not work for automatic clicks triggered for the same
-	 * slot. Since the automatically triggered clicks may arrive quite some time later, we cannot differentiate them
-	 * from manual fast clicking.
+	 * Limitations (TODO): We cannot use a much lower time span (e.g. limiting it to 1 or 2 ticks),
+	 * because the automatically triggered clicks may arrive quite some time later (up to 150 ms
+	 * later on a local server and possibly more with network delay involved). Also, this does not
+	 * work for automatic clicks triggered for the same slot. Since the automatically triggered
+	 * clicks may arrive quite some time later, we cannot differentiate them from manual fast
+	 * clicking.
 	 * 
 	 * @return <code>true</code> if we detected an automatically triggered shift left-click
 	 */
@@ -247,13 +259,15 @@ public abstract class UIHandler {
 		isAutomaticShiftLeftClick = false; // Reset
 		final long nowNanos = System.nanoTime();
 		if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-			if (event.getRawSlot() != lastManualClickedSlotId && (nowNanos - lastManualClickNanos) < AUTOMATIC_SHIFT_LEFT_CLICK_NANOS) {
+			if (event.getRawSlot() != lastManualClickedSlotId
+					&& (nowNanos - lastManualClickNanos) < AUTOMATIC_SHIFT_LEFT_CLICK_NANOS) {
 				isAutomaticShiftLeftClick = true;
 				Log.debug("  Detected automatically triggered shift left-click! (on different slot)");
 			}
 		}
-		// Note: We reset these for all types of clicks, because when quickly switching between shift and non-shift
-		// clicking we sometimes receive non-shift clicks that are followed by the automatic shift-clicks:
+		// Note: We reset these for all types of clicks, because when quickly switching between
+		// shift and non-shift clicking we sometimes receive non-shift clicks that are followed by
+		// the automatic shift-clicks:
 		if (!isAutomaticShiftLeftClick) {
 			lastManualClickNanos = nowNanos;
 			lastManualClickedSlotId = event.getRawSlot();
@@ -263,11 +277,11 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW}) for {@link InventoryClickEvent}s for inventory views that are
-	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * Called early ({@link EventPriority#LOW}) for {@link InventoryClickEvent}s for inventory views
+	 * that are {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * <p>
-	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
-	 * event.
+	 * Any UI potentially canceling the event should consider doing so early in order for other
+	 * plugins to ignore the event.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
@@ -284,8 +298,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryClickEvent}s for inventory views that are
-	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryClickEvent}s for inventory views
+	 * that are {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
@@ -302,11 +316,11 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW}) for {@link InventoryDragEvent}s for inventory views that are
-	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * Called early ({@link EventPriority#LOW}) for {@link InventoryDragEvent}s for inventory views
+	 * that are {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * <p>
-	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
-	 * event.
+	 * Any UI potentially canceling the event should consider doing so early in order for other
+	 * plugins to ignore the event.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
@@ -323,8 +337,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryDragEvent}s for inventory views that are
-	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryDragEvent}s for inventory views
+	 * that are {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>

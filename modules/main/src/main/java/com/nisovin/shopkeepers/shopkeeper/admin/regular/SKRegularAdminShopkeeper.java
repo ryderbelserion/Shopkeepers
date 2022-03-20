@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.regular.RegularAdminShopkeeper;
@@ -21,13 +23,15 @@ import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements RegularAdminShopkeeper {
+public class SKRegularAdminShopkeeper
+		extends AbstractAdminShopkeeper implements RegularAdminShopkeeper {
 
 	// There can be multiple different offers for the same kind of item:
-	private final List<SKTradeOffer> offers = new ArrayList<>();
-	private final List<? extends SKTradeOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<@NonNull SKTradeOffer> offers = new ArrayList<>();
+	private final List<? extends @NonNull SKTradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKRegularAdminShopkeeper}.
@@ -63,22 +67,22 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public boolean hasTradingRecipes(Player player) {
+	public boolean hasTradingRecipes(@Nullable Player player) {
 		return !this.getOffers().isEmpty();
 	}
 
 	@Override
-	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
-		// SKTradeOffer extends SKTradingRecipe and reports to not be out-of-stock. Both SKTradeOffer and TradingRecipe
-		// are immutable. We can therefore reuse the offers as trading recipes, and don't have to create new trading
-		// recipes for them.
+	public List<? extends @NonNull TradingRecipe> getTradingRecipes(@Nullable Player player) {
+		// SKTradeOffer extends SKTradingRecipe and reports to not be out-of-stock. Both
+		// SKTradeOffer and TradingRecipe are immutable. We can therefore reuse the offers as
+		// trading recipes, and don't have to create new trading recipes for them.
 		return offersView;
 	}
 
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "recipes";
-	public static final Property<List<? extends TradeOffer>> OFFERS = new BasicProperty<List<? extends TradeOffer>>()
+	public static final Property<@NonNull List<? extends @NonNull TradeOffer>> OFFERS = new BasicProperty<@NonNull List<? extends @NonNull TradeOffer>>()
 			.dataKeyAccessor(DATA_KEY_OFFERS, SKTradeOffer.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
@@ -86,11 +90,19 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	static {
 		// Register shopkeeper data migrations:
-		ShopkeeperDataMigrator.registerMigration(new Migration("admin-offers",
-				MigrationPhase.ofShopkeeperClass(SKRegularAdminShopkeeper.class)) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"admin-offers",
+				MigrationPhase.ofShopkeeperClass(SKRegularAdminShopkeeper.class)
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
-				return SKTradeOffer.migrateOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), logPrefix);
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
+				return SKTradeOffer.migrateOffers(
+						shopkeeperData.getDataValue(DATA_KEY_OFFERS),
+						logPrefix
+				);
 			}
 		});
 	}
@@ -106,7 +118,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public List<? extends TradeOffer> getOffers() {
+	public List<? extends @NonNull TradeOffer> getOffers() {
 		return offersView;
 	}
 
@@ -121,15 +133,15 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public void setOffers(List<? extends TradeOffer> offers) {
+	public void setOffers(List<? extends @NonNull TradeOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(List<? extends TradeOffer> offers) {
-		assert offers != null && !offers.contains(null);
+	private void _setOffers(List<? extends @NonNull TradeOffer> offers) {
+		assert offers != null && !CollectionUtils.containsNull(offers);
 		this._clearOffers();
 		this._addOffers(offers);
 	}
@@ -151,15 +163,15 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public void addOffers(List<? extends TradeOffer> offers) {
+	public void addOffers(List<? extends @NonNull TradeOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(List<? extends TradeOffer> offers) {
-		assert offers != null && !offers.contains(null);
+	private void _addOffers(List<? extends @NonNull TradeOffer> offers) {
+		assert offers != null && !CollectionUtils.containsNull(offers);
 		offers.forEach(this::_addOffer);
 	}
 }

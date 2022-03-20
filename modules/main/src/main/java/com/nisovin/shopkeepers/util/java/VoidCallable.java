@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.Callable;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A {@link Callable} without return type.
  * <p>
@@ -9,18 +11,20 @@ import java.util.concurrent.Callable;
  * 
  * <pre>
  * {@code
- * methodRequiringCallable((VoidCallable) () -> doSomething());
+ * requiresCallable((VoidCallable) () -> doSomething());
  * }
  * </pre>
+ * <p>
+ * Unlike {@link Runnable#run()}, the {@link #voidCall()} method may throw an exception.
  */
 @FunctionalInterface
-public interface VoidCallable extends Callable<Void> {
+public interface VoidCallable extends Callable<@Nullable Void> {
 
 	/**
 	 * Calls {@link #voidCall()} and returns <code>null</code>.
 	 */
 	@Override
-	public default Void call() throws Exception {
+	public default @Nullable Void call() throws Exception {
 		this.voidCall();
 		return null;
 	}

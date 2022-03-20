@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -14,11 +16,11 @@ import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link FallbackArgument} that wraps two {@link CommandArgument command arguments}: If parsing the first command
- * argument fails, the second command argument gets evaluated as fallback.
+ * A {@link FallbackArgument} that wraps two {@link CommandArgument command arguments}: If parsing
+ * the first command argument fails, the second command argument gets evaluated as fallback.
  * <p>
- * Unlike {@link AnyFallbackArgument} this provides a value of a specific type. This requires the both original and the
- * fallback argument to be of the same type.
+ * Unlike {@link AnyFallbackArgument} this provides a value of a specific type. This requires the
+ * both original and the fallback argument to be of the same type.
  * 
  * @param <T>
  *            the type of the parsed argument
@@ -66,25 +68,48 @@ public class TypedFallbackArgument<T> extends FallbackArgument<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public T parse(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		return (T) anyFallbackArgument.parse(input, context, argsReader);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public T parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		return (T) anyFallbackArgument.parseValue(input, context, argsReader);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T parseFallback(	CommandInput input, CommandContext context, ArgumentsReader argsReader,
-							FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
-		return (T) anyFallbackArgument.parseFallback(input, context, argsReader, fallbackException, parsingFailed);
+	public T parseFallback(
+			CommandInput input,
+			CommandContext context,
+			ArgumentsReader argsReader,
+			FallbackArgumentException fallbackException,
+			boolean parsingFailed
+	) throws ArgumentParseException {
+		return (T) anyFallbackArgument.parseFallback(
+				input,
+				context,
+				argsReader,
+				fallbackException,
+				parsingFailed
+		);
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		return anyFallbackArgument.complete(input, context, argsReader);
 	}
 }

@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.dependencies.towny;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.TownBlock;
@@ -12,7 +13,7 @@ public final class TownyDependency {
 
 	public static final String PLUGIN_NAME = "Towny";
 
-	public static Plugin getPlugin() {
+	public static @Nullable Plugin getPlugin() {
 		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
 	}
 

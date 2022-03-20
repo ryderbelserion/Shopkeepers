@@ -7,7 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Shulker;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -26,20 +29,24 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class ShulkerShop extends SKLivingShopObject<Shulker> {
+public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 
-	public static final Property<DyeColor> COLOR = new BasicProperty<DyeColor>()
+	public static final Property<@Nullable DyeColor> COLOR = new BasicProperty<@Nullable DyeColor>()
 			.dataKeyAccessor("color", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates default color
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<DyeColor> colorProperty = new PropertyValue<>(COLOR)
-			.onValueChanged(this::applyColor)
+	private final PropertyValue<@Nullable DyeColor> colorProperty = new PropertyValue<>(COLOR)
+			.onValueChanged(Unsafe.initialized(this)::applyColor)
 			.build(properties);
 
-	public ShulkerShop(	LivingShops livingShops, SKLivingShopObjectType<ShulkerShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public ShulkerShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull ShulkerShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -62,30 +69,33 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		return editorButtons;
 	}
 
 	// COLOR
 
-	public DyeColor getColor() {
+	public @Nullable DyeColor getColor() {
 		return colorProperty.getValue();
 	}
 
-	public void setColor(DyeColor color) {
+	public void setColor(@Nullable DyeColor color) {
 		colorProperty.setValue(color);
 	}
 
 	public void cycleColor(boolean backwards) {
-		this.setColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getColor(), backwards));
+		this.setColor(
+				EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getColor(), backwards)
+		);
 	}
 
 	private void applyColor() {
 		Shulker entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		entity.setColor(this.getColor());
+		// TODO Bukkit's Shulker interface does not specify the nullness
+		entity.setColor(Unsafe.nullableAsNonNull(this.getColor()));
 	}
 
 	private ItemStack getColorEditorItem() {
@@ -96,19 +106,26 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(color));
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonShulkerColor, Messages.buttonShulkerColorLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonShulkerColor,
+				Messages.buttonShulkerColorLore
+		);
 		return iconItem;
 	}
 
 	private Button getColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleColor(backwards);
 				return true;

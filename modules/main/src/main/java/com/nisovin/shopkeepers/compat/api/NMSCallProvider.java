@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.CompatVersion;
@@ -25,8 +26,8 @@ public interface NMSCallProvider {
 	public default CompatVersion getCompatVersion() {
 		CompatVersion compatVersion = NMSManager.getCompatVersion(this.getVersionId());
 		// Not finding the compat version indicates a bug.
-		Validate.State.notNull(compatVersion, "Could not find CompatVersion for '" + this.getVersionId() + "'!");
-		return compatVersion;
+		return Validate.State.notNull(compatVersion, "Could not find CompatVersion for '"
+				+ this.getVersionId() + "'!");
 	}
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
@@ -50,38 +51,42 @@ public interface NMSCallProvider {
 	// TODO Replace this once only the latest versions of 1.15.1 and upwards are supported.
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
 
-	// Sets the entity as adult for mob types for which we don't support the baby property yet, i.e. because they are
-	// exclusive to the specific MC version and don't extend Ageable:
-	// TODO Remove this once there are no exclusive mobs anymore to which this applies (currently, once we only support
-	// MC 1.16.1. upwards)
+	// Sets the entity as adult for mob types for which we don't support the baby property yet, i.e.
+	// because they are exclusive to the specific MC version and don't extend Ageable:
+	// TODO Remove this once there are no exclusive mobs anymore to which this applies (currently,
+	// once we only support MC 1.16.1. upwards)
 	public default void setExclusiveAdult(LivingEntity entity) {
 		// No exclusive mobs by default.
 	}
 
-	// TODO Remove this once we only support later versions of Bukkit 1.16.5 and upwards (those have an API method to
-	// set the DespawnDelay).
+	// TODO Remove this once we only support later versions of Bukkit 1.16.5 and upwards (those have
+	// an API method to set the DespawnDelay).
 	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay);
 
-	// Performs any version-specific setup that needs to happen before the entity is spawned. The available operations
-	// may be limited during this phase of the entity spawning.
+	// Performs any version-specific setup that needs to happen before the entity is spawned. The
+	// available operations may be limited during this phase of the entity spawning.
 	public default void prepareEntity(Entity entity) {
 	}
 
-	// Performs any version-specific setup of the entity that needs to happen right after the entity was spawned.
+	// Performs any version-specific setup of the entity that needs to happen right after the entity
+	// was spawned.
 	public default void setupSpawnedEntity(Entity entity) {
 	}
 
-	public default boolean matches(@ReadOnly ItemStack provided, UnmodifiableItemStack required) {
+	public default boolean matches(
+			@ReadOnly @Nullable ItemStack provided,
+			@Nullable UnmodifiableItemStack required
+	) {
 		return this.matches(provided, ItemUtils.asItemStackOrNull(required));
 	}
 
 	/**
-	 * Checks if the <code>provided</code> item stack fulfills the requirements of a trading recipe requiring the given
-	 * <code>required</code> item stack.
+	 * Checks if the <code>provided</code> item stack fulfills the requirements of a trading recipe
+	 * requiring the given <code>required</code> item stack.
 	 * <p>
-	 * This mimics Minecraft's item comparison: This checks if the item stacks are either both empty, or of same type
-	 * and the provided item stack's metadata contains all the contents of the required item stack's metadata (with any
-	 * list metadata being equal).
+	 * This mimics Minecraft's item comparison: This checks if the item stacks are either both
+	 * empty, or of same type and the provided item stack's metadata contains all the contents of
+	 * the required item stack's metadata (with any list metadata being equal).
 	 * 
 	 * @param provided
 	 *            the provided item stack
@@ -89,20 +94,24 @@ public interface NMSCallProvider {
 	 *            the required item stack, this may be an unmodifiable item stack
 	 * @return <code>true</code> if the provided item stack matches the required item stack
 	 */
-	public boolean matches(@ReadOnly ItemStack provided, @ReadOnly ItemStack required);
+	public boolean matches(
+			@ReadOnly @Nullable ItemStack provided,
+			@ReadOnly @Nullable ItemStack required
+	);
 
-	// Note: It is not safe to reduce the number of trading recipes! Reducing the size below the selected index can
-	// crash the client. It's left to the caller to ensure that the number of recipes does not get reduced, for example
-	// by inserting dummy entries.
+	// Note: It is not safe to reduce the number of trading recipes! Reducing the size below the
+	// selected index can crash the client. It's left to the caller to ensure that the number of
+	// recipes does not get reduced, for example by inserting dummy entries.
 	public void updateTrades(Player player);
 
 	// For use in chat hover messages, null if not supported.
-	public String getItemSNBT(@ReadOnly ItemStack itemStack);
+	public @Nullable String getItemSNBT(@ReadOnly ItemStack itemStack);
 
 	// For use in translatable item type names, null if not supported.
-	// Note: This might not necessarily match the name that is usually displayed for an ItemStack, but rather the
-	// translated item type name (for example for items such as different types of potions, skulls, etc.).
-	public String getItemTypeTranslationKey(Material material);
+	// Note: This might not necessarily match the name that is usually displayed for an ItemStack,
+	// but rather the translated item type name (for example for items such as different types of
+	// potions, skulls, etc.).
+	public @Nullable String getItemTypeTranslationKey(Material material);
 
 	// MC 1.17 specific features
 	// TODO Remove this once we only support MC 1.17 and above.

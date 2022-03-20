@@ -12,6 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -24,7 +25,7 @@ public class NotificationUserPreferences implements Listener {
 	}
 
 	private final Plugin plugin;
-	private final Map<UUID, UserPreferences> userPreferences = new HashMap<>();
+	private final Map<@NonNull UUID, @NonNull UserPreferences> userPreferences = new HashMap<>();
 
 	public NotificationUserPreferences(Plugin plugin) {
 		this.plugin = plugin;
@@ -41,7 +42,12 @@ public class NotificationUserPreferences implements Listener {
 
 	private UserPreferences getOrCreateUserPreferences(Player player) {
 		Validate.notNull(player, "player is null");
-		return userPreferences.computeIfAbsent(player.getUniqueId(), playerId -> new UserPreferences());
+		UserPreferences preferences = userPreferences.computeIfAbsent(
+				player.getUniqueId(),
+				playerId -> new UserPreferences()
+		);
+		assert preferences != null;
+		return preferences;
 	}
 
 	public boolean hasReceivedDisableTradeNotificationsHint(Player player) {

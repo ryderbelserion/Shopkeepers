@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.shopobjects.virtual;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
@@ -17,7 +19,11 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 
 	protected final VirtualShops virtualShops;
 
-	protected SKVirtualShopObject(VirtualShops virtualShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SKVirtualShopObject(
+			VirtualShops virtualShops,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(shopkeeper, creationData);
 		this.virtualShops = virtualShops;
 	}
@@ -50,7 +56,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	}
 
 	@Override
-	public String getId() {
+	public @Nullable String getId() {
 		return null;
 	}
 
@@ -64,7 +70,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	}
 
 	@Override
-	public Location getLocation() {
+	public @Nullable Location getLocation() {
 		return null;
 	}
 
@@ -76,25 +82,25 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	}
 
 	@Override
-	public Location getTickVisualizationParticleLocation() {
+	public @Nullable Location getTickVisualizationParticleLocation() {
 		return null;
 	}
 
 	// NAMING
 
 	@Override
-	public void setName(String name) {
+	public void setName(@Nullable String name) {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 
 	// EDITOR ACTIONS
 
 	@Override
-	public List<Button> createEditorButtons() {
+	public List<@NonNull Button> createEditorButtons() {
 		return super.createEditorButtons();
 	}
 }

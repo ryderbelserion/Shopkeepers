@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -29,9 +30,9 @@ public final class LocationUtils {
 	/**
 	 * Checks if the given locations represent the same position.
 	 * <p>
-	 * This compares the precise coordinates of the given locations, as well as their worlds. If both locations do not
-	 * store any world, or both their worlds are no longer loaded, their worlds are considered equal. The pitch and yaw
-	 * of the given locations are ignored.
+	 * This compares the precise coordinates of the given locations, as well as their worlds. If
+	 * both locations do not store any world, or both their worlds are no longer loaded, their
+	 * worlds are considered equal. The pitch and yaw of the given locations are ignored.
 	 * <p>
 	 * If both locations are <code>null</code>, this returns <code>true</code>.
 	 * 
@@ -41,7 +42,10 @@ public final class LocationUtils {
 	 *            the second location
 	 * @return <code>true</code> if the locations correspond to the same position
 	 */
-	public static boolean isEqualPosition(Location location1, Location location2) {
+	public static boolean isEqualPosition(
+			@Nullable Location location1,
+			@Nullable Location location2
+	) {
 		if (location1 == location2) return true; // Also handles both being null
 		if (location1 == null || location2 == null) return false;
 		if (Double.doubleToLongBits(location1.getX()) != Double.doubleToLongBits(location2.getX())) {
@@ -67,8 +71,8 @@ public final class LocationUtils {
 	/**
 	 * Gets the squared distance between the given locations.
 	 * <p>
-	 * Both locations are required to have a valid (non-<code>null</code>) world. If the locations are located in
-	 * different worlds, this returns {@link Double#MAX_VALUE}.
+	 * Both locations are required to have a valid (non-<code>null</code>) world. If the locations
+	 * are located in different worlds, this returns {@link Double#MAX_VALUE}.
 	 * 
 	 * @param location1
 	 *            the first location, not <code>null</code>
@@ -84,10 +88,10 @@ public final class LocationUtils {
 		World world2 = location2.getWorld();
 		Validate.notNull(world1, "World of location1 is null");
 		Validate.notNull(world2, "World of location2 is null");
-		// Comparing the worlds by identity rather than equals / UUID is sufficient. Location itself compares worlds by
-		// identity in Location#distanceSquared. Also, even if the worlds have the same UUID but are different
-		// instances, it is unclear whether they can be treated as equal, since some operations on a previously unloaded
-		// world might have no effect.
+		// Comparing the worlds by identity rather than equals / UUID is sufficient. Location itself
+		// compares worlds by identity in Location#distanceSquared. Also, even if the worlds have
+		// the same UUID but are different instances, it is unclear whether they can be treated as
+		// equal, since some operations on a previously unloaded world might have no effect.
 		if (world1 != world2) return Double.MAX_VALUE; // Different worlds
 		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
 		double dx = location1.getX() - location2.getX();

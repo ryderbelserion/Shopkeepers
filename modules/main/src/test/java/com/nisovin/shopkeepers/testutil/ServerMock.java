@@ -9,13 +9,17 @@ import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemFactory;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_14_R1.util.Versioning;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Mocks the Server (at least the functions required for our tests).
  * <p>
  * Adopted from CraftBukkit.
  */
-class ServerMock extends ProxyHandler<Server> {
+class ServerMock extends ProxyHandler<@NonNull Server> {
 
 	// Static initializer: Ensures that this is only setup once across all tests.
 	static {
@@ -35,7 +39,7 @@ class ServerMock extends ProxyHandler<Server> {
 	@Override
 	protected void setupMethodHandlers() throws Exception {
 		this.addHandler(Server.class.getMethod("getItemFactory"), (proxy, args) -> {
-			return CraftItemFactory.instance();
+			return Unsafe.assertNonNull(CraftItemFactory.instance());
 		});
 
 		this.addHandler(Server.class.getMethod("getName"), (proxy, args) -> {
@@ -43,7 +47,8 @@ class ServerMock extends ProxyHandler<Server> {
 		});
 
 		this.addHandler(Server.class.getMethod("getVersion"), (proxy, args) -> {
-			return ServerMock.class.getPackage().getImplementationVersion();
+			Package pkg = Unsafe.assertNonNull(ServerMock.class.getPackage());
+			return pkg.getImplementationVersion();
 		});
 
 		this.addHandler(Server.class.getMethod("getBukkitVersion"), (proxy, args) -> {
@@ -59,8 +64,14 @@ class ServerMock extends ProxyHandler<Server> {
 			return CraftMagicNumbers.INSTANCE;
 		});
 
-		this.addHandler(Server.class.getMethod("createBlockData", Material.class), (proxy, args) -> {
-			return CraftBlockData.newData((Material) args[0], null);
-		});
+		this.addHandler(
+				Server.class.getMethod("createBlockData", Material.class),
+				(proxy, args) -> {
+					Validate.notNull(args, "args is null");
+					assert args != null;
+					Material material = Unsafe.castNonNull(args[0]);
+					return CraftBlockData.newData(material, Unsafe.uncheckedNull());
+				}
+		);
 	}
 }

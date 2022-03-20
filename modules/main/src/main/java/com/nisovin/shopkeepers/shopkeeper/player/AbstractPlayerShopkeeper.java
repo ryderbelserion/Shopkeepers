@@ -7,17 +7,20 @@ import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -34,12 +37,14 @@ import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
 import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
+import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.user.SKUser;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
@@ -65,21 +70,30 @@ import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
+public abstract class AbstractPlayerShopkeeper
+		extends AbstractShopkeeper implements PlayerShopkeeper {
 
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
-	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(
+			1,
+			CHECK_CONTAINER_PERIOD_SECONDS + 1
+	);
 
-	private User owner; // Not null after successful initialization
+	private User owner = SKUser.EMPTY; // Valid after successful initialization
 	// The world name of this BlockLocation matches the shopkeeper world name.
-	// TODO Allow the container to be located in a world different to that of the shopkeeper? This could also be useful
-	// for virtual player shops, which don't have a world themselves, but would still need a container block in a world.
-	private BlockLocation container; // Immutable BlockLocation
+	// TODO Allow the container to be located in a world different to that of the shopkeeper? This
+	// could also be useful for virtual player shops, which don't have a world themselves, but would
+	// still need a container block in a world.
+	// Immutable, valid after successful initialization:
+	private BlockLocation container = BlockLocation.EMPTY;
 	private boolean notifyOnTrades = NOTIFY_ON_TRADES.getDefaultValue();
-	private UnmodifiableItemStack hireCost = null; // Null if not for hire
+	private @Nullable UnmodifiableItemStack hireCost = null; // Null if not for hire
 
 	// Initial threshold between [1, CHECK_CONTAINER_PERIOD_SECONDS] for load balancing:
-	private final RateLimiter checkContainerLimiter = new RateLimiter(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
+	private final RateLimiter checkContainerLimiter = new RateLimiter(
+			CHECK_CONTAINER_PERIOD_SECONDS,
+			nextCheckingOffset.getAndIncrement()
+	);
 
 	/**
 	 * Creates a new and not yet initialized {@link AbstractPlayerShopkeeper}.
@@ -93,15 +107,14 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	 * Expects a {@link PlayerShopCreationData}.
 	 */
 	@Override
-	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected void loadFromCreationData(int id, ShopCreationData shopCreationData)
+			throws ShopkeeperCreateException {
 		super.loadFromCreationData(id, shopCreationData);
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
-		Player owner = playerShopCreationData.getCreator();
-		Block container = playerShopCreationData.getShopContainer();
-		assert owner != null;
-		assert container != null;
+		Player owner = Unsafe.assertNonNull(playerShopCreationData.getCreator());
+		Block container = Unsafe.assertNonNull(playerShopCreationData.getShopContainer());
 
-		this._setOwner(owner.getUniqueId(), owner.getName());
+		this._setOwner(owner.getUniqueId(), Unsafe.assertNonNull(owner.getName()));
 		this._setContainer(container.getX(), container.getY(), container.getZ());
 	}
 
@@ -148,7 +161,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void delete(Player player) {
+	public void delete(@Nullable Player player) {
 		// Return the shop creation item:
 		if (Settings.deletingPlayerShopReturnsCreationItem && player != null && this.isOwner(player)) {
 			ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
@@ -157,21 +170,26 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				// Inventory is full, drop the item instead:
 				Location playerLocation = player.getEyeLocation();
 				Location shopLocation = this.getShopObject().getLocation(); // Null if not spawned
-				// If within a certain range, drop the item at the shop's location, else drop at player's location:
+				// If within a certain range, drop the item at the shop's location, else drop at
+				// player's location:
 				Location dropLocation;
-				if (shopLocation != null && LocationUtils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
+				if (shopLocation != null
+						&& LocationUtils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
 					dropLocation = shopLocation;
 				} else {
 					dropLocation = playerLocation;
 				}
-				dropLocation.getWorld().dropItem(dropLocation, shopCreationItem);
+				World world = Unsafe.assertNonNull(dropLocation.getWorld());
+				world.dropItem(dropLocation, shopCreationItem);
 			}
 		}
 		super.delete(player);
 	}
 
 	@Override
-	protected void populateMessageArguments(Map<String, Supplier<Object>> messageArguments) {
+	protected void populateMessageArguments(
+			Map<@NonNull String, @NonNull Supplier<@NonNull ?>> messageArguments
+	) {
 		super.populateMessageArguments(messageArguments);
 		messageArguments.put("owner_name", this::getOwnerName);
 		messageArguments.put("owner_uuid", this::getOwnerUUID);
@@ -181,11 +199,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected void onShopkeeperMoved() {
 		super.onShopkeeperMoved();
 
-		// Update the container location and the registered container protection if the shopkeeper has been moved to a
-		// different world:
-		// The container is (currently) assumed to always be located in the same world as the shopkeeper. If the
-		// shopkeeper is moved to a different world, the container is expected to also have been moved. Otherwise, if
-		// the container cannot be found in the new world, trading will not work.
+		// Update the container location and the registered container protection if the shopkeeper
+		// has been moved to a different world:
+		// The container is (currently) assumed to always be located in the same world as the
+		// shopkeeper. If the shopkeeper is moved to a different world, the container is expected to
+		// also have been moved. Otherwise, if the container cannot be found in the new world,
+		// trading will not work.
 		if (!Objects.equals(this.getWorldName(), container.getWorldName())) {
 			// This updates the container's world based on the shopkeeper's current world:
 			this._setContainer(container);
@@ -195,21 +214,19 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	public void onPlayerInteraction(Player player) {
 		Validate.notNull(player, "player is null");
-
 		// Naming via item:
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
-		if (Settings.namingOfPlayerShopsViaItem && DerivedSettings.namingItemData.matches(itemInMainHand)) {
+		if (Settings.namingOfPlayerShopsViaItem
+				&& DerivedSettings.namingItemData.matches(itemInMainHand)) {
 			// Check if player can edit this shopkeeper:
-			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
+			UIHandler editorHandler = Unsafe.assertNonNull(this.getUIHandler(DefaultUITypes.EDITOR()));
 			if (editorHandler.canOpen(player, false)) {
 				// Rename with the player's item in hand:
-				ItemMeta itemMeta = itemInMainHand.getItemMeta(); // Can be null
-				String newName = (itemMeta != null && itemMeta.hasDisplayName()) ? itemMeta.getDisplayName() : "";
-				assert newName != null; // ItemMeta#getDisplayName returns non-null in all cases
+				String newName = ItemUtils.getDisplayNameOrEmpty(itemInMainHand);
 
-				// Handled name changing:
-				if (SKShopkeepersPlugin.getInstance().getShopkeeperNaming().requestNameChange(player, this, newName)) {
+				ShopkeeperNaming shopkeeperNaming = SKShopkeepersPlugin.getInstance().getShopkeeperNaming();
+				if (shopkeeperNaming.requestNameChange(player, this, newName)) {
 					// Manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 						ItemStack newItemInMainHand = ItemUtils.decreaseItemAmount(itemInMainHand, 1);
@@ -231,25 +248,32 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// OWNER
 
-	public static final Property<UUID> OWNER_UNIQUE_ID = new BasicProperty<UUID>()
+	public static final Property<@NonNull UUID> OWNER_UNIQUE_ID = new BasicProperty<@NonNull UUID>()
 			.dataKeyAccessor("owner uuid", UUIDSerializers.LENIENT)
 			.build();
-	public static final Property<String> OWNER_NAME = new BasicProperty<String>()
+	public static final Property<@NonNull String> OWNER_NAME = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("owner", StringSerializers.SCALAR)
 			.validator(StringValidators.NON_EMPTY)
-			.validator((property, value) -> {
-				// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the
-				// future (as soon as possible, because it conflicts with any player actually named 'unknown').
+			.validator(value -> {
+				// TODO We no longer use the fallback name (since late 1.14.4). Remove the
+				// "unknown"-check again in the
+				// future (as soon as possible, because it conflicts with any player actually named
+				// 'unknown').
 				Validate.isTrue(!value.equals("unknown"), "Invalid owner name: 'unknown'");
 			})
 			.build();
-	public static final Property<User> OWNER = new BasicProperty<User>()
+	public static final Property<@NonNull User> OWNER = new BasicProperty<@NonNull User>()
 			.name("owner")
-			.dataAccessor(new DataAccessor<User>() {
+			.dataAccessor(new DataAccessor<@NonNull User>() {
 				@Override
-				public void save(DataContainer dataContainer, User value) {
-					dataContainer.set(OWNER_UNIQUE_ID, value.getUniqueId());
-					dataContainer.set(OWNER_NAME, value.getLastKnownName());
+				public void save(DataContainer dataContainer, @Nullable User value) {
+					if (value != null) {
+						dataContainer.set(OWNER_UNIQUE_ID, value.getUniqueId());
+						dataContainer.set(OWNER_NAME, value.getLastKnownName());
+					} else {
+						dataContainer.set(OWNER_UNIQUE_ID, null);
+						dataContainer.set(OWNER_NAME, null);
+					}
 				}
 
 				@Override
@@ -273,7 +297,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setOwner(Player player) {
-		this.setOwner(player.getUniqueId(), player.getName());
+		this.setOwner(player.getUniqueId(), Unsafe.assertNonNull(player.getName()));
 	}
 
 	// TODO Add to API
@@ -325,13 +349,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public Player getOwner() {
+	public @Nullable Player getOwner() {
 		return Bukkit.getPlayer(this.getOwnerUUID());
 	}
 
 	// TRADE NOTIFICATIONS
 
-	public static final Property<Boolean> NOTIFY_ON_TRADES = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> NOTIFY_ON_TRADES = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("notifyOnTrades", BooleanSerializers.LENIENT)
 			.defaultValue(true)
 			.omitIfDefault()
@@ -365,7 +389,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// HIRING
 
-	public static final Property<UnmodifiableItemStack> HIRE_COST_ITEM = new BasicProperty<UnmodifiableItemStack>()
+	public static final Property<@Nullable UnmodifiableItemStack> HIRE_COST_ITEM = new BasicProperty<@Nullable UnmodifiableItemStack>()
 			.dataKeyAccessor("hirecost", ItemStackSerializers.UNMODIFIABLE)
 			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
 			.nullable() // Null if the shop is not for hire
@@ -374,10 +398,15 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	static {
 		// Register shopkeeper data migrations:
-		ShopkeeperDataMigrator.registerMigration(new Migration("hire-cost-item",
-				MigrationPhase.ofShopkeeperClass(AbstractPlayerShopkeeper.class)) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"hire-cost-item",
+				MigrationPhase.ofShopkeeperClass(AbstractPlayerShopkeeper.class)
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
 				UnmodifiableItemStack hireCost = shopkeeperData.get(HIRE_COST_ITEM);
 				if (hireCost == null) return false; // Nothing to migrate
 
@@ -416,12 +445,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void setForHire(ItemStack hireCost) {
+	public void setForHire(@Nullable ItemStack hireCost) {
 		this._setForHire(hireCost);
 		this.markDirty();
 	}
 
-	private void _setForHire(ItemStack hireCost) {
+	private void _setForHire(@Nullable ItemStack hireCost) {
 		boolean isForHire = this.isForHire();
 		if (ItemUtils.isEmpty(hireCost)) {
 			// Disable hiring:
@@ -433,14 +462,14 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			}
 		} else {
 			// Set for hire:
-			this.hireCost = ItemUtils.unmodifiableCloneIfModifiable(hireCost);
+			this.hireCost = ItemUtils.nonNullUnmodifiableCloneIfModifiable(Unsafe.assertNonNull(hireCost));
 			this.setName(Messages.forHireTitle);
 		}
 		// TODO Close any currently open hiring UIs for players.
 	}
 
 	@Override
-	public UnmodifiableItemStack getHireCost() {
+	public @Nullable UnmodifiableItemStack getHireCost() {
 		return hireCost;
 	}
 
@@ -449,23 +478,29 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	// TODO Rename the storage keys to containerx/y/z?
 	// TODO Change to a list of containers?
 	// TODO Store container world independently of shopkeeper world?
-	public static final Property<Integer> CONTAINER_X = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> CONTAINER_X = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("chestx", NumberSerializers.INTEGER)
 			.build();
-	public static final Property<Integer> CONTAINER_Y = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> CONTAINER_Y = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("chesty", NumberSerializers.INTEGER)
 			.build();
-	public static final Property<Integer> CONTAINER_Z = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> CONTAINER_Z = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("chestz", NumberSerializers.INTEGER)
 			.build();
-	public static final Property<BlockLocation> CONTAINER = new BasicProperty<BlockLocation>()
+	public static final Property<@NonNull BlockLocation> CONTAINER = new BasicProperty<@NonNull BlockLocation>()
 			.name("container")
-			.dataAccessor(new DataAccessor<BlockLocation>() {
+			.dataAccessor(new DataAccessor<@NonNull BlockLocation>() {
 				@Override
-				public void save(DataContainer dataContainer, BlockLocation value) {
-					dataContainer.set(CONTAINER_X, value.getX());
-					dataContainer.set(CONTAINER_Y, value.getY());
-					dataContainer.set(CONTAINER_Z, value.getZ());
+				public void save(DataContainer dataContainer, @Nullable BlockLocation value) {
+					if (value != null) {
+						dataContainer.set(CONTAINER_X, value.getX());
+						dataContainer.set(CONTAINER_Y, value.getY());
+						dataContainer.set(CONTAINER_Z, value.getZ());
+					} else {
+						dataContainer.set(CONTAINER_X, null);
+						dataContainer.set(CONTAINER_Y, null);
+						dataContainer.set(CONTAINER_Z, null);
+					}
 				}
 
 				@Override
@@ -509,17 +544,18 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			this.unprotectContainer();
 		}
 
-		// Update container:
+		// Update the container:
 		// Ensure that the container's world matches the shopkeeper world:
+		BlockLocation newContainer = container;
 		String shopkeeperWorldName = this.getWorldName(); // Can be null for virtual shopkeepers
 		if (!Objects.equals(container.getWorldName(), shopkeeperWorldName)) {
-			MutableBlockLocation newContainer = container.mutableCopy();
-			newContainer.setWorldName(shopkeeperWorldName);
-			container = newContainer;
+			MutableBlockLocation containerCopy = container.mutableCopy();
+			containerCopy.setWorldName(shopkeeperWorldName);
+			newContainer = containerCopy;
 		}
 
 		// Ensure that we store an immutable BlockLocation:
-		this.container = container.immutable();
+		this.container = newContainer.immutable();
 
 		if (this.isValid()) {
 			// Enable the protection for the new container:
@@ -549,12 +585,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public Block getContainer() {
+	public @Nullable Block getContainer() {
 		return container.getBlock();
 	}
 
 	// Returns null if the container could not be found.
-	public Inventory getContainerInventory() {
+	public @Nullable Inventory getContainerInventory() {
 		Block container = this.getContainer();
 		if (container != null && ShopContainers.isSupportedContainer(container.getType())) {
 			return ShopContainers.getInventory(container); // Not null
@@ -563,21 +599,23 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// Returns an empty array if the container could not be found.
-	public ItemStack[] getContainerContents() {
+	public @Nullable ItemStack[] getContainerContents() {
 		Inventory containerInventory = this.getContainerInventory();
 		if (containerInventory == null) {
 			// Container not found:
 			return InventoryUtils.emptyItemStackArray();
 		} else {
-			return containerInventory.getContents(); // Not null
+			return Unsafe.cast(containerInventory.getContents()); // Not null
 		}
 	}
 
 	@Override
 	public int getCurrencyInContainer() {
 		int totalCurrency = 0;
-		ItemStack[] contents = this.getContainerContents(); // Empty if the container is not found
+		// Empty if the container is not found:
+		@Nullable ItemStack[] contents = this.getContainerContents();
 		for (ItemStack itemStack : contents) {
+			if (itemStack == null) continue;
 			Currency currency = Currencies.match(itemStack);
 			if (currency != null) {
 				totalCurrency += (itemStack.getAmount() * currency.getValue());
@@ -586,19 +624,29 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return totalCurrency;
 	}
 
-	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected final TradingRecipe createSellingRecipe(UnmodifiableItemStack itemBeingSold, int price, boolean outOfStock) {
-		int remainingPrice = price;
+	// Returns null (and logs a warning) if the price cannot be represented correctly by currency
+	// items.
+	protected final @Nullable TradingRecipe createSellingRecipe(
+			UnmodifiableItemStack itemBeingSold,
+			int price,
+			boolean outOfStock
+	) {
+		Validate.notNull(itemBeingSold, "itemBeingSold is null");
+		Validate.isTrue(price > 0, "price has to be positive");
 
 		UnmodifiableItemStack item1 = null;
 		UnmodifiableItemStack item2 = null;
 
+		int remainingPrice = price;
 		if (Currencies.isHighCurrencyEnabled() && price > Settings.highCurrencyMinCost) {
 			Currency highCurrency = Currencies.getHigh();
-			int highCurrencyAmount = Math.min(price / highCurrency.getValue(), highCurrency.getMaxStackSize());
+			int highCurrencyAmount = Math.min(
+					price / highCurrency.getValue(),
+					highCurrency.getMaxStackSize()
+			);
 			if (highCurrencyAmount > 0) {
 				remainingPrice -= (highCurrencyAmount * highCurrency.getValue());
-				UnmodifiableItemStack highCurrencyItem = UnmodifiableItemStack.of(highCurrency.getItemData().createItemStack(highCurrencyAmount));
+				UnmodifiableItemStack highCurrencyItem = highCurrency.getItemData().createUnmodifiableItemStack(highCurrencyAmount);
 				item1 = highCurrencyItem; // Using the first slot
 			}
 		}
@@ -610,12 +658,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				// Cannot represent this price with the used currency items:
 				// TODO Move this warning into the loading phase.
 				int maxPrice = getMaximumSellingPrice();
-				Log.warning(this.getLogPrefix() + "Skipping offer with invalid price (" + price + "). Maximum price is "
-						+ maxPrice + ".");
+				Log.warning(this.getLogPrefix() + "Skipping offer with invalid price (" + price
+						+ "). Maximum price is " + maxPrice + ".");
 				return null;
 			}
 
-			UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(baseCurrency.getItemData().createItemStack(remainingPrice));
+			UnmodifiableItemStack currencyItem = baseCurrency.getItemData().createUnmodifiableItemStack(remainingPrice);
 			if (item1 == null) {
 				item1 = currencyItem;
 			} else {
@@ -623,21 +671,27 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				item2 = currencyItem;
 			}
 		}
-		return new SKTradingRecipe(itemBeingSold, item1, item2, outOfStock);
+		assert item1 != null;
+		return new SKTradingRecipe(itemBeingSold, Unsafe.assertNonNull(item1), item2, outOfStock);
 	}
 
-	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected final TradingRecipe createBuyingRecipe(UnmodifiableItemStack itemBeingBought, int price, boolean outOfStock) {
+	// Returns null (and logs a warning) if the price cannot be represented correctly by currency
+	// items.
+	protected final @Nullable TradingRecipe createBuyingRecipe(
+			UnmodifiableItemStack itemBeingBought,
+			int price,
+			boolean outOfStock
+	) {
 		Currency currency = Currencies.getBase();
 		int maxPrice = currency.getStackValue();
 		if (price > maxPrice) {
 			// Cannot represent this price with the used currency items:
 			// TODO Move this warning into the loading phase.
-			Log.warning(this.getLogPrefix() + "Skipping offer with invalid price (" + price + "). Maximum price is "
-					+ maxPrice + ".");
+			Log.warning(this.getLogPrefix() + "Skipping offer with invalid price (" + price
+					+ "). Maximum price is " + maxPrice + ".");
 			return null;
 		}
-		UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(currency.getItemData().createItemStack(price));
+		UnmodifiableItemStack currencyItem = currency.getItemData().createUnmodifiableItemStack(price);
 		return new SKTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
 	}
 
@@ -687,8 +741,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		super.onTick();
 	}
 
-	// Deletes the shopkeeper if the container is no longer present (e.g. if it got removed externally by another
-	// plugin, such as WorldEdit, etc.):
+	// Deletes the shopkeeper if the container is no longer present (e.g. if it got removed
+	// externally by another plugin, such as WorldEdit, etc.):
 	private void onTickCheckDeleteIfContainerBroken() {
 		if (!Settings.deleteShopkeeperOnBreakContainer) return;
 		if (!checkContainerLimiter.request()) {
@@ -698,8 +752,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		// This checks if the block is still a valid container:
 		Block containerBlock = this.getContainer();
 		if (containerBlock != null && !ShopContainers.isSupportedContainer(containerBlock.getType())) {
-			// Note: If this shopkeeper is deleted due to the chest having been broken, we will trigger a delayed
-			// save after the ticking of the shopkeepers.
+			// Note: If this shopkeeper is deleted due to the chest having been broken, we will
+			// trigger a delayed save after the ticking of the shopkeepers.
 			SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
 		}
 	}

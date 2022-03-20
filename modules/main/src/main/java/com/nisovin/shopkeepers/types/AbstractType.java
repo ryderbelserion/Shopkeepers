@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.types.Type;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
@@ -17,28 +19,33 @@ public abstract class AbstractType implements Type {
 	/**
 	 * A unique identifier.
 	 * <p>
-	 * Make sure that the identifier (and its {@link StringUtils#normalize(String) normalization}) are unique among all
-	 * other {@link Type types} of the same context.
+	 * Make sure that the identifier (and its {@link StringUtils#normalize(String) normalization})
+	 * are unique among all other {@link Type types} of the same context.
 	 * <p>
-	 * This could for example be used inside save/configuration files, so it should not contain any characters which
-	 * could cause problems with that.
+	 * This could for example be used inside save/configuration files, so it should not contain any
+	 * characters which could cause problems with that.
 	 */
 	protected final String identifier; // Not null or empty
-	protected final List<String> aliases; // Unmodifiable, not null, can be empty, normalized
-	protected final String permission; // Can be null
+	// Unmodifiable, not null, can be empty, normalized:
+	protected final List<? extends @NonNull String> aliases;
+	protected final @Nullable String permission; // Can be null
 
-	protected AbstractType(String identifier, String permission) {
+	protected AbstractType(String identifier, @Nullable String permission) {
 		this(identifier, Collections.emptyList(), permission);
 	}
 
-	protected AbstractType(String identifier, List<String> aliases, String permission) {
+	protected AbstractType(
+			String identifier,
+			List<? extends @NonNull String> aliases,
+			@Nullable String permission
+	) {
 		this.identifier = StringUtils.normalize(identifier);
 		Validate.notEmpty(this.identifier, "identifier is null or empty");
 		Validate.notNull(aliases, "aliases is null");
 		if (aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
-			List<String> normalizedAliases = new ArrayList<>(aliases.size());
+			List<@NonNull String> normalizedAliases = new ArrayList<>(aliases.size());
 			for (String alias : aliases) {
 				Validate.notEmpty(alias, "aliases contains null or empty alias");
 				normalizedAliases.add(StringUtils.normalize(alias));
@@ -54,18 +61,22 @@ public abstract class AbstractType implements Type {
 	}
 
 	@Override
-	public Collection<String> getAliases() {
+	public Collection<? extends @NonNull String> getAliases() {
 		return aliases;
 	}
 
 	@Override
-	public String getPermission() {
+	public @Nullable String getPermission() {
 		return permission;
 	}
 
 	@Override
 	public boolean hasPermission(Player player) {
-		return (permission == null || PermissionUtils.hasPermission(player, permission));
+		if (permission != null) {
+			return PermissionUtils.hasPermission(player, permission);
+		} else {
+			return true;
+		}
 	}
 
 	@Override
@@ -75,12 +86,12 @@ public abstract class AbstractType implements Type {
 
 	@Override
 	public boolean matches(String identifier) {
-		if (StringUtils.isEmpty(identifier)) return false;
-		identifier = StringUtils.normalize(identifier);
-		if (identifier.equals(this.identifier)) return true;
-		if (this.aliases.contains(identifier)) return true;
+		Validate.notNull(identifier, "identifier is null");
+		String normalized = StringUtils.normalize(identifier);
+		if (normalized.equals(this.identifier)) return true;
+		if (this.aliases.contains(normalized)) return true;
 		String displayName = StringUtils.normalize(this.getDisplayName());
-		return identifier.equals(displayName);
+		return normalized.equals(displayName);
 	}
 
 	@Override
@@ -93,5 +104,15 @@ public abstract class AbstractType implements Type {
 		return builder.toString();
 	}
 
-	// Not overriding equals and hashCode: Only the exact same type instance is considered equal.
+	// hashCode and equals: Instances are compared by identity.
+
+	@Override
+	public final int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public final boolean equals(@Nullable Object obj) {
+		return super.equals(obj);
+	}
 }

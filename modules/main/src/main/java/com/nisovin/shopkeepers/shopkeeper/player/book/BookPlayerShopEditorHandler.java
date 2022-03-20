@@ -10,6 +10,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -24,7 +26,8 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<BookOffer> {
+	private static class TradingRecipesAdapter
+			extends DefaultTradingRecipesAdapter<@NonNull BookOffer> {
 
 		private final SKBookPlayerShopkeeper shopkeeper;
 
@@ -34,14 +37,17 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		public List<TradingRecipeDraft> getTradingRecipes() {
+		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
 			// We only add one recipe per book title:
-			Set<String> bookTitles = new HashSet<>();
+			Set<@NonNull String> bookTitles = new HashSet<>();
 
 			// Add the shopkeeper's offers:
-			Map<String, ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
-			List<? extends BookOffer> offers = shopkeeper.getOffers();
-			List<TradingRecipeDraft> recipes = new ArrayList<>(Math.max(offers.size(), containerBooksByTitle.size()));
+			Map<? extends @NonNull String, ? extends @NonNull ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
+			List<? extends @NonNull BookOffer> offers = shopkeeper.getOffers();
+			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(Math.max(
+					offers.size(),
+					containerBooksByTitle.size()
+			));
 			offers.forEach(bookOffer -> {
 				String bookTitle = bookOffer.getBookTitle();
 				bookTitles.add(bookTitle);
@@ -64,26 +70,25 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				}
 
 				// Add new empty recipe:
-				ItemStack bookItemCopy = ItemUtils.copySingleItem(bookItem); // Ensures a stack size of 1
+				ItemStack bookItemCopy = ItemUtils.copySingleItem(bookItem);
 				TradingRecipeDraft recipe = createTradingRecipeDraft(bookItemCopy, 0);
 				recipes.add(recipe);
 			});
-
 			return recipes;
 		}
 
 		@Override
-		protected List<? extends BookOffer> getOffers() {
+		protected List<? extends @NonNull BookOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<BookOffer> newOffers) {
+		protected void setOffers(List<? extends @NonNull BookOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 
 		@Override
-		protected BookOffer createOffer(TradingRecipeDraft recipe) {
+		protected @Nullable BookOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
 			// We can reuse the trading recipe draft's items without copying them first.
 			UnmodifiableItemStack bookItem = recipe.getResultItem();

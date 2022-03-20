@@ -6,25 +6,29 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Manages a collection of attached {@link Component}s.
  * <p>
- * Attached components can be {@link #get(Class) queried} by their class. Only one component instance can be added for
- * any particular component class.
+ * Attached components can be {@link #get(Class) queried} by their class. Only one component
+ * instance can be added for any particular component class.
  * <p>
- * Additionally, attached components can register {@link Component#getProvidedServices() provided services}. Services
- * can be of any type, including other component types. Every component implicitly provides its own type as a service.
- * When multiple components provide the same service, the most recently added component is chosen as the active provider
- * of that service.
+ * Additionally, attached components can register {@link Component#getProvidedServices() provided
+ * services}. Services can be of any type, including other component types. Every component
+ * implicitly provides its own type as a service. When multiple components provide the same service,
+ * the most recently added component is chosen as the active provider of that service.
  */
 public class ComponentHolder {
 
-	private final Map<Class<? extends Component>, Component> components = new LinkedHashMap<>();
-	private final Collection<? extends Component> componentsView = Collections.unmodifiableCollection(components.values());
+	private final Map<@NonNull Class<? extends @NonNull Component>, @NonNull Component> components = new LinkedHashMap<>();
+	private final Collection<? extends @NonNull Component> componentsView = Collections.unmodifiableCollection(components.values());
 
-	private final Map<Class<?>, Component> services = new HashMap<>();
+	private final Map<@NonNull Class<?>, @NonNull Component> services = new HashMap<>();
 
 	/**
 	 * Creates a new {@link ComponentHolder}.
@@ -39,7 +43,7 @@ public class ComponentHolder {
 	 * 
 	 * @return an unmodifiable view on the currently attached components, not <code>null</code>
 	 */
-	public final Collection<? extends Component> getComponents() {
+	public final Collection<? extends @NonNull Component> getComponents() {
 		return componentsView;
 	}
 
@@ -52,9 +56,10 @@ public class ComponentHolder {
 	 *            the component class, not <code>null</code>
 	 * @return the component, or <code>null</code> if there is none
 	 */
-	@SuppressWarnings("unchecked")
-	public final <C extends Component> C get(Class<? extends C> componentClass) {
-		return (C) components.get(componentClass); // Can be null
+	public final <C extends @Nullable Component> @Nullable C get(
+			Class<? extends @NonNull C> componentClass
+	) {
+		return Unsafe.cast(components.get(componentClass)); // Can be null
 	}
 
 	/**
@@ -68,9 +73,13 @@ public class ComponentHolder {
 	 * @throws RuntimeException
 	 *             if the component of the given type is missing but cannot be created
 	 */
-	@SuppressWarnings("unchecked")
-	public final <C extends Component> C getOrAdd(Class<? extends C> componentClass) {
-		C component = (C) components.computeIfAbsent(componentClass, this::createComponent);
+	public final <C extends @NonNull Component> @NonNull C getOrAdd(
+			Class<? extends @NonNull C> componentClass
+	) {
+		@NonNull C component = Unsafe.castNonNull(components.computeIfAbsent(
+				componentClass,
+				this::createComponent
+		));
 		if (component.getHolder() == null) {
 			this.onComponentAdded(component);
 		}
@@ -87,9 +96,10 @@ public class ComponentHolder {
 	 * @param component
 	 *            the component, not <code>null</code>
 	 */
-	public final <C extends Component> void add(C component) {
+	public final <C extends @NonNull Component> void add(@NonNull C component) {
 		Validate.notNull(component, "component is null");
-		Validate.isTrue(component.getHolder() == null, "component is already attached to some holder");
+		Validate.isTrue(component.getHolder() == null,
+				"component is already attached to some holder");
 		Component previousComponent = components.put(component.getClass(), component);
 		if (previousComponent != null) {
 			this.onComponentRemoved(previousComponent);
@@ -106,9 +116,10 @@ public class ComponentHolder {
 	 *            the component class, not <code>null</code>
 	 * @return the previous component, or <code>null</code> if there was none
 	 */
-	@SuppressWarnings("unchecked")
-	public final <C extends Component> C remove(Class<? extends C> componentClass) {
-		C component = (C) components.remove(componentClass);
+	public final <C extends @Nullable Component> @Nullable C remove(
+			Class<? extends @NonNull C> componentClass
+	) {
+		@Nullable C component = Unsafe.cast(components.remove(componentClass));
 		if (component != null) {
 			this.onComponentRemoved(component);
 		}
@@ -124,22 +135,24 @@ public class ComponentHolder {
 	 *            the component, not <code>null</code>
 	 * @return the given component, not <code>null</code>
 	 */
-	public final <C extends Component> C remove(C component) {
+	public final <C extends @Nullable Component> @NonNull C remove(@NonNull C component) {
 		Validate.notNull(component, "component is null");
-		@SuppressWarnings("unchecked")
-		Class<? extends C> componentClass = (Class<? extends C>) component.getClass();
+		Class<? extends @NonNull C> componentClass = Unsafe.castNonNull(component.getClass());
 		if (components.remove(componentClass, component)) {
 			this.onComponentRemoved(component);
 		}
 		return component;
 	}
 
-	private <C extends Component> C createComponent(Class<? extends C> componentClass) {
+	private <C extends @Nullable Component> @NonNull C createComponent(
+			Class<? extends @NonNull C> componentClass
+	) {
 		Validate.notNull(componentClass, "componentClass is null");
 		try {
 			return componentClass.newInstance();
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to create component of type " + componentClass.getName(), e);
+			throw new RuntimeException("Failed to create component of type "
+					+ componentClass.getName(), e);
 		}
 	}
 
@@ -166,14 +179,14 @@ public class ComponentHolder {
 	 *            the service class, not <code>null</code>
 	 * @return the service provider, or <code>null</code> if there is none
 	 */
-	@SuppressWarnings("unchecked")
-	public final <S> S getService(Class<? extends S> service) {
-		return (S) services.get(service); // Can be null
+	public final <S> @Nullable S getService(Class<? extends @NonNull S> service) {
+		return Unsafe.cast(services.get(service)); // Can be null
 	}
 
 	private void updateServicesOnComponentAdded(Component component) {
 		assert component != null && component.getHolder() == this;
-		// The given component is the most recently added component. It therefore overrides all previously registered
+		// The given component is the most recently added component. It therefore overrides all
+		// previously registered
 		// service providers.
 		this.setServiceProvider(component.getClass(), component);
 		component.getProvidedServices().forEach(service -> {
@@ -215,9 +228,10 @@ public class ComponentHolder {
 		}
 	}
 
-	private Component findServiceProvider(Class<?> service, Component ignore) {
+	private @Nullable Component findServiceProvider(Class<?> service, @Nullable Component ignore) {
 		assert service != null;
-		// The most recently added component that provides the service is the active service provider:
+		// The most recently added component that provides the service is the active service
+		// provider:
 		Component provider = null;
 		for (Component component : this.getComponents()) {
 			if (component == ignore) continue;
@@ -237,8 +251,8 @@ public class ComponentHolder {
 	}
 
 	@Override
-	public final boolean equals(Object o) {
-		return super.equals(o);
+	public final boolean equals(@Nullable Object obj) {
+		return super.equals(obj);
 	}
 
 	@Override

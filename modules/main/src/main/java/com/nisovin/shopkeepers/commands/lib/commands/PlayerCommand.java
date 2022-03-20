@@ -1,9 +1,11 @@
 package com.nisovin.shopkeepers.commands.lib.commands;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandSourceRejectedException;
@@ -16,10 +18,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public abstract class PlayerCommand extends Command {
 
 	public PlayerCommand(String name) {
-		this(name, null);
+		this(name, Collections.emptyList());
 	}
 
-	public PlayerCommand(String name, List<String> aliases) {
+	public PlayerCommand(String name, List<@NonNull String> aliases) {
 		super(name, aliases);
 	}
 
@@ -36,7 +38,11 @@ public abstract class PlayerCommand extends Command {
 		}
 	}
 
-	public static CommandSourceRejectedException createCommandSourceRejectedException(CommandSender sender) {
-		return new CommandSourceRejectedException(Text.of("You must be a player in order to execute this command!"));
+	public static CommandSourceRejectedException createCommandSourceRejectedException(
+			CommandSender sender
+	) {
+		return new CommandSourceRejectedException(
+				Text.of("You must be a player in order to execute this command!")
+		);
 	}
 }

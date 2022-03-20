@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.util.data.container.value;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -11,7 +13,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public abstract class AbstractDataValue implements DataValue {
 
-	private DataValue view = null; // Lazily setup
+	private @Nullable DataValue view = null; // Lazily setup
 
 	/**
 	 * Creates a new {@link AbstractDataValue}.
@@ -28,14 +30,14 @@ public abstract class AbstractDataValue implements DataValue {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getOfTypeOrDefault(Class<T> type, T defaultValue) {
+	public <T> @Nullable T getOfTypeOrDefault(Class<T> type, @Nullable T defaultValue) {
 		Validate.notNull(type, "type is null");
 		Object value = this.get();
 		return type.isInstance(value) ? (T) value : defaultValue;
 	}
 
 	@Override
-	public String getStringOrDefault(String defaultValue) {
+	public @Nullable String getStringOrDefault(@Nullable String defaultValue) {
 		String value = ConversionUtils.toString(this.get());
 		return (value != null) ? value : defaultValue;
 	}
@@ -71,17 +73,18 @@ public abstract class AbstractDataValue implements DataValue {
 	}
 
 	@Override
-	public void set(Object value) {
+	public void set(@Nullable Object value) {
 		if (value == null) {
 			this.clear();
 		} else {
-			// Storing a DataContainer or DataValue instead of its serialized form is a common error:
+			// Storing a DataContainer or DataValue instead of its serialized form is a common
+			// error:
 			Validate.isTrue(!(value instanceof DataContainer), "Cannot insert DataContainer!");
 			Validate.isTrue(!(value instanceof DataValue), "Cannot insert DataValue!");
-			// Note: The value of this DataValue may be loaded from a storage format that supports additional types of
-			// values. The validation of a value loaded from some storage is not the responsibility of this DataValue,
-			// but of the clients that read the value from this DataValue. We therefore do not validate or filter the
-			// inserted value here.
+			// Note: The value of this DataValue may be loaded from a storage format that supports
+			// additional types of values. The validation of a value loaded from some storage is not
+			// the responsibility of this DataValue, but of the clients that read the value from
+			// this DataValue. We therefore do not validate or filter the inserted value here.
 			this.internalSet(value);
 		}
 	}
@@ -99,6 +102,7 @@ public abstract class AbstractDataValue implements DataValue {
 		if (view == null) {
 			view = new UnmodifiableDataValue(this);
 		}
+		assert view != null;
 		return view;
 	}
 
@@ -118,7 +122,7 @@ public abstract class AbstractDataValue implements DataValue {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public final boolean equals(@Nullable Object obj) {
 		if (obj == this) return true;
 		if (!(obj instanceof DataValue)) return false;
 		DataValue other = (DataValue) obj;

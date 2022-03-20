@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
@@ -7,7 +10,7 @@ import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class TextValue extends ValueType<Text> {
+public class TextValue extends ValueType<@NonNull Text> {
 
 	public static final TextValue INSTANCE = new TextValue();
 
@@ -17,18 +20,20 @@ public class TextValue extends ValueType<Text> {
 	}
 
 	@Override
-	public Text load(Object configValue) throws ValueLoadException {
-		return Text.parse(COLORED_STRING_VALUE.load(configValue));
+	public @Nullable Text load(@Nullable Object configValue) throws ValueLoadException {
+		String string = COLORED_STRING_VALUE.load(configValue);
+		if (string == null) return null;
+		return Text.parse(string);
 	}
 
 	@Override
-	public Object save(Text value) {
+	public @Nullable Object save(@Nullable Text value) {
 		if (value == null) return null;
 		return COLORED_STRING_VALUE.save(value.toPlainFormatText());
 	}
 
 	@Override
-	public String format(Text value) {
+	public String format(@Nullable Text value) {
 		if (value == null) return "null";
 		return TextUtils.decolorize(value.toPlainFormatText());
 	}

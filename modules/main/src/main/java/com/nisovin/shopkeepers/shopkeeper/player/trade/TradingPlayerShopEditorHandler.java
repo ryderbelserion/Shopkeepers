@@ -10,8 +10,11 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -26,7 +29,8 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<TradeOffer> {
+	private static class TradingRecipesAdapter
+			extends DefaultTradingRecipesAdapter<@NonNull TradeOffer> {
 
 		private final SKTradingPlayerShopkeeper shopkeeper;
 
@@ -36,25 +40,33 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		public List<TradingRecipeDraft> getTradingRecipes() {
+		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
 			// Add the shopkeeper's offers:
-			List<? extends TradeOffer> offers = shopkeeper.getOffers();
-			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+			List<? extends @NonNull TradeOffer> offers = shopkeeper.getOffers();
+			// With heuristic initial capacity:
+			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
 			offers.forEach(offer -> {
 				// The offer returns copies of its items:
-				TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
+				TradingRecipeDraft recipe = new TradingRecipeDraft(
+						offer.getResultItem(),
+						offer.getItem1(),
+						offer.getItem2()
+				);
 				recipes.add(recipe);
 			});
 
 			// Add new empty recipe drafts for items from the container without existing offer:
 			// We only add one recipe per similar item:
-			List<ItemStack> newRecipes = new ArrayList<>();
-			ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+			List<@NonNull ItemStack> newRecipes = new ArrayList<>();
+			// Empty if the container is not found:
+			@Nullable ItemStack[] containerContents = shopkeeper.getContainerContents();
 			for (ItemStack containerItem : containerContents) {
-				if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+				// Ignore empty ItemStacks:
+				if (containerItem == null) continue;
+				if (ItemUtils.isEmpty(containerItem)) continue;
 
 				// Replace placeholder item, if this is one:
-				containerItem = PlaceholderItems.replace(containerItem);
+				containerItem = PlaceholderItems.replaceNonNull(containerItem);
 
 				if (shopkeeper.hasOffer(containerItem)) {
 					// There is already a recipe for this item:
@@ -67,7 +79,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				}
 
 				// Add new empty recipe:
-				containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
+				containerItem = ItemUtils.copySingleItem(containerItem);
 				TradingRecipeDraft recipe = new TradingRecipeDraft(containerItem, null, null);
 				recipes.add(recipe);
 				newRecipes.add(containerItem);
@@ -77,28 +89,28 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		protected List<? extends TradeOffer> getOffers() {
+		protected List<? extends @NonNull TradeOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<TradeOffer> newOffers) {
+		protected void setOffers(List<? extends @NonNull TradeOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 
 		@Override
-		protected TradeOffer createOffer(TradingRecipeDraft recipe) {
+		protected @Nullable TradeOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
 			// We can reuse the trading recipe draft's items without copying them first.
-			UnmodifiableItemStack resultItem = recipe.getResultItem();
-			UnmodifiableItemStack item1 = recipe.getRecipeItem1();
+			UnmodifiableItemStack resultItem = Unsafe.assertNonNull(recipe.getResultItem());
+			UnmodifiableItemStack item1 = Unsafe.assertNonNull(recipe.getRecipeItem1());
 			UnmodifiableItemStack item2 = recipe.getRecipeItem2();
 
 			// Replace placeholder items, if any:
-			// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before
-			// the player has all the required items.
-			resultItem = PlaceholderItems.replace(resultItem);
-			item1 = PlaceholderItems.replace(item1);
+			// Note: We also replace placeholder items in the buy items, because this allows the
+			// setup of trades before the player has all the required items.
+			resultItem = PlaceholderItems.replaceNonNull(resultItem);
+			item1 = PlaceholderItems.replaceNonNull(item1);
 			item2 = PlaceholderItems.replace(item2);
 
 			return TradeOffer.create(resultItem, item1, item2);
@@ -125,7 +137,10 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void handlePlayerInventoryClick(EditorSession editorSession, InventoryClickEvent event) {
+	protected void handlePlayerInventoryClick(
+			EditorSession editorSession,
+			InventoryClickEvent event
+	) {
 		// Assert: Event cancelled.
 		// Clicking in player inventory:
 		if (event.isShiftClick()) return; // Ignoring shift clicks
@@ -154,7 +169,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		ItemStack cursor = event.getCursor();
 		if (!ItemUtils.isEmpty(cursor)) {
 			// Place item from cursor:
-			ItemStack cursorClone = ItemUtils.copySingleItem(cursor); // Copy with a stack size of 1
+			ItemStack cursorClone = ItemUtils.copySingleItem(Unsafe.assertNonNull(cursor));
 			// Replace placeholder item, if this is one:
 			ItemStack cursorCloneFinal = PlaceholderItems.replace(cursorClone);
 			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
@@ -181,7 +196,8 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			}
 			ItemStack newItem = this.updateItemAmountOnClick(event, minAmount, emptySlotItem);
 
-			// If the trade column might now be completely empty, update it to insert the correct placeholder items:
+			// If the trade column might now be completely empty, update it to insert the correct
+			// placeholder items:
 			if (newItem == null) {
 				this.updateTradeColumn(inventory, tradeColumn);
 			}
@@ -217,7 +233,8 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				// Clicking in player inventory:
 				// The cancelled drag event resets the cursor afterwards, so we need this delay:
 				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-					// Freshly get and check cursor to make sure that players don't abuse this delay:
+					// Freshly get and check cursor to make sure that players don't abuse this
+					// delay:
 					ItemStack cursorCurrent = view.getCursor();
 					if (ItemUtils.isEmpty(cursorCurrent)) return;
 					ItemStack current = view.getItem(rawSlot);

@@ -8,6 +8,7 @@ import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -17,6 +18,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class SchedulerUtils {
 
 	public static int getActiveAsyncTasks(Plugin plugin) {
+		Validate.notNull(plugin, "plugin is null");
 		int workers = 0;
 		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {
 			if (worker.getOwner().equals(plugin)) {
@@ -43,31 +45,36 @@ public final class SchedulerUtils {
 	/**
 	 * Schedules the given task to be run on the primary thread if required.
 	 * <p>
-	 * If the current thread is already the primary thread, the task will be run immediately. Otherwise, it attempts to
-	 * schedule the task to run on the server's primary thread. However, if the plugin is <code>null</code> or disabled,
-	 * the task won't be scheduled.
+	 * If the current thread is already the primary thread, the task will be run immediately.
+	 * Otherwise, it attempts to schedule the task to run on the server's primary thread. However,
+	 * if the plugin is disabled, the task won't be scheduled.
 	 * 
 	 * @param plugin
-	 *            the plugin to use for scheduling
+	 *            the plugin to use for scheduling, not <code>null</code>
 	 * @param task
-	 *            the task
-	 * @return <code>true</code> if the task was run or successfully scheduled to be run, <code>false</code> otherwise
+	 *            the task, not <code>null</code>
+	 * @return <code>true</code> if the task was run or successfully scheduled to be run,
+	 *         <code>false</code> otherwise
 	 */
 	public static boolean runOnMainThreadOrOmit(Plugin plugin, Runnable task) {
+		validatePluginTask(plugin, task);
 		if (isMainThread()) {
 			task.run();
 			return true;
 		} else {
-			if (plugin == null) return false;
 			return (runTaskOrOmit(plugin, task) != null);
 		}
 	}
 
-	public static BukkitTask runTaskOrOmit(Plugin plugin, Runnable task) {
+	public static @Nullable BukkitTask runTaskOrOmit(Plugin plugin, Runnable task) {
 		return runTaskLaterOrOmit(plugin, task, 0L);
 	}
 
-	public static BukkitTask runTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
+	public static @Nullable BukkitTask runTaskLaterOrOmit(
+			Plugin plugin,
+			Runnable task,
+			long delay
+	) {
 		validatePluginTask(plugin, task);
 		// Tasks can only be registered while enabled:
 		if (plugin.isEnabled()) {
@@ -80,11 +87,15 @@ public final class SchedulerUtils {
 		return null;
 	}
 
-	public static BukkitTask runAsyncTaskOrOmit(Plugin plugin, Runnable task) {
+	public static @Nullable BukkitTask runAsyncTaskOrOmit(Plugin plugin, Runnable task) {
 		return runAsyncTaskLaterOrOmit(plugin, task, 0L);
 	}
 
-	public static BukkitTask runAsyncTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
+	public static @Nullable BukkitTask runAsyncTaskLaterOrOmit(
+			Plugin plugin,
+			Runnable task,
+			long delay
+	) {
 		validatePluginTask(plugin, task);
 		// Tasks can only be registered while enabled:
 		if (plugin.isEnabled()) {
@@ -100,8 +111,8 @@ public final class SchedulerUtils {
 	/**
 	 * Awaits the completion of async tasks of the specified plugin.
 	 * <p>
-	 * If a logger is specified, it will be used to print informational messages suited to the context of this method
-	 * being called during disabling of the plugin.
+	 * If a logger is specified, it will be used to print informational messages suited to the
+	 * context of this method being called during disabling of the plugin.
 	 * 
 	 * @param plugin
 	 *            the plugin
@@ -109,17 +120,22 @@ public final class SchedulerUtils {
 	 *            the duration to wait for async tasks to finish in seconds (can be <code>0</code>)
 	 * @param logger
 	 *            the logger used for printing informational messages, can be <code>null</code>
-	 * @return the number of remaining async tasks that are still running after waiting for the specified duration
+	 * @return the number of remaining async tasks that are still running after waiting for the
+	 *         specified duration
 	 */
-	public static int awaitAsyncTasksCompletion(Plugin plugin, int asyncTasksTimeoutSeconds, Logger logger) {
+	public static int awaitAsyncTasksCompletion(
+			Plugin plugin,
+			int asyncTasksTimeoutSeconds,
+			@Nullable Logger logger
+	) {
 		Validate.notNull(plugin, "plugin is null");
 		Validate.isTrue(asyncTasksTimeoutSeconds >= 0, "asyncTasksTimeoutSeconds cannot be negative");
 
 		int activeAsyncTasks = getActiveAsyncTasks(plugin);
 		if (activeAsyncTasks > 0 && asyncTasksTimeoutSeconds > 0) {
 			if (logger != null) {
-				logger.info("Waiting up to " + asyncTasksTimeoutSeconds + " seconds for " + activeAsyncTasks
-						+ " remaining async tasks to finish ..");
+				logger.info("Waiting up to " + asyncTasksTimeoutSeconds + " seconds for "
+						+ activeAsyncTasks + " remaining async tasks to finish ...");
 			}
 
 			final long asyncTasksTimeoutMillis = TimeUnit.SECONDS.toMillis(asyncTasksTimeoutSeconds);
@@ -150,8 +166,10 @@ public final class SchedulerUtils {
 		}
 
 		if (activeAsyncTasks > 0 && logger != null) {
-			// Severe, since this can potentially result in data loss, depending on what the tasks are doing:
-			logger.severe("There are still " + activeAsyncTasks + " remaining async tasks active! Disabling anyways now ..");
+			// Severe, since this can potentially result in data loss, depending on what the tasks
+			// are doing:
+			logger.severe("There are still " + activeAsyncTasks
+					+ " remaining async tasks active! Disabling anyways now.");
 		}
 		return activeAsyncTasks;
 	}

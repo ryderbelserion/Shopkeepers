@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.shopobjects.living.types.villager;
 import org.bukkit.Sound;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -12,13 +14,19 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
  */
 public class WanderingTraderSounds extends VillagerSounds {
 
-	public WanderingTraderSounds(SKLivingShopObject<? extends WanderingTrader> shopObject) {
+	public WanderingTraderSounds(
+			SKLivingShopObject<? extends @NonNull WanderingTrader> shopObject
+	) {
 		super(shopObject);
 	}
 
 	@Override
 	protected Sound getAmbientSound() {
-		return this.isShopkeeperTrading() ? Sound.ENTITY_WANDERING_TRADER_TRADE : Sound.ENTITY_WANDERING_TRADER_AMBIENT;
+		if (this.isShopkeeperTrading()) {
+			return Sound.ENTITY_WANDERING_TRADER_TRADE;
+		} else {
+			return Sound.ENTITY_WANDERING_TRADER_AMBIENT;
+		}
 	}
 
 	@Override
@@ -27,7 +35,11 @@ public class WanderingTraderSounds extends VillagerSounds {
 	}
 
 	@Override
-	protected Sound getTradeInteractionSound(ItemStack resultItem) {
-		return ItemUtils.isEmpty(resultItem) ? Sound.ENTITY_WANDERING_TRADER_NO : Sound.ENTITY_WANDERING_TRADER_YES;
+	protected Sound getTradeInteractionSound(@Nullable ItemStack resultItem) {
+		if (ItemUtils.isEmpty(resultItem)) {
+			return Sound.ENTITY_WANDERING_TRADER_NO;
+		} else {
+			return Sound.ENTITY_WANDERING_TRADER_YES;
+		}
 	}
 }

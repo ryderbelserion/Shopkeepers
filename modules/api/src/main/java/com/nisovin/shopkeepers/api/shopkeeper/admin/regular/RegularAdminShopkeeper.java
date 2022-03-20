@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.api.shopkeeper.admin.regular;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 
@@ -19,7 +21,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<? extends TradeOffer> getOffers();
+	public List<? extends @NonNull TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -34,13 +36,13 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<? extends TradeOffer> offers);
+	public void setOffers(List<? extends @NonNull TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
 	 * <p>
-	 * The offer gets added to the end of the current offers. If you want to insert, replace or reorder offers, use
-	 * {@link #setOffers(List)} instead.
+	 * The offer gets added to the end of the current offers. If you want to insert, replace or
+	 * reorder offers, use {@link #setOffers(List)} instead.
 	 * 
 	 * @param offer
 	 *            the offer to add
@@ -50,11 +52,11 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	/**
 	 * Adds the given offers to the shopkeeper.
 	 * <p>
-	 * The offers get added to the end of the current offers. If you want to insert, replace or reorder offers, use
-	 * {@link #setOffers(List)} instead.
+	 * The offers get added to the end of the current offers. If you want to insert, replace or
+	 * reorder offers, use {@link #setOffers(List)} instead.
 	 * 
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<? extends TradeOffer> offers);
+	public void addOffers(List<? extends @NonNull TradeOffer> offers);
 }

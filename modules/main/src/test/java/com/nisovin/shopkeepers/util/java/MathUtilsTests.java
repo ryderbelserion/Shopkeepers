@@ -15,10 +15,17 @@ public class MathUtilsTests {
 
 		// Special values:
 		Assert.assertTrue(MathUtils.fuzzyEquals(-0.0D, 0.0D)); // Unlike Double#equals(Object)
-		Assert.assertTrue(MathUtils.fuzzyEquals(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
-		Assert.assertTrue(MathUtils.fuzzyEquals(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
-		Assert.assertFalse(MathUtils.fuzzyEquals(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
-		Assert.assertTrue(MathUtils.fuzzyEquals(Double.NaN, Double.NaN)); // Similar to Double#equals(Object)
+		Assert.assertTrue(
+				MathUtils.fuzzyEquals(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY)
+		);
+		Assert.assertTrue(
+				MathUtils.fuzzyEquals(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY)
+		);
+		Assert.assertFalse(
+				MathUtils.fuzzyEquals(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)
+		);
+		// Similar to Double#equals(Object):
+		Assert.assertTrue(MathUtils.fuzzyEquals(Double.NaN, Double.NaN));
 		double nan = 0.0D / 0.0D;
 		Assert.assertTrue(MathUtils.fuzzyEquals(Double.NaN, nan));
 	}

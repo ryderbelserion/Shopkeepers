@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.data.container;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * An unmodifiable view of another {@link DataContainer}.
  */
@@ -20,7 +22,7 @@ public final class UnmodifiableDataContainer extends DelegateDataContainer {
 	}
 
 	@Override
-	public void set(String key, Object value) {
+	public void set(String key, @Nullable Object value) {
 		throw unmodifiableException();
 	}
 

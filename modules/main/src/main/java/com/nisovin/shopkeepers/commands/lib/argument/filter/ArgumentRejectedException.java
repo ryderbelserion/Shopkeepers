@@ -1,12 +1,14 @@
 package com.nisovin.shopkeepers.commands.lib.argument.filter;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.InvalidArgumentException;
 import com.nisovin.shopkeepers.text.Text;
 
 /**
- * An {@link InvalidArgumentException} that indicates that a parsed argument got rejected, for example by an
- * {@link ArgumentFilter}.
+ * An {@link InvalidArgumentException} that indicates that a parsed argument got rejected, for
+ * example by an {@link ArgumentFilter}.
  */
 public class ArgumentRejectedException extends InvalidArgumentException {
 
@@ -16,7 +18,11 @@ public class ArgumentRejectedException extends InvalidArgumentException {
 		this(argument, message, null);
 	}
 
-	public ArgumentRejectedException(CommandArgument<?> argument, Text message, Throwable cause) {
+	public ArgumentRejectedException(
+			CommandArgument<?> argument,
+			Text message,
+			@Nullable Throwable cause
+	) {
 		super(argument, message, cause);
 	}
 }

@@ -6,6 +6,8 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -19,13 +21,13 @@ import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
  */
 public abstract class ShopCreationData {
 
-	private final Player creator; // can be null
-	private final ShopType<?> shopType; // not null
-	private final ShopObjectType<?> shopObjectType; // not null
-	private Location spawnLocation; // modifiable, can be null for virtual shops
-	private BlockFace targetedBlockFace; // can be null, modifiable
+	private final @Nullable Player creator;
+	private final ShopType<?> shopType;
+	private final ShopObjectType<?> shopObjectType;
+	private @Nullable Location spawnLocation; // Modifiable, can be null for virtual shops
+	private @Nullable BlockFace targetedBlockFace; // Modifiable
 
-	private Map<String, Object> additionalData;
+	private @Nullable Map<@NonNull String, @NonNull Object> additionalData;
 
 	/**
 	 * Creates a {@link ShopCreationData}.
@@ -41,8 +43,13 @@ public abstract class ShopCreationData {
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
 	 */
-	protected ShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
-								Location spawnLocation, BlockFace targetedBlockFace) {
+	protected ShopCreationData(
+			@Nullable Player creator,
+			ShopType<?> shopType,
+			ShopObjectType<?> shopObjectType,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
 		Preconditions.checkNotNull(shopType, "shopType is null");
 		Preconditions.checkNotNull(shopObjectType, "shopObjectType is null");
 		this.creator = creator;
@@ -53,7 +60,8 @@ public abstract class ShopCreationData {
 			spawnLocation.checkFinite();
 			this.spawnLocation = spawnLocation.clone();
 		} else {
-			Preconditions.checkArgument(shopObjectType instanceof VirtualShopObjectType, "spawnLocation is null, but the shop object type is not virtual");
+			Preconditions.checkArgument(shopObjectType instanceof VirtualShopObjectType,
+					"spawnLocation is null, but the shop object type is not virtual");
 			this.spawnLocation = null;
 		}
 		this.targetedBlockFace = targetedBlockFace;
@@ -62,10 +70,10 @@ public abstract class ShopCreationData {
 	/**
 	 * The creator of the shop.
 	 * 
-	 * @return the creating player, might be <code>null</code> (depending on which type of shopkeeper is created and in
-	 *         which context)
+	 * @return the creating player, might be <code>null</code> (depending on which type of
+	 *         shopkeeper is created and in which context)
 	 */
-	public Player getCreator() {
+	public @Nullable Player getCreator() {
 		return creator;
 	}
 
@@ -92,8 +100,8 @@ public abstract class ShopCreationData {
 	 * 
 	 * @return the spawn location, can be <code>null</code> for virtual shops
 	 */
-	public Location getSpawnLocation() {
-		return (spawnLocation == null) ? null : spawnLocation.clone();
+	public @Nullable Location getSpawnLocation() {
+		return (spawnLocation != null) ? spawnLocation.clone() : null;
 	}
 
 	/**
@@ -102,20 +110,26 @@ public abstract class ShopCreationData {
 	 * Has to be located in the same world as the previous spawn location.
 	 * 
 	 * @param newSpawnLocation
-	 *            the new spawn location
+	 *            the new spawn location, can be <code>null</code> for virtual shops
 	 */
-	public void setSpawnLocation(Location newSpawnLocation) {
+	public void setSpawnLocation(@Nullable Location newSpawnLocation) {
 		if (!(shopObjectType instanceof VirtualShopObjectType)) {
-			Preconditions.checkNotNull(newSpawnLocation, "newSpawnLocation is null, but the shop object type is not virtual");
+			Preconditions.checkNotNull(newSpawnLocation,
+					"newSpawnLocation is null, but the shop object type is not virtual");
 		}
 		if (newSpawnLocation == null) {
 			this.spawnLocation = null;
 		} else {
-			Preconditions.checkNotNull(newSpawnLocation.getWorld(), "newSpawnLocation has no world");
+			Preconditions.checkNotNull(
+					newSpawnLocation.getWorld(),
+					"newSpawnLocation has no world"
+			);
 			newSpawnLocation.checkFinite();
 			if (this.spawnLocation != null) {
-				Preconditions.checkArgument(this.spawnLocation.getWorld() == newSpawnLocation.getWorld(),
-						"Cannot set the spawn location to a different world!");
+				Preconditions.checkArgument(
+						this.spawnLocation.getWorld() == newSpawnLocation.getWorld(),
+						"Cannot set the spawn location to a different world!"
+				);
 			}
 			this.spawnLocation = newSpawnLocation.clone();
 		}
@@ -126,7 +140,7 @@ public abstract class ShopCreationData {
 	 * 
 	 * @return the targeted block face, can be <code>null</code>
 	 */
-	public BlockFace getTargetedBlockFace() {
+	public @Nullable BlockFace getTargetedBlockFace() {
 		return targetedBlockFace;
 	}
 
@@ -136,7 +150,7 @@ public abstract class ShopCreationData {
 	 * @param blockFace
 	 *            the new block face
 	 */
-	public void setTargetedBlockFace(BlockFace blockFace) {
+	public void setTargetedBlockFace(@Nullable BlockFace blockFace) {
 		this.targetedBlockFace = blockFace;
 	}
 
@@ -150,9 +164,8 @@ public abstract class ShopCreationData {
 	 * @return the value, or <code>null</code> if there is no value for the specified key
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getValue(String key) {
-		if (additionalData == null) return null;
-		return (T) additionalData.get(key);
+	public <T> @Nullable T getValue(String key) {
+		return (additionalData != null) ? (T) additionalData.get(key) : null;
 	}
 
 	/**
@@ -165,14 +178,16 @@ public abstract class ShopCreationData {
 	 * @param value
 	 *            the value, or <code>null</code> to remove the value for the specified key
 	 */
-	public <T> void setValue(String key, T value) {
+	public <T> void setValue(String key, @Nullable T value) {
 		if (value == null) {
-			if (additionalData == null) return;
-			additionalData.remove(key);
+			if (additionalData != null) {
+				additionalData.remove(key);
+			}
 		} else {
 			if (additionalData == null) {
 				additionalData = new HashMap<>();
 			}
+			assert additionalData != null;
 			additionalData.put(key, value);
 		}
 	}

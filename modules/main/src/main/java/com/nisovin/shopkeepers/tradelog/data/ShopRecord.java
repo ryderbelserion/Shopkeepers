@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers.tradelog.data;
 
+import java.util.Objects;
 import java.util.UUID;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -9,8 +12,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * An immutable snapshot of the information about a shop.
  * <p>
- * This information is not necessarily up-to-date, but represents the shop's information at a certain point in time
- * (e.g. the shop might have been modified or even deleted).
+ * This information is not necessarily up-to-date, but represents the shop's information at a
+ * certain point in time (e.g. the shop might have been modified or even deleted).
  */
 public class ShopRecord {
 
@@ -26,7 +29,10 @@ public class ShopRecord {
 		UUID shopUniqueId = shopkeeper.getUniqueId();
 		String shopTypeId = shopkeeper.getType().getIdentifier();
 		PlayerShopkeeper playerShop = (shopkeeper instanceof PlayerShopkeeper) ? (PlayerShopkeeper) shopkeeper : null;
-		PlayerRecord owner = (playerShop == null) ? null : PlayerRecord.of(playerShop.getOwnerUUID(), playerShop.getOwnerName());
+		PlayerRecord owner = null;
+		if (playerShop != null) {
+			owner = PlayerRecord.of(playerShop.getOwnerUUID(), playerShop.getOwnerName());
+		}
 		String shopName = shopkeeper.getName(); // Can be empty
 		String worldName = shopkeeper.getWorldName();
 		int x = shopkeeper.getX();
@@ -38,15 +44,24 @@ public class ShopRecord {
 	private final UUID uniqueId;
 	private final String typeId;
 	// The owner might no longer match the current owner of the shopkeeper.
-	private final PlayerRecord owner; // Can be null (e.g. for admin shops)
+	private final @Nullable PlayerRecord owner; // Can be null (e.g. for admin shops)
 	private final String name; // Can be empty
-	private final String worldName; // Can be null for virtual shops, not empty
+	private final @Nullable String worldName; // Can be null for virtual shops, not empty
 	// Coordinates are all 0 for virtual shops:
 	private final int x;
 	private final int y;
 	private final int z;
 
-	public ShopRecord(UUID shopUniqueId, String shopTypeId, PlayerRecord owner, String shopName, String worldName, int x, int y, int z) {
+	public ShopRecord(
+			UUID shopUniqueId,
+			String shopTypeId,
+			@Nullable PlayerRecord owner,
+			String shopName,
+			@Nullable String worldName,
+			int x,
+			int y,
+			int z
+	) {
 		Validate.notNull(shopUniqueId, "shopUniqueId is null");
 		Validate.notNull(shopTypeId, "shopTypeId is null");
 		Validate.notNull(shopName, "shopName is null"); // Can be empty
@@ -95,7 +110,7 @@ public class ShopRecord {
 	 * 
 	 * @return the owner, can be <code>null</code>
 	 */
-	public PlayerRecord getOwner() {
+	public @Nullable PlayerRecord getOwner() {
 		return owner;
 	}
 
@@ -104,7 +119,7 @@ public class ShopRecord {
 	 * 
 	 * @return the world name, can <code>null</code> for virtual shops, not empty
 	 */
-	public String getWorldName() {
+	public @Nullable String getWorldName() {
 		return worldName;
 	}
 
@@ -164,9 +179,9 @@ public class ShopRecord {
 		int result = 1;
 		result = prime * result + uniqueId.hashCode();
 		result = prime * result + typeId.hashCode();
-		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+		result = prime * result + Objects.hashCode(owner);
 		result = prime * result + name.hashCode();
-		result = prime * result + ((worldName == null) ? 0 : worldName.hashCode());
+		result = prime * result + Objects.hashCode(worldName);
 		result = prime * result + x;
 		result = prime * result + y;
 		result = prime * result + z;
@@ -174,20 +189,16 @@ public class ShopRecord {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (!(obj instanceof ShopRecord)) return false;
 		ShopRecord other = (ShopRecord) obj;
 		if (!uniqueId.equals(other.uniqueId)) return false;
 		if (!typeId.equals(other.typeId)) return false;
-		if (owner == null) {
-			if (other.owner != null) return false;
-		} else if (!owner.equals(other.owner)) return false;
+		if (!Objects.equals(owner, other.owner)) return false;
 		if (!name.equals(other.name)) return false;
-		if (worldName == null) {
-			if (other.worldName != null) return false;
-		} else if (!worldName.equals(other.worldName)) return false;
+		if (!Objects.equals(worldName, other.worldName)) return false;
 		if (x != other.x) return false;
 		if (y != other.y) return false;
 		if (z != other.z) return false;

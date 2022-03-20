@@ -25,7 +25,8 @@ public class BlockZombieVillagerCuringListener implements Listener {
 	public BlockZombieVillagerCuringListener() {
 	}
 
-	// Try to prevent curing as early as possible, so that the player doesn't waste his golden apple.
+	// Try to prevent curing as early as possible, so that the player doesn't waste his golden
+	// apple.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onZombieVillagerCureStarted(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof ZombieVillager)) return;
@@ -33,7 +34,8 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		ItemStack itemInHand = InventoryUtils.getItem(player.getInventory(), event.getHand());
 		if (itemInHand != null && itemInHand.getType() == Material.GOLDEN_APPLE) {
 			// Prevent curing:
-			Log.debug(() -> "Preventing zombie villager curing at " + TextUtils.getLocationString(player.getLocation()));
+			Log.debug(() -> "Preventing zombie villager curing at "
+					+ TextUtils.getLocationString(player.getLocation()));
 			event.setCancelled(true);
 			TextUtils.sendMessage(player, Messages.zombieVillagerCuringDisabled);
 		}
@@ -45,14 +47,17 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		if (!(event.getEntity() instanceof ZombieVillager)) return;
 
 		ZombieVillager zombieVillager = (ZombieVillager) event.getEntity();
-		Log.debug(() -> "Preventing zombie villager curing (transform) at " + TextUtils.getLocationString(zombieVillager.getLocation()));
+		Log.debug(() -> "Preventing zombie villager curing (transform) at "
+				+ TextUtils.getLocationString(zombieVillager.getLocation()));
 		event.setCancelled(true);
 
 		// Inform the player who initiated the curing:
 		OfflinePlayer conversionOfflinePlayer = zombieVillager.getConversionPlayer();
-		Player conversionPlayer = (conversionOfflinePlayer == null) ? null : conversionOfflinePlayer.getPlayer();
-		if (conversionPlayer != null) {
-			TextUtils.sendMessage(conversionPlayer, Messages.zombieVillagerCuringDisabled);
+		if (conversionOfflinePlayer != null) {
+			Player conversionPlayer = conversionOfflinePlayer.getPlayer();
+			if (conversionPlayer != null) {
+				TextUtils.sendMessage(conversionPlayer, Messages.zombieVillagerCuringDisabled);
+			}
 		}
 	}
 }

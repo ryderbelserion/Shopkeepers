@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.data.property.validation;
 
-import com.nisovin.shopkeepers.util.data.property.Property;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -11,10 +12,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * @param <T>
  *            the type of the validated value
  */
-public final class ChainedPropertyValidator<T> implements PropertyValidator<T> {
+public final class ChainedPropertyValidator<T> implements PropertyValidator<@NonNull T> {
 
-	private final PropertyValidator<? super T> first;
-	private final PropertyValidator<? super T> second;
+	private final PropertyValidator<? super @NonNull T> first;
+	private final PropertyValidator<? super @NonNull T> second;
 
 	/**
 	 * Creates a new {@link ChainedPropertyValidator}.
@@ -24,7 +25,10 @@ public final class ChainedPropertyValidator<T> implements PropertyValidator<T> {
 	 * @param second
 	 *            the second validator, not <code>null</code>
 	 */
-	public ChainedPropertyValidator(PropertyValidator<? super T> first, PropertyValidator<? super T> second) {
+	public ChainedPropertyValidator(
+			PropertyValidator<? super @NonNull T> first,
+			PropertyValidator<? super @NonNull T> second
+	) {
 		Validate.notNull(first, "first is null");
 		Validate.notNull(second, "second is null");
 		this.first = first;
@@ -32,8 +36,8 @@ public final class ChainedPropertyValidator<T> implements PropertyValidator<T> {
 	}
 
 	@Override
-	public void validate(Property<? extends T> property, T value) {
-		first.validate(property, value);
-		second.validate(property, value);
+	public void validate(@NonNull T value) {
+		first.validate(value);
+		second.validate(value);
 	}
 }

@@ -1,11 +1,16 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
+import java.util.Objects;
+
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
@@ -22,22 +27,26 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * Instances of this class are immutable.
  * <p>
- * Only the {@link #getSound() Sound} or {@link #getSoundName() sound name} are required to be specified. Any other
- * data, such as the {@link #getCategory() sound category}, {@link #getPitch() pitch}, or {@link #getVolume() volume},
- * is optional: If these are not specified, the sound effect will use their respective defaults when played.
+ * Only the {@link #getSound() Sound} or {@link #getSoundName() sound name} are required to be
+ * specified. Any other data, such as the {@link #getCategory() sound category}, {@link #getPitch()
+ * pitch}, or {@link #getVolume() volume}, is optional: If these are not specified, the sound effect
+ * will use their respective defaults when played.
  * <p>
- * Playing sound effects with a {@link #getSound() Sound} or {@link #getSoundName() sound name} may be implemented
- * differently (Minecraft uses two different packets for them). Even if two sound effects refer to the same sound, one
- * by {@link Sound} and the other by sound name, they are not considered equal.
+ * Playing sound effects with a {@link #getSound() Sound} or {@link #getSoundName() sound name} may
+ * be implemented differently (Minecraft uses two different packets for them). Even if two sound
+ * effects refer to the same sound, one by {@link Sound} and the other by sound name, they are not
+ * considered equal.
  * <p>
- * When deserializing a {@link SoundEffect}, we first try to map a given sound name to a server-known {@link Sound}.
- * This means that if the sound effect was using a sound name instead of a {@link Sound} before being serialized, the
- * deserialized sound effect may not be equal to the previously serialized sound effect.
+ * When deserializing a {@link SoundEffect}, we first try to map a given sound name to a
+ * server-known {@link Sound}. This means that if the sound effect was using a sound name instead of
+ * a {@link Sound} before being serialized, the deserialized sound effect may not be equal to the
+ * previously serialized sound effect.
  * <p>
- * The {@link #getSoundName() sound name} can be empty to indicate that the sound effect shall not be played. This
- * allows plugin users to disable certain sound effects inside the config, and allows the plugin to differentiate
- * between disabled sound effects and missing / unspecified sound effects. Another option to disable a sound effect is
- * to set its volume to zero (or a value close to zero).
+ * The {@link #getSoundName() sound name} can be empty to indicate that the sound effect shall not
+ * be played. This allows plugin users to disable certain sound effects inside the config, and
+ * allows the plugin to differentiate between disabled sound effects and missing / unspecified sound
+ * effects. Another option to disable a sound effect is to set its volume to zero (or a value close
+ * to zero).
  */
 public final class SoundEffect {
 
@@ -46,20 +55,20 @@ public final class SoundEffect {
 	 */
 	public static final SoundEffect EMPTY = new SoundEffect("");
 
-	private static final Property<String> SOUND_NAME = new BasicProperty<String>()
+	private static final Property<@NonNull String> SOUND_NAME = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("sound", StringSerializers.SCALAR)
 			.build();
-	private static final Property<SoundCategory> CATEGORY = new BasicProperty<SoundCategory>()
+	private static final Property<@Nullable SoundCategory> CATEGORY = new BasicProperty<@Nullable SoundCategory>()
 			.dataKeyAccessor("category", EnumSerializers.lenient(SoundCategory.class))
 			.nullable() // Optional
 			.defaultValue(SoundCategory.MASTER)
 			.build();
-	private static final Property<Float> PITCH = new BasicProperty<Float>()
+	private static final Property<@Nullable Float> PITCH = new BasicProperty<@Nullable Float>()
 			.dataKeyAccessor("pitch", NumberSerializers.FLOAT)
 			.nullable() // Optional
 			.defaultValue(1.0f)
 			.build();
-	private static final Property<Float> VOLUME = new BasicProperty<Float>()
+	private static final Property<@Nullable Float> VOLUME = new BasicProperty<@Nullable Float>()
 			.dataKeyAccessor("volume", NumberSerializers.FLOAT)
 			.nullable() // Optional
 			.defaultValue(1.0f)
@@ -71,9 +80,9 @@ public final class SoundEffect {
 	/**
 	 * A {@link DataSerializer} for values of type {@link SoundEffect}.
 	 */
-	public static final DataSerializer<SoundEffect> SERIALIZER = new DataSerializer<SoundEffect>() {
+	public static final DataSerializer<@NonNull SoundEffect> SERIALIZER = new DataSerializer<@NonNull SoundEffect>() {
 		@Override
-		public Object serialize(SoundEffect value) {
+		public @Nullable Object serialize(SoundEffect value) {
 			Validate.notNull(value, "value is null");
 			Sound sound = value.getSound();
 			String soundName = value.getSoundName();
@@ -127,13 +136,14 @@ public final class SoundEffect {
 		}
 	};
 
-	// Either sound or soundName is not null. Sound name is used when referring to a sound that is not known to the
-	// server and might only exist on (certain) clients.
-	private final Sound sound; // Can be null, not null if soundName is null
-	private final String soundName; // Can be null, not null if sound is null, empty to not play any sound
-	private final SoundCategory category; // Null if not specified
-	private final Float pitch; // Null if not specified
-	private final Float volume; // Null if not specified
+	// Either sound or soundName is not null. Sound name is used when referring to a sound that is
+	// not known to the server and might only exist on (certain) clients.
+	private final @Nullable Sound sound; // Can be null, not null if soundName is null
+	// Can be null, not null if sound is null, empty to not play any sound:
+	private final @Nullable String soundName;
+	private final @Nullable SoundCategory category; // Null if not specified
+	private final @Nullable Float pitch; // Null if not specified
+	private final @Nullable Float volume; // Null if not specified
 
 	/**
 	 * Creates a new {@link SoundEffect}.
@@ -161,8 +171,8 @@ public final class SoundEffect {
 	 * @param sound
 	 *            the sound, or <code>null</code> iff {@code soundName} is not <code>null</code>
 	 * @param soundName
-	 *            the sound name, or <code>null</code> iff {@code sound} is not <code>null</code>, can be empty to not
-	 *            play any sound
+	 *            the sound name, or <code>null</code> iff {@code sound} is not <code>null</code>,
+	 *            can be empty to not play any sound
 	 * @param category
 	 *            the sound category, or <code>null</code> if not specified
 	 * @param pitch
@@ -170,7 +180,13 @@ public final class SoundEffect {
 	 * @param volume
 	 *            the volume, or <code>null</code> if not specified
 	 */
-	private SoundEffect(Sound sound, String soundName, SoundCategory category, Float pitch, Float volume) {
+	private SoundEffect(
+			@Nullable Sound sound,
+			@Nullable String soundName,
+			@Nullable SoundCategory category,
+			@Nullable Float pitch,
+			@Nullable Float volume
+	) {
 		if (sound != null) {
 			Validate.isTrue(soundName == null, "sound and soundName are both non-null");
 		} else {
@@ -184,36 +200,38 @@ public final class SoundEffect {
 	}
 
 	/**
-	 * Creates a new {@link SoundEffect} that copies the data of this {@link SoundEffect} but uses the specified
-	 * {@link SoundCategory}.
+	 * Creates a new {@link SoundEffect} that copies the data of this {@link SoundEffect} but uses
+	 * the specified {@link SoundCategory}.
 	 * 
 	 * @param category
 	 *            the sound category, or <code>null</code> to indicate 'unspecified'
 	 * @return the new sound effect
 	 */
-	public SoundEffect withCategory(SoundCategory category) {
+	public SoundEffect withCategory(@Nullable SoundCategory category) {
 		return new SoundEffect(sound, soundName, category, pitch, volume);
 	}
 
 	/**
-	 * Creates a new {@link SoundEffect} that copies the data of this {@link SoundEffect} but uses the specified pitch.
+	 * Creates a new {@link SoundEffect} that copies the data of this {@link SoundEffect} but uses
+	 * the specified pitch.
 	 * 
 	 * @param pitch
 	 *            the pitch, or <code>null</code> to indicate 'unspecified'
 	 * @return the new sound effect
 	 */
-	public SoundEffect withPitch(Float pitch) {
+	public SoundEffect withPitch(@Nullable Float pitch) {
 		return new SoundEffect(sound, soundName, category, pitch, volume);
 	}
 
 	/**
-	 * Creates a new {@link SoundEffect} that copies the data of this {@link SoundEffect} but uses the specified volume.
+	 * Creates a new {@link SoundEffect} that copies the data of this {@link SoundEffect} but uses
+	 * the specified volume.
 	 * 
 	 * @param volume
 	 *            the volume, or <code>null</code> to indicate 'unspecified'
 	 * @return the new sound effect
 	 */
-	public SoundEffect withVolume(Float volume) {
+	public SoundEffect withVolume(@Nullable Float volume) {
 		return new SoundEffect(sound, soundName, category, pitch, volume);
 	}
 
@@ -222,20 +240,20 @@ public final class SoundEffect {
 	 * 
 	 * @return the sound, or <code>null</code> if a {@link #getSoundName() sound name} is used
 	 */
-	public Sound getSound() {
+	public @Nullable Sound getSound() {
 		return sound;
 	}
 
 	/**
 	 * Gets the sound name.
 	 * <p>
-	 * This sound name may refer to a sound that only exists on (certain) clients. It might not correspond to a known
-	 * {@link Sound}.
+	 * This sound name may refer to a sound that only exists on (certain) clients. It might not
+	 * correspond to a known {@link Sound}.
 	 * 
-	 * @return the sound name, or <code>null</code> if a {@link #getSound() Sound} is used, can be empty to indicate to
-	 *         not play any sound
+	 * @return the sound name, or <code>null</code> if a {@link #getSound() Sound} is used, can be
+	 *         empty to indicate to not play any sound
 	 */
-	public String getSoundName() {
+	public @Nullable String getSoundName() {
 		return soundName;
 	}
 
@@ -244,7 +262,7 @@ public final class SoundEffect {
 	 * 
 	 * @return the sound category, or <code>null</code> if not specified
 	 */
-	public SoundCategory getCategory() {
+	public @Nullable SoundCategory getCategory() {
 		return category;
 	}
 
@@ -257,7 +275,7 @@ public final class SoundEffect {
 	 * @return the sound category, not <code>null</code>
 	 */
 	public SoundCategory getEffectiveCategory() {
-		return (category != null) ? category : CATEGORY.getDefaultValue();
+		return (category != null) ? category : Unsafe.assertNonNull(CATEGORY.getDefaultValue());
 	}
 
 	/**
@@ -265,7 +283,7 @@ public final class SoundEffect {
 	 * 
 	 * @return the pitch, or <code>null</code> if not specified
 	 */
-	public Float getPitch() {
+	public @Nullable Float getPitch() {
 		return pitch;
 	}
 
@@ -277,7 +295,7 @@ public final class SoundEffect {
 	 * @return the pitch
 	 */
 	public float getEffectivePitch() {
-		return (pitch != null) ? pitch : PITCH.getDefaultValue();
+		return (pitch != null) ? pitch : Unsafe.assertNonNull(PITCH.getDefaultValue());
 	}
 
 	/**
@@ -285,31 +303,34 @@ public final class SoundEffect {
 	 * 
 	 * @return the volume, or <code>null</code> if not specified
 	 */
-	public Float getVolume() {
+	public @Nullable Float getVolume() {
 		return volume;
 	}
 
 	/**
 	 * Gets the effective volume.
 	 * <p>
-	 * If this {@link SoundEffect} specifies no volume, this returns the default volume {@code 1.0f}.
+	 * If this {@link SoundEffect} specifies no volume, this returns the default volume
+	 * {@code 1.0f}.
 	 * 
 	 * @return the volume
 	 */
 	public float getEffectiveVolume() {
-		return (volume != null) ? volume : VOLUME.getDefaultValue();
+		return (volume != null) ? volume : Unsafe.assertNonNull(VOLUME.getDefaultValue());
 	}
 
 	/**
 	 * Checks whether this {@link SoundEffect} is disabled.
 	 * <p>
-	 * The sound effect is disabled if either its {@link #getSoundName() sound name} is empty, or its
-	 * {@link #getVolume() volume} is close to zero. A disabled sound effect is not played by any of the play methods.
+	 * The sound effect is disabled if either its {@link #getSoundName() sound name} is empty, or
+	 * its {@link #getVolume() volume} is close to zero. A disabled sound effect is not played by
+	 * any of the play methods.
 	 * 
 	 * @return <code>true</code> if this sound effect is disabled
 	 */
 	public boolean isDisabled() {
-		return (soundName != null && soundName.isEmpty()) || (volume != null && volume <= MIN_VOLUME);
+		return (soundName != null && soundName.isEmpty())
+				|| (volume != null && volume <= MIN_VOLUME);
 	}
 
 	/**
@@ -323,16 +344,31 @@ public final class SoundEffect {
 		World world = LocationUtils.getWorld(location);
 		if (this.isDisabled()) return;
 
+		Sound sound = this.sound;
 		if (sound != null) {
-			world.playSound(location, sound, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
+			world.playSound(
+					location,
+					sound,
+					this.getEffectiveCategory(),
+					this.getEffectiveVolume(),
+					this.getEffectivePitch()
+			);
 		} else {
+			String soundName = Unsafe.assertNonNull(this.soundName);
 			assert !soundName.isEmpty();
-			world.playSound(location, soundName, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
+			world.playSound(
+					location,
+					soundName,
+					this.getEffectiveCategory(),
+					this.getEffectiveVolume(),
+					this.getEffectivePitch()
+			);
 		}
 	}
 
 	/**
-	 * Plays this {@link SoundEffect} for the specified player at their {@link Player#getLocation()}.
+	 * Plays this {@link SoundEffect} for the specified player at their
+	 * {@link Player#getLocation()}.
 	 * 
 	 * @param player
 	 *            the player, not <code>null</code>
@@ -340,9 +376,9 @@ public final class SoundEffect {
 	 */
 	public void play(Player player) {
 		Validate.notNull(player, "player is null");
-		// Note: We intentionally play the sound at the feet location, not the head/eye location. Playing the sound at
-		// the eye location can result in the sound being played/heard slightly to the left or the right, depending on
-		// the player's location.
+		// Note: We intentionally play the sound at the feet location, not the head/eye location.
+		// Playing the sound at the eye location can result in the sound being played/heard slightly
+		// to the left or the right, depending on the player's location.
 		this.play(player, player.getLocation());
 	}
 
@@ -360,11 +396,25 @@ public final class SoundEffect {
 		Validate.notNull(location, "location is null");
 		if (this.isDisabled()) return;
 
+		Sound sound = this.sound;
 		if (sound != null) {
-			player.playSound(location, sound, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
+			player.playSound(
+					location,
+					sound,
+					this.getEffectiveCategory(),
+					this.getEffectiveVolume(),
+					this.getEffectivePitch()
+			);
 		} else {
+			String soundName = Unsafe.assertNonNull(this.soundName);
 			assert !soundName.isEmpty();
-			player.playSound(location, soundName, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
+			player.playSound(
+					location,
+					soundName,
+					this.getEffectiveCategory(),
+					this.getEffectiveVolume(),
+					this.getEffectivePitch()
+			);
 		}
 	}
 
@@ -389,30 +439,24 @@ public final class SoundEffect {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((sound == null) ? 0 : sound.hashCode());
-		result = prime * result + ((soundName == null) ? 0 : soundName.hashCode());
-		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + ((pitch == null) ? 0 : pitch.hashCode());
-		result = prime * result + ((volume == null) ? 0 : volume.hashCode());
+		result = prime * result + Objects.hashCode(sound);
+		result = prime * result + Objects.hashCode(soundName);
+		result = prime * result + Objects.hashCode(category);
+		result = prime * result + Objects.hashCode(pitch);
+		result = prime * result + Objects.hashCode(volume);
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof SoundEffect)) return false;
 		SoundEffect other = (SoundEffect) obj;
-		if (sound != other.sound) return false;
-		if (soundName == null) {
-			if (other.soundName != null) return false;
-		} else if (!soundName.equals(other.soundName)) return false;
-		if (category != other.category) return false;
-		if (pitch == null) {
-			if (other.pitch != null) return false;
-		} else if (!pitch.equals(other.pitch)) return false;
-		if (volume == null) {
-			if (other.volume != null) return false;
-		} else if (!volume.equals(other.volume)) return false;
+		if (Objects.equals(sound, other.sound)) return false;
+		if (Objects.equals(soundName, other.soundName)) return false;
+		if (Objects.equals(category, other.category)) return false;
+		if (Objects.equals(pitch, other.pitch)) return false;
+		if (Objects.equals(volume, other.volume)) return false;
 		return true;
 	}
 
@@ -422,6 +466,6 @@ public final class SoundEffect {
 	 * @return the serialized {@link SoundEffect}
 	 */
 	public Object serialize() {
-		return SERIALIZER.serialize(this);
+		return Unsafe.assertNonNull(SERIALIZER.serialize(this));
 	}
 }

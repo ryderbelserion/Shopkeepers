@@ -3,8 +3,8 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -13,16 +13,18 @@ import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.RequiresPlayerArgumentException;
 import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
+import com.nisovin.shopkeepers.util.java.ObjectUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link FallbackArgument} that returns the sender if it is a player, without consuming any arguments.
+ * A {@link FallbackArgument} that returns the sender if it is a player, without consuming any
+ * arguments.
  * <p>
  * If the sender is not a player, a {@link RequiresPlayerArgumentException} is thrown.
  */
-public class SenderPlayerFallback extends TypedFallbackArgument<Player> {
+public class SenderPlayerFallback extends TypedFallbackArgument<@NonNull Player> {
 
-	public static class SenderPlayerArgument extends CommandArgument<Player> {
+	public static class SenderPlayerArgument extends CommandArgument<@NonNull Player> {
 
 		public SenderPlayerArgument(String name) {
 			super(name);
@@ -34,22 +36,33 @@ public class SenderPlayerFallback extends TypedFallbackArgument<Player> {
 		}
 
 		@Override
-		public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-			CommandSender sender = input.getSender();
-			if (!(sender instanceof Player)) {
+		public Player parseValue(
+				CommandInput input,
+				CommandContextView context,
+				ArgumentsReader argsReader
+		) throws ArgumentParseException {
+			Player player = ObjectUtils.castOrNull(input.getSender(), Player.class);
+			if (player == null) {
 				throw this.requiresPlayerError();
 			} else {
-				return (Player) sender;
+				return player;
 			}
 		}
 
 		@Override
-		public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		public List<? extends @NonNull String> complete(
+				CommandInput input,
+				CommandContextView context,
+				ArgumentsReader argsReader
+		) {
 			return Collections.emptyList();
 		}
 	}
 
-	public SenderPlayerFallback(CommandArgument<Player> argument) {
-		super(argument, new SenderPlayerArgument(Validate.notNull(argument, "argument is null").getName()));
+	public SenderPlayerFallback(CommandArgument<@NonNull Player> argument) {
+		super(
+				Validate.notNull(argument, "argument is null"),
+				new SenderPlayerArgument(argument.getName())
+		);
 	}
 }

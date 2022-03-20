@@ -45,8 +45,6 @@ class CommandRemote extends Command {
 		CommandSender sender = input.getSender();
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
-
 		Player targetPlayer = context.get(ARGUMENT_PLAYER);
 		assert targetPlayer != null;
 		if (targetPlayer != sender) {

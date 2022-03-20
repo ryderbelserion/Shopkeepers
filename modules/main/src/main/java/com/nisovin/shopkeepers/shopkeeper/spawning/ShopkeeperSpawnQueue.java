@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopkeeper.spawning;
 import java.util.function.Consumer;
 
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState.State;
@@ -13,24 +14,26 @@ import com.nisovin.shopkeepers.util.taskqueue.TaskQueue;
 /**
  * A queue for load balancing the spawning of shopkeepers.
  * <p>
- * Spawning shopkeepers can be relatively costly performance-wise. In order to avoid performance drops when chunks with
- * lots of shopkeepers are activated, we use this queue to distribute the spawning of shopkeepers over several ticks.
+ * Spawning shopkeepers can be relatively costly performance-wise. In order to avoid performance
+ * drops when chunks with lots of shopkeepers are activated, we use this queue to distribute the
+ * spawning of shopkeepers over several ticks.
  * <p>
- * Shopkeepers may already be ticked while they are still pending to be spawned. Shop objects can use
- * {@link AbstractShopObject#isSpawningScheduled()} to check if they are currently still pending to be spawned.
+ * Shopkeepers may already be ticked while they are still pending to be spawned. Shop objects can
+ * use {@link AbstractShopObject#isSpawningScheduled()} to check if they are currently still pending
+ * to be spawned.
  */
-public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
+public class ShopkeeperSpawnQueue extends TaskQueue<@NonNull AbstractShopkeeper> {
 
 	// With this configuration we can spawn around 40 shopkeepers per second.
 	// A more frequently running task has a higher general overhead.
 	private static final int SPAWN_TASK_PERIOD_TICKS = 3;
-	// On my test setup, and without any GC taking place, the spawning of a shopkeeper seems to take between
-	// 0.05-0.25ms, with an average of around 0.1ms.
+	// On my test setup, and without any GC taking place, the spawning of a shopkeeper seems to take
+	// between 0.05-0.25ms, with an average of around 0.1ms.
 	private static final int SPAWNS_PER_EXECUTION = 6;
 
-	private final Consumer<AbstractShopkeeper> spawner;
+	private final Consumer<? super @NonNull AbstractShopkeeper> spawner;
 
-	ShopkeeperSpawnQueue(Plugin plugin, Consumer<AbstractShopkeeper> spawner) {
+	ShopkeeperSpawnQueue(Plugin plugin, Consumer<? super @NonNull AbstractShopkeeper> spawner) {
 		super(plugin, SPAWN_TASK_PERIOD_TICKS, SPAWNS_PER_EXECUTION);
 		Validate.notNull(spawner, "spawner is null");
 		this.spawner = spawner;

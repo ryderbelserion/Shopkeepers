@@ -1,13 +1,15 @@
 package com.nisovin.shopkeepers.commands.lib;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * This exception is thrown during handling of a command when an error occurs or execution fails. The detail message of
- * the exception might get sent to the {@link CommandSender} which triggered the command.
+ * This exception is thrown during handling of a command when an error occurs or execution fails.
+ * The detail message of the exception might get sent to the {@link CommandSender} which triggered
+ * the command.
  */
 public class CommandException extends Exception {
 
@@ -26,11 +28,11 @@ public class CommandException extends Exception {
 		return plainMessage;
 	}
 
-	public CommandException(Text message, Throwable cause) {
+	public CommandException(Text message, @Nullable Throwable cause) {
 		super(validateMessage(message), cause);
 		// TODO Can this copy be avoided?
-		// Required since placeholder and translation arguments may dynamically change while the exception is kept
-		// around.
+		// Required since placeholder and translation arguments may dynamically change while the
+		// exception is kept around.
 		this.messageText = message.copy();
 	}
 

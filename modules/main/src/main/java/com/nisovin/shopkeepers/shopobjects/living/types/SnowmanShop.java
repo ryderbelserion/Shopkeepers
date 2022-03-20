@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -24,19 +27,23 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class SnowmanShop extends SKLivingShopObject<Snowman> {
+public class SnowmanShop extends SKLivingShopObject<@NonNull Snowman> {
 
-	public static final Property<Boolean> PUMPKIN_HEAD = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> PUMPKIN_HEAD = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("pumpkinHead", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Boolean> pumpkinHeadProperty = new PropertyValue<>(PUMPKIN_HEAD)
-			.onValueChanged(this::applyPumpkinHead)
+	private final PropertyValue<@NonNull Boolean> pumpkinHeadProperty = new PropertyValue<>(PUMPKIN_HEAD)
+			.onValueChanged(Unsafe.initialized(this)::applyPumpkinHead)
 			.build(properties);
 
-	public SnowmanShop(	LivingShops livingShops, SKLivingShopObjectType<SnowmanShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public SnowmanShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull SnowmanShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -59,8 +66,8 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPumpkinHeadEditorButton());
 		return editorButtons;
 	}
@@ -86,20 +93,27 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 	}
 
 	private ItemStack getPumpkinHeadEditorItem() {
-		ItemStack iconItem = new ItemStack(this.hasPumpkinHead() ? Material.CARVED_PUMPKIN : Material.PUMPKIN);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSnowmanPumpkinHead, Messages.buttonSnowmanPumpkinHeadLore);
+		Material iconItemType = this.hasPumpkinHead() ? Material.CARVED_PUMPKIN : Material.PUMPKIN;
+		ItemStack iconItem = new ItemStack(iconItemType);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonSnowmanPumpkinHead,
+				Messages.buttonSnowmanPumpkinHeadLore
+		);
 		return iconItem;
 	}
 
 	private Button getPumpkinHeadEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getPumpkinHeadEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cyclePumpkinHead();
 				return true;
 			}

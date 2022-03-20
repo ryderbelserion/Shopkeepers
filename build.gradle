@@ -1,6 +1,7 @@
 plugins {
 	id 'base' // Adds the clean task to the root project
 	id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
+	id 'org.checkerframework' version '0.6.8' apply false
 	// Useful for build debugging:
 	// https://gitlab.com/barfuin/gradle-taskinfo
 	//id 'org.barfuin.gradle.taskinfo' version '1.3.0'
@@ -64,7 +65,8 @@ ext.configureJarTaskWithMavenMetadata = { project, jarTask ->
 
 ext.configureShadowArtifacts = { project ->
 	project.artifacts {
-		// Similar to the regular jar, declare the shadow jar as output of the project for any projects that depend on it.
+		// Similar to the regular jar, declare the shadow jar as output of the project for any
+		// projects that depend on it.
 		archives project.shadowJar
 		apiElements project.shadowJar
 		runtimeElements project.shadowJar
@@ -86,19 +88,22 @@ ext.configureMavenPublication = { project, publication ->
 		// https://github.com/gradle/gradle/issues/15932
 		// https://github.com/gradle/gradle/issues/8811
 
-		// Note: Gradle maps all api dependencies to 'compile' scope and all implementation dependencies to 'runtime'
-		// scope (instead of 'provided' scope). Although this does not match the project's compile configuration (since
-		// the runtime scope is not considered part of the project's compilation classpath), this is not an issue
-		// because the primary purpose of the published pom file is not to configure the build of this project, but only
-		// to ensure that any transitive compile and runtime dependencies are declared for consuming projects.
+		// Note: Gradle maps all api dependencies to 'compile' scope and all implementation
+		// dependencies to 'runtime' scope (instead of 'provided' scope). Although this does not
+		// match the project's compile configuration (since the runtime scope is not considered part
+		// of the project's compilation classpath), this is not an issue because the primary purpose
+		// of the published pom file is not to configure the build of this project, but only to
+		// ensure that any transitive compile and runtime dependencies are declared for consuming
+		// projects.
 	}
 }
 
 ext.configureShadowMavenPublication = { project, publication ->
 	configureMavenPublication(project, publication)
-	// Adding the java component here, instead of the shadow component, ensures that we generate the default pom contents,
-	// including entries for all dependencies. The shadow component would omit all dependencies (except those of the
-	// 'shadow' configuration), even if we configure the shadowJar task to only include some of the dependencies.
+	// Adding the java component here, instead of the shadow component, ensures that we generate the
+	// default pom contents, including entries for all dependencies. The shadow component would omit
+	// all dependencies (except those of the 'shadow' configuration), even if we configure the
+	// shadowJar task to only include some of the dependencies.
 	// However, the published artifacts are overridden to only publish the shadow jar instead.
 	publication.from project.components.java
 	publication.artifact project.shadowJar
@@ -112,9 +117,10 @@ ext.disableMavenPublications = { project ->
 
 allprojects {
 	// Set up default properties if they match the root project's values:
-	// Note: In order to allow subprojects to define their values of these properties inside their build files (instead of
-	// their 'gradle.properties' files), any task configurations that depend on these properties have to be deferred until
-	// after the subproject's build script has been evaluated.
+	// Note: In order to allow subprojects to define their values of these properties inside their
+	// build files (instead of their 'gradle.properties' files), any task configurations that depend
+	// on these properties have to be deferred until after the subproject's build script has been
+	// evaluated.
 	if (project.properties['artifactId'] == rootProject.properties['artifactId']) {
 		project.ext.artifactId = project.name
 	}
@@ -145,6 +151,7 @@ subprojects {
 
 		compileJava {
 			options.encoding = 'UTF-8'
+			options.compilerArgs += ['-Xmaxerrs', '10000', '-Xmaxwarns', '10000']
 		}
 
 		processResources {
@@ -170,9 +177,27 @@ subprojects {
 		}
 	}
 
+	project.plugins.withId('org.checkerframework') {
+		dependencies {
+			compileOnly libs.checkerframework.qual
+			checkerFramework libs.checkerframework.checker
+			testImplementation libs.checkerframework.qual
+		}
+
+		checkerFramework {
+			//skipCheckerFramework = true
+			checkers = [
+				'org.checkerframework.checker.nullness.NullnessChecker'
+			]
+			extraJavacArgs = [
+				//'-AsuppressWarnings=initialization'
+			]
+		}
+	}
+
 	project.plugins.withId('maven-publish') {
-		// The maven-publish plugin does not generate the 'pom.properties' file. In order to mimic a normal Maven
-		// artifact, this task can be used to generate the properties file ourselves.
+		// The maven-publish plugin does not generate the 'pom.properties' file. In order to mimic a
+		//  normal Maven artifact, this task can be used to generate the properties file ourselves.
 		task generateMavenPomPropertiesFile {
 			File directory = new File("${buildDir}/mavenProperties/")
 			File outputFile = new File(directory, 'pom.properties')

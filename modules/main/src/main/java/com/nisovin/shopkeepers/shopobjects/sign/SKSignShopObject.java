@@ -16,7 +16,10 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -55,20 +58,21 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	private static final String DATA_KEY_SIGN_TYPE = "signType";
-	public static final Property<SignType> SIGN_TYPE = new BasicProperty<SignType>()
+	public static final Property<@NonNull SignType> SIGN_TYPE = new BasicProperty<@NonNull SignType>()
 			.dataKeyAccessor(DATA_KEY_SIGN_TYPE, EnumSerializers.lenient(SignType.class))
-			.validator((property, value) -> {
-				Validate.isTrue(value.isSupported(), () -> "Unsupported sign type: '" + value.name() + "'.");
+			.validator(value -> {
+				Validate.isTrue(value.isSupported(),
+						() -> "Unsupported sign type: '" + value.name() + "'.");
 			})
 			.defaultValue(SignType.OAK)
 			.build();
 
-	public static final Property<Boolean> WALL_SIGN = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> WALL_SIGN = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("wallSign", BooleanSerializers.LENIENT)
 			.defaultValue(true)
 			.build();
 
-	public static final Property<Boolean> GLOWING_TEXT = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> GLOWING_TEXT = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("glowingText", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
@@ -78,10 +82,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		// Migration from TreeSpecies to SignType.
 		// TODO Remove this again at some point. Added in v2.10.0.
-		ShopkeeperDataMigrator.registerMigration(new Migration("sign-type",
-				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"sign-type",
+				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
 				boolean migrated = false;
 				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
 				String signTypeName = shopObjectData.getString(DATA_KEY_SIGN_TYPE);
@@ -102,10 +111,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
 		// TODO Remove this migration again at some point.
-		ShopkeeperDataMigrator.registerMigration(new Migration("sign-facing-to-yaw",
-				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"sign-facing-to-yaw",
+				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
 				boolean migrated = false;
 				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
 				String signFacingName = shopObjectData.getString("signFacing");
@@ -134,7 +148,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 				return migrated;
 			}
 
-			private boolean isValidSignFacing(ShopObjectData shopObjectData, BlockFace signFacing) throws InvalidDataException {
+			private boolean isValidSignFacing(
+					ShopObjectData shopObjectData,
+					BlockFace signFacing
+			) throws InvalidDataException {
 				Boolean wallSign = shopObjectData.getOrNullIfMissing(WALL_SIGN); // Can be null
 				if (wallSign == null) return true; // Skip the validation
 				if (wallSign) {
@@ -147,28 +164,38 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	private static final int CHECK_PERIOD_SECONDS = 10;
-	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(
+			1,
+			CHECK_PERIOD_SECONDS + 1
+	);
 	private static final long RESPAWN_TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(3);
 
 	protected final SignShops signShops;
 
-	private final PropertyValue<SignType> signTypeProperty = new PropertyValue<>(SIGN_TYPE)
-			.onValueChanged(this::applySignType)
+	private final PropertyValue<@NonNull SignType> signTypeProperty = new PropertyValue<>(SIGN_TYPE)
+			.onValueChanged(Unsafe.initialized(this)::applySignType)
 			.build(properties);
-	private final PropertyValue<Boolean> wallSignProperty = new PropertyValue<>(WALL_SIGN)
-			.onValueChanged(this::respawn)
+	private final PropertyValue<@NonNull Boolean> wallSignProperty = new PropertyValue<>(WALL_SIGN)
+			.onValueChanged(Unsafe.initialized(this)::respawn)
 			.build(properties);
-	private final PropertyValue<Boolean> glowingTextProperty = new PropertyValue<>(GLOWING_TEXT)
-			.onValueChanged(this::applyGlowingText)
+	private final PropertyValue<@NonNull Boolean> glowingTextProperty = new PropertyValue<>(GLOWING_TEXT)
+			.onValueChanged(Unsafe.initialized(this)::applyGlowingText)
 			.build(properties);
 
-	private Block block = null;
+	private @Nullable Block block = null;
 	private long lastFailedRespawnAttemptMillis = 0;
 
 	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
-	private final RateLimiter checkLimiter = new RateLimiter(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
+	private final RateLimiter checkLimiter = new RateLimiter(
+			CHECK_PERIOD_SECONDS,
+			nextCheckingOffset.getAndIncrement()
+	);
 
-	protected SKSignShopObject(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SKSignShopObject(
+			SignShops signShops,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(shopkeeper, creationData);
 		this.signShops = signShops;
 		if (creationData != null) {
@@ -205,13 +232,14 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// ACTIVATION
 
 	@Override
-	public Block getBlock() {
+	public @Nullable Block getBlock() {
 		return block;
 	}
 
-	public Sign getSign() {
+	public @Nullable Sign getSign() {
 		if (!this.isActive()) return null;
-		assert block != null && ItemUtils.isSign(block.getType());
+		Block block = Unsafe.assertNonNull(this.block);
+		assert ItemUtils.isSign(block.getType());
 		return (Sign) block.getState();
 	}
 
@@ -219,7 +247,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public boolean isActive() {
 		Block block = this.getBlock();
 		if (block == null) return false; // Not spawned
-		assert shopkeeper.getChunkCoords().isChunkLoaded(); // The shopkeeper is despawned on chunk unload
+		// The shopkeeper is despawned on chunk unload:
+		assert Unsafe.assertNonNull(shopkeeper.getChunkCoords()).isChunkLoaded();
 		if (!ItemUtils.isSign(block.getType())) return false; // No longer a sign
 		return true;
 	}
@@ -235,8 +264,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return false;
 		}
 
-		// If re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
-		// abused (sign drop farming), therefore we limit the number of spawn attempts:
+		// If re-spawning fails due to the sign dropping for some reason (ex. attached block
+		// missing) this could be abused (sign drop farming), therefore we limit the number of spawn
+		// attempts:
 		if (System.currentTimeMillis() - lastFailedRespawnAttemptMillis < RESPAWN_TIMEOUT_MILLIS) {
 			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Sign is on spawn cooldown.");
 			return false;
@@ -288,7 +318,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			signData = wallSignData;
 		} else {
 			// Sign post:
-			org.bukkit.block.data.type.Sign signPostData = (org.bukkit.block.data.type.Sign) Bukkit.createBlockData(signMaterial);
+			org.bukkit.block.data.type.Sign signPostData = Unsafe.castNonNull(
+					Bukkit.createBlockData(signMaterial)
+			);
 			signPostData.setRotation(this.getSignFacing());
 			signData = signPostData;
 		}
@@ -297,12 +329,18 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	private static Material getSignMaterial(SignType signType, boolean wallSign) {
 		assert signType != null && signType.isSupported();
-		if (wallSign) return signType.getWallSignMaterial();
-		else return signType.getSignMaterial();
+		Material signMaterial;
+		if (wallSign) {
+			signMaterial = signType.getWallSignMaterial();
+		} else {
+			signMaterial = signType.getSignMaterial();
+		}
+		return Unsafe.assertNonNull(signMaterial);
 	}
 
 	@Override
 	public void despawn() {
+		Block block = this.block;
 		if (block == null) return;
 
 		// Cleanup:
@@ -343,8 +381,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	protected void setupPlayerShopSign(Sign sign, PlayerShopkeeper playerShop) {
-		Map<String, Object> arguments = new HashMap<>();
-		arguments.put("shopName", this.prepareName(playerShop.getName())); // Not null, can be empty
+		Map<@NonNull String, @NonNull Object> arguments = new HashMap<>();
+		// Not null, can be empty:
+		arguments.put("shopName", Unsafe.assertNonNull(this.prepareName(playerShop.getName())));
 		arguments.put("owner", playerShop.getOwnerName());  // Not null, can be empty
 
 		sign.setLine(0, StringUtils.replaceArguments(Messages.playerSignShopLine1, arguments));
@@ -354,8 +393,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	protected void setupAdminShopSign(Sign sign, AdminShopkeeper adminShop) {
-		Map<String, Object> arguments = new HashMap<>();
-		arguments.put("shopName", this.prepareName(adminShop.getName())); // Not null, can be empty
+		Map<@NonNull String, @NonNull Object> arguments = new HashMap<>();
+		// Not null, can be empty:
+		arguments.put("shopName", Unsafe.assertNonNull(this.prepareName(adminShop.getName())));
 
 		sign.setLine(0, StringUtils.replaceArguments(Messages.adminSignShopLine1, arguments));
 		sign.setLine(1, StringUtils.replaceArguments(Messages.adminSignShopLine2, arguments));
@@ -373,20 +413,22 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 
 		if (this.isSpawningScheduled()) {
-			Log.debug(DebugOptions.regularTickActivities,
-					() -> shopkeeper.getLogPrefix() + "Spawning is scheduled. Skipping sign check.");
+			Log.debug(DebugOptions.regularTickActivities, () -> shopkeeper.getLogPrefix()
+					+ "Spawning is scheduled. Skipping sign check.");
 			return;
 		}
 
 		// Indicate ticking activity for visualization:
 		this.indicateTickActivity();
 
-		// This is only called for shopkeepers in active (i.e. loaded) chunks, and shopkeepers are despawned on chunk
+		// This is only called for shopkeepers in active (i.e. loaded) chunks, and shopkeepers are
+		// despawned on chunk
 		// unload:
-		assert shopkeeper.getChunkCoords().isChunkLoaded();
+		assert Unsafe.assertNonNull(shopkeeper.getChunkCoords()).isChunkLoaded();
 
 		if (!this.isActive()) {
-			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Sign is missing! Attempting respawn.");
+			Log.debug(() -> shopkeeper.getLocatedLogPrefix()
+					+ "Sign is missing! Attempting respawn.");
 			// Cleanup any previously spawned block, and then respawn:
 			this.despawn();
 			boolean success = this.spawn();
@@ -398,7 +440,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public Location getTickVisualizationParticleLocation() {
+	public @Nullable Location getTickVisualizationParticleLocation() {
 		Location location = this.getLocation();
 		if (location == null) return null;
 		if (this.isWallSign()) {
@@ -413,14 +455,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// NAMING
 
 	@Override
-	public void setName(String name) {
-		// Sign blocks don't have a name (the sign contents are language file specific). However, this method is usually
-		// called when the shopkeeper is renamed, which may require an update of the sign contents.
+	public void setName(@Nullable String name) {
+		// Sign blocks don't have a name (the sign contents are language file specific). However,
+		// this method is usually called when the shopkeeper is renamed, which may require an update
+		// of the sign contents.
 		this.updateSign();
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		// Sign blocks don't have a name (the sign contents are language file specific):
 		return null;
 	}
@@ -436,8 +479,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// EDITOR ACTIONS
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
 		if (MC_1_17.isAvailable()) {
 			editorButtons.add(this.getGlowingTextEditorButton());
@@ -475,31 +518,46 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		Sign sign = this.getSign();
 		if (sign == null) return; // Not spawned or no longer a sign
 
-		// Note: The different sign types are different materials. We need to capture the sign state (e.g. sign
-		// contents), because they would otherwise be removed when changing the block's type.
+		// Note: The different sign types are different materials. We need to capture the sign state
+		// (e.g. sign contents), because they would otherwise be removed when changing the block's
+		// type.
 		BlockData blockData = this.createBlockData();
 		sign.setBlockData(blockData); // Keeps sign data (e.g. text) the same
 		sign.update(true, false); // Force: Material has changed, skip physics update.
 	}
 
 	public void cycleSignType(boolean backwards) {
-		this.setSignType(EnumUtils.cycleEnumConstant(SignType.class, this.getSignType(), backwards, SignType.IS_SUPPORTED));
+		this.setSignType(
+				EnumUtils.cycleEnumConstant(
+						SignType.class,
+						this.getSignType(),
+						backwards,
+						SignType.IS_SUPPORTED
+				)
+		);
 	}
 
 	private ItemStack getSignTypeEditorItem() {
-		ItemStack iconItem = new ItemStack(this.getSignType().getSignMaterial());
-		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
+		Material signMaterial = Unsafe.assertNonNull(this.getSignType().getSignMaterial());
+		ItemStack iconItem = new ItemStack(signMaterial);
+		return ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonSignVariant,
+				Messages.buttonSignVariantLore
+		);
 	}
 
 	private Button getSignTypeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getSignTypeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleSignType(backwards);
 				return true;
@@ -533,22 +591,29 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private ItemStack getGlowingTextEditorItem() {
 		ItemStack iconItem;
 		if (this.isGlowingText()) {
-			iconItem = new ItemStack(MC_1_17.GLOW_INK_SAC);
+			Material iconType = Unsafe.assertNonNull(MC_1_17.GLOW_INK_SAC.orElse(Material.INK_SAC));
+			iconItem = new ItemStack(iconType);
 		} else {
 			iconItem = new ItemStack(Material.INK_SAC);
 		}
-		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignGlowingText, Messages.buttonSignGlowingTextLore);
+		return ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonSignGlowingText,
+				Messages.buttonSignGlowingTextLore
+		);
 	}
 
 	private Button getGlowingTextEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getGlowingTextEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleGlowingText(backwards);
 				return true;

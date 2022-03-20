@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIType;
@@ -11,7 +13,7 @@ import com.nisovin.shopkeepers.ui.hiring.HiringUIType;
 import com.nisovin.shopkeepers.ui.trading.TradingUIType;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorUIType;
 
-public class SKDefaultUITypes implements DefaultUITypes {
+public final class SKDefaultUITypes implements DefaultUITypes {
 
 	private final EditorUIType editorUIType = EditorUIType.INSTANCE;
 	private final TradingUIType tradingUIType = TradingUIType.INSTANCE;
@@ -23,8 +25,8 @@ public class SKDefaultUITypes implements DefaultUITypes {
 	}
 
 	@Override
-	public List<? extends AbstractUIType> getAllUITypes() {
-		List<AbstractUIType> defaults = new ArrayList<>();
+	public List<? extends @NonNull AbstractUIType> getAllUITypes() {
+		List<@NonNull AbstractUIType> defaults = new ArrayList<>();
 		defaults.add(editorUIType);
 		defaults.add(tradingUIType);
 		defaults.add(hiringUIType);

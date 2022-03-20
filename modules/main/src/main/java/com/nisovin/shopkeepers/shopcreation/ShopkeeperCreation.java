@@ -10,8 +10,11 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -27,19 +30,20 @@ public class ShopkeeperCreation {
 
 	private static final int MAX_TRACKED_CONTAINERS = 5;
 
-	// This BlockLocation object is reused for lookups. It does not need to be reset after every use.
+	// This BlockLocation object is reused for lookups. It does not need to be reset after every
+	// use.
 	private static final MutableBlockLocation sharedBlockLocation = new MutableBlockLocation();
 
 	private final SKShopkeepersPlugin plugin;
 	private final CreateListener createListener;
 
 	// By player name:
-	private final Map<String, Deque<BlockLocation>> recentlyPlacedContainers = new HashMap<>();
-	private final Map<String, Block> selectedContainer = new HashMap<>();
+	private final Map<@NonNull String, @NonNull Deque<@NonNull BlockLocation>> recentlyPlacedContainers = new HashMap<>();
+	private final Map<@NonNull String, @NonNull Block> selectedContainer = new HashMap<>();
 
 	public ShopkeeperCreation(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
-		this.createListener = new CreateListener(plugin, this);
+		this.createListener = new CreateListener(plugin, Unsafe.initialized(this));
 	}
 
 	public void onEnable() {
@@ -50,12 +54,13 @@ public class ShopkeeperCreation {
 	public void onDisable() {
 		createListener.onDisable();
 		selectedContainer.clear();
-		// Note: recentlyPlacedContainers does not get cleared here to persist across plugin reloads.
+		// Note: recentlyPlacedContainers does not get cleared here to persist across plugin
+		// reloads.
 	}
 
 	public void onPlayerQuit(Player player) {
 		assert player != null;
-		String playerName = player.getName();
+		String playerName = Unsafe.assertNonNull(player.getName());
 		selectedContainer.remove(playerName);
 		recentlyPlacedContainers.remove(playerName);
 	}
@@ -70,8 +75,12 @@ public class ShopkeeperCreation {
 	public void addRecentlyPlacedContainer(Player player, Block container) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
-		String playerName = player.getName();
-		Deque<BlockLocation> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(playerName, key -> new ArrayDeque<>(MAX_TRACKED_CONTAINERS + 1));
+		String playerName = Unsafe.assertNonNull(player.getName());
+		Deque<@NonNull BlockLocation> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(
+				playerName,
+				key -> new ArrayDeque<>(MAX_TRACKED_CONTAINERS + 1)
+		);
+		assert recentlyPlaced != null;
 		if (recentlyPlaced.size() == MAX_TRACKED_CONTAINERS) {
 			recentlyPlaced.removeFirst();
 		}
@@ -81,8 +90,8 @@ public class ShopkeeperCreation {
 	public boolean isRecentlyPlacedContainer(Player player, Block container) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
-		String playerName = player.getName();
-		Deque<BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerName);
+		String playerName = Unsafe.assertNonNull(player.getName());
+		Deque<@NonNull BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerName);
 		if (recentlyPlaced == null) return false;
 		BlockLocation containerLocation = this.getSharedKey(container);
 		return recentlyPlaced.contains(containerLocation);
@@ -90,9 +99,9 @@ public class ShopkeeperCreation {
 
 	// SELECTED CONTAINER
 
-	public void selectContainer(Player player, Block container) {
+	public void selectContainer(Player player, @Nullable Block container) {
 		Validate.notNull(player, "player is null");
-		String playerName = player.getName();
+		String playerName = Unsafe.assertNonNull(player.getName());
 		if (container == null) {
 			selectedContainer.remove(playerName);
 		} else {
@@ -102,9 +111,10 @@ public class ShopkeeperCreation {
 		}
 	}
 
-	public Block getSelectedContainer(Player player) {
+	public @Nullable Block getSelectedContainer(Player player) {
 		Validate.notNull(player, "player is null");
-		return selectedContainer.get(player.getName());
+		String playerName = Unsafe.assertNonNull(player.getName());
+		return selectedContainer.get(playerName);
 	}
 
 	// SHOPKEEPER CREATION
@@ -120,26 +130,32 @@ public class ShopkeeperCreation {
 		}
 
 		// Check for recently placed:
-		if (Settings.requireContainerRecentlyPlaced && !this.isRecentlyPlacedContainer(player, containerBlock)) {
+		if (Settings.requireContainerRecentlyPlaced
+				&& !this.isRecentlyPlacedContainer(player, containerBlock)) {
 			// Container was not recently placed:
 			TextUtils.sendMessage(player, Messages.containerNotPlaced);
 			return false;
 		}
 
-		// Check if the player can access the container:
-		if (!InteractionUtils.checkBlockInteract(player, containerBlock)) { // checks access via dummy interact event
+		// Check if the player can access the container by triggering a dummy interact event:
+		if (!InteractionUtils.checkBlockInteract(player, containerBlock)) {
 			TextUtils.sendMessage(player, Messages.noContainerAccess);
 			return false;
 		}
 		return true;
 	}
 
-	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {
+	public Location determineSpawnLocation(
+			Player player,
+			Block targetBlock,
+			BlockFace targetBlockFace
+	) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(targetBlock, "targetBlock is null");
 		Validate.notNull(targetBlockFace, "targetBlockFace is null");
-		// If the target block is passable (and not a liquid, which can only come up as target block when we try to
-		// place the shopkeeper on top of water or lava), spawn there, otherwise shift according to target block face:
+		// If the target block is passable (and not a liquid, which can only come up as target block
+		// when we try to place the shopkeeper on top of water or lava), spawn there, otherwise
+		// shift according to target block face:
 		Block spawnBlock;
 		if (targetBlock.isPassable() && !targetBlock.isLiquid()) {
 			spawnBlock = targetBlock;
@@ -149,8 +165,8 @@ public class ShopkeeperCreation {
 		Location spawnLocation = LocationUtils.getBlockCenterLocation(spawnBlock);
 		if (targetBlockFace.getModY() == 0 && targetBlockFace != BlockFace.SELF) {
 			// Set the yaw of the spawn location to match the direction of the target block face:
-			// This is for example required for wall sign shopkeepers, but also allows placing living shopkeepers to be
-			// rotated precisely into a specific direction.
+			// This is for example required for wall sign shopkeepers, but also allows placing
+			// living shopkeepers to be rotated precisely into a specific direction.
 			spawnLocation.setYaw(BlockFaceUtils.getYaw(targetBlockFace));
 		} else {
 			// Face towards the player:

@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -24,19 +27,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class MooshroomShop extends BabyableShop<MushroomCow> {
+public class MooshroomShop extends BabyableShop<@NonNull MushroomCow> {
 
-	public static final Property<MushroomCow.Variant> VARIANT = new BasicProperty<MushroomCow.Variant>()
+	public static final Property<MushroomCow.@NonNull Variant> VARIANT = new BasicProperty<MushroomCow.@NonNull Variant>()
 			.dataKeyAccessor("variant", EnumSerializers.lenient(MushroomCow.Variant.class))
 			.defaultValue(MushroomCow.Variant.RED)
 			.build();
 
-	private final PropertyValue<MushroomCow.Variant> variantProperty = new PropertyValue<>(VARIANT)
-			.onValueChanged(this::applyVariant)
+	private final PropertyValue<MushroomCow.@NonNull Variant> variantProperty = new PropertyValue<>(VARIANT)
+			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
-	public MooshroomShop(	LivingShops livingShops, SKLivingShopObjectType<MooshroomShop> livingObjectType,
-							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public MooshroomShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull MooshroomShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -59,8 +66,8 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
@@ -76,7 +83,9 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	}
 
 	public void cycleVariant(boolean backwards) {
-		this.setVariant(EnumUtils.cycleEnumConstant(MushroomCow.Variant.class, this.getVariant(), backwards));
+		this.setVariant(
+				EnumUtils.cycleEnumConstant(MushroomCow.Variant.class, this.getVariant(), backwards)
+		);
 	}
 
 	private void applyVariant() {
@@ -96,19 +105,25 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 			iconItem = new ItemStack(Material.BROWN_MUSHROOM);
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonMooshroomVariant, Messages.buttonMooshroomVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonMooshroomVariant,
+				Messages.buttonMooshroomVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getVariantEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getVariantEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleVariant(backwards);
 				return true;

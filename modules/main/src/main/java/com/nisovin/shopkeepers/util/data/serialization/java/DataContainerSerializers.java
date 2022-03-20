@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.util.data.serialization.java;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
@@ -10,9 +13,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class DataContainerSerializers {
 
-	private static abstract class DataContainerSerializer implements DataSerializer<DataContainer> {
+	private static abstract class DataContainerSerializer implements DataSerializer<@NonNull DataContainer> {
 		@Override
-		public Object serialize(DataContainer value) {
+		public @Nullable Object serialize(DataContainer value) {
 			Validate.notNull(value, "value is null");
 			return value.serialize();
 		}
@@ -21,10 +24,11 @@ public final class DataContainerSerializers {
 	/**
 	 * A {@link DataSerializer} for {@link DataContainer} values.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} uses
-	 * {@link DataContainer#of(Object)} to reconstruct the data container.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} uses {@link DataContainer#of(Object)} to reconstruct the data
+	 * container.
 	 */
-	public static final DataSerializer<DataContainer> DEFAULT = new DataContainerSerializer() {
+	public static final DataSerializer<@NonNull DataContainer> DEFAULT = new DataContainerSerializer() {
 		@Override
 		public DataContainer deserialize(Object data) throws InvalidDataException {
 			Validate.notNull(data, "data is null");
@@ -41,10 +45,11 @@ public final class DataContainerSerializers {
 	/**
 	 * A {@link DataSerializer} for {@link DataContainer} values.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} behaves like
-	 * {@link #DEFAULT}, but {@link DataContainer#isEmpty() empty} data containers are considered invalid.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} behaves like {@link #DEFAULT}, but {@link DataContainer#isEmpty()
+	 * empty} data containers are considered invalid.
 	 */
-	public static final DataSerializer<DataContainer> DEFAULT_NON_EMPTY = new DataContainerSerializer() {
+	public static final DataSerializer<@NonNull DataContainer> DEFAULT_NON_EMPTY = new DataContainerSerializer() {
 		@Override
 		public DataContainer deserialize(Object data) throws InvalidDataException {
 			DataContainer value = DEFAULT.deserialize(data);

@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.config.lib;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * This exception is thrown when a {@link Config} cannot be loaded due to some severe issue.
  */
@@ -13,7 +15,7 @@ public class ConfigLoadException extends Exception {
 	 * @param message
 	 *            the detail message
 	 */
-	public ConfigLoadException(String message) {
+	public ConfigLoadException(@Nullable String message) {
 		super(message);
 	}
 
@@ -25,7 +27,7 @@ public class ConfigLoadException extends Exception {
 	 * @param cause
 	 *            the cause
 	 */
-	public ConfigLoadException(String message, Throwable cause) {
+	public ConfigLoadException(@Nullable String message, @Nullable Throwable cause) {
 		super(message, cause);
 	}
 }

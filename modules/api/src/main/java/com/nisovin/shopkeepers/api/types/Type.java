@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.api.types;
 import java.util.Collection;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents a type of something.
@@ -10,24 +12,25 @@ import org.bukkit.entity.Player;
 public interface Type {
 
 	/**
-	 * Gets the unique identifier for this type.
+	 * Gets the unique identifier of this type.
 	 * 
 	 * @return the unique identifier, not <code>null</code> or empty
 	 */
 	public String getIdentifier();
 
 	/**
-	 * Gets aliases for this type.
+	 * Gets the aliases of this type.
+	 * <p>
+	 * The aliases are for example used by {@link #matches(String)}.
 	 *
-	 * @return the aliases, not <code>null</code>
-	 * @see Type#matches(String)
+	 * @return the aliases, not <code>null</code>, can be empty
 	 */
-	public Collection<String> getAliases();
+	public Collection<? extends @NonNull String> getAliases();
 
 	/**
 	 * Gets the display name of this type.
 	 * 
-	 * @return the display name
+	 * @return the display name, not <code>null</code>
 	 */
 	public default String getDisplayName() {
 		return this.getIdentifier();
@@ -38,33 +41,35 @@ public interface Type {
 	 * 
 	 * @return the permission, or <code>null</code> to indicate that no permission is required
 	 */
-	public String getPermission();
+	public @Nullable String getPermission();
 
 	/**
-	 * Checks if the given player has the required permission to access or use this type in some way.
+	 * Checks if the given player has the required permission to access or use this type in some
+	 * way.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @return <code>true</code> if the player has the required permission
+	 * @see #getPermission()
 	 */
 	public boolean hasPermission(Player player);
 
 	/**
-	 * Checks whether this type is enabled.
+	 * Checks if this type is enabled.
 	 * 
 	 * @return <code>true</code> if enabled
 	 */
 	public boolean isEnabled();
 
 	/**
-	 * Checks if the given (possibly inaccurate) identifier matches to this type.
+	 * Checks if the given identifier matches this type.
 	 * <p>
-	 * Typically this normalizes and compares the given identifier with the identifier of this type, the aliases and the
-	 * display name.
+	 * Typically, this normalizes and compares the given identifier with the identifier of this
+	 * type, its aliases, and its display name.
 	 * 
 	 * @param identifier
-	 *            an (possible inaccurate) identifier
-	 * @return <code>true</code> if the given identifier is considered to represent this type
+	 *            the identifier, not <code>null</code>
+	 * @return <code>true</code> if the given identifier matches this type
 	 */
 	public boolean matches(String identifier);
 }

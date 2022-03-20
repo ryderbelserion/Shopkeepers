@@ -2,7 +2,9 @@ package com.nisovin.shopkeepers.shopkeeper.player.sell;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -39,7 +41,10 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (offer == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"Could not find the offer corresponding to the trading recipe!"
+			);
 			return false;
 		}
 
@@ -48,21 +53,28 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (expectedSoldItemAmount != soldItem.getAmount()) {
 			// Unexpected, because the recipe was created based on this offer.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "The offer does not match the trading recipe!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The offer does not match the trading recipe!"
+			);
 			return false;
 		}
 
-		assert containerInventory != null && newContainerContents != null;
+		@Nullable ItemStack[] newContainerContents = Unsafe.assertNonNull(this.newContainerContents);
 
 		// Remove result items from container contents:
 		if (InventoryUtils.removeItems(newContainerContents, soldItem) != 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStock);
-			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container does not contain the required items."
+			);
 			return false;
 		}
 
 		// Add earnings to container contents:
-		// TODO Maybe add the actual items the trading player gave, instead of creating new currency items?
+		// TODO Maybe add the actual items the trading player gave, instead of creating new currency
+		// items?
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
 		if (amountAfterTaxes > 0) {
 			// TODO Always store the currency in the most compressed form possible, regardless of
@@ -74,14 +86,17 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 				if (highCurrencyAmount > 0) {
 					ItemStack currencyItems = highCurrency.getItemData().createItemStack(highCurrencyAmount);
 					int remainingHighCurrency = InventoryUtils.addItems(newContainerContents, currencyItems);
-					remaining -= ((highCurrencyAmount - remainingHighCurrency) * highCurrency.getValue());
+					remaining -= (highCurrencyAmount - remainingHighCurrency) * highCurrency.getValue();
 				}
 			}
 			if (remaining > 0) {
 				ItemStack currencyItems = Currencies.getBase().getItemData().createItemStack(remaining);
 				if (InventoryUtils.addItems(newContainerContents, currencyItems) != 0) {
 					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
-					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
+					this.debugPreventedTrade(
+							tradingPlayer,
+							"The shop's container cannot hold the traded items."
+					);
 					return false;
 				}
 			}

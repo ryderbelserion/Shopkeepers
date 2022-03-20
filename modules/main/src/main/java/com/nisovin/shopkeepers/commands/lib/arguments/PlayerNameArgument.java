@@ -4,10 +4,14 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -26,19 +30,24 @@ public class PlayerNameArgument extends ObjectNameArgument {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = ObjectNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT;
 
-	// Note: Not providing a default argument filter that only accepts names of online players, because this can be
-	// achieved more efficiently by using PlayerByNameArgument instead.
+	// Note: Not providing a default argument filter that only accepts names of online players,
+	// because this can be achieved more efficiently by using PlayerByNameArgument instead.
 
 	public PlayerNameArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public PlayerNameArgument(String name, ArgumentFilter<String> filter) {
+	public PlayerNameArgument(String name, ArgumentFilter<? super @NonNull String> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	// Joining remaining args doesn't make much sense for player names (and we normalize whitespace in display names).
-	public PlayerNameArgument(String name, ArgumentFilter<String> filter, int minimumCompletionInput) {
+	// Joining remaining args doesn't make much sense for player names (and we normalize whitespace
+	// in display names).
+	public PlayerNameArgument(
+			String name,
+			ArgumentFilter<? super @NonNull String> filter,
+			int minimumCompletionInput
+	) {
 		super(name, false, filter, minimumCompletionInput);
 	}
 
@@ -68,23 +77,31 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 *            <code>true</code> to include display name suggestions
 	 * @return the player name completion suggestions
 	 */
-	public static Iterable<String> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
-																	int minimumCompletionInput, String namePrefix,
-																	Predicate<Player> playerFilter, boolean includeDisplayNames) {
+	public static Iterable<? extends @NonNull String> getDefaultCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String namePrefix,
+			Predicate<? super @NonNull Player> playerFilter,
+			boolean includeDisplayNames
+	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (namePrefix.length() < minimumCompletionInput) {
 			return Collections.emptyList();
 		}
 
-		// Assumption: Name prefix does not contain color codes (users are not expected to specify color codes).
+		// Assumption: Name prefix does not contain color codes (users are not expected to specify
+		// color codes).
 		// Normalizes whitespace and converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(namePrefix);
-		return Bukkit.getOnlinePlayers().stream()
+		// TODO Cast: Workaround for a limitation of CheckerFramework
+		Stream<@NonNull Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
+		Iterable<@NonNull String> suggestions = onlinePlayers
 				.filter(playerFilter)
-				.map(player -> {
+				.<@Nullable String>map(player -> {
 					// Note: Not suggesting both the name and display name for the same player.
 					// Assumption: Player names don't contain whitespace or color codes
-					String name = player.getName();
+					String name = Unsafe.assertNonNull(player.getName());
 					if (StringUtils.normalize(name).startsWith(normalizedNamePrefix)) {
 						return name;
 					} else if (includeDisplayNames) {
@@ -95,12 +112,25 @@ public class PlayerNameArgument extends ObjectNameArgument {
 							return normalizedWithCase;
 						}
 					}
-					return null; // no match
-				}).filter(Objects::nonNull)::iterator;
+					return null; // No match
+				}).filter(Objects::nonNull)
+				.<@NonNull String>map(Unsafe::assertNonNull)::iterator;
+		return suggestions;
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, PredicateUtils.alwaysTrue(), true);
+	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			String idPrefix
+	) {
+		return getDefaultCompletionSuggestions(
+				input,
+				context,
+				minimumCompletionInput,
+				idPrefix,
+				PredicateUtils.alwaysTrue(),
+				true
+		);
 	}
 }

@@ -20,8 +20,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -37,9 +40,11 @@ import com.nisovin.shopkeepers.util.logging.Log;
 class SignShopListener implements Listener {
 
 	// Local copy as array (enables a very high-performance iteration):
-	// Note: This also includes the direction DOWN, even though signs cannot be attached to the bottom of blocks,
-	// because physics updates can also propagate from the block above to a non-attached sign block below.
-	private static final BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides().toArray(new BlockFace[0]);
+	// Note: This also includes the direction DOWN, even though signs cannot be attached to the
+	// bottom of blocks, because physics updates can also propagate from the block above to a
+	// non-attached sign block below.
+	private static final @NonNull BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides()
+			.toArray(new @NonNull BlockFace[0]);
 
 	private final SKShopkeepersPlugin plugin;
 	private final SKSignShopObjectType signShopObjectType;
@@ -53,9 +58,10 @@ class SignShopListener implements Listener {
 
 	void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		// Ensure that our interact event handler is always executed first, even after plugin reloads:
-		// In order to not change the order among the already registered event handlers of our own plugin, we move them
-		// all together to the front of the handler list.
+		// Ensure that our interact event handler is always executed first, even after plugin
+		// reloads:
+		// In order to not change the order among the already registered event handlers of our own
+		// plugin, we move them all together to the front of the handler list.
 		EventUtils.enforceExecuteFirst(PlayerInteractEvent.class, EventPriority.LOWEST, plugin);
 	}
 
@@ -64,7 +70,7 @@ class SignShopListener implements Listener {
 	}
 
 	// Null to clear
-	void cancelNextBlockPhysics(Block block) {
+	void cancelNextBlockPhysics(@Nullable Block block) {
 		if (block == null) {
 			cancelNextBlockPhysics.setWorldName(null);
 		} else {
@@ -72,10 +78,12 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	// See LivingEntityShopListener for the reasoning behind using event priority LOWEST and ignoring cancelled events.
-	// The shop creation item reacts to player interactions as well. If a player interacts with a sign shop while
-	// holding a shop creation item in his hand, we want the sign shop interaction to take precedence. This listener
-	// therefore has to be registered before the shop creation listener.
+	// See LivingEntityShopListener for the reasoning behind using event priority LOWEST and
+	// ignoring cancelled events.
+	// The shop creation item reacts to player interactions as well. If a player interacts with a
+	// sign shop while holding a shop creation item in his hand, we want the sign shop interaction
+	// to take precedence. This listener therefore has to be registered before the shop creation
+	// listener.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// Ignore our own fake interact event:
@@ -84,11 +92,12 @@ class SignShopListener implements Listener {
 		// Check for sign shop interaction:
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-		Block block = event.getClickedBlock();
+		Block block = Unsafe.assertNonNull(event.getClickedBlock());
 		if (!ItemUtils.isSign(block.getType())) return;
 
 		Player player = event.getPlayer();
-		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + TextUtils.getLocationString(block));
+		Log.debug(() -> "Player " + player.getName() + " is interacting (" + event.getHand()
+				+ ") with sign at " + TextUtils.getLocationString(block));
 
 		AbstractShopkeeper shopkeeper = signShopObjectType.getShopkeeper(block);
 		if (shopkeeper == null) {
@@ -104,8 +113,8 @@ class SignShopListener implements Listener {
 		// Update inventory in case the interaction would trigger an item action normally:
 		player.updateInventory();
 
-		// Ignore if already cancelled. This resolves conflicts with other event handlers that also run at LOWEST
-		// priority, such as for example Shopkeepers' shop creation item listener.
+		// Ignore if already cancelled. This resolves conflicts with other event handlers that also
+		// run at LOWEST priority, such as for example Shopkeepers' shop creation item listener.
 		if (!useInteractedBlock) {
 			Log.debug("  Ignoring already cancelled block interaction");
 			return;
@@ -147,7 +156,12 @@ class SignShopListener implements Listener {
 			int adjacentX = blockX + blockFace.getModX();
 			int adjacentY = blockY + blockFace.getModY();
 			int adjacentZ = blockZ + blockFace.getModZ();
-			Shopkeeper shopkeeper = signShopObjectType.getShopkeeper(worldName, adjacentX, adjacentY, adjacentZ);
+			Shopkeeper shopkeeper = signShopObjectType.getShopkeeper(
+					worldName,
+					adjacentX,
+					adjacentY,
+					adjacentZ
+			);
 			if (shopkeeper == null) continue;
 
 			SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
@@ -159,8 +173,8 @@ class SignShopListener implements Listener {
 				// The sign shop is attached to the given block:
 				return true;
 			}
-			// Else continue: There might be other signs shops that are actually attached to the block in the remaining
-			// block directions.
+			// Else continue: There might be other signs shops that are actually attached to the
+			// block in the remaining block directions.
 		}
 		return false;
 	}
@@ -196,7 +210,8 @@ class SignShopListener implements Listener {
 		// Spigot changed the behavior of this event in MC 1.13 to reduce the number of event calls:
 		// Related: https://hub.spigotmc.org/jira/browse/SPIGOT-4256
 		for (BlockFace blockFace : BLOCK_SIDES) {
-			// Note: Avoiding getting the adjacent block slightly improves performance of handling this event.
+			// Note: Avoiding getting the adjacent block slightly improves performance of handling
+			// this event.
 			int adjacentX = blockX + blockFace.getModX();
 			int adjacentY = blockY + blockFace.getModY();
 			int adjacentZ = blockZ + blockFace.getModZ();
@@ -218,15 +233,17 @@ class SignShopListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		this.removeProtectedBlocks(event.blockList());
+		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		this.removeProtectedBlocks(blockList);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		this.removeProtectedBlocks(event.blockList());
+		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		this.removeProtectedBlocks(blockList);
 	}
 
-	private void removeProtectedBlocks(List<Block> blockList) {
+	private void removeProtectedBlocks(List<? extends @NonNull Block> blockList) {
 		assert blockList != null;
 		blockList.removeIf(this::isProtectedBlock);
 	}

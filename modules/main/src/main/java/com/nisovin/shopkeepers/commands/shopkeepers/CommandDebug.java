@@ -1,10 +1,11 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -21,12 +22,18 @@ class CommandDebug extends Command {
 
 	private static final class DebugOptionArgument extends FixedValuesArgument {
 
-		private static Map<String, String> getDebugOptionsMap() {
-			return DebugOptions.getAll().stream().collect(Collectors.toMap(key -> key, key -> key));
+		private static Map<? extends @NonNull String, ? extends @NonNull String> getDebugOptionsMap() {
+			Map<@NonNull String, @NonNull String> debugOptionsMap = new LinkedHashMap<>();
+			DebugOptions.getAll().forEach(debugOption -> {
+				debugOptionsMap.put(debugOption, debugOption);
+			});
+			return debugOptionsMap;
 		}
 
-		private static final Text invalidArgumentMsg = Text.parse("&cUnknown debug option '{argument}'. Available options: "
-				+ String.join(", ", DebugOptions.getAll()));
+		private static final Text invalidArgumentMsg = Text.parse(
+				"&cUnknown debug option '{argument}'. Available options: "
+						+ String.join(", ", DebugOptions.getAll())
+		);
 
 		public DebugOptionArgument(String name) {
 			super(name, getDebugOptionsMap());
@@ -56,12 +63,13 @@ class CommandDebug extends Command {
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
-		String debugOption = context.get(ARGUMENT_DEBUG_OPTION);
+		String debugOption = context.getOrNull(ARGUMENT_DEBUG_OPTION);
 		if (debugOption == null) {
 			// Toggle debug mode:
 			Settings.debug = !Settings.debug;
 			Settings.onSettingsChanged();
-			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Settings.debug ? "enabled" : "disabled"));
+			sender.sendMessage(ChatColor.GREEN + "Debug mode "
+					+ (Settings.debug ? "enabled" : "disabled"));
 		} else {
 			assert DebugOptions.getAll().contains(debugOption); // Validated by the argument
 			// Toggle debug option:
@@ -74,7 +82,8 @@ class CommandDebug extends Command {
 				enabled = true;
 			}
 			Settings.onSettingsChanged();
-			sender.sendMessage(ChatColor.GREEN + "Debug option '" + debugOption + "' " + (enabled ? "enabled" : "disabled"));
+			sender.sendMessage(ChatColor.GREEN + "Debug option '" + debugOption + "' "
+					+ (enabled ? "enabled" : "disabled"));
 		}
 	}
 }

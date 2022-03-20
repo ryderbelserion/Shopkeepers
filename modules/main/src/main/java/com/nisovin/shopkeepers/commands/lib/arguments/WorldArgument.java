@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -14,14 +15,18 @@ import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
-public class WorldArgument extends CommandArgument<World> {
+public class WorldArgument extends CommandArgument<@NonNull World> {
 
 	public WorldArgument(String name) {
 		super(name);
 	}
 
 	@Override
-	public World parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public World parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
@@ -41,7 +46,11 @@ public class WorldArgument extends CommandArgument<World> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		return Collections.emptyList();
 	}
 }

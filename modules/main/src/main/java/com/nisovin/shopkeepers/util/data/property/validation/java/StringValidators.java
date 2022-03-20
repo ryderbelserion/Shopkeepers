@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.data.property.validation.java;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.util.data.property.validation.PropertyValidator;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -9,9 +11,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class StringValidators {
 
 	/**
-	 * A {@link PropertyValidator} that ensures that the validated String is not {@link String#isEmpty() empty}.
+	 * A {@link PropertyValidator} that ensures that the validated String is not
+	 * {@link String#isEmpty() empty}.
 	 */
-	public static final PropertyValidator<String> NON_EMPTY = (property, value) -> {
+	public static final PropertyValidator<@NonNull String> NON_EMPTY = (value) -> {
 		Validate.isTrue(!value.isEmpty(), "String is empty!");
 	};
 

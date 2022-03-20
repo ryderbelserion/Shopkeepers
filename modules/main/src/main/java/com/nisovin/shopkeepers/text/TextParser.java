@@ -1,31 +1,39 @@
 package com.nisovin.shopkeepers.text;
 
 import org.bukkit.ChatColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
+/**
+ * Produces a {@link Text} from a plain String representation.
+ * <p>
+ * The primary goal of the mapping between the chosen String representation and its corresponding
+ * parsed {@link Text} is to not only preserve the visual appearance, but also the structure, i.e.
+ * the internal representation, of the given input text: Ideally, {@link Text#toPlainFormatText()}
+ * of the parsed {@link Text} should be able to reproduce the original input.
+ * <p>
+ * The input String gets split at every color and formatting code, and at every placeholder, and
+ * these segments are chained via {@link TextBuilder#next(Text)}.
+ */
 class TextParser {
 
 	private static final TextParser INSTANCE = new TextParser();
 
 	// Non-public, use Text#parse(String)
-	// Note: Unlike Spigot, this does not take into account clickable URLs. URLs need to be made clickable manually
-	// where required. TODO Include URL parsing?
+	// Note: Unlike Spigot, this does not take into account clickable URLs. URLs need to be made
+	// clickable manually where required. TODO Include URL parsing?
 	static Text parse(String input) {
 		return INSTANCE._parse(input);
 	}
 
 	/////
 
-	/*
-	 * Primary goal: Persist not only the visual appearance but also the structure (internal representation) of the given input
-	 * text. Text#toPlainText should produce the original input Text again if possible.
-	 * 
-	 * The input text gets split at every color and formatting code and every placeholder and chained via TextBuilder#next(Text).
-	 */
-
-	private TextBuilder root;
-	private TextBuilder last;
+	private @Nullable TextBuilder root;
+	private @Nullable TextBuilder last;
 
 	private final StringBuilder stringBuilder = new StringBuilder();
 
@@ -39,8 +47,8 @@ class TextParser {
 	}
 
 	private Text _parse(String input) {
+		Validate.notNull(input, "input is null");
 		// Assert: Already reset.
-		if (input == null) return null;
 		if (input.isEmpty()) return Text.EMPTY;
 
 		final int length = input.length();
@@ -86,8 +94,8 @@ class TextParser {
 		// Append any remaining pending text:
 		this.appendCurrentText();
 
-		assert root != null; // Expecting at least one Text since we checked for empty input
-		Text result = root.build();
+		// We expect there to be at least one Text (root), because we checked for an empty input:
+		Text result = Unsafe.assertNonNull(root).build();
 		// Assert: All Texts in the chain are built.
 
 		this.reset(); // Reset for later reuse
@@ -102,7 +110,7 @@ class TextParser {
 		}
 	}
 
-	private <T extends TextBuilder> T next(T next) {
+	private <T extends @NonNull TextBuilder> T next(T next) {
 		assert next != null;
 		// Append any pending text:
 		this.appendCurrentText();
@@ -112,8 +120,7 @@ class TextParser {
 			root = next;
 		} else {
 			// Link to previous Text:
-			assert last != null;
-			last.next(next);
+			Unsafe.assertNonNull(last).next(next);
 		}
 		last = next;
 		return next;

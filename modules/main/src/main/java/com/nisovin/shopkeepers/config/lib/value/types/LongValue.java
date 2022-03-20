@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
-public class LongValue extends ValueType<Long> {
+public class LongValue extends ValueType<@NonNull Long> {
 
 	public static final LongValue INSTANCE = new LongValue();
 
@@ -13,7 +16,7 @@ public class LongValue extends ValueType<Long> {
 	}
 
 	@Override
-	public Long load(Object configValue) throws ValueLoadException {
+	public @Nullable Long load(@Nullable Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		Long value = ConversionUtils.toLong(configValue);
 		if (value == null) {
@@ -23,7 +26,7 @@ public class LongValue extends ValueType<Long> {
 	}
 
 	@Override
-	public Object save(Long value) {
+	public @Nullable Object save(@Nullable Long value) {
 		return value;
 	}
 

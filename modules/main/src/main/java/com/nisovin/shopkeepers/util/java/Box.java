@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A mutable wrapper around a reference to another object.
  *
@@ -10,7 +12,7 @@ import java.util.Objects;
  */
 public class Box<T> {
 
-	private T value;
+	private @Nullable T value;
 
 	/**
 	 * Creates a new {@link Box} with a value of <code>null</code>.
@@ -24,7 +26,7 @@ public class Box<T> {
 	 * @param value
 	 *            the initial value
 	 */
-	public Box(T value) {
+	public Box(@Nullable T value) {
 		this.value = value;
 	}
 
@@ -33,7 +35,7 @@ public class Box<T> {
 	 * 
 	 * @return the value
 	 */
-	public T getValue() {
+	public @Nullable T getValue() {
 		return value;
 	}
 
@@ -43,7 +45,7 @@ public class Box<T> {
 	 * @param value
 	 *            the new value
 	 */
-	public void setValue(T value) {
+	public void setValue(@Nullable T value) {
 		this.value = value;
 	}
 
@@ -53,7 +55,7 @@ public class Box<T> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof Box)) return false;
 		Box<?> other = (Box<?>) obj;

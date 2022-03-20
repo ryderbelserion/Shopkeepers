@@ -39,7 +39,6 @@ class CommandEdit extends PlayerCommand {
 		Player player = (Player) input.getSender();
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 
 		// Open shop trading window:
 		shopkeeper.openEditorWindow(player);

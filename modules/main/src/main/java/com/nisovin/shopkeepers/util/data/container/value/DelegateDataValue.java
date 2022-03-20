@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.data.container.value;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -21,12 +23,12 @@ public class DelegateDataValue extends AbstractDataValue {
 	}
 
 	@Override
-	public Object getOrDefault(Object defaultValue) {
+	public @Nullable Object getOrDefault(@Nullable Object defaultValue) {
 		return dataValue.getOrDefault(defaultValue);
 	}
 
 	@Override
-	public void set(Object value) {
+	public void set(@Nullable Object value) {
 		dataValue.set(value);
 	}
 

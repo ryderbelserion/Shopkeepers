@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -47,7 +48,7 @@ class CommandSnapshotRemove extends Command {
 		this.setDescription(Messages.commandDescriptionSnapshotRemove);
 
 		// Arguments:
-		CommandArgument<Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
+		CommandArgument<@NonNull Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		);
@@ -62,7 +63,6 @@ class CommandSnapshotRemove extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		AbstractShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 
 		List<? extends ShopkeeperSnapshot> snapshots = shopkeeper.getSnapshots();
 
@@ -83,12 +83,20 @@ class CommandSnapshotRemove extends Command {
 				shopkeeper.removeAllSnapshots();
 				shopkeeper.save();
 
-				Messages.snapshotRemovedAll.setPlaceholderArguments(shopkeeper.getMessageArguments("shop_"));
-				TextUtils.sendMessage(sender, Messages.snapshotRemovedAll, "snapshotsCount", snapshotsCount);
+				Messages.snapshotRemovedAll.setPlaceholderArguments(
+						shopkeeper.getMessageArguments("shop_")
+				);
+				TextUtils.sendMessage(sender, Messages.snapshotRemovedAll,
+						"snapshotsCount", snapshotsCount
+				);
 			});
 
-			Messages.confirmRemoveAllSnapshots.setPlaceholderArguments(shopkeeper.getMessageArguments("shop_"));
-			TextUtils.sendMessage(sender, Messages.confirmRemoveAllSnapshots, "snapshotsCount", snapshotsCount);
+			Messages.confirmRemoveAllSnapshots.setPlaceholderArguments(
+					shopkeeper.getMessageArguments("shop_")
+			);
+			TextUtils.sendMessage(sender, Messages.confirmRemoveAllSnapshots,
+					"snapshotsCount", snapshotsCount
+			);
 			TextUtils.sendMessage(sender, Messages.confirmationRequired);
 			return;
 		}
@@ -119,14 +127,18 @@ class CommandSnapshotRemove extends Command {
 			TextUtils.sendMessage(sender, Messages.snapshotRemoved,
 					"id", snapshotId,
 					"name", snapshot.getName(),
-					"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(snapshot.getTimestamp())
+					"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(
+							snapshot.getTimestamp()
+					)
 			);
 		});
 
 		TextUtils.sendMessage(sender, Messages.confirmRemoveSnapshot,
 				"id", snapshotId,
 				"name", snapshot.getName(),
-				"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(snapshot.getTimestamp())
+				"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(
+						snapshot.getTimestamp()
+				)
 		);
 		TextUtils.sendMessage(sender, Messages.confirmationRequired);
 	}

@@ -2,9 +2,13 @@ package com.nisovin.shopkeepers.util.data.container;
 
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.value.DataContainerValue;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
-import com.nisovin.shopkeepers.util.data.serialization.DataAccessor;
+import com.nisovin.shopkeepers.util.data.serialization.DataLoader;
+import com.nisovin.shopkeepers.util.data.serialization.DataSaver;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.MissingDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -15,7 +19,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public abstract class AbstractDataContainer implements DataContainer {
 
-	private DataContainer view = null; // Lazily setup
+	private @Nullable DataContainer view = null; // Lazily setup
 
 	/**
 	 * Creates a new {@link AbstractDataContainer}.
@@ -37,14 +41,14 @@ public abstract class AbstractDataContainer implements DataContainer {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getOfTypeOrDefault(String key, Class<T> type, T defaultValue) {
+	public <T> @Nullable T getOfTypeOrDefault(String key, Class<T> type, @Nullable T defaultValue) {
 		Validate.notNull(type, "type is null");
 		Object value = this.get(key);
 		return type.isInstance(value) ? (T) value : defaultValue;
 	}
 
 	@Override
-	public String getStringOrDefault(String key, String defaultValue) {
+	public @Nullable String getStringOrDefault(String key, @Nullable String defaultValue) {
 		String value = ConversionUtils.toString(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
@@ -80,24 +84,27 @@ public abstract class AbstractDataContainer implements DataContainer {
 	}
 
 	@Override
-	public void set(String key, Object value) {
+	public void set(String key, @Nullable Object value) {
 		Validate.notEmpty(key, "key is empty");
 		if (value == null) {
 			this.remove(key);
 		} else {
-			// Storing a DataContainer or DataValue instead of its serialized form is a common error:
+			// Storing a DataContainer or DataValue instead of its serialized form is a common
+			// error:
 			Validate.isTrue(!(value instanceof DataContainer), "Cannot insert DataContainer!");
 			Validate.isTrue(!(value instanceof DataValue), "Cannot insert DataValue!");
-			// Note: The contents of this DataContainer may be loaded from a storage format that supports additional
-			// types of values. The validation of values loaded from some storage is not the responsibility of this
-			// DataContainer, but of the clients that read values from this DataContainer. We therefore do not validate
-			// or filter the inserted values here.
+			// Note: The contents of this DataContainer may be loaded from a storage format that
+			// supports additional types of values. The validation of values loaded from some
+			// storage is not the responsibility of this DataContainer, but of the clients that read
+			// values from this DataContainer. We therefore do not validate or filter the inserted
+			// values here.
 			this.internalSet(key, value);
 		}
 	}
 
 	/**
-	 * This method is invoked by {@link #set(String, Object)} after the key and value have been validated.
+	 * This method is invoked by {@link #set(String, Object)} after the key and value have been
+	 * validated.
 	 * 
 	 * @param key
 	 *            the key, not <code>null</code> or empty
@@ -111,39 +118,42 @@ public abstract class AbstractDataContainer implements DataContainer {
 		Validate.notNull(values, "values is null");
 		values.forEach((key, value) -> {
 			String stringKey = ConversionUtils.toString(key);
-			this.set(stringKey, value);
+			Validate.notEmpty(stringKey, "key is empty");
+			this.set(Unsafe.assertNonNull(stringKey), value);
 		});
 	}
 
 	@Override
-	public <T> T get(DataAccessor<T> accessor) throws InvalidDataException {
-		Validate.notNull(accessor, "accessor is null");
-		return accessor.load(this);
+	public <T> T get(DataLoader<? extends T> loader) throws InvalidDataException {
+		Validate.notNull(loader, "loader is null");
+		return loader.load(this);
 	}
 
 	@Override
-	public <T> T getOrNullIfMissing(DataAccessor<T> accessor) throws InvalidDataException {
+	public <T> @Nullable T getOrNullIfMissing(
+			DataLoader<? extends T> loader
+	) throws InvalidDataException {
 		try {
-			return this.get(accessor);
+			return this.get(loader);
 		} catch (MissingDataException e) {
 			return null;
 		}
 	}
 
 	@Override
-	public <T> T getOrNull(DataAccessor<T> accessor) {
-		Validate.notNull(accessor, "accessor is null");
+	public <T> @Nullable T getOrNull(DataLoader<? extends T> loader) {
+		Validate.notNull(loader, "loader is null");
 		try {
-			return this.get(accessor);
+			return this.get(loader);
 		} catch (InvalidDataException e) {
 			return null;
 		}
 	}
 
 	@Override
-	public <T> void set(DataAccessor<T> accessor, T value) {
-		Validate.notNull(accessor, "accessor is null");
-		accessor.save(this, value);
+	public <T> void set(DataSaver<? super T> saver, @Nullable T value) {
+		Validate.notNull(saver, "saver is null");
+		saver.save(this, value);
 	}
 
 	@Override
@@ -151,6 +161,7 @@ public abstract class AbstractDataContainer implements DataContainer {
 		if (view == null) {
 			view = new UnmodifiableDataContainer(this);
 		}
+		assert view != null;
 		return view;
 	}
 }

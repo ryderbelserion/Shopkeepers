@@ -24,15 +24,16 @@ class InventoryMoveItemListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onInventoryMoveItem(InventoryMoveItemEvent event) {
 		assert event.getSource() != null && event.getDestination() != null;
-		if (this.isProtectedInventory(event.getSource()) || this.isProtectedInventory(event.getDestination())) {
+		if (this.isProtectedInventory(event.getSource())
+				|| this.isProtectedInventory(event.getDestination())) {
 			event.setCancelled(true);
 		}
 	}
 
 	private boolean isProtectedInventory(Inventory inventory) {
 		assert inventory != null;
-		// Note: We avoid calling Inventory#getHolder here for performance reasons. For block inventories this creates a
-		// snapshot of the block's BlockState.
+		// Note: We avoid calling Inventory#getHolder here for performance reasons. For block
+		// inventories this creates a snapshot of the block's BlockState.
 		Location inventoryLocation = inventory.getLocation(); // can be null
 		if (inventoryLocation == null) return false;
 		Block block = inventoryLocation.getBlock(); // not null

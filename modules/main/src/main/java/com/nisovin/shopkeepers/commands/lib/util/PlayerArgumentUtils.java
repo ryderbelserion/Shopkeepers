@@ -2,23 +2,22 @@ package com.nisovin.shopkeepers.commands.lib.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class PlayerArgumentUtils {
-
-	private PlayerArgumentUtils() {
-	}
+public final class PlayerArgumentUtils {
 
 	/*
 	 * Assumptions:
@@ -28,10 +27,10 @@ public class PlayerArgumentUtils {
 	 * - Names don't include color codes.
 	 * - Display names may include whitespace, color codes, arbitrary characters and may not be unique.
 	 */
-	public interface PlayerNameMatcher extends ObjectMatcher<Player> {
+	public interface PlayerNameMatcher extends ObjectMatcher<@NonNull Player> {
 
 		@Override
-		public Stream<Player> match(String input);
+		public Stream<@NonNull Player> match(String input);
 
 		/**
 		 * Whether this {@link PlayerNameMatcher} matches display names.
@@ -44,7 +43,7 @@ public class PlayerArgumentUtils {
 
 		public static final PlayerNameMatcher NAME_EXACT = new PlayerNameMatcher() {
 			@Override
-			public Stream<Player> match(String input) {
+			public Stream<@NonNull Player> match(String input) {
 				if (StringUtils.isEmpty(input)) return Stream.empty();
 				// Note: This is case-insensitive.
 				// Assumption: Player names are unique regardless of case.
@@ -94,7 +93,7 @@ public class PlayerArgumentUtils {
 	private static abstract class AbstractPlayerNameMatcher implements PlayerNameMatcher {
 
 		@Override
-		public Stream<Player> match(String input) {
+		public Stream<@NonNull Player> match(String input) {
 			if (StringUtils.isEmpty(input)) return Stream.empty();
 
 			// Check for an exact match first:
@@ -104,14 +103,21 @@ public class PlayerArgumentUtils {
 			}
 
 			String normalizedInput = StringUtils.normalize(input);
-			List<Player> matchingPlayers = new ArrayList<>();
+			List<@NonNull Player> matchingPlayers = new ArrayList<>();
 			boolean[] onlyPerfectMatches = new boolean[] { false };
 			for (Player player : Bukkit.getOnlinePlayers()) {
+				assert player != null;
 				// Check name:
-				String playerName = player.getName();
+				String playerName = Unsafe.assertNonNull(player.getName());
 				String normalizedPlayerName = StringUtils.normalize(playerName);
 
-				boolean matched = this.match(normalizedInput, player, normalizedPlayerName, matchingPlayers, onlyPerfectMatches);
+				boolean matched = this.match(
+						normalizedInput,
+						player,
+						normalizedPlayerName,
+						matchingPlayers,
+						onlyPerfectMatches
+				);
 				if (matched) {
 					if (onlyPerfectMatches[0]) {
 						// We found an exact player name match, return that player:
@@ -124,7 +130,12 @@ public class PlayerArgumentUtils {
 				// Check display name:
 				String displayName = player.getDisplayName();
 				String normalizedDisplayName = StringUtils.normalize(TextUtils.stripColor(displayName));
-				this.match(normalizedInput, player, normalizedDisplayName, matchingPlayers, onlyPerfectMatches);
+				this.match(
+						normalizedInput,
+						player, normalizedDisplayName,
+						matchingPlayers,
+						onlyPerfectMatches
+				);
 			}
 			return matchingPlayers.stream();
 		}
@@ -138,8 +149,13 @@ public class PlayerArgumentUtils {
 			return true;
 		}
 
-		protected boolean match(String normalizedInput, Player player, String normalizedName,
-								List<Player> matchingPlayers, boolean[] onlyPerfectMatches) {
+		protected boolean match(
+				String normalizedInput,
+				Player player,
+				String normalizedName,
+				List<@NonNull Player> matchingPlayers,
+				boolean[] onlyPerfectMatches
+		) {
 			if (this.matches(normalizedInput, normalizedName)) {
 				if (normalizedName.length() == normalizedInput.length()) {
 					// Perfect match of normalized names:
@@ -166,14 +182,28 @@ public class PlayerArgumentUtils {
 	private static final int DEFAULT_AMBIGUOUS_PLAYER_NAME_MAX_ENTRIES = 5;
 
 	// Note: Iterable is only iterated once.
-	// true if there are multiple matches.
-	public static boolean handleAmbiguousPlayerName(CommandSender sender, String name, Iterable<Map.Entry<UUID, String>> matches) {
-		return handleAmbiguousPlayerName(sender, name, matches, DEFAULT_AMBIGUOUS_PLAYER_NAME_MAX_ENTRIES);
+	// Returns true if there are multiple matches.
+	public static boolean handleAmbiguousPlayerName(
+			CommandSender sender,
+			String name,
+			Iterable<? extends @NonNull Entry<? extends @NonNull UUID, ? extends @NonNull String>> matches
+	) {
+		return handleAmbiguousPlayerName(
+				sender,
+				name,
+				matches,
+				DEFAULT_AMBIGUOUS_PLAYER_NAME_MAX_ENTRIES
+		);
 	}
 
 	// Note: Iterable is only iterated once.
-	// true if there are multiple matches.
-	public static boolean handleAmbiguousPlayerName(CommandSender sender, String name, Iterable<Map.Entry<UUID, String>> matches, int maxEntries) {
+	// Returns true if there are multiple matches.
+	public static boolean handleAmbiguousPlayerName(
+			CommandSender sender,
+			String name,
+			Iterable<? extends @NonNull Entry<? extends @NonNull UUID, ? extends @NonNull String>> matches,
+			int maxEntries
+	) {
 		return CommandArgumentUtils.handleAmbiguousInput(sender, name, matches, maxEntries,
 				() -> {
 					TextUtils.sendMessage(sender, Messages.ambiguousPlayerName, "name", name);
@@ -193,5 +223,8 @@ public class PlayerArgumentUtils {
 					TextUtils.sendMessage(sender, Messages.ambiguousPlayerNameMore);
 				}
 		);
+	}
+
+	private PlayerArgumentUtils() {
 	}
 }

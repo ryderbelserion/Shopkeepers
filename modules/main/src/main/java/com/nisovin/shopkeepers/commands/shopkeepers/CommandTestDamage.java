@@ -47,9 +47,18 @@ class CommandTestDamage extends PlayerCommand {
 		this.setHiddenInParentHelp(true);
 
 		// Arguments:
-		this.addArgument(new BoundedDoubleArgument(ARGUMENT_DAMAGE, 0.0D, Double.MAX_VALUE).orDefaultValue(0.0D));
-		this.addArgument(new PositiveIntegerArgument(ARGUMENT_TIMES_PER_TICK).orDefaultValue(1));
-		this.addArgument(new PositiveIntegerArgument(ARGUMENT_DURATION_TICKS).orDefaultValue((int) Ticks.fromSeconds(10)));
+		this.addArgument(
+				new BoundedDoubleArgument(ARGUMENT_DAMAGE, 0.0D, Double.MAX_VALUE)
+						.orDefaultValue(0.0D)
+		);
+		this.addArgument(
+				new PositiveIntegerArgument(ARGUMENT_TIMES_PER_TICK)
+						.orDefaultValue(1)
+		);
+		this.addArgument(
+				new PositiveIntegerArgument(ARGUMENT_DURATION_TICKS)
+						.orDefaultValue((int) Ticks.fromSeconds(10))
+		);
 	}
 
 	@Override
@@ -62,7 +71,10 @@ class CommandTestDamage extends PlayerCommand {
 		int durationTicks = context.get(ARGUMENT_DURATION_TICKS);
 		assert durationTicks >= 1;
 
-		LivingEntity target = (LivingEntity) EntityUtils.getTargetedEntity(player, (entity) -> entity instanceof LivingEntity);
+		LivingEntity target = (LivingEntity) EntityUtils.getTargetedEntity(
+				player,
+				(entity) -> entity instanceof LivingEntity
+		);
 		if (target == null) {
 			player.sendMessage(ChatColor.RED + "No living entity targeted!");
 			return;
@@ -109,8 +121,9 @@ class CommandTestDamage extends PlayerCommand {
 
 				// Periodic progress feedback:
 				if ((tickCounter % 20) == 0) {
-					player.sendMessage(ChatColor.GRAY + "... (" + ChatColor.YELLOW + tickCounter + ChatColor.GRAY + " / "
-							+ ChatColor.YELLOW + durationTicks + ChatColor.GRAY + ")");
+					player.sendMessage(ChatColor.GRAY + "... (" + ChatColor.YELLOW + tickCounter
+							+ ChatColor.GRAY + " / " + ChatColor.YELLOW + durationTicks
+							+ ChatColor.GRAY + ")");
 				}
 			}
 		}.runTaskTimer(plugin, 1L, 1L);

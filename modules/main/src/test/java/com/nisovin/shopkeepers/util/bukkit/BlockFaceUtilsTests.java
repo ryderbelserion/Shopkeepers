@@ -53,9 +53,18 @@ public class BlockFaceUtilsTests {
 		assertEquals(BlockFace.SOUTH, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(-10.0F));
 		assertEquals(BlockFace.SOUTH, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(-370.0F));
 		assertEquals(BlockFace.SOUTH, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(730.0F));
-		assertEquals(BlockFace.SOUTH_SOUTH_WEST, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(22.5F));
-		assertEquals(BlockFace.SOUTH_WEST, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(45.0F));
-		assertEquals(BlockFace.WEST_SOUTH_WEST, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(67.5F));
+		assertEquals(
+				BlockFace.SOUTH_SOUTH_WEST,
+				BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(22.5F)
+		);
+		assertEquals(
+				BlockFace.SOUTH_WEST,
+				BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(45.0F)
+		);
+		assertEquals(
+				BlockFace.WEST_SOUTH_WEST,
+				BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(67.5F)
+		);
 		assertEquals(BlockFace.WEST, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(90.0F));
 		assertEquals(BlockFace.NORTH, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(180.0F));
 		assertEquals(BlockFace.NORTH, BlockFaceDirections.SECONDARY_INTERCARDINAL.fromYaw(-180.0F));

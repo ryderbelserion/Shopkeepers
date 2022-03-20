@@ -4,10 +4,14 @@ import java.util.List;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectType;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
@@ -20,13 +24,18 @@ import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
+public final class SKLivingShopObjectType<T extends @NonNull SKLivingShopObject<?>>
+		extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
 
 	@FunctionalInterface
-	public static interface ShopObjectConstructor<T extends SKLivingShopObject<?>> {
+	public static interface ShopObjectConstructor<T extends @NonNull SKLivingShopObject<?>> {
 
-		public T create(LivingShops livingShops, SKLivingShopObjectType<T> shopObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData);
+		public @NonNull T create(
+				LivingShops livingShops,
+				SKLivingShopObjectType<T> shopObjectType,
+				AbstractShopkeeper shopkeeper,
+				@Nullable ShopCreationData creationData
+		);
 	}
 
 	private static final String PERMISSION_ALL_ENTITY_TYPES = "shopkeeper.entity.*";
@@ -35,9 +44,15 @@ public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> exten
 	protected final EntityType entityType;
 	private final ShopObjectConstructor<T> shopObjectConstructor;
 
-	protected SKLivingShopObjectType(	LivingShops livingShops, EntityType entityType, String identifier,
-										List<String> aliases, String permission, Class<T> shopObjectType,
-										ShopObjectConstructor<T> shopObjectConstructor) {
+	protected SKLivingShopObjectType(
+			LivingShops livingShops,
+			EntityType entityType,
+			String identifier,
+			List<? extends @NonNull String> aliases,
+			String permission,
+			Class<@NonNull T> shopObjectType,
+			ShopObjectConstructor<T> shopObjectConstructor
+	) {
 		super(identifier, aliases, permission, shopObjectType);
 		Validate.isTrue(entityType.isAlive(), "entityType is not alive");
 		Validate.isTrue(entityType.isSpawnable(), "entityType is not spawnable");
@@ -59,13 +74,16 @@ public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> exten
 
 	@Override
 	public boolean hasPermission(Player player) {
-		return PermissionUtils.hasPermission(player, PERMISSION_ALL_ENTITY_TYPES) || super.hasPermission(player);
+		return PermissionUtils.hasPermission(player, PERMISSION_ALL_ENTITY_TYPES)
+				|| super.hasPermission(player);
 	}
 
 	@Override
 	public String getDisplayName() {
 		// TODO Translation support for the entity type name?
-		return StringUtils.replaceArguments(Messages.shopObjectTypeLiving, "type", StringUtils.normalize(entityType.name()));
+		return StringUtils.replaceArguments(Messages.shopObjectTypeLiving,
+				"type", StringUtils.normalize(entityType.name())
+		);
 	}
 
 	@Override
@@ -80,26 +98,39 @@ public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> exten
 	}
 
 	@Override
-	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
+	public boolean validateSpawnLocation(
+			@Nullable Player creator,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
 		if (!super.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
 			return false;
 		}
+		assert spawnLocation != null;
+		Unsafe.assertNonNull(spawnLocation);
 
 		// Check if the world's difficulty would prevent the mob from spawning:
-		if (EntityUtils.isRemovedOnPeacefulDifficulty(entityType)
-				&& spawnLocation.getWorld().getDifficulty() == Difficulty.PEACEFUL) {
-			if (creator != null) {
-				TextUtils.sendMessage(creator, Messages.mobCannotSpawnOnPeacefulDifficulty);
+		if (EntityUtils.isRemovedOnPeacefulDifficulty(entityType)) {
+			World world = Unsafe.assertNonNull(spawnLocation.getWorld());
+			if (world.getDifficulty() == Difficulty.PEACEFUL) {
+				if (creator != null) {
+					TextUtils.sendMessage(creator, Messages.mobCannotSpawnOnPeacefulDifficulty);
+				}
+				return false;
 			}
-			return false;
 		}
 		return true;
 	}
 
 	@Override
-	public final T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public final T createObject(
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		T shopObject = shopObjectConstructor.create(livingShops, this, shopkeeper, creationData);
-		Validate.State.notNull(shopObject, () -> "SKLivingShopObjectType for entity type '" + entityType + "' created null shop object!");
+		Validate.State.notNull(shopObject, () -> "SKLivingShopObjectType for entity type '"
+				+ entityType + "' created null shop object!");
+		assert shopObject != null;
 		return shopObject;
 	}
 }

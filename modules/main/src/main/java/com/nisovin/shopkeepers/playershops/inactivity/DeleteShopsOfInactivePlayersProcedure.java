@@ -11,14 +11,18 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerInactiveEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -30,7 +34,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 	private static class InactivePlayerData {
 
 		private final int lastSeenDaysAgo;
-		private final List<PlayerShopkeeper> shopkeepers = new ArrayList<>();
+		private final List<@NonNull PlayerShopkeeper> shopkeepers = new ArrayList<>();
 
 		InactivePlayerData(int lastSeenDaysAgo) {
 			this.lastSeenDaysAgo = lastSeenDaysAgo;
@@ -40,7 +44,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 			return lastSeenDaysAgo;
 		}
 
-		List<PlayerShopkeeper> getShopkeepers() {
+		List<@NonNull PlayerShopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 	}
@@ -52,20 +56,22 @@ class DeleteShopsOfInactivePlayersProcedure {
 	private boolean started = false;
 	// Retrieved once and then reused for all inactivity checks of this procedure:
 	private final long currentTimeMillis = System.currentTimeMillis();
-	private final Map<User, InactivePlayerData> inactivePlayers = new HashMap<>();
+	private final Map<@NonNull User, @Nullable InactivePlayerData> inactivePlayers = new HashMap<>();
 
 	public DeleteShopsOfInactivePlayersProcedure(SKShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
-		// Local copy, because this setting might change while we use it, and we might access it asynchronously:
+		// Local copy, because this setting might change while we use it, and we might access it
+		// asynchronously:
 		this.playerInactivityDays = Settings.playerShopkeeperInactiveDays;
 	}
 
 	/**
 	 * Starts this procedure.
 	 * <p>
-	 * This is expected to be called right after construction. Each procedure instance can only be run once.
+	 * This is expected to be called right after construction. Each procedure instance can only be
+	 * run once.
 	 */
 	public void start() {
 		Validate.State.isTrue(!started, "Already started!");
@@ -82,12 +88,12 @@ class DeleteShopsOfInactivePlayersProcedure {
 		this.asyncCheckInactivityOfAllShopOwnersAndContinue();
 	}
 
-	// This initially collects all shop owners into the inactivePlayers Map, which is subsequently pruned from shop
-	// owners that are not actually inactive.
+	// This initially collects all shop owners into the inactivePlayers Map, which is subsequently
+	// pruned from shop owners that are not actually inactive.
 	private void collectShopOwners() {
 		shopkeeperRegistry.getAllPlayerShopkeepers().forEach(playerShop -> {
-			// In this first step, we only collect the existing shop owners, and don't store their shopkeepers yet.
-			// Later, we collect the shopkeepers of only the inactive shop owners.
+			// In this first step, we only collect the existing shop owners, and don't store their
+			// shopkeepers yet. Later, we collect the shopkeepers of only the inactive shop owners.
 			inactivePlayers.put(playerShop.getOwnerUser(), null);
 		});
 	}
@@ -97,14 +103,15 @@ class DeleteShopsOfInactivePlayersProcedure {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				// Set up the data for all inactive shop owners, and remove all shop owners that are not inactive:
+				// Set up the data for all inactive shop owners, and remove all shop owners that are
+				// not inactive:
 				setUpInactiveShopOwners();
 
 				// Abort if no inactive players were found:
 				if (inactivePlayers.isEmpty()) return;
 
-				// Abort if the task has been cancelled in the meantime (e.g. if the plugin has been disabled or
-				// reloaded):
+				// Abort if the task has been cancelled in the meantime (e.g. if the plugin has been
+				// disabled or reloaded):
 				if (this.isCancelled()) return;
 
 				continueWithInactiveShopOwners();
@@ -113,11 +120,12 @@ class DeleteShopsOfInactivePlayersProcedure {
 	}
 
 	// This may be called asynchronously.
-	// Sets up the data for all inactive shop owners, and removes all shop owners that are not inactive.
+	// Sets up the data for all inactive shop owners, and removes all shop owners that are not
+	// inactive.
 	private void setUpInactiveShopOwners() {
-		Iterator<Entry<User, InactivePlayerData>> iterator = inactivePlayers.entrySet().iterator();
+		Iterator<@NonNull Entry<@NonNull User, @Nullable InactivePlayerData>> iterator = inactivePlayers.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<User, InactivePlayerData> entry = iterator.next();
+			Entry<@NonNull User, @Nullable InactivePlayerData> entry = iterator.next();
 			User user = entry.getKey();
 			InactivePlayerData data = this.setUpIfInactive(user);
 			if (data == null) {
@@ -127,18 +135,18 @@ class DeleteShopsOfInactivePlayersProcedure {
 				entry.setValue(data);
 			}
 		}
-		assert !inactivePlayers.values().contains(null);
+		assert !CollectionUtils.containsNull(inactivePlayers.values());
 	}
 
 	// This may be called asynchronously.
 	// Returns null if the given user is not inactive.
-	private InactivePlayerData setUpIfInactive(User user) {
+	private @Nullable InactivePlayerData setUpIfInactive(User user) {
 		assert user != null;
 		OfflinePlayer offlinePlayer = user.getOfflinePlayer();
-		// Some servers may delete player data files, either regularly for all players (which breaks this feature), or
-		// for particular players (for example to reset or fix some issue with their data). If this is the case, we
-		// cannot reliably determine when the player was last seen on the server, and therefore do not delete their
-		// shopkeepers.
+		// Some servers may delete player data files, either regularly for all players (which breaks
+		// this feature), or for particular players (for example to reset or fix some issue with
+		// their data). If this is the case, we cannot reliably determine when the player was last
+		// seen on the server, and therefore do not delete their shopkeepers.
 		if (!offlinePlayer.hasPlayedBefore()) return null;
 
 		long lastPlayedMillis = offlinePlayer.getLastPlayed();
@@ -153,7 +161,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 
 	private void continueWithInactiveShopOwners() {
 		assert !inactivePlayers.isEmpty();
-		assert !inactivePlayers.values().contains(null);
+		assert !CollectionUtils.containsNull(inactivePlayers.values());
 		this.collectShopsOfInactivePlayers();
 		this.deleteShopsOfInactivePlayers();
 	}
@@ -167,17 +175,18 @@ class DeleteShopsOfInactivePlayersProcedure {
 				inactivePlayerData.getShopkeepers().add(playerShop);
 			}
 		});
-		// Note: For some inactive shop owners we might no longer find any shopkeepers. Their entries will then not
+		// Note: For some inactive shop owners we might no longer find any shopkeepers. Their
+		// entries will then not
 		// contain any shopkeepers.
 	}
 
 	private void deleteShopsOfInactivePlayers() {
-		inactivePlayers.forEach((user, inactivePlayerData) -> {
-			assert inactivePlayerData != null;
-			List<? extends PlayerShopkeeper> shopkeepers = inactivePlayerData.getShopkeepers();
+		inactivePlayers.forEach((user, nullableInactivePlayerData) -> {
+			InactivePlayerData inactivePlayerData = Unsafe.assertNonNull(nullableInactivePlayerData);
+			List<? extends @NonNull PlayerShopkeeper> shopkeepers = inactivePlayerData.getShopkeepers();
 			if (shopkeepers.isEmpty()) {
-				// We initially found this shop owner and identified them as inactive, but were then subsequently no
-				// longer able to find any shopkeepers that are still owned by them.
+				// We initially found this shop owner and identified them as inactive, but were then
+				// subsequently no longer able to find any shopkeepers that are still owned by them.
 				return;
 			}
 
@@ -200,16 +209,16 @@ class DeleteShopsOfInactivePlayersProcedure {
 			shopkeepers.forEach(playerShop -> {
 				if (!playerShop.isValid()) {
 					// The shopkeeper has already been removed in the meantime.
-					Log.debug(() -> playerShop.getUniqueIdLogPrefix() + "Deletion due to inactivity of owner "
-							+ playerShop.getOwnerString()
-							+ " (last seen " + inactivePlayerData.getLastSeenDaysAgo() + " days ago)"
-							+ " skipped: The shopkeeper has already been removed.");
+					Log.debug(() -> playerShop.getUniqueIdLogPrefix()
+							+ "Deletion due to inactivity of owner " + playerShop.getOwnerString()
+							+ " (last seen " + inactivePlayerData.getLastSeenDaysAgo()
+							+ " days ago)" + " skipped: The shopkeeper has already been removed.");
 					return;
 				}
 
 				Log.info(playerShop.getUniqueIdLogPrefix() + "Deletion due to inactivity of owner "
-						+ playerShop.getOwnerString()
-						+ " (last seen " + inactivePlayerData.getLastSeenDaysAgo() + " days ago).");
+						+ playerShop.getOwnerString() + " (last seen "
+						+ inactivePlayerData.getLastSeenDaysAgo() + " days ago).");
 				playerShop.delete();
 			});
 		});

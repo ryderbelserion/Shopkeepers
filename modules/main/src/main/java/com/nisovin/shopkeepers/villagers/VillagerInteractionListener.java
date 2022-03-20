@@ -14,9 +14,12 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -27,7 +30,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
- * Handles prevention of trading, hiring and editing of regular villagers (including wandering traders).
+ * Handles prevention of trading, hiring and editing of regular villagers (including wandering
+ * traders).
  */
 public class VillagerInteractionListener implements Listener {
 
@@ -60,7 +64,8 @@ public class VillagerInteractionListener implements Listener {
 			return;
 		}
 
-		if ((isVillager && Settings.disableOtherVillagers) || (isWanderingTrader && Settings.disableWanderingTraders)) {
+		if ((isVillager && Settings.disableOtherVillagers)
+				|| (isWanderingTrader && Settings.disableWanderingTraders)) {
 			// Prevent trading with non-shopkeeper villagers:
 			event.setCancelled(true);
 			Log.debug("  trading prevented");
@@ -69,11 +74,12 @@ public class VillagerInteractionListener implements Listener {
 		Player player = event.getPlayer();
 
 		// We only react to main hand events.
-		// However, unlike vanilla Minecraft, Forge clients might send additional off-hand interactions, even if the
-		// previous main-hand interaction was cancelled. This breaks the villager editor, because it immediately closes
-		// the villager editor again and opens the regular villager trading interface instead (see Shopkeepers#728). In
-		// an attempt to resolve this incompatibility, we therefore cancel these off-hand interactions if the player
-		// already has some inventory open currently.
+		// However, unlike vanilla Minecraft, Forge clients might send additional off-hand
+		// interactions, even if the previous main-hand interaction was cancelled. This breaks the
+		// villager editor, because it immediately closes the villager editor again and opens the
+		// regular villager trading interface instead (see Shopkeepers#728). In an attempt to
+		// resolve this incompatibility, we therefore cancel these off-hand interactions if the
+		// player already has some inventory open currently.
 		if (event.getHand() != EquipmentSlot.HAND) {
 			if (InventoryUtils.hasInventoryOpen(player)) {
 				event.setCancelled(true);
@@ -92,7 +98,8 @@ public class VillagerInteractionListener implements Listener {
 		}
 
 		if (overrideTrading) {
-			// The villager interaction resulted in some action that overrides the default trading behavior:
+			// The villager interaction resulted in some action that overrides the default trading
+			// behavior:
 			event.setCancelled(true);
 		}
 	}
@@ -105,7 +112,12 @@ public class VillagerInteractionListener implements Listener {
 			// Open the villager editor:
 			// Silent request (fails if the player is missing the permission):
 			VillagerEditorHandler villagerEditor = new VillagerEditorHandler(villager);
-			if (SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(villagerEditor, player, true)) {
+			boolean uiOpened = SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(
+					villagerEditor,
+					player,
+					true
+			);
+			if (uiOpened) {
 				Log.debug("    ..success (normal trading prevented).");
 				return true;
 			} else {
@@ -123,8 +135,8 @@ public class VillagerInteractionListener implements Listener {
 		}
 		Log.debug("  possible hire ..");
 
-		// Check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
-		// plugin).
+		// Check if the player is allowed to remove (attack) the entity (in case the entity is
+		// protected by another plugin).
 		Log.debug("    checking villager access.");
 		if (!this.checkEntityAccess(player, villager)) {
 			Log.debug("    ..no permission to remove villager.");
@@ -147,7 +159,9 @@ public class VillagerInteractionListener implements Listener {
 		// Check if the player has enough of those hiring items:
 		final int costs = Settings.hireOtherVillagersCosts;
 		if (costs > 0) {
-			ItemStack[] storageContents = playerInventory.getStorageContents();
+			@Nullable ItemStack @NonNull [] storageContents = Unsafe.cast(
+					playerInventory.getStorageContents()
+			);
 			if (!InventoryUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
 				TextUtils.sendMessage(player, Messages.cannotHire);
 				Log.debug("    ..not holding enough hire items.");
@@ -157,7 +171,8 @@ public class VillagerInteractionListener implements Listener {
 			Log.debug("  Villager hiring: The player has the needed amount of hiring items.");
 			int inHandAmount = itemInMainHand.getAmount();
 			int remaining = inHandAmount - costs;
-			Log.debug(() -> "  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
+			Log.debug(() -> "  Villager hiring: in hand=" + inHandAmount + " costs=" + costs
+					+ " remaining=" + remaining);
 			if (remaining > 0) {
 				itemInMainHand.setAmount(remaining);
 			} else { // remaining <= 0
@@ -179,7 +194,8 @@ public class VillagerInteractionListener implements Listener {
 		}
 
 		// Remove the entity:
-		// Note: The leashed trader llamas for the wandering trader will break and the llamas will remain.
+		// Note: The leashed trader llamas for the wandering trader will break and the llamas will
+		// remain.
 		villager.remove();
 
 		// Update client's inventory:
@@ -192,7 +208,10 @@ public class VillagerInteractionListener implements Listener {
 
 	// Returns true if the player can access (remove / attack) this entity.
 	private boolean checkEntityAccess(Player player, Entity entity) {
-		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(player, entity);
+		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(
+				player,
+				entity
+		);
 		plugin.getServer().getPluginManager().callEvent(fakeDamageEvent);
 		return !fakeDamageEvent.isCancelled();
 	}

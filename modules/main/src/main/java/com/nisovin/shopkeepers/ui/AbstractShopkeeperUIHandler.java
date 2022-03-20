@@ -28,7 +28,8 @@ public abstract class AbstractShopkeeperUIHandler extends UIHandler implements S
 	protected void debugNotOpeningUI(Player player, String reason) {
 		Validate.notNull(player, "player is null");
 		Validate.notEmpty(reason, "reason is null or empty");
-		Log.debug(() -> shopkeeper.getLogPrefix() + "Not opening UI '" + this.getUIType().getIdentifier()
-				+ "' for player " + player.getName() + ": " + reason);
+		Log.debug(() -> shopkeeper.getLogPrefix() + "Not opening UI '"
+				+ this.getUIType().getIdentifier() + "' for player " + player.getName() + ": "
+				+ reason);
 	}
 }

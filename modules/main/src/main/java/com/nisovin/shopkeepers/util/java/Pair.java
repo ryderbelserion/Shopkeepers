@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * Immutable pair of values.
  * 
@@ -67,10 +69,10 @@ public class Pair<V1, V2> {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (o == this) return true;
-		if (!(o instanceof Pair<?, ?>)) return false;
-		Pair<?, ?> other = (Pair<?, ?>) o;
+	public boolean equals(@Nullable Object obj) {
+		if (obj == this) return true;
+		if (!(obj instanceof Pair<?, ?>)) return false;
+		Pair<?, ?> other = (Pair<?, ?>) obj;
 		if (!Objects.equals(first, other.getFirst())) return false;
 		if (!Objects.equals(second, other.getSecond())) return false;
 		return true;

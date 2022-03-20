@@ -25,7 +25,8 @@ public class BlockVillagerSpawnListener implements Listener {
 		switch (spawnReason) {
 		case CUSTOM: // Plugins
 		case SPAWNER_EGG:
-			// Not obtainable in vanilla Minecraft, regular item usage of shopkeeper creation item is handled separately.
+			// Not obtainable in vanilla Minecraft. Normal usage of the shopkeeper creation item is
+			// handled separately.
 		case SPAWNER: // Not obtainable in vanilla Minecraft
 		case CURED: // Handled separately
 			return true;
@@ -35,9 +36,13 @@ public class BlockVillagerSpawnListener implements Listener {
 	}
 
 	private boolean isSpawningBlocked(EntityType entityType) {
-		if (Settings.blockVillagerSpawns && entityType == EntityType.VILLAGER) return true;
-		if (Settings.blockWanderingTraderSpawns && (entityType == EntityType.WANDERING_TRADER || entityType == EntityType.TRADER_LLAMA)) return true;
-		return false;
+		if (entityType == EntityType.VILLAGER) {
+			return Settings.blockVillagerSpawns;
+		} else if (entityType == EntityType.WANDERING_TRADER || entityType == EntityType.TRADER_LLAMA) {
+			return Settings.blockWanderingTraderSpawns;
+		} else {
+			return false;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -48,13 +53,15 @@ public class BlockVillagerSpawnListener implements Listener {
 		EntityType entityType = event.getEntityType();
 		// Prevent spawning of villagers, wandering traders and their trader llamas:
 		if (this.isSpawningBlocked(entityType)) {
-			Log.debug(() -> "Preventing mob spawn of " + entityType + " at " + TextUtils.getLocationString(event.getLocation()));
+			Log.debug(() -> "Preventing mob spawn of " + entityType + " at "
+					+ TextUtils.getLocationString(event.getLocation()));
 			event.setCancelled(true);
 		}
 	}
 
 	// LOW priority so that other plugins don't have to process those meant-to-be-removed entities.
-	// TODO Entity loading is deferred from chunk loading in MC 1.17 (https://hub.spigotmc.org/jira/browse/SPIGOT-6547).
+	// TODO Entity loading is deferred from chunk loading in MC 1.17
+	// (https://hub.spigotmc.org/jira/browse/SPIGOT-6547).
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onChunkLoad(ChunkLoadEvent event) {
 		// Remove villagers that got spawned as part of chunk generation:
@@ -62,7 +69,8 @@ public class BlockVillagerSpawnListener implements Listener {
 		for (Entity entity : event.getChunk().getEntities()) {
 			EntityType entityType = entity.getType();
 			if (this.isSpawningBlocked(entityType)) {
-				Log.debug(() -> "Preventing mob spawn (chunk-gen) of " + entityType + " at " + TextUtils.getLocationString(entity.getLocation()));
+				Log.debug(() -> "Preventing mob spawn (chunk-gen) of " + entityType + " at "
+						+ TextUtils.getLocationString(entity.getLocation()));
 				entity.remove();
 			}
 		}

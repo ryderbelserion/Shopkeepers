@@ -9,9 +9,11 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
@@ -33,6 +35,7 @@ import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.ObjectUtils;
 
 class CommandRemoveAll extends Command {
 
@@ -48,7 +51,11 @@ class CommandRemoveAll extends Command {
 	private final ShopkeeperRegistry shopkeeperRegistry;
 	private final Confirmations confirmations;
 
-	CommandRemoveAll(ShopkeepersPlugin plugin, ShopkeeperRegistry shopkeeperRegistry, Confirmations confirmations) {
+	CommandRemoveAll(
+			ShopkeepersPlugin plugin,
+			ShopkeeperRegistry shopkeeperRegistry,
+			Confirmations confirmations
+	) {
 		super("removeAll", Arrays.asList("deleteAll"));
 		this.plugin = plugin;
 		this.shopkeeperRegistry = shopkeeperRegistry;
@@ -61,10 +68,14 @@ class CommandRemoveAll extends Command {
 
 		// Arguments:
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
-				new LiteralArgument(ARGUMENT_ALL_ADMIN_SHOPS, Arrays.asList(ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME))
-						.setDisplayName(ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME),
-				new LiteralArgument(ARGUMENT_ALL_PLAYER_SHOPS, Arrays.asList(ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME))
-						.setDisplayName(ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME),
+				new LiteralArgument(
+						ARGUMENT_ALL_ADMIN_SHOPS,
+						Arrays.asList(ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME)
+				).setDisplayName(ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME),
+				new LiteralArgument(
+						ARGUMENT_ALL_PLAYER_SHOPS,
+						Arrays.asList(ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME)
+				).setDisplayName(ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME),
 				new FirstOfArgument(ARGUMENT_PLAYER, Arrays.asList(
 						// TODO Provide completions for known shop owners?
 						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // Accepts any uuid
@@ -87,17 +98,20 @@ class CommandRemoveAll extends Command {
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
-		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
+		Player senderPlayer = ObjectUtils.castOrNull(sender, Player.class);
 		boolean allPlayers = context.has(ARGUMENT_ALL_PLAYER_SHOPS);
 		boolean allAdmin = context.has(ARGUMENT_ALL_ADMIN_SHOPS);
-		UUID targetPlayerUUID = context.get(ARGUMENT_PLAYER_UUID); // Can be null
-		String targetPlayerName = context.get(ARGUMENT_PLAYER_NAME); // Can be null
+		UUID targetPlayerUUID = context.getOrNull(ARGUMENT_PLAYER_UUID); // Can be null
+		String targetPlayerName = context.getOrNull(ARGUMENT_PLAYER_NAME); // Can be null
 		assert allPlayers ^ allAdmin ^ (targetPlayerUUID != null ^ targetPlayerName != null);
 
 		boolean targetOwnShops = false;
 		if (targetPlayerUUID != null || targetPlayerName != null) {
 			// Check if the target matches the sender player:
-			if (senderPlayer != null && (senderPlayer.getUniqueId().equals(targetPlayerUUID) || senderPlayer.getName().equalsIgnoreCase(targetPlayerName))) {
+			String senderName = Unsafe.assertNonNull(sender.getName());
+			if (senderPlayer != null
+					&& (senderPlayer.getUniqueId().equals(targetPlayerUUID)
+							|| senderName.equalsIgnoreCase(targetPlayerName))) {
 				targetOwnShops = true;
 				// Get missing / exact player information:
 				targetPlayerUUID = senderPlayer.getUniqueId();
@@ -105,8 +119,9 @@ class CommandRemoveAll extends Command {
 			} else if (targetPlayerName != null) {
 				// Check if the target matches an online player:
 				// This check is case-insensitive.
-				// If the name matches an online player, remove that player's shops (regardless of if the name is
-				// ambiguous / if there are shops of other players with matching name).
+				// If the name matches an online player, remove that player's shops (regardless of
+				// if the name is ambiguous / if there are shops of other players with matching
+				// name).
 				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName);
 				if (onlinePlayer != null) {
 					// Get missing / exact player information:
@@ -132,12 +147,13 @@ class CommandRemoveAll extends Command {
 		}
 
 		// Get the affected shops:
-		// Note: Doing this before prompting the command executor for confirmation allows us to detect ambiguous player
-		// names and missing player information (the player name/uuid if only the uuid/name is specified).
-		List<? extends Shopkeeper> affectedShops;
+		// Note: Doing this before prompting the command executor for confirmation allows us to
+		// detect ambiguous player names and missing player information (the player name/uuid if
+		// only the uuid/name is specified).
+		List<? extends @NonNull Shopkeeper> affectedShops;
 		if (allAdmin) {
 			// Search all admin shops:
-			List<Shopkeeper> adminShops = new ArrayList<>();
+			List<@NonNull Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof AdminShopkeeper) {
 					adminShops.add(shopkeeper);
@@ -146,7 +162,7 @@ class CommandRemoveAll extends Command {
 			affectedShops = adminShops;
 		} else if (allPlayers) {
 			// Search all player shops:
-			List<Shopkeeper> playerShops = new ArrayList<>();
+			List<@NonNull Shopkeeper> playerShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					playerShops.add(shopkeeper);
@@ -156,14 +172,26 @@ class CommandRemoveAll extends Command {
 		} else {
 			assert targetPlayerUUID != null ^ targetPlayerName != null;
 			// Search for shops owned by the target player:
-			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperArgumentUtils.getOwnedPlayerShops(targetPlayerUUID, targetPlayerName);
+			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperArgumentUtils.getOwnedPlayerShops(
+					targetPlayerUUID,
+					targetPlayerName
+			);
 			assert ownedPlayerShopsResult != null;
 
-			// If the input name is ambiguous, we print an error and require the player to be specified by uuid:
-			Map<UUID, String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
+			// If the input name is ambiguous, we print an error and require the player to be
+			// specified by uuid:
+			Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
-			if (PlayerArgumentUtils.handleAmbiguousPlayerName(sender, targetPlayerName, matchingShopOwners.entrySet())) {
-				return;
+			if (matchingShopOwners.size() > 1) {
+				assert targetPlayerName != null;
+				boolean ambiguous = PlayerArgumentUtils.handleAmbiguousPlayerName(
+						sender,
+						Unsafe.assertNonNull(targetPlayerName),
+						matchingShopOwners.entrySet()
+				);
+				if (ambiguous) {
+					return;
+				}
 			}
 
 			// Get missing / exact player information:
@@ -179,8 +207,8 @@ class CommandRemoveAll extends Command {
 		String finalTargetPlayerName = targetPlayerName;
 		// This is dangerous: Let the sender first confirm this action.
 		confirmations.awaitConfirmation(sender, () -> {
-			// Note: New shops might have been created in the meantime, but the command only affects the already
-			// determined affected shops.
+			// Note: New shops might have been created in the meantime, but the command only affects
+			// the already determined affected shops.
 			// Remove shops:
 			int invalidShops = 0;
 			int cancelledDeletions = 0;
@@ -194,7 +222,10 @@ class CommandRemoveAll extends Command {
 
 				if (senderPlayer != null) {
 					// Call event:
-					PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, senderPlayer);
+					PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(
+							shopkeeper,
+							senderPlayer
+					);
 					if (deleteEvent.isCancelled()) {
 						cancelledDeletions += 1;
 						continue;
@@ -232,7 +263,10 @@ class CommandRemoveAll extends Command {
 			} else {
 				// Removed all shops of the specified player:
 				TextUtils.sendMessage(sender, Messages.shopsOfPlayerRemoved,
-						"player", TextUtils.getPlayerText(finalTargetPlayerName, finalTargetPlayerUUID),
+						"player", TextUtils.getPlayerText(
+								finalTargetPlayerName,
+								finalTargetPlayerUUID
+						),
 						"shopsCount", actualShopCount
 				);
 			}

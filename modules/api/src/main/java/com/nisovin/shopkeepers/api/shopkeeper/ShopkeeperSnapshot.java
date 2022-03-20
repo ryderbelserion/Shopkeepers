@@ -9,7 +9,8 @@ import com.nisovin.shopkeepers.api.internal.ApiInternals;
 /**
  * A snapshot of a {@link Shopkeeper}'s dynamic state at a certain point in time.
  * <p>
- * {@link Object#equals(Object)} compares snapshots based on their object identity, not based on their data.
+ * {@link Object#equals(Object)} compares snapshots based on their object identity, not based on
+ * their data.
  */
 public interface ShopkeeperSnapshot {
 
@@ -25,13 +26,13 @@ public interface ShopkeeperSnapshot {
 	/**
 	 * Checks if the given {@link ShopkeeperSnapshot} name is valid.
 	 * <p>
-	 * The tested constraints are not fixed and might change or be extended in the future. Currently, this performs at
-	 * least the following checks:
+	 * The tested constraints are not fixed and might change or be extended in the future.
+	 * Currently, this performs at least the following checks:
 	 * <ul>
 	 * <li>The name is not <code>null</code> or empty.
 	 * <li>The name's length does not exceed the {@link #getMaxNameLength() name length limit}.
-	 * <li>The name does not contain the color code character {@link ChatColor#COLOR_CHAR} (character '&amp;' is
-	 * allowed).
+	 * <li>The name does not contain the color code character {@link ChatColor#COLOR_CHAR}
+	 * (character '&amp;' is allowed).
 	 * </ul>
 	 * 
 	 * @param name

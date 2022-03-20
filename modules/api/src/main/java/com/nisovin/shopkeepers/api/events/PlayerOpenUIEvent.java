@@ -9,10 +9,11 @@ import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.ui.UIType;
 
 /**
- * This event is called whenever a player is about to open a user interface of a certain {@link UIType}.
+ * This event is called whenever a player is about to open a user interface of a certain
+ * {@link UIType}.
  * <p>
- * If the event is cancelled, the UI will not open. However, even if the event does not get cancelled, the UI might not
- * open if there are other reasons preventing that.
+ * If the event is cancelled, the UI will not open. However, even if the event does not get
+ * cancelled, the UI might not open if there are other reasons preventing that.
  * <p>
  * Do not attempt to open any UIs for the player during the handling of this event!
  */
@@ -62,12 +63,12 @@ public class PlayerOpenUIEvent extends Event implements Cancellable {
 	/**
 	 * Checks if this UI request is silent.
 	 * <p>
-	 * A silent request is not supposed to produce any output if it fails. For example, the player is not supposed to
-	 * receive a 'You do not have the permission to access this UI'-message if access is denied due to a missing
-	 * permission.
+	 * A silent request is not supposed to produce any output if it fails. For example, the player
+	 * is not supposed to receive a 'You do not have the permission to access this UI'-message if
+	 * access is denied due to a missing permission.
 	 * <p>
-	 * Silent UI requests may for example be used if there is a default fallback behavior that is supposed to be used
-	 * for players which do not have access to a specific type of UI.
+	 * Silent UI requests may for example be used if there is a default fallback behavior that is
+	 * supposed to be used for players which do not have access to a specific type of UI.
 	 * 
 	 * @return <code>true</code> if this is a silent UI request
 	 */

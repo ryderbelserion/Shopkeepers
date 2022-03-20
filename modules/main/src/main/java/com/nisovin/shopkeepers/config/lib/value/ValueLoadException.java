@@ -3,25 +3,35 @@ package com.nisovin.shopkeepers.config.lib.value;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class ValueLoadException extends Exception {
 
 	private static final long serialVersionUID = -3068903999888105245L;
 
-	private final List<String> extraMessages;
+	private final List<? extends @NonNull String> extraMessages;
 
-	public ValueLoadException(String message) {
+	public ValueLoadException(@Nullable String message) {
 		this(message, null, null);
 	}
 
-	public ValueLoadException(String message, Throwable cause) {
+	public ValueLoadException(@Nullable String message, @Nullable Throwable cause) {
 		this(message, null, cause);
 	}
 
-	public ValueLoadException(String message, List<String> extraMessages) {
+	public ValueLoadException(
+			@Nullable String message,
+			@Nullable List<? extends @NonNull String> extraMessages
+	) {
 		this(message, extraMessages, null);
 	}
 
-	public ValueLoadException(String message, List<String> extraMessages, Throwable cause) {
+	public ValueLoadException(
+			@Nullable String message,
+			@Nullable List<? extends @NonNull String> extraMessages,
+			@Nullable Throwable cause
+	) {
 		super(message, cause);
 		this.extraMessages = (extraMessages != null) ? extraMessages : Collections.emptyList();
 	}
@@ -31,7 +41,7 @@ public class ValueLoadException extends Exception {
 	 * 
 	 * @return additional detail messages, not <code>null</code> but can be empty
 	 */
-	public List<String> getExtraMessages() {
+	public List<? extends @NonNull String> getExtraMessages() {
 		return extraMessages;
 	}
 }

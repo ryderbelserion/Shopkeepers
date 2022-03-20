@@ -34,8 +34,8 @@ class CommandSetForHire extends PlayerCommand {
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
-				TargetShopkeeperFilter.PLAYER)
-		);
+				TargetShopkeeperFilter.PLAYER
+		));
 	}
 
 	@Override
@@ -44,7 +44,6 @@ class CommandSetForHire extends PlayerCommand {
 		Player player = (Player) input.getSender();
 
 		PlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
@@ -55,7 +54,8 @@ class CommandSetForHire extends PlayerCommand {
 		}
 
 		// Check that the shop is owned by the executing player:
-		if (!shopkeeper.isOwner(player) && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (!shopkeeper.isOwner(player)
+				&& !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(player, Messages.notOwner);
 			return;
 		} else {

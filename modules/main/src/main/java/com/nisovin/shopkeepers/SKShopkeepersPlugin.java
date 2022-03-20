@@ -1,6 +1,10 @@
 package com.nisovin.shopkeepers;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
@@ -8,11 +12,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
 import com.nisovin.shopkeepers.api.internal.InternalShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.chatinput.ChatInput;
@@ -61,12 +68,26 @@ import com.nisovin.shopkeepers.villagers.RegularVillagers;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepersPlugin {
 
+	private static final Set<? extends @NonNull String> SKIP_PRELOADING_CLASSES = Collections.unmodifiableSet(
+			new HashSet<>(Arrays.asList(
+					// Skip classes that interact with optional dependencies:
+					"com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency$Internal",
+					"com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils$Internal",
+					"com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait",
+					"com.nisovin.shopkeepers.spigot.text.SpigotText$Internal"
+			))
+	);
+
 	private static final int ASYNC_TASKS_TIMEOUT_SECONDS = 10;
 
-	private static SKShopkeepersPlugin plugin;
+	private static @Nullable SKShopkeepersPlugin plugin;
+
+	public static boolean isPluginEnabled() {
+		return (plugin != null);
+	}
 
 	public static SKShopkeepersPlugin getInstance() {
-		return plugin;
+		return Validate.State.notNull(plugin, "Plugin is not enabled!");
 	}
 
 	private final ApiInternals apiInternals = new SKApiInternals();
@@ -77,54 +98,71 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	// Default shop and shop object types:
 	private final SKDefaultShopTypes defaultShopTypes = new SKDefaultShopTypes();
-	private final SKDefaultShopObjectTypes defaultShopObjectTypes = new SKDefaultShopObjectTypes(this);
+	private final SKDefaultShopObjectTypes defaultShopObjectTypes = new SKDefaultShopObjectTypes(
+			Unsafe.initialized(this)
+	);
 
 	// UI registry:
-	private final SKUIRegistry uiRegistry = new SKUIRegistry(this);
+	private final SKUIRegistry uiRegistry = new SKUIRegistry(Unsafe.initialized(this));
 	private final SKDefaultUITypes defaultUITypes = new SKDefaultUITypes();
 
 	// Shopkeeper registry:
-	private final SKShopkeeperRegistry shopkeeperRegistry = new SKShopkeeperRegistry(this);
+	private final SKShopkeeperRegistry shopkeeperRegistry = new SKShopkeeperRegistry(
+			Unsafe.initialized(this)
+	);
 
 	// Shopkeeper storage:
-	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
+	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(
+			Unsafe.initialized(this)
+	);
 
-	private final ItemConversions itemConversions = new ItemConversions(this);
-	private final Commands commands = new Commands(this);
-	private final ChatInput chatInput = new ChatInput(this);
+	private final ItemConversions itemConversions = new ItemConversions(Unsafe.initialized(this));
+	private final Commands commands = new Commands(Unsafe.initialized(this));
+	private final ChatInput chatInput = new ChatInput(Unsafe.initialized(this));
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
-	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
-	private final TradeLoggers tradeLoggers = new TradeLoggers(this);
-	private final TradeNotifications tradeNotifications = new TradeNotifications(this);
-	private final EventDebugger eventDebugger = new EventDebugger(this);
+	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(
+			Unsafe.initialized(this)
+	);
+	private final TradeLoggers tradeLoggers = new TradeLoggers(Unsafe.initialized(this));
+	private final TradeNotifications tradeNotifications = new TradeNotifications(
+			Unsafe.initialized(this)
+	);
+	private final EventDebugger eventDebugger = new EventDebugger(Unsafe.initialized(this));
 
-	private final PlayerShops playerShops = new PlayerShops(this);
+	private final PlayerShops playerShops = new PlayerShops(Unsafe.initialized(this));
 
-	private final ProtectedContainers protectedContainers = new ProtectedContainers(this);
-	private final RemoveShopOnContainerBreak removeShopOnContainerBreak = new RemoveShopOnContainerBreak(this, protectedContainers);
-	private final LivingShops livingShops = new LivingShops(this);
-	private final SignShops signShops = new SignShops(this);
-	private final CitizensShops citizensShops = new CitizensShops(this);
+	private final ProtectedContainers protectedContainers = new ProtectedContainers(
+			Unsafe.initialized(this)
+	);
+	private final RemoveShopOnContainerBreak removeShopOnContainerBreak = new RemoveShopOnContainerBreak(
+			Unsafe.initialized(this),
+			protectedContainers
+	);
+	private final LivingShops livingShops = new LivingShops(Unsafe.initialized(this));
+	private final SignShops signShops = new SignShops(Unsafe.initialized(this));
+	private final CitizensShops citizensShops = new CitizensShops(Unsafe.initialized(this));
 
-	private final RegularVillagers regularVillagers = new RegularVillagers(this);
+	private final RegularVillagers regularVillagers = new RegularVillagers(
+			Unsafe.initialized(this)
+	);
 
-	private final PluginMetrics pluginMetrics = new PluginMetrics(this);
+	private final PluginMetrics pluginMetrics = new PluginMetrics(Unsafe.initialized(this));
 
 	private boolean outdatedServer = false;
 	private boolean incompatibleServer = false;
-	private ConfigLoadException configLoadError = null; // null on success
+	private @Nullable ConfigLoadException configLoadError = null; // Null on success
 
 	private void loadAllPluginClasses() {
 		File pluginJarFile = this.getFile();
 		long startNanos = System.nanoTime();
 		boolean success = ClassUtils.loadAllClassesFromJar(pluginJarFile, className -> {
 			// Skip version dependent classes:
-			if (className.startsWith("com.nisovin.shopkeepers.compat.")) return false;
-			// Skip classes that interact with optional dependencies:
-			if (className.equals("com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency$Internal")) return false;
-			if (className.equals("com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils$Internal")) return false;
-			if (className.equals("com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait")) return false;
-			if (className.equals("com.nisovin.shopkeepers.spigot.text.SpigotText$Internal")) return false;
+			if (className.startsWith("com.nisovin.shopkeepers.compat.")) {
+				return false;
+			}
+			if (SKIP_PRELOADING_CLASSES.contains(className)) {
+				return false;
+			}
 			return true;
 		}, this.getLogger());
 		if (success) {
@@ -172,8 +210,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		plugin = this;
 		InternalShopkeepersAPI.enable(this);
 
-		// Loading all plugin classes up front ensures that we don't run into missing classes (usually during shutdown)
-		// when the plugin jar gets replaced during runtime (e.g. for hot reloads):
+		// Loading all plugin classes up front ensures that we don't run into missing classes
+		// (usually during shutdown) when the plugin jar gets replaced during runtime (e.g. for hot
+		// reloads):
 		this.loadAllPluginClasses();
 
 		// Validate that this server is running a minimum required version:
@@ -198,7 +237,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		Messages.loadLanguageFile();
 
 		// WorldGuard only allows registering flags before it gets enabled.
-		// Note: Changing the config setting has no effect until the next server restart or server reload.
+		// Note: Changing the config setting has no effect until the next server restart or server
+		// reload.
 		if (Settings.registerWorldGuardAllowShopFlag) {
 			WorldGuardDependency.registerAllowShopFlag();
 		}
@@ -220,7 +260,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Validate that this server is running a minimum required version:
 		if (this.outdatedServer) {
-			Log.severe("Outdated server version (" + Bukkit.getVersion() + "): Shopkeepers cannot be enabled. Please update your server!");
+			Log.severe("Outdated server version (" + Bukkit.getVersion()
+					+ "): Shopkeepers cannot be enabled. Please update your server!");
 			this.setEnabled(false); // also calls onDisable
 			return;
 		}
@@ -265,9 +306,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Test server assumptions:
 		if (!ServerAssumptionsTest.run()) {
 			if (Settings.ignoreFailedServerAssumptionTests) {
-				Log.severe("Server incompatibility detected! But we continue to enable the plugin anyway,"
-						+ " because setting 'ignore-failed-server-assumption-tests' is enabled."
-						+ " Do not expect support for problems you encounter while running in this mode!");
+				Log.severe("Server incompatibility detected! But we continue to enable the plugin "
+						+ "anyway, because setting 'ignore-failed-server-assumption-tests' is "
+						+ "enabled. Runnning the plugin in this mode is unsupported!");
 			} else {
 				Log.severe("Server incompatibility detected! Disabling the plugin!");
 				this.setEnabled(false); // Also calls onDisable
@@ -283,13 +324,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 
 		// Call startup event so that other plugins can make their registrations:
-		// TODO This event doesn't make much sense, because dependent plugins are enabled after us, so they were not yet
-		// able to register their event handlers.
-		// An option could be to enable the Shopkeepers plugin 1 tick after all other plugins have been enabled. But
-		// then any performance intensive startup tasks (loading shops, ..) would potentially be interpreted as lag by
-		// the server.
-		// Another option is for these plugins to perform their setup during onLoad (similar to how we register default
-		// shop types, etc., during onLoad).
+		// TODO This event doesn't make much sense, because dependent plugins are enabled after us,
+		// so they were not yet able to register their event handlers.
+		// An option could be to enable the Shopkeepers plugin 1 tick after all other plugins have
+		// been enabled. But then any performance intensive startup tasks (loading shops, ..) would
+		// potentially be interpreted as lag by the server.
+		// Another option is for these plugins to perform their setup during onLoad (similar to how
+		// we register default shop types, etc., during onLoad).
 		Bukkit.getPluginManager().callEvent(new ShopkeepersStartupEvent());
 
 		// Inform UI registry (registers UI event handlers):
@@ -310,8 +351,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		livingShops.onEnable();
 
 		// Enable sign shops:
-		// Note: This has to be enabled before the shop creation listener, so that interactions with sign shops take
-		// precedence over interactions with the shop creation item.
+		// Note: This has to be enabled before the shop creation listener, so that interactions with
+		// sign shops take precedence over interactions with the shop creation item.
 		signShops.onEnable();
 
 		// Enable citizens shops:
@@ -353,7 +394,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		if (!loadingSuccessful) {
 			// Detected an issue during loading.
 			// Disabling the plugin without saving, to prevent loss of shopkeeper data:
-			Log.severe("Detected an issue during the loading of the saved shopkeepers data! Disabling the plugin!");
+			Log.severe("Detected an issue during the loading of the saved shopkeepers data! "
+					+ "Disabling the plugin!");
 			shopkeeperStorage.disableSaving();
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
@@ -384,12 +426,17 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	@Override
 	public void onDisable() {
 		// Wait for async tasks to complete:
-		SchedulerUtils.awaitAsyncTasksCompletion(this, ASYNC_TASKS_TIMEOUT_SECONDS, this.getLogger());
+		SchedulerUtils.awaitAsyncTasksCompletion(
+				this,
+				ASYNC_TASKS_TIMEOUT_SECONDS,
+				this.getLogger()
+		);
 
 		// Inform UI registry about disable:
 		uiRegistry.onDisable();
 
-		// Deactivate (despawn) all shopkeepers (prior to saving shopkeepers data and before unloading all shopkeepers):
+		// Deactivate (despawn) all shopkeepers (prior to saving shopkeepers data and before
+		// unloading all shopkeepers):
 		shopkeeperRegistry.getChunkActivator().deactivateShopkeepersInAllWorlds();
 
 		// Disable living entity shops:
@@ -596,16 +643,21 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	@Override
 	public boolean hasCreatePermission(Player player) {
-		if (player == null) return false;
-		return (shopTypesRegistry.getSelection(player) != null) && (shopObjectTypesRegistry.getSelection(player) != null);
+		Validate.notNull(player, "player is null");
+		assert player != null;
+		return (shopTypesRegistry.getSelection(player) != null)
+				&& (shopObjectTypesRegistry.getSelection(player) != null);
 	}
 
 	@Override
-	public AbstractShopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
+	public @Nullable AbstractShopkeeper handleShopkeeperCreation(
+			ShopCreationData shopCreationData
+	) {
 		Validate.notNull(shopCreationData, "shopCreationData is null");
 		ShopType<?> rawShopType = shopCreationData.getShopType();
 		Validate.isTrue(rawShopType instanceof AbstractShopType,
-				"ShopType of shopCreationData is not of type AbstractShopType, but: " + rawShopType.getClass().getName());
+				"ShopType of shopCreationData is not of type AbstractShopType, but: "
+						+ rawShopType.getClass().getName());
 		AbstractShopType<?> shopType = (AbstractShopType<?>) rawShopType;
 		// Forward to shop type:
 		return shopType.handleShopkeeperCreation(shopCreationData);

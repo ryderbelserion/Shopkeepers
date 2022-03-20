@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -13,17 +15,20 @@ public class ColoredStringValue extends StringValue {
 	}
 
 	@Override
-	public String load(Object configValue) throws ValueLoadException {
-		return TextUtils.colorize(super.load(configValue));
+	public @Nullable String load(@Nullable Object configValue) throws ValueLoadException {
+		String string = super.load(configValue);
+		if (string == null) return null;
+		return TextUtils.colorize(string);
 	}
 
 	@Override
-	public Object save(String value) {
+	public @Nullable Object save(@Nullable String value) {
+		if (value == null) return null;
 		return TextUtils.decolorize(value);
 	}
 
 	@Override
-	public String format(String value) {
+	public String format(@Nullable String value) {
 		if (value == null) return "null";
 		return TextUtils.decolorize(value);
 	}

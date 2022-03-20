@@ -15,8 +15,9 @@ public interface PriceOffer {
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
-	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
+	 * and therefore not copied before it is stored by the price offer. Otherwise, it is first
+	 * copied.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -31,7 +32,8 @@ public interface PriceOffer {
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored
+	 * by the price offer.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty

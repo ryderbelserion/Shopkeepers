@@ -4,7 +4,7 @@ import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class ConfigMigrationHelper {
+public final class ConfigMigrationHelper {
 
 	// Returns true if there was a value set that got removed.
 	public static boolean removeSetting(DataContainer configData, String key) {
@@ -19,14 +19,20 @@ public class ConfigMigrationHelper {
 	}
 
 	// Returns true if there has been a matching value that got replaced.
-	public static boolean migrateValue(DataContainer configData, String key, Object expectedOldValue, Object newValue) {
+	public static boolean migrateValue(
+			DataContainer configData,
+			String key,
+			Object expectedOldValue,
+			Object newValue
+	) {
 		Validate.notNull(configData, "configData is null");
 		Validate.notNull(key, "key is null");
 		Validate.notNull(expectedOldValue, "expectedOldValue is null");
 		if (configData.contains(key)) {
 			Object oldValue = configData.get(key);
 			if (expectedOldValue.equals(oldValue)) {
-				Log.info("  Migrating setting '" + key + "' from value '" + oldValue + "' to new value '" + newValue + "'.");
+				Log.info("  Migrating setting '" + key + "' from value '" + oldValue
+						+ "' to new value '" + newValue + "'.");
 				configData.set(key, newValue);
 				return true;
 			}
@@ -41,7 +47,8 @@ public class ConfigMigrationHelper {
 		Validate.notNull(newKey, "newKey is null");
 		if (configData.contains(oldKey) && !configData.contains(newKey)) {
 			Object oldValue = configData.get(oldKey);
-			Log.info("  Migrating setting '" + oldKey + "' to '" + newKey + "'. Value: " + oldValue);
+			Log.info("  Migrating setting '" + oldKey + "' to '" + newKey
+					+ "'. Value: " + oldValue);
 			configData.set(newKey, oldValue);
 			configData.remove(oldKey);
 			return true;

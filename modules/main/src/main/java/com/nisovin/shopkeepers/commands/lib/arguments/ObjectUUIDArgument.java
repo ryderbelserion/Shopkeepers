@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.UUID;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -10,10 +12,10 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
  * Base class for arguments that accept a UUID as identifier for some type of objects.
  * <p>
  * By default this argument accepts any UUID. But unlike {@link UUIDArgument} this class uses
- * {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} to provide completions for partial
- * inputs.
+ * {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} to provide
+ * completions for partial inputs.
  */
-public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
+public abstract class ObjectUUIDArgument extends ObjectIdArgument<@NonNull UUID> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 3;
 
@@ -21,12 +23,21 @@ public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter) {
+	public ObjectUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimumCompletionInput) {
-		super(name, new UUIDArgument(name + ":uuid"), filter, minimumCompletionInput);
+	public ObjectUUIDArgument(
+			String name,
+			ArgumentFilter<? super @NonNull UUID> filter,
+			int minimumCompletionInput
+	) {
+		super(
+				name,
+				new UUIDArgument(name + ":uuid"),
+				filter,
+				minimumCompletionInput
+		);
 	}
 
 	@Override

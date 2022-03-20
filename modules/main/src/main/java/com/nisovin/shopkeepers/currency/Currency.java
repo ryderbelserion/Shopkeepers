@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.currency;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -19,7 +21,8 @@ public final class Currency {
 	 * Creates a new {@link Currency}.
 	 * 
 	 * @param id
-	 *            the unique id, not <code>null</code> or empty, gets {@link StringUtils#normalize(String) normalized}
+	 *            the unique id, not <code>null</code> or empty, gets
+	 *            {@link StringUtils#normalize(String) normalized}
 	 * @param displayName
 	 *            a display name that is used in messages, not <code>null</code> or empty
 	 * @param itemData
@@ -28,13 +31,13 @@ public final class Currency {
 	 *            the value, has to be positive
 	 */
 	public Currency(String id, String displayName, ItemData itemData, int value) {
-		id = StringUtils.normalize(id);
 		Validate.notEmpty(id, "id is null or empty");
 		Validate.notEmpty(displayName, "displayName is null or empty");
 		Validate.notNull(itemData, "itemData is null");
 		Validate.isTrue(!ItemUtils.isEmpty(itemData.asUnmodifiableItemStack()), "itemData is empty");
 		Validate.isTrue(value > 0, "value has to be positive");
-		this.id = id;
+		this.id = StringUtils.normalize(id);
+		Validate.notEmpty(this.id, "id is blank");
 		this.displayName = displayName;
 		this.itemData = itemData;
 		this.value = value;
@@ -68,7 +71,8 @@ public final class Currency {
 	}
 
 	/**
-	 * Gets the value of a single item of this currency measured in some base currency with value <code>1</code>.
+	 * Gets the value of a single item of this currency measured in some base currency with value
+	 * <code>1</code>.
 	 * 
 	 * @return the value, is positive
 	 */
@@ -76,8 +80,8 @@ public final class Currency {
 		return value;
 	}
 
-	// TODO Make this configurable? E.g. allow forcing a lower than normal stack size that affects how the currency
-	// items are switched between inside the editor.
+	// TODO Make this configurable? E.g. allow forcing a lower than normal stack size that affects
+	// how the currency items are switched between inside the editor.
 	/**
 	 * Gets the maximum stack size of this currency item.
 	 * 
@@ -99,7 +103,7 @@ public final class Currency {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("CurrencyItem [id=");
+		builder.append("Currency [id=");
 		builder.append(id);
 		builder.append(", itemData=");
 		builder.append(itemData);
@@ -118,7 +122,7 @@ public final class Currency {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof Currency)) return false;
 		Currency other = (Currency) obj;

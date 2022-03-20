@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.util.data.serialization.java;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -11,9 +14,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class EnumSerializers {
 
-	public static abstract class EnumSerializer<E extends Enum<E>> implements DataSerializer<E> {
+	public static abstract class EnumSerializer<E extends @NonNull Enum<E>>
+			implements DataSerializer<@NonNull E> {
 
-		protected final Class<E> enumType;
+		protected final Class<@NonNull E> enumType;
 
 		/**
 		 * Creates a new {@link EnumSerializers}.
@@ -21,7 +25,7 @@ public final class EnumSerializers {
 		 * @param enumType
 		 *            the enum class, not <code>null</code>
 		 */
-		public EnumSerializer(Class<E> enumType) {
+		public EnumSerializer(Class<@NonNull E> enumType) {
 			Validate.notNull(enumType, "enumType is null");
 			this.enumType = enumType;
 		}
@@ -32,11 +36,12 @@ public final class EnumSerializers {
 
 		protected InvalidDataException unknownEnumValueError(String valueName) {
 			assert valueName != null;
-			return new InvalidDataException("Unknown " + enumType.getSimpleName() + ": " + valueName);
+			return new InvalidDataException("Unknown " + enumType.getSimpleName() + ": "
+					+ valueName);
 		}
 
 		@Override
-		public Object serialize(E value) {
+		public @Nullable Object serialize(E value) {
 			Validate.notNull(value, "value is null");
 			return value.name();
 		}
@@ -45,8 +50,9 @@ public final class EnumSerializers {
 	/**
 	 * Gets a {@link DataSerializer} for values of the specified enum.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} uses
-	 * {@link Enum#valueOf(Class, String)} to find an exact match for a given serialized enum value name.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} uses {@link Enum#valueOf(Class, String)} to find an exact match for a
+	 * given serialized enum value name.
 	 * 
 	 * @param <E>
 	 *            the enum type
@@ -54,12 +60,14 @@ public final class EnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends Enum<E>> DataSerializer<E> strict(Class<E> enumType) {
-		return new EnumSerializer<E>(enumType) {
+	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> strict(
+			Class<@NonNull E> enumType
+	) {
+		return new EnumSerializer<@NonNull E>(enumType) {
 			@Override
-			public E deserialize(Object data) throws InvalidDataException {
+			public @NonNull E deserialize(Object data) throws InvalidDataException {
 				String valueName = this.deserializeEnumValueName(data);
-				E value = EnumUtils.valueOf(enumType, valueName);
+				@Nullable E value = EnumUtils.valueOf(enumType, valueName);
 				if (value == null) {
 					throw this.unknownEnumValueError(valueName);
 				} else {
@@ -72,10 +80,11 @@ public final class EnumSerializers {
 	/**
 	 * Gets a {@link DataSerializer} for values of the specified enum.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} first tries to
-	 * find an enum value whose name perfectly matches the given serialized enum value name, and otherwise tries to find
-	 * a matching enum value by {@link EnumUtils#normalizeEnumName(String) formatting} the given serialized enum value
-	 * name so that it matches the usual enum formatting.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} first tries to find an enum value whose name perfectly matches the
+	 * given serialized enum value name, and otherwise tries to find a matching enum value by
+	 * {@link EnumUtils#normalizeEnumName(String) formatting} the given serialized enum value name
+	 * so that it matches the usual enum formatting.
 	 * 
 	 * @param <E>
 	 *            the enum type
@@ -83,12 +92,14 @@ public final class EnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends Enum<E>> DataSerializer<E> lenient(Class<E> enumType) {
-		return new EnumSerializer<E>(enumType) {
+	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> lenient(
+			Class<@NonNull E> enumType
+	) {
+		return new EnumSerializer<@NonNull E>(enumType) {
 			@Override
-			public E deserialize(Object data) throws InvalidDataException {
+			public @NonNull E deserialize(Object data) throws InvalidDataException {
 				String valueName = this.deserializeEnumValueName(data);
-				E value = ConversionUtils.parseEnum(enumType, valueName);
+				@Nullable E value = ConversionUtils.parseEnum(enumType, valueName);
 				if (value == null) {
 					throw this.unknownEnumValueError(valueName);
 				} else {

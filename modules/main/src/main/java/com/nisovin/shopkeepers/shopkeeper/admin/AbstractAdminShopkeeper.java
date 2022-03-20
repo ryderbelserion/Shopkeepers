@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.admin;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -22,7 +23,8 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper implements AdminShopkeeper {
+public abstract class AbstractAdminShopkeeper
+		extends AbstractShopkeeper implements AdminShopkeeper {
 
 	public static class AdminShopTradingHandler extends TradingHandler {
 
@@ -43,7 +45,8 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 			String tradePermission = this.getShopkeeper().getTradePermission();
 			if (tradePermission != null && !PermissionUtils.hasPermission(player, tradePermission)) {
 				if (!silent) {
-					this.debugNotOpeningUI(player, "Player is missing the custom trade permission '" + tradePermission + "'.");
+					this.debugNotOpeningUI(player, "Player is missing the custom trade permission '"
+							+ tradePermission + "'.");
 					TextUtils.sendMessage(player, Messages.missingCustomTradePerm);
 				}
 				return false;
@@ -53,7 +56,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	// Null if no additional trading permission is required. Not empty.
-	private String tradePermission = null;
+	private @Nullable String tradePermission = null;
 
 	/**
 	 * Creates a new and not yet initialized {@link AbstractAdminShopkeeper}.
@@ -67,7 +70,8 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	 * Expects an {@link AdminShopCreationData}.
 	 */
 	@Override
-	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected void loadFromCreationData(int id, ShopCreationData shopCreationData)
+			throws ShopkeeperCreateException {
 		super.loadFromCreationData(id, shopCreationData);
 	}
 
@@ -93,7 +97,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 
 	// TRADE PERMISSION
 
-	public static final Property<String> TRADE_PERMISSION = new BasicProperty<String>()
+	public static final Property<@Nullable String> TRADE_PERMISSION = new BasicProperty<@Nullable String>()
 			.dataAccessor(new DataKeyAccessor<>("tradePerm", StringSerializers.SCALAR)
 					.emptyDataPredicate(EmptyDataPredicates.EMPTY_STRING)
 			)
@@ -112,17 +116,17 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	@Override
-	public String getTradePermission() {
+	public @Nullable String getTradePermission() {
 		return tradePermission;
 	}
 
 	@Override
-	public void setTradePermission(String tradePermission) {
+	public void setTradePermission(@Nullable String tradePermission) {
 		this._setTradePermission(tradePermission);
 		this.markDirty();
 	}
 
-	private void _setTradePermission(String tradePermission) {
+	private void _setTradePermission(@Nullable String tradePermission) {
 		this.tradePermission = StringUtils.getNotEmpty(tradePermission);
 	}
 }

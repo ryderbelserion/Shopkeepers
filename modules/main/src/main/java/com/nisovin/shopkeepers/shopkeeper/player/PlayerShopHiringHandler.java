@@ -6,9 +6,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHireEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -58,6 +62,19 @@ public class PlayerShopHiringHandler extends HiringHandler {
 		return true;
 	}
 
+	private boolean canPlayerHireShopType(Player player, Shopkeeper shopkeeper) {
+		if (!Settings.hireRequireCreationPermission) return true;
+		if (!shopkeeper.getType().hasPermission(player)) return false;
+		if (!shopkeeper.getShopObject().getType().hasPermission(player)) return false;
+		return true;
+	}
+
+	private int getOwnedShopsCount(Player player) {
+		assert player != null;
+		ShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
+		return shopkeeperRegistry.getPlayerShopkeepersByOwner(player.getUniqueId()).size();
+	}
+
 	@Override
 	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
 		super.onInventoryClickEarly(uiSession, event);
@@ -74,8 +91,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			// Actually: This feature was originally meant for admins to set up pre-existing shops.
 			// Handle hiring:
 			// Check if the player can hire (create) this type of shopkeeper:
-			if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
-					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
+			if (!this.canPlayerHireShopType(player, shopkeeper)) {
 				// Missing permission to hire this type of shopkeeper:
 				TextUtils.sendMessage(player, Messages.cannotHireShopType);
 				uiSession.abortDelayed();
@@ -85,15 +101,17 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			UnmodifiableItemStack hireCost = shopkeeper.getHireCost();
 			if (hireCost == null) {
 				// The shopkeeper is no longer for hire.
-				// TODO Maybe instead ensure that we always close all hiring UIs when the hiring item changes.
+				// TODO Maybe instead ensure that we always close all hiring UIs when the hiring
+				// item changes.
 				// TODO Send a feedback message to the player
 				uiSession.abortDelayed();
 				return;
 			}
 
-			// Check if the player can afford to hire the shopkeeper, and calculate the resulting player inventory:
+			// Check if the player can afford to hire the shopkeeper, and calculate the resulting
+			// player inventory:
 			PlayerInventory playerInventory = player.getInventory();
-			ItemStack[] newPlayerInventoryContents = playerInventory.getContents();
+			@Nullable ItemStack[] newPlayerInventoryContents = Unsafe.castNonNull(playerInventory.getContents());
 			if (InventoryUtils.removeItems(newPlayerInventoryContents, hireCost) != 0) {
 				// The player cannot afford to hire the shopkeeper:
 				TextUtils.sendMessage(player, Messages.cannotHire);
@@ -104,7 +122,12 @@ public class PlayerShopHiringHandler extends HiringHandler {
 
 			// Call event:
 			int maxShopsLimit = PlayerShopsLimit.getMaxShopsLimit(player);
-			PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(shopkeeper, player, newPlayerInventoryContents, maxShopsLimit);
+			PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(
+					shopkeeper,
+					player,
+					newPlayerInventoryContents,
+					maxShopsLimit
+			);
 			Bukkit.getPluginManager().callEvent(hireEvent);
 			if (hireEvent.isCancelled()) {
 				Log.debug("PlayerShopkeeperHireEvent was cancelled!");
@@ -116,8 +139,8 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			// Check max shops limit:
 			maxShopsLimit = hireEvent.getMaxShopsLimit();
 			if (maxShopsLimit != Integer.MAX_VALUE) {
-				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
-				if (count >= maxShopsLimit) {
+				int ownedShopsCount = this.getOwnedShopsCount(player);
+				if (ownedShopsCount >= maxShopsLimit) {
 					TextUtils.sendMessage(player, Messages.tooManyShops);
 					uiSession.abortDelayed();
 					return;
@@ -125,7 +148,8 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			// Hire the shopkeeper:
-			InventoryUtils.setContents(playerInventory, newPlayerInventoryContents); // Apply player inventory changes
+			// Apply player inventory changes:
+			InventoryUtils.setContents(playerInventory, newPlayerInventoryContents);
 			shopkeeper.setForHire(null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();

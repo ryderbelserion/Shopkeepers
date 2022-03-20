@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.internals;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
@@ -24,7 +25,9 @@ public class SKApiInternals implements ApiInternals {
 	// FACTORIES
 
 	@Override
-	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack) {
+	public @Nullable UnmodifiableItemStack createUnmodifiableItemStack(
+			@Nullable ItemStack itemStack
+	) {
 		return SKUnmodifiableItemStack.of(itemStack);
 	}
 
@@ -39,12 +42,20 @@ public class SKApiInternals implements ApiInternals {
 	}
 
 	@Override
-	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public TradeOffer createTradeOffer(
+			ItemStack resultItem,
+			ItemStack item1,
+			@Nullable ItemStack item2
+	) {
 		return new SKTradeOffer(resultItem, item1, item2);
 	}
 
 	@Override
-	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+	public TradeOffer createTradeOffer(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	) {
 		return new SKTradeOffer(resultItem, item1, item2);
 	}
 

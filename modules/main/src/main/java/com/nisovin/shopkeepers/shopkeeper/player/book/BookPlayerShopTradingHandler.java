@@ -6,7 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -16,6 +18,7 @@ import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.ui.trading.Trade;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -23,7 +26,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-	private static final Predicate<ItemStack> WRITABLE_BOOK_MATCHER = ItemUtils.itemsOfType(Material.WRITABLE_BOOK);
+	private static final Predicate<@ReadOnly @Nullable ItemStack> WRITABLE_BOOK_MATCHER = ItemUtils.itemsOfType(Material.WRITABLE_BOOK);
 
 	protected BookPlayerShopTradingHandler(SKBookPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
@@ -46,7 +49,10 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (bookMeta == null || !BookItems.isCopy(bookMeta)) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "The traded item is no valid book copy!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The traded item is no valid book copy!"
+			);
 			return false;
 		}
 
@@ -54,25 +60,35 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (bookTitle == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "Could not determine the book title of the traded item!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"Could not determine the book title of the traded item!"
+			);
 			return false;
 		}
 
 		// Get the offer for this type of item:
 		BookOffer offer = shopkeeper.getOffer(bookTitle);
 		if (offer == null) {
-			// Unexpected, but this might happen if the trades got modified while the player was trading:
+			// Unexpected, but this might happen if the trades got modified while the player was
+			// trading:
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"Could not find the offer corresponding to the trading recipe!"
+			);
 			return false;
 		}
 
-		assert containerInventory != null && newContainerContents != null;
+		@Nullable ItemStack[] newContainerContents = Unsafe.assertNonNull(this.newContainerContents);
 
 		// Remove a blank book from the container contents:
 		if (InventoryUtils.removeItems(newContainerContents, WRITABLE_BOOK_MATCHER, 1) != 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientWritableBooks);
-			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain any writable (book-and-quill) items.");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container does not contain any writable (book-and-quill) items."
+			);
 			return false;
 		}
 
@@ -93,7 +109,10 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 				ItemStack currencyItems = Currencies.getBase().getItemData().createItemStack(remaining);
 				if (InventoryUtils.addItems(newContainerContents, currencyItems) != 0) {
 					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
-					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
+					this.debugPreventedTrade(
+							tradingPlayer,
+							"The shop's container cannot hold the traded items."
+					);
 					return false;
 				}
 			}

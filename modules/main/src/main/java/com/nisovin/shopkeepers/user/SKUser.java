@@ -6,19 +6,34 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.util.java.LRUCache;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class SKUser implements User {
 
-	private static final Map<UUID, User> cache = new LRUCache<>(100);
+	/**
+	 * A {@link User} with nil UUID and undefined name.
+	 * <p>
+	 * The name of this user is not guaranteed to remain constant across plugin versions, so do not
+	 * depend on it always matching its current value.
+	 * <p>
+	 * This can for example be used as an alternative non-<code>null</code> representation of an
+	 * unset, unknown, or missing User.
+	 */
+	public static final User EMPTY = of(new UUID(0L, 0L), "[unset]");
+
+	private static final Map<@NonNull UUID, @NonNull User> cache = new LRUCache<>(100);
 
 	/**
 	 * Gets a {@link User} with the specified unique id and last known name.
 	 * <p>
-	 * This method may cache and reuse the returned {@link User} object for future calls of this method.
+	 * This method may cache and reuse the returned {@link User} object for future calls of this
+	 * method.
 	 * 
 	 * @param uniqueId
 	 *            the unique id, not <code>null</code>
@@ -27,7 +42,7 @@ public final class SKUser implements User {
 	 * @return the user, not <code>null</code>
 	 */
 	public static User of(UUID uniqueId, String lastKnownName) {
-		return cache.compute(uniqueId, (uuid, oldUser) -> {
+		User user = cache.compute(uniqueId, (uuid, oldUser) -> {
 			if (oldUser != null && oldUser.getLastKnownName().equals(lastKnownName)) {
 				assert oldUser.getUniqueId().equals(uniqueId);
 				return oldUser;
@@ -35,6 +50,8 @@ public final class SKUser implements User {
 				return new SKUser(uniqueId, lastKnownName);
 			}
 		});
+		assert user != null;
+		return user;
 	}
 
 	/////
@@ -62,7 +79,9 @@ public final class SKUser implements User {
 	@Override
 	public String getName() {
 		Player player = this.getPlayer();
-		if (player != null) return player.getName();
+		if (player != null) {
+			return Unsafe.assertNonNull(player.getName());
+		}
 		return lastKnownName;
 	}
 
@@ -79,7 +98,7 @@ public final class SKUser implements User {
 	}
 
 	@Override
-	public Player getPlayer() {
+	public @Nullable Player getPlayer() {
 		return Bukkit.getPlayer(uniqueId);
 	}
 
@@ -109,7 +128,7 @@ public final class SKUser implements User {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof User)) return false;
 		User other = (User) obj;

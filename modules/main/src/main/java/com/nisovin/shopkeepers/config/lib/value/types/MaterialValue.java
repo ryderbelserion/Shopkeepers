@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
 import org.bukkit.Material;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
@@ -8,7 +9,7 @@ import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class MaterialValue extends MinecraftEnumValue<Material> {
+public class MaterialValue extends MinecraftEnumValue<@NonNull Material> {
 
 	public static final MaterialValue INSTANCE = new MaterialValue();
 
@@ -17,7 +18,10 @@ public class MaterialValue extends MinecraftEnumValue<Material> {
 	}
 
 	@Override
-	protected ValueLoadException newInvalidEnumValueException(String valueName, ValueParseException parseException) {
+	protected ValueLoadException newInvalidEnumValueException(
+			String valueName,
+			ValueParseException parseException
+	) {
 		return new InvalidMaterialException(parseException.getMessage(), parseException);
 	}
 

@@ -14,9 +14,12 @@ import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
@@ -39,13 +42,13 @@ import com.nisovin.shopkeepers.util.logging.Log;
 /**
  * Mimics the ambient and trading sound effects of vanilla villagers.
  * <p>
- * This class can be adapted by subclasses to mimic the sound effects of other types of {@link AbstractVillager}, such
- * as wandering traders.
+ * This class can be adapted by subclasses to mimic the sound effects of other types of
+ * {@link AbstractVillager}, such as wandering traders.
  */
 public class VillagerSounds extends TradingListener {
 
-	// TODO Sound effect when the shopkeeper has no trades, similar to when the villager denies trading and shakes
-	// its head?
+	// TODO Sound effect when the shopkeeper has no trades, similar to when the villager denies
+	// trading and shakes its head?
 
 	private static final int INPUT_SLOT_1 = 0;
 	private static final int INPUT_SLOT_2 = 1;
@@ -64,14 +67,14 @@ public class VillagerSounds extends TradingListener {
 	private final LivingShopObject shopObject;
 
 	private long lastSoundNanos = System.nanoTime();
-	private BukkitTask tradeInteractionTask = null;
+	private @Nullable BukkitTask tradeInteractionTask = null;
 
-	public VillagerSounds(SKLivingShopObject<? extends AbstractVillager> shopObject) {
+	public VillagerSounds(SKLivingShopObject<? extends @NonNull AbstractVillager> shopObject) {
 		Validate.notNull(shopObject, "shopObject is null");
-		assert AbstractVillager.class.isAssignableFrom(shopObject.getEntityType().getEntityClass());
+		assert AbstractVillager.class.isAssignableFrom(Unsafe.assertNonNull(shopObject.getEntityType().getEntityClass()));
 		this.shopObject = shopObject;
 		this.shopkeeper = shopObject.getShopkeeper();
-		Validate.notNull(shopkeeper, "shopObject is not associated to any shopkeeper yet");
+		Validate.notNull(shopkeeper, "shopObject is not associated with any shopkeeper yet");
 	}
 
 	/**
@@ -80,12 +83,20 @@ public class VillagerSounds extends TradingListener {
 	 * @return the ambient sound, not <code>null</code>
 	 */
 	protected Sound getAmbientSound() {
-		// Note: This will play a different ambient sound even if the trading player is actually trading remotely.
-		return this.isShopkeeperTrading() ? Sound.ENTITY_VILLAGER_TRADE : Sound.ENTITY_VILLAGER_AMBIENT;
+		// Note: This will play a different ambient sound even if the trading player is actually
+		// trading remotely.
+		if (this.isShopkeeperTrading()) {
+			return Sound.ENTITY_VILLAGER_TRADE;
+		} else {
+			return Sound.ENTITY_VILLAGER_AMBIENT;
+		}
 	}
 
 	protected final boolean isShopkeeperTrading() {
-		return !ShopkeepersAPI.getUIRegistry().getUISessions(shopkeeper, DefaultUITypes.TRADING()).isEmpty();
+		return !ShopkeepersAPI.getUIRegistry().getUISessions(
+				shopkeeper,
+				DefaultUITypes.TRADING()
+		).isEmpty();
 	}
 
 	/**
@@ -98,14 +109,19 @@ public class VillagerSounds extends TradingListener {
 	}
 
 	/**
-	 * Gets the sound that is played whenever the trading player interacted with the trading interface in some way.
+	 * Gets the sound that is played whenever the trading player interacted with the trading
+	 * interface in some way.
 	 * 
 	 * @param resultItem
 	 *            the current item in the result slot, can be <code>null</code> or empty
 	 * @return the trade interaction sound, not <code>null</code>
 	 */
-	protected Sound getTradeInteractionSound(ItemStack resultItem) {
-		return ItemUtils.isEmpty(resultItem) ? Sound.ENTITY_VILLAGER_NO : Sound.ENTITY_VILLAGER_YES;
+	protected Sound getTradeInteractionSound(@Nullable ItemStack resultItem) {
+		if (ItemUtils.isEmpty(resultItem)) {
+			return Sound.ENTITY_VILLAGER_NO;
+		} else {
+			return Sound.ENTITY_VILLAGER_YES;
+		}
 	}
 
 	/**
@@ -113,11 +129,14 @@ public class VillagerSounds extends TradingListener {
 	 * 
 	 * @return the villager entity, or <code>null</code> if the villager is not spawned currently.
 	 */
-	private AbstractVillager getVillager() {
+	private @Nullable AbstractVillager getVillager() {
 		return (AbstractVillager) shopObject.getEntity(); // Null if not spawned
 	}
 
-	private boolean isTradingPlayerCloseToVillager(Location playerLocation, Location villagerLocation) {
+	private boolean isTradingPlayerCloseToVillager(
+			Location playerLocation,
+			Location villagerLocation
+	) {
 		assert playerLocation != null && villagerLocation != null;
 		return LocationUtils.getDistanceSquared(playerLocation, villagerLocation) <= TRADING_PLAYER_MAX_DISTANCE_SQ;
 	}
@@ -131,7 +150,12 @@ public class VillagerSounds extends TradingListener {
 		return (villager.isAdult() ? 1.0F : 1.5F) + MathUtils.randomFloatInRange(-0.2F, 0.2F);
 	}
 
-	private void tryPlayVillagerTradingSound(Player tradingPlayer, String context, Sound sound, boolean playGlobal) {
+	private void tryPlayVillagerTradingSound(
+			Player tradingPlayer,
+			String context,
+			Sound sound,
+			boolean playGlobal
+	) {
 		assert tradingPlayer != null && context != null && sound != null;
 		AbstractVillager villager = this.getVillager();
 		if (villager == null) return; // Not spawned
@@ -142,33 +166,50 @@ public class VillagerSounds extends TradingListener {
 			return;
 		}
 
-		playGlobal = playGlobal && !Settings.simulateTradingSoundsOnlyForTheTradingPlayer;
-		this.playVillagerSound(villager, villagerLocation, context, sound, playGlobal ? null : tradingPlayer);
+		Player receiver = null; // Play to all nearby players
+		if (!playGlobal || Settings.simulateTradingSoundsOnlyForTheTradingPlayer) {
+			receiver = tradingPlayer;
+		}
+		this.playVillagerSound(villager, villagerLocation, context, sound, receiver);
 	}
 
-	private void playVillagerSound(	AbstractVillager villager, Location villagerLocation,
-									String context, Sound sound, Player receivingPlayer) {
-		assert villager != null && context != null && sound != null;
-		if (villagerLocation == null) {
-			villagerLocation = villager.getLocation();
-		}
-
+	private void playVillagerSound(
+			AbstractVillager villager,
+			Location villagerLocation,
+			String context,
+			Sound sound,
+			@Nullable Player receivingPlayer
+	) {
+		assert villager != null && villagerLocation != null && context != null && sound != null;
 		float pitch = this.getPitch(villager);
 		if (receivingPlayer == null) {
 			// The sound can be heard by all nearby players:
-			villager.getWorld().playSound(villagerLocation, sound, SoundCategory.NEUTRAL, 1.0F, pitch);
+			villager.getWorld().playSound(
+					villagerLocation,
+					sound,
+					SoundCategory.NEUTRAL,
+					1.0F,
+					pitch
+			);
 		} else {
 			// The sound is only played to the specified player:
-			receivingPlayer.playSound(villagerLocation, sound, SoundCategory.NEUTRAL, 1.0F, pitch);
+			receivingPlayer.playSound(
+					villagerLocation,
+					sound,
+					SoundCategory.NEUTRAL,
+					1.0F,
+					pitch
+			);
 		}
 
 		Log.debug(DebugOptions.regularTickActivities,
 				() -> shopkeeper.getLogPrefix() + "Playing " + context + " sound: " + sound);
 	}
 
-	// We play a sound whenever the player interacts with one of the trading slots (inputs or result), or selects a
-	// different trading recipe, and there is at least one input item afterwards. Similar as in vanilla Minecraft, this
-	// may even play a sound if none of the input or result items have actually changed.
+	// We play a sound whenever the player interacts with one of the trading slots (inputs or
+	// result), or selects a different trading recipe, and there is at least one input item
+	// afterwards. Similar as in vanilla Minecraft, this may even play a sound if none of the input
+	// or result items have actually changed.
 	@Override
 	public void onInventoryClick(UISession uiSession, InventoryClickEvent event) {
 		if (event.isCancelled()) return; // Ignore the cancelled inventory interaction
@@ -192,7 +233,10 @@ public class VillagerSounds extends TradingListener {
 			// We are already about to process another inventory interaction.
 			return;
 		}
-		tradeInteractionTask = Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), new ProcessTradeInteractionTask(uiSession));
+		tradeInteractionTask = Bukkit.getScheduler().runTask(
+				SKShopkeepersPlugin.getInstance(),
+				new ProcessTradeInteractionTask(uiSession)
+		);
 	}
 
 	private class ProcessTradeInteractionTask implements Runnable {
@@ -248,21 +292,23 @@ public class VillagerSounds extends TradingListener {
 	}
 
 	private void handleTradeSound(Trade trade) {
-		// TODO Looking at the Minecraft code, I would expect this sound to only be played to the trading player
-		// whenever they shift click the result slot, ignoring any sound throttling. However, when testing this, the
-		// sound is actually played to all nearby players, even when not shift clicking, and with sound throttling
-		// similar to that of the normal trade interaction sound.
-		// Unlike the general trade interaction sound, this sound is played even if the input slots are empty after the
-		// inventory interaction.
-		// Throttling the sounds on every completed trade prevents the general trade interaction sound from playing.
+		// TODO Looking at the Minecraft code, I would expect this sound to only be played to the
+		// trading player whenever they shift click the result slot, ignoring any sound throttling.
+		// However, when testing this, the sound is actually played to all nearby players, even when
+		// not shift clicking, and with sound throttling similar to that of the normal trade
+		// interaction sound.
+		// Unlike the general trade interaction sound, this sound is played even if the input slots
+		// are empty after the inventory interaction.
+		// Throttling the sounds on every completed trade prevents the general trade interaction
+		// sound from playing.
 
 		long nanosSinceLastSound = System.nanoTime() - lastSoundNanos;
 		if (nanosSinceLastSound < TRADE_INTERACTION_SOUND_DELAY_NANOS) {
 			return;
 		}
 
-		// Unlike in vanilla Minecraft, where trading is only possible with adult villagers, we use the villager's
-		// dynamic pitch here.
+		// Unlike in vanilla Minecraft, where trading is only possible with adult villagers, we use
+		// the villager's dynamic pitch here.
 		Sound sound = this.getTradeSound();
 		Player player = trade.getTradingPlayer();
 		this.tryPlayVillagerTradingSound(player, "trade", sound, true);
@@ -273,8 +319,8 @@ public class VillagerSounds extends TradingListener {
 	}
 
 	/**
-	 * This is expected to be called once per {@link AbstractShopObject#onTick() shopkeeper tick}, i.e. once per second
-	 * while the shop object is active.
+	 * This is expected to be called once per {@link AbstractShopObject#onTick() shopkeeper tick},
+	 * i.e. once per second while the shop object is active.
 	 */
 	public void tick() {
 		this.checkPlayAmbientSound();
@@ -287,14 +333,20 @@ public class VillagerSounds extends TradingListener {
 		long nanosSinceAmbientSoundThreshold = System.nanoTime() - (lastSoundNanos + AMBIENT_SOUND_DELAY_NANOS);
 		if (nanosSinceAmbientSoundThreshold < 0) return;
 
-		// Vanilla Minecraft checks every tick whether a mob should play or skip its ambient sound. With every tick that
-		// passed since the last ambient sound played, the probability for playing the ambient sound increases.
-		// We only check once per second whether the mob should play its ambient sound. This code calculates the
-		// combined probability that the mob skipped its ambient sound during the last 20 ticks, taking into account the
-		// time that passed since the mob's last ambient sound played.
-		// The time in seconds, relative to the ambient sound threshold, of the last shopkeeper tick (one second ago):
-		double baseTimeSeconds = TimeUtils.convert(nanosSinceAmbientSoundThreshold - TimeUtils.NANOS_PER_SECOND,
-				TimeUnit.NANOSECONDS, TimeUnit.SECONDS);
+		// Vanilla Minecraft checks every tick whether a mob should play or skip its ambient sound.
+		// With every tick that passed since the last ambient sound played, the probability for
+		// playing the ambient sound increases.
+		// We only check once per second whether the mob should play its ambient sound. This code
+		// calculates the combined probability that the mob skipped its ambient sound during the
+		// last 20 ticks, taking into account the time that passed since the mob's last ambient
+		// sound played.
+		// The time in seconds, relative to the ambient sound threshold, of the last shopkeeper tick
+		// (one second ago):
+		double baseTimeSeconds = TimeUtils.convert(
+				nanosSinceAmbientSoundThreshold - TimeUtils.NANOS_PER_SECOND,
+				TimeUnit.NANOSECONDS,
+				TimeUnit.SECONDS
+		);
 		double skipProbability = 1.0D;
 		for (int t = 0; t < Ticks.PER_SECOND; t++) {
 			double timeSeconds = baseTimeSeconds + t * Ticks.DURATION_SECONDS;
@@ -307,7 +359,7 @@ public class VillagerSounds extends TradingListener {
 
 		// Play the ambient sound to all nearby players:
 		Sound sound = this.getAmbientSound();
-		this.playVillagerSound(villager, null, "ambient", sound, null);
+		this.playVillagerSound(villager, villager.getLocation(), "ambient", sound, null);
 		this.throttleSounds();
 	}
 }

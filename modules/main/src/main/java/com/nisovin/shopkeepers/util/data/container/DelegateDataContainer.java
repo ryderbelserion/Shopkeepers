@@ -3,6 +3,9 @@ package com.nisovin.shopkeepers.util.data.container;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -24,12 +27,12 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Object getOrDefault(String key, Object defaultValue) {
+	public @Nullable Object getOrDefault(String key, @Nullable Object defaultValue) {
 		return dataContainer.getOrDefault(key, defaultValue);
 	}
 
 	@Override
-	public void set(String key, Object value) {
+	public void set(String key, @Nullable Object value) {
 		dataContainer.set(key, value);
 	}
 
@@ -55,22 +58,22 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<String> getKeys() {
+	public Set<? extends @NonNull String> getKeys() {
 		return dataContainer.getKeys();
 	}
 
 	@Override
-	public Map<String, ?> getValues() {
+	public Map<? extends @NonNull String, @NonNull ?> getValues() {
 		return dataContainer.getValues();
 	}
 
 	@Override
-	public Map<String, Object> getValuesCopy() {
+	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
 		return dataContainer.getValuesCopy();
 	}
 
 	@Override
-	public Object serialize() {
+	public @Nullable Object serialize() {
 		return dataContainer.serialize();
 	}
 
@@ -90,7 +93,7 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		return dataContainer.equals(obj);
 	}
 }

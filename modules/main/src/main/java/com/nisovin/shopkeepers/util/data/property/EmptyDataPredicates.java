@@ -13,14 +13,16 @@ import com.nisovin.shopkeepers.util.data.container.DataContainer;
 public final class EmptyDataPredicates {
 
 	/**
-	 * A {@link Predicate} that checks if the given data is an {@link String#isEmpty() empty String}.
+	 * A {@link Predicate} that checks if the given data is an {@link String#isEmpty() empty
+	 * String}.
 	 */
 	public static final Predicate<Object> EMPTY_STRING = (data) -> {
 		return (data instanceof String) && ((String) data).isEmpty();
 	};
 
 	/**
-	 * A {@link Predicate} that checks if the given data is an {@link DataContainer#isEmpty() empty DataContainer}.
+	 * A {@link Predicate} that checks if the given data is an {@link DataContainer#isEmpty() empty
+	 * DataContainer}.
 	 */
 	public static final Predicate<Object> EMPTY_CONTAINER = (data) -> {
 		DataContainer dataContainer = DataContainer.of(data);

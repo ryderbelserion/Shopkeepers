@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -16,20 +18,35 @@ public final class CommandInput {
 	private final CommandSender sender;
 	private final Command command;
 	private final String commandAlias;
-	private final List<String> arguments; // Unmodifiable
+	private final List<? extends @NonNull String> arguments; // Unmodifiable
 
 	// The arguments are expected to not change during the command processing.
-	public CommandInput(CommandSender sender, Command command, String commandAlias, String[] arguments) {
-		this(sender, command, commandAlias, (arguments == null) ? Collections.emptyList() : Arrays.asList(arguments));
+	public CommandInput(
+			CommandSender sender,
+			Command command,
+			String commandAlias,
+			@NonNull String[] arguments
+	) {
+		this(
+				sender,
+				command,
+				commandAlias,
+				Arrays.asList(Validate.notNull(arguments, "arguments is null"))
+		);
 	}
 
 	// The arguments are expected to not change during the command processing.
-	public CommandInput(CommandSender sender, Command command, String commandAlias, List<String> arguments) {
+	public CommandInput(
+			CommandSender sender,
+			Command command,
+			String commandAlias,
+			List<? extends @NonNull String> arguments
+	) {
 		Validate.notNull(sender, "sender is null");
 		Validate.notNull(command, "command is null");
 		Validate.notEmpty(commandAlias, "commandAlias is null or empty");
 		Validate.notNull(arguments, "arguments is null");
-		Validate.isTrue(!arguments.contains(null), "arguments contains null");
+		Validate.isTrue(!CollectionUtils.containsNull(arguments), "arguments contains null");
 
 		this.sender = sender;
 		this.command = command;
@@ -58,9 +75,10 @@ public final class CommandInput {
 	/**
 	 * Gets the alias that was used to invoke the command.
 	 * <p>
-	 * Note: The server might allow the execution of the command via aliases that don't match any of the command's
-	 * {@link Command#getAliases() known aliases} (for example via the command's known aliases prefixed by the plugin's
-	 * name, or via custom aliases that were defined by the server admin).
+	 * Note: The server might allow the execution of the command via aliases that don't match any of
+	 * the command's {@link Command#getAliases() known aliases} (for example via the command's known
+	 * aliases prefixed by the plugin's name, or via custom aliases that were defined by the server
+	 * admin).
 	 * 
 	 * @return the used command alias, not <code>null</code> or empty
 	 */
@@ -73,7 +91,7 @@ public final class CommandInput {
 	 * 
 	 * @return an unmodifiable view on the arguments, not <code>null</code> but may be empty
 	 */
-	public List<String> getArguments() {
+	public List<? extends @NonNull String> getArguments() {
 		return arguments;
 	}
 

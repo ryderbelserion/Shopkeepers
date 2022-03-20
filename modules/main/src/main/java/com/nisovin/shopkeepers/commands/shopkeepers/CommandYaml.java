@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -46,13 +47,18 @@ class CommandYaml extends PlayerCommand {
 		}
 
 		// Serialized ItemStack and ItemData:
-		String itemStackYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("item-in-hand", itemInHand);
-		// This ItemData object is only used temporarily, so there is no need to copy the item stack:
-		Object itemDataSerialized = new ItemData(UnmodifiableItemStack.of(itemInHand)).serialize();
-		String itemDataYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("item-in-hand-config-data", itemDataSerialized);
+		String itemStackYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline(
+				"item-in-hand", itemInHand
+		);
+		// This ItemData object is only used temporarily, so there is no need to copy the item
+		// stack:
+		Object itemDataSerialized = new ItemData(UnmodifiableItemStack.ofNonNull(itemInHand)).serialize();
+		String itemDataYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline(
+				"item-in-hand-config-data", itemDataSerialized
+		);
 
-		String[] itemStackYamlLines = StringUtils.splitLines(itemStackYaml);
-		String[] itemDataYamlLines = StringUtils.splitLines(itemDataYaml);
+		@NonNull String[] itemStackYamlLines = StringUtils.splitLines(itemStackYaml);
+		@NonNull String[] itemDataYamlLines = StringUtils.splitLines(itemDataYaml);
 
 		// Print to player:
 		player.sendMessage(ChatColor.YELLOW + "Serialized ItemStack:");

@@ -6,20 +6,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link Text} that gets translated on the client.
  * <p>
- * In case translatable texts are not supported or when converting to {@link #toPlainText() plain} or
- * {@link #toPlainFormatText() plain format} text, its {@link #getChild() child} is used as fallback. Otherwise, the
- * child is ignored.
+ * In case translatable texts are not supported or when converting to {@link #toPlainText() plain}
+ * or {@link #toPlainFormatText() plain format} text, its {@link #getChild() child} is used as
+ * fallback. Otherwise, the child is ignored.
  */
 public class TranslatableText extends TextBuilder {
 
 	private final String translationKey; // Not null or empty
-	// Only contains already built Texts:
-	private List<Text> translationArguments = Collections.emptyList(); // Not null, can be empty, unmodifiable view
+	// Only contains already built Texts.
+	// Not null, can be empty, unmodifiable view.
+	private List<? extends @NonNull Text> translationArguments = Collections.emptyList();
 
 	TranslatableText(String translationKey) {
 		Validate.notEmpty(translationKey, "translationKey is null or empty");
@@ -40,43 +43,45 @@ public class TranslatableText extends TextBuilder {
 	/**
 	 * Gets the translation arguments.
 	 * 
-	 * @return an unmodifiable view on the translation arguments, not <code>null</code>, can be empty
+	 * @return an unmodifiable view on the translation arguments, not <code>null</code>, can be
+	 *         empty
 	 */
-	public List<Text> getTranslationArguments() {
+	public List<? extends @NonNull Text> getTranslationArguments() {
 		return translationArguments;
 	}
 
 	/**
 	 * Sets the translation arguments.
 	 * <p>
-	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its {@link Object#toString()
-	 * String representation}. If the argument is a {@link Supplier} it will be invoked to obtain the actual argument.
+	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its
+	 * {@link Object#toString() String representation}. If the argument is a {@link Supplier} it
+	 * will be invoked to obtain the actual argument.
 	 * <p>
-	 * Any {@link Text} translation arguments that are not yet {@link TextBuilder#isBuilt() built} may get built by this
-	 * method.
+	 * Any {@link Text} translation arguments that are not yet {@link TextBuilder#isBuilt() built}
+	 * may get built by this method.
 	 * 
 	 * @param translationArguments
-	 *            the translation arguments, or <code>null</code> or empty to unset
+	 *            the translation arguments, or empty to unset, not <code>null</code>
 	 * @return this Text
 	 */
-	public TranslatableText setTranslationArguments(List<?> translationArguments) {
-		if (translationArguments == null || translationArguments.isEmpty()) {
+	public TranslatableText setTranslationArguments(List<@NonNull ?> translationArguments) {
+		Validate.notNull(translationArguments, "translationArguments is null");
+		if (translationArguments.isEmpty()) {
 			this.translationArguments = Collections.emptyList(); // Resetting is always allowed
 		} else {
-			List<Text> translationTextArguments = new ArrayList<>(translationArguments.size());
-			for (Object argument : translationArguments) {
+			List<@NonNull Text> translationTextArguments = new ArrayList<>(translationArguments.size());
+			translationArguments.forEach(argument -> {
 				Validate.notNull(argument, "translationArguments contains null");
 				Validate.isTrue(argument != this, "translationArguments contains this Text itself");
 
 				Text argumentText = Text.of(argument);
-				Validate.isTrue(argumentText.getParent() == null, "translationArguments contains a non-root Text");
+				Validate.isTrue(argumentText.getParent() == null,
+						"translationArguments contains a non-root Text");
 				translationTextArguments.add(argumentText);
-			}
+			});
 
 			// Build all unbuilt arguments:
-			for (Text argument : translationTextArguments) {
-				buildIfRequired(argument);
-			}
+			translationTextArguments.forEach(TranslatableText::buildIfRequired);
 
 			this.translationArguments = Collections.unmodifiableList(translationTextArguments);
 		}
@@ -100,7 +105,8 @@ public class TranslatableText extends TextBuilder {
 	}
 
 	/**
-	 * This will not copy the translation key. Any currently set translation arguments get (deeply) copied.
+	 * This will not copy the translation key. Any currently set translation arguments get (deeply)
+	 * copied.
 	 */
 	@Override
 	public TranslatableText copy(Text sourceText, boolean copyChilds) {
@@ -116,13 +122,18 @@ public class TranslatableText extends TextBuilder {
 		}
 	}
 
-	private static List<Text> copyAll(Collection<? extends Text> toCopy) {
-		if (toCopy == null) return null;
-		if (toCopy.isEmpty()) return Collections.emptyList();
-		List<Text> copies = new ArrayList<>(toCopy.size());
-		for (Text text : toCopy) {
-			copies.add(text.copy());
+	private static List<? extends @NonNull Text> copyAll(
+			Collection<? extends @NonNull Text> toCopy
+	) {
+		assert toCopy != null;
+		if (toCopy.isEmpty()) {
+			return Collections.emptyList();
 		}
+
+		List<@NonNull Text> copies = new ArrayList<>(toCopy.size());
+		toCopy.forEach(text -> {
+			copies.add(text.copy());
+		});
 		return copies;
 	}
 

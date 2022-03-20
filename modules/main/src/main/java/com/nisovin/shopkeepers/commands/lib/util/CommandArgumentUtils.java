@@ -4,27 +4,46 @@ import java.util.Iterator;
 import java.util.function.ObjIntConsumer;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class CommandArgumentUtils {
-
-	private CommandArgumentUtils() {
-	}
+public final class CommandArgumentUtils {
 
 	private static final int DEFAULT_AMBIGUOUS_INPUT_MAX_ENTRIES = 5;
 
 	// Note: Iterable is only iterated once.
 	// true if there are multiple matches.
-	public static <T> boolean handleAmbiguousInput(	CommandSender sender, String input, Iterable<T> matches,
-													Runnable sendHeader, ObjIntConsumer<T> sendEntry, Runnable sendMore) {
-		return handleAmbiguousInput(sender, input, matches, DEFAULT_AMBIGUOUS_INPUT_MAX_ENTRIES, sendHeader, sendEntry, sendMore);
+	public static <T> boolean handleAmbiguousInput(
+			CommandSender sender,
+			String input,
+			Iterable<? extends @NonNull T> matches,
+			Runnable sendHeader,
+			ObjIntConsumer<@NonNull T> sendEntry,
+			Runnable sendMore
+	) {
+		return handleAmbiguousInput(
+				sender,
+				input,
+				matches,
+				DEFAULT_AMBIGUOUS_INPUT_MAX_ENTRIES,
+				sendHeader,
+				sendEntry,
+				sendMore
+		);
 	}
 
 	// Note: Iterable is only iterated once.
 	// true if there are multiple matches.
-	public static <T> boolean handleAmbiguousInput(	CommandSender sender, String input, Iterable<T> matches, int maxEntries,
-													Runnable sendHeader, ObjIntConsumer<T> sendEntry, Runnable sendMore) {
+	public static <T> boolean handleAmbiguousInput(
+			CommandSender sender,
+			String input,
+			Iterable<? extends @NonNull T> matches,
+			int maxEntries,
+			Runnable sendHeader,
+			ObjIntConsumer<@NonNull T> sendEntry,
+			Runnable sendMore
+	) {
 		Validate.notNull(sender, "sender is null");
 		Validate.notNull(input, "input is null");
 		Validate.notNull(matches, "matches is null");
@@ -32,9 +51,9 @@ public class CommandArgumentUtils {
 		Validate.notNull(sendEntry, "sendEntry is null");
 		Validate.notNull(sendMore, "sendMore is null");
 
-		Iterator<T> matchesIter = matches.iterator();
+		Iterator<? extends @NonNull T> matchesIter = matches.iterator();
 		if (!matchesIter.hasNext()) return false; // Empty -> Not ambiguous.
-		T match = matchesIter.next();
+		@NonNull T match = matchesIter.next();
 		if (!matchesIter.hasNext()) return false; // Only one element -> Not ambiguous.
 
 		// Header:
@@ -57,5 +76,8 @@ public class CommandArgumentUtils {
 			}
 		}
 		return true;
+	}
+
+	private CommandArgumentUtils() {
 	}
 }

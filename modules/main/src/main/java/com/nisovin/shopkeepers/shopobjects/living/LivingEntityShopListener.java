@@ -45,8 +45,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.projectiles.ProjectileSource;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -69,57 +72,73 @@ class LivingEntityShopListener implements Listener {
 
 	void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		// Ensure that our interact event handlers are always executed first, even after plugin reloads:
-		// In order to not change the order among the already registered event handlers of our own plugin, we move them
-		// all together to the front of their handler lists.
-		EventUtils.enforceExecuteFirst(PlayerInteractEntityEvent.class, EventPriority.LOWEST, plugin);
-		EventUtils.enforceExecuteFirst(PlayerInteractAtEntityEvent.class, EventPriority.LOWEST, plugin);
+		// Ensure that our interact event handlers are always executed first, even after plugin
+		// reloads:
+		// In order to not change the order among the already registered event handlers of our own
+		// plugin, we move them all together to the front of their handler lists.
+		EventUtils.enforceExecuteFirst(
+				PlayerInteractEntityEvent.class,
+				EventPriority.LOWEST,
+				plugin
+		);
+		EventUtils.enforceExecuteFirst(
+				PlayerInteractAtEntityEvent.class,
+				EventPriority.LOWEST,
+				plugin
+		);
 	}
 
 	void onDisable() {
 		HandlerList.unregisterAll(this);
 	}
 
-	// We want to bypass other plugins by default, so that shops can also be opened in protected regions.
-	// We cancel the event to prevent any vanilla mechanics from taking place, and also to indicate to other plugins,
-	// and to later event handlers of our own plugin, that they can safely ignore the event (e.g. to prevent protection
-	// plugins from sending their 'interaction denied' message for shopkeeper entities). For that purpose, we handle and
-	// cancel the event as early as possible (LOWEST priority).
-	// Using a higher event priority with a setting to ignore whether the event got already cancelled by other plugins
-	// is not an option, because then these other plugins will already have handled the event and we have no chance to
-	// avoid their side effects (e.g. protection plugins will already have sent the player their 'interaction denied'
-	// message, even though we open the shop UI afterwards anyways).
-	// In some usecases it may be desired by the server admin that we take into account whether some other plugin wants
-	// to cancel the interaction. For those situations the setting 'check-shop-interaction-result' can be used to call
-	// an additional interaction event that other plugins can react to and which determines whether we handle the
-	// interaction. Since this might cause side effects in general due to other plugins handling the event, this is
-	// disabled by default. This also requires that we listen to and cancel the event as early as possible, so that the
-	// event is not handled twice by other plugins in this situation.
-	// There is still the potential for conflicts with other event handlers that run on LOWEST priority as well. If
-	// these are event handlers of our own plugin (for which we control the order in which they are registered and
-	// handle the event), we usually want to ignore the event if it has already been cancelled, because this indicates
-	// that the event has triggered some other mechanic that takes precedence.
-	// And if the event has been cancelled by another plugin, we cannot differentiate between whether this is one of the
-	// cases that we could relatively safely bypass (for example, if some protection plugin reacts on LOWEST event
-	// priority and has sent its 'interaction denied' message, it may be reasonable to still open the shop menu
-	// regardless to at least remain functional in that case), or if this is a case in which we definitively do not want
-	// to trigger our action (for example, if another plugin defines a mechanic that is triggered by the same event we
-	// usually want that only one of these actions takes place).
+	// We want to bypass other plugins by default, so that shops can also be opened in protected
+	// regions.
+	// We cancel the event to prevent any vanilla mechanics from taking place, and also to indicate
+	// to other plugins, and to later event handlers of our own plugin, that they can safely ignore
+	// the event (e.g. to prevent protection plugins from sending their 'interaction denied' message
+	// for shopkeeper entities). For that purpose, we handle and cancel the event as early as
+	// possible (LOWEST priority).
+	// Using a higher event priority with a setting to ignore whether the event got already
+	// cancelled by other plugins is not an option, because then these other plugins will already
+	// have handled the event and we have no chance to avoid their side effects (e.g. protection
+	// plugins will already have sent the player their 'interaction denied' message, even though we
+	// open the shop UI afterwards anyways).
+	// In some usecases it may be desired by the server admin that we take into account whether some
+	// other plugin wants to cancel the interaction. For those situations the setting
+	// 'check-shop-interaction-result' can be used to call an additional interaction event that
+	// other plugins can react to and which determines whether we handle the interaction. Since this
+	// might cause side effects in general due to other plugins handling the event, this is disabled
+	// by default. This also requires that we listen to and cancel the event as early as possible,
+	// so that the event is not handled twice by other plugins in this situation.
+	// There is still the potential for conflicts with other event handlers that run on LOWEST
+	// priority as well. If these are event handlers of our own plugin (for which we control the
+	// order in which they are registered and handle the event), we usually want to ignore the event
+	// if it has already been cancelled, because this indicates that the event has triggered some
+	// other mechanic that takes precedence.
+	// And if the event has been cancelled by another plugin, we cannot differentiate between
+	// whether this is one of the cases that we could relatively safely bypass (for example, if some
+	// protection plugin reacts on LOWEST event priority and has sent its 'interaction denied'
+	// message, it may be reasonable to still open the shop menu regardless to at least remain
+	// functional in that case), or if this is a case in which we definitively do not want to
+	// trigger our action (for example, if another plugin defines a mechanic that is triggered by
+	// the same event we usually want that only one of these actions takes place).
 	// For the above reasons we therefore ignore the event if it has already been cancelled.
-	// One option to resolve these conflicts with other plugins that listen on LOWEST event priority as well might seem
-	// to be the 'loadbefore' entry in the plugin.yml file. However, this is not an acceptable solution, because it
-	// depends on being aware of and explicitly specifying these other plugins, and it breaks whenever the Shopkeepers
-	// plugin is dynamically reloaded, because that re-registers all event handlers and thereby moves them to the back
-	// of the registered event handlers.
-	// In an attempt to resolve these conflicts with other plugins anyways (for instance, GriefPrevention, a popular
-	// protection plugin, reacts on LOWEST event priority), we forcefully move our event handler(s) to the front of the
-	// relevant handler list. This ensures that our event handler(s) are executed first, even if our plugin has been
-	// dynamically reloaded.
-	// If another plugin is supposed to still execute before us so that it can cancel our event handling, it could
-	// either apply a similar trick, or the server admin can enable the already mentioned
-	// 'check-shop-interaction-result' setting.
-	// The reasoning outlined here does not only apply to this specific event handler, but also to other event handlers
-	// in this plugin for which we chose to execute at event priority LOWEST.
+	// One option to resolve these conflicts with other plugins that listen on LOWEST event priority
+	// as well might seem to be the 'loadbefore' entry in the plugin.yml file. However, this is not
+	// an acceptable solution, because it depends on being aware of and explicitly specifying these
+	// other plugins, and it breaks whenever the Shopkeepers plugin is dynamically reloaded, because
+	// that re-registers all event handlers and thereby moves them to the back of the registered
+	// event handlers.
+	// In an attempt to resolve these conflicts with other plugins anyways (for instance,
+	// GriefPrevention, a popular protection plugin, reacts on LOWEST event priority), we forcefully
+	// move our event handler(s) to the front of the relevant handler list. This ensures that our
+	// event handler(s) are executed first, even if our plugin has been dynamically reloaded.
+	// If another plugin is supposed to still execute before us so that it can cancel our event
+	// handling, it could either apply a similar trick, or the server admin can enable the already
+	// mentioned 'check-shop-interaction-result' setting.
+	// The reasoning outlined here does not only apply to this specific event handler, but also to
+	// other event handlers in this plugin for which we chose to execute at event priority LOWEST.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		// Ignore our own fake interact event:
@@ -130,8 +149,8 @@ class LivingEntityShopListener implements Listener {
 
 		Player player = event.getPlayer();
 		boolean isInteractAtEvent = (event instanceof PlayerInteractAtEntityEvent);
-		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") "
-				+ (isInteractAtEvent ? "at " : "with ") + clickedEntity.getType()
+		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand())
+				+ ") " + (isInteractAtEvent ? "at " : "with ") + clickedEntity.getType()
 				+ " at " + clickedEntity.getLocation());
 
 		// We only deal with living entities here:
@@ -144,23 +163,26 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// Ignore if already cancelled. This resolves conflicts with other event handlers that also run at LOWEST
-		// priority.
+		// Ignore if already cancelled. This resolves conflicts with other event handlers that also
+		// run at LOWEST priority.
 		if (event.isCancelled()) {
 			Log.debug("  Ignoring already cancelled event.");
 			return;
 		}
 
-		// If Citizens NPC: Don't cancel the event, let Citizens perform other actions as appropriate.
+		// If Citizens NPC: Don't cancel the event, let Citizens perform other actions as
+		// appropriate.
 		if (shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
 			// Always cancel interactions with shopkeepers, to prevent any default behavior:
 			Log.debug("  Cancelling entity interaction");
 			event.setCancelled(true);
-			// Update inventory in case the interaction would trigger an item action normally (such as animal feeding):
+			// Update inventory in case the interaction would trigger an item action normally (such
+			// as animal feeding):
 			player.updateInventory();
 		}
 
-		// The PlayerInteractAtEntityEvent gets sometimes called additionally to the PlayerInteractEntityEvent.
+		// The PlayerInteractAtEntityEvent gets sometimes called additionally to the
+		// PlayerInteractEntityEvent.
 		// We cancel the event but don't process it any further.
 		if (isInteractAtEvent) {
 			Log.debug("  Ignoring InteractAtEntity event");
@@ -174,13 +196,15 @@ class LivingEntityShopListener implements Listener {
 		}
 
 		// TODO Minecraft bug: https://bugs.mojang.com/browse/MC-141494
-		// Interacting with a villager while holding a written book in the main or off hand results in weird glitches
-		// and tricks the plugin into thinking that the editor or trading UI got opened even though the book got opened
-		// instead. We therefore ignore any interactions with shopkeeper mobs for now when the interacting player is
-		// holding a written book.
-		// TODO This has been fixed in MC 1.16. Remove this check once we only support MC 1.16 and above.
+		// Interacting with a villager while holding a written book in the main or off hand results
+		// in weird glitches and tricks the plugin into thinking that the editor or trading UI got
+		// opened even though the book got opened instead. We therefore ignore any interactions with
+		// shopkeeper mobs for now when the interacting player is holding a written book.
+		// TODO This has been fixed in MC 1.16. Remove this check once we only support MC 1.16 and
+		// above.
 		if (hasWrittenBookInHand(player)) {
-			Log.debug("  Ignoring interaction due to holding a written book in main or off hand. See Minecraft issue MC-141494.");
+			Log.debug("  Ignoring interaction due to holding a written book in main or off hand. "
+					+ "See Minecraft issue MC-141494.");
 			return;
 		}
 
@@ -199,11 +223,12 @@ class LivingEntityShopListener implements Listener {
 	private static boolean hasWrittenBookInHand(Player player) {
 		assert player != null;
 		PlayerInventory inventory = player.getInventory();
-		return (isWrittenBook(inventory.getItemInMainHand()) || isWrittenBook(inventory.getItemInOffHand()));
+		return isWrittenBook(inventory.getItemInMainHand())
+				|| isWrittenBook(inventory.getItemInOffHand());
 	}
 
-	private static boolean isWrittenBook(ItemStack itemStack) {
-		return (itemStack != null && itemStack.getType() == Material.WRITTEN_BOOK);
+	private static boolean isWrittenBook(@Nullable ItemStack itemStack) {
+		return (itemStack != null) && (itemStack.getType() == Material.WRITTEN_BOOK);
 	}
 
 	// This event gets sometimes called additionally to the PlayerInteractEntityEvent
@@ -212,12 +237,15 @@ class LivingEntityShopListener implements Listener {
 		this.onEntityInteract(event);
 	}
 
-	// TODO Many of those behaviors might no longer be active, once all entities use NoAI (once legacy mob behavior is
-	// no longer supported).
+	// TODO Many of those behaviors might no longer be active, once all entities use NoAI (once
+	// legacy mob behavior is no longer supported).
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTarget(EntityTargetEvent event) {
-		if (shopkeeperRegistry.isShopkeeper(event.getEntity()) || shopkeeperRegistry.isShopkeeper(event.getTarget())) {
+		Entity entity = event.getEntity();
+		@Nullable Entity target = event.getTarget();
+		if (shopkeeperRegistry.isShopkeeper(entity)
+				|| (target != null && shopkeeperRegistry.isShopkeeper(target))) {
 			event.setCancelled(true);
 		}
 	}
@@ -268,7 +296,8 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onCreeperCharged(CreeperPowerEvent event) {
-		if (event.getCause() == PowerCause.LIGHTNING && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+		if (event.getCause() != PowerCause.LIGHTNING) return;
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
@@ -310,7 +339,8 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// Handles all kinds of events, such as for example villagers struck by lightning turning into witches.
+	// Handles all kinds of events, such as for example villagers struck by lightning turning into
+	// witches.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTransform(EntityTransformEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
@@ -321,6 +351,7 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPotionSplash(PotionSplashEvent event) {
 		for (LivingEntity entity : event.getAffectedEntities()) {
+			assert entity != null;
 			if (shopkeeperRegistry.isShopkeeper(entity)) {
 				event.setIntensity(entity, 0.0D);
 			}
@@ -336,10 +367,19 @@ class LivingEntityShopListener implements Listener {
 
 		// Find nearby monsters that prevent bed entering (see MC EntityHuman):
 		Block bedBlock = event.getBed();
-		Collection<Entity> monsters = bedBlock.getWorld().getNearbyEntities(bedBlock.getLocation(), 8.0D, 5.0D, 8.0D, (entity) -> {
-			// TODO Bukkit API to check if monster prevents sleeping? ie. pigzombies only prevent sleeping if angered
-			return (entity instanceof Monster) && (!(entity instanceof PigZombie) || ((PigZombie) entity).isAngry());
-		});
+		Collection<@NonNull Entity> monsters = Unsafe.castNonNull(bedBlock.getWorld().getNearbyEntities(
+				bedBlock.getLocation(),
+				8.0D, 5.0D, 8.0D,
+				(entity) -> {
+					// TODO Bukkit API to check if monster prevents sleeping?
+					// E.g. PigZombies only prevent sleeping if they are angered.
+					if (!(entity instanceof Monster)) return false;
+					if (entity instanceof PigZombie) {
+						return ((PigZombie) entity).isAngry();
+					}
+					return true;
+				}
+		));
 
 		for (Entity entity : monsters) {
 			if (!shopkeeperRegistry.isShopkeeper(entity)) {
@@ -348,7 +388,8 @@ class LivingEntityShopListener implements Listener {
 			}
 		}
 		// Sleeping is only prevented due to nearby shopkeepers. -> Bypass and allow sleeping:
-		Log.debug(() -> "Allowing sleeping of player '" + event.getPlayer().getName() + "': The only nearby monsters are shopkeepers.");
+		Log.debug(() -> "Allowing sleeping of player '" + event.getPlayer().getName()
+				+ "': The only nearby monsters are shopkeepers.");
 		event.setUseBed(Result.ALLOW);
 	}
 
@@ -357,7 +398,8 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityLaunchProjectile(ProjectileLaunchEvent event) {
 		ProjectileSource source = event.getEntity().getShooter();
-		if (source instanceof LivingEntity && shopkeeperRegistry.isShopkeeper((LivingEntity) source)) {
+		if (!(source instanceof LivingEntity)) return;
+		if (shopkeeperRegistry.isShopkeeper((LivingEntity) source)) {
 			event.setCancelled(true);
 		}
 	}
@@ -383,7 +425,8 @@ class LivingEntityShopListener implements Listener {
 	// Prevent shopkeeper entities from being affected by potion effects:
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
-		if (event.getAction() == Action.ADDED && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+		if (event.getAction() != Action.ADDED) return;
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}

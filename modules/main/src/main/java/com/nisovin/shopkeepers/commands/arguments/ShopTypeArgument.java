@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -16,9 +17,10 @@ import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.java.ObjectUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
+public class ShopTypeArgument extends CommandArgument<@NonNull ShopType<?>> {
 
 	public ShopTypeArgument(String name) {
 		super(name);
@@ -30,7 +32,11 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 	}
 
 	@Override
-	public ShopType<?> parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public ShopType<?> parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
@@ -43,13 +49,17 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		if (argsReader.getRemainingSize() != 1) {
 			return Collections.emptyList();
 		}
 
-		Player senderPlayer = (input.getSender() instanceof Player) ? (Player) input.getSender() : null;
-		List<String> suggestions = new ArrayList<>();
+		Player senderPlayer = ObjectUtils.castOrNull(input.getSender(), Player.class);
+		List<@NonNull String> suggestions = new ArrayList<>();
 		String partialArg = StringUtils.normalize(argsReader.next());
 		for (ShopType<?> shopType : ShopkeepersPlugin.getInstance().getShopTypeRegistry().getRegisteredTypes()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;

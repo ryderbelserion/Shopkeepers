@@ -11,6 +11,8 @@ public class GringottsChart extends Metrics.SimplePie {
 	private static final String GRINGOTTS_PLUGIN_NAME = "Gringotts";
 
 	public GringottsChart() {
-		super("uses_gringotts", () -> (Bukkit.getPluginManager().isPluginEnabled(GRINGOTTS_PLUGIN_NAME)) ? "Yes" : "No");
+		super("uses_gringotts", () -> {
+			return Bukkit.getPluginManager().isPluginEnabled(GRINGOTTS_PLUGIN_NAME) ? "Yes" : "No";
+		});
 	}
 }

@@ -7,7 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -26,28 +29,32 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class WolfShop extends SittableShop<Wolf> {
+public class WolfShop extends SittableShop<@NonNull Wolf> {
 
-	public static final Property<Boolean> ANGRY = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> ANGRY = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("angry", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	public static final Property<DyeColor> COLLAR_COLOR = new BasicProperty<DyeColor>()
+	public static final Property<@Nullable DyeColor> COLLAR_COLOR = new BasicProperty<@Nullable DyeColor>()
 			.dataKeyAccessor("collarColor", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates 'no collar' / untamed
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<Boolean> angryProperty = new PropertyValue<>(ANGRY)
-			.onValueChanged(this::applyAngry)
+	private final PropertyValue<@NonNull Boolean> angryProperty = new PropertyValue<>(ANGRY)
+			.onValueChanged(Unsafe.initialized(this)::applyAngry)
 			.build(properties);
-	private final PropertyValue<DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
-			.onValueChanged(this::applyCollarColor)
+	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
+			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
 
-	public WolfShop(LivingShops livingShops, SKLivingShopObjectType<WolfShop> livingObjectType,
-					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public WolfShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull WolfShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -73,8 +80,8 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
@@ -101,20 +108,28 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	private ItemStack getAngryEditorItem() {
-		ItemStack iconItem = new ItemStack(this.isAngry() ? Material.RED_WOOL : Material.WHITE_WOOL);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonWolfAngry, Messages.buttonWolfAngryLore);
+		Material iconItemType = this.isAngry() ? Material.RED_WOOL : Material.WHITE_WOOL;
+		ItemStack iconItem = new ItemStack(iconItemType);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonWolfAngry,
+				Messages.buttonWolfAngryLore
+		);
 		return iconItem;
 	}
 
 	private Button getAngryEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getAngryEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleAngry();
 				return true;
 			}
@@ -123,16 +138,22 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	// COLLAR COLOR
 
-	public DyeColor getCollarColor() {
+	public @Nullable DyeColor getCollarColor() {
 		return collarColorProperty.getValue();
 	}
 
-	public void setCollarColor(DyeColor collarColor) {
+	public void setCollarColor(@Nullable DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
 	}
 
 	public void cycleCollarColor(boolean backwards) {
-		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCollarColor(), backwards));
+		this.setCollarColor(
+				EnumUtils.cycleEnumConstantNullable(
+						DyeColor.class,
+						this.getCollarColor(),
+						backwards
+				)
+		);
 	}
 
 	private void applyCollarColor() {
@@ -156,19 +177,26 @@ public class WolfShop extends SittableShop<Wolf> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(collarColor));
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonCollarColor, Messages.buttonCollarColorLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonCollarColor,
+				Messages.buttonCollarColorLore
+		);
 		return iconItem;
 	}
 
 	private Button getCollarColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getCollarColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleCollarColor(backwards);
 				return true;

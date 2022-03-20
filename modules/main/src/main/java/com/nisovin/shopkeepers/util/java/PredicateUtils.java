@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.function.Predicate;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public final class PredicateUtils {
 
 	private static final Predicate<Object> ALWAYS_TRUE = (object) -> true;
@@ -32,8 +34,8 @@ public final class PredicateUtils {
 	}
 
 	/**
-	 * Returns the given {@link Predicate} if it is not <code>null</code>, and otherwise a Predicate that always returns
-	 * <code>true</code>.
+	 * Returns the given {@link Predicate} if it is not <code>null</code>, and otherwise a Predicate
+	 * that always returns <code>true</code>.
 	 * 
 	 * @param <T>
 	 *            the predicate type
@@ -41,14 +43,14 @@ public final class PredicateUtils {
 	 *            a predicate, possibly <code>null</code>
 	 * @return the predicate
 	 */
-	public static <T> Predicate<T> orAlwaysTrue(Predicate<T> predicate) {
+	public static <T> Predicate<T> orAlwaysTrue(@Nullable Predicate<T> predicate) {
 		if (predicate != null) return predicate;
 		return alwaysTrue();
 	}
 
 	/**
-	 * Returns the given {@link Predicate} if it is not <code>null</code>, and otherwise a Predicate that always returns
-	 * <code>false</code>.
+	 * Returns the given {@link Predicate} if it is not <code>null</code>, and otherwise a Predicate
+	 * that always returns <code>false</code>.
 	 * 
 	 * @param <T>
 	 *            the predicate type
@@ -56,7 +58,7 @@ public final class PredicateUtils {
 	 *            a predicate, possibly <code>null</code>
 	 * @return the predicate
 	 */
-	public static <T> Predicate<T> orAlwaysFalse(Predicate<T> predicate) {
+	public static <T> Predicate<T> orAlwaysFalse(@Nullable Predicate<T> predicate) {
 		if (predicate != null) return predicate;
 		return alwaysFalse();
 	}

@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.api.internal;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
@@ -20,7 +21,8 @@ public interface ApiInternals {
 	 * 
 	 * @return the internals, not <code>null</code>
 	 * @throws IllegalStateException
-	 *             if the API is not enabled currently, e.g. because the plugin is not enabled currently
+	 *             if the API is not enabled currently, e.g. because the plugin is not enabled
+	 *             currently
 	 */
 	public static ApiInternals getInstance() {
 		return InternalShopkeepersAPI.getPlugin().getApiInternals();
@@ -31,20 +33,25 @@ public interface ApiInternals {
 	/**
 	 * Creates an {@link UnmodifiableItemStack} for the given {@link ItemStack}.
 	 * <p>
-	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given item stack itself.
+	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given
+	 * item stack itself.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be <code>null</code>
-	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
+	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is
+	 *         <code>null</code>
 	 * @see UnmodifiableItemStack#of(ItemStack)
 	 */
-	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack);
+	public @Nullable UnmodifiableItemStack createUnmodifiableItemStack(
+			@Nullable ItemStack itemStack
+	);
 
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
-	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
+	 * and therefore not copied before it is stored by the price offer. Otherwise, it is first
+	 * copied.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -58,7 +65,8 @@ public interface ApiInternals {
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored
+	 * by the price offer.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -72,8 +80,9 @@ public interface ApiInternals {
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
-	 * copied before they are stored by the trade offer. Otherwise, they are first copied.
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
+	 * and therefore not copied before they are stored by the trade offer. Otherwise, they are first
+	 * copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -84,13 +93,17 @@ public interface ApiInternals {
 	 * @return the new offer
 	 * @see TradeOffer#create(ItemStack, ItemStack, ItemStack)
 	 */
-	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2);
+	public TradeOffer createTradeOffer(
+			ItemStack resultItem,
+			ItemStack item1,
+			@Nullable ItemStack item2
+	);
 
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trade
-	 * offer.
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are
+	 * stored by the trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -101,7 +114,11 @@ public interface ApiInternals {
 	 * @return the new offer
 	 * @see TradeOffer#create(UnmodifiableItemStack, UnmodifiableItemStack, UnmodifiableItemStack)
 	 */
-	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2);
+	public TradeOffer createTradeOffer(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	);
 
 	/**
 	 * Creates a new {@link BookOffer}.

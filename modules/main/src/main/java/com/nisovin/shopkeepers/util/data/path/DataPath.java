@@ -4,35 +4,42 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * Immutable representation of the location of an element inside the hierarchical structure of some data object.
+ * Immutable representation of the location of an element inside the hierarchical structure of some
+ * data object.
  * <p>
- * Data objects are often recursively composed of branching elements such as {@link DataContainer}s and {@link List}s.
- * Each segment of a {@link DataPath} represents a 'level of depth' in this hierarchical structure.
+ * Data objects are often recursively composed of branching elements such as {@link DataContainer}s
+ * and {@link List}s. Each segment of a {@link DataPath} represents a 'level of depth' in this
+ * hierarchical structure.
  * <p>
- * There is no fixed definition for what constitutes a 'level of depth' for different types of data objects, or how a
- * {@link DataPath} represents these levels. Currently, {@link DataPath#resolve(Object)} supports branching for
- * {@link DataContainer}s and {@link List}s and uses the element key or the String representation of the list index for
- * the respective element lookup.
+ * There is no fixed definition for what constitutes a 'level of depth' for different types of data
+ * objects, or how a {@link DataPath} represents these levels. Currently,
+ * {@link DataPath#resolve(Object)} supports branching for {@link DataContainer}s and {@link List}s
+ * and uses the element key or the String representation of the list index for the respective
+ * element lookup.
  */
 public final class DataPath {
 
-	// TODO Add a user-friendly string representation and parsing of data paths, maybe using 'dot' as segment separator
-	// (and blocking it from being used as key in DataContainers?)
-	// TODO Change the representation of list elements from "a.1.c" to "a[1].c"? Introduce segment types ('queries')
-	// that can only be resolved against specific types of data objects?
+	// TODO Add a user-friendly string representation and parsing of data paths, maybe using 'dot'
+	// as segment separator (and blocking it from being used as key in DataContainers?)
+	// TODO Change the representation of list elements from "a.1.c" to "a[1].c"? Introduce segment
+	// types ('queries') that can only be resolved against specific types of data objects?
 
 	/**
 	 * An empty {@link DataPath}.
 	 */
 	public static final DataPath EMPTY = new DataPath();
 
-	private final List<String> segments; // Not null, can be empty, immutable
+	private final List<? extends @NonNull String> segments; // Not null, can be empty, immutable
 
 	private DataPath() {
 		this(Collections.emptyList(), true);
@@ -45,7 +52,10 @@ public final class DataPath {
 	 *            the segment, not <code>null</code> or empty
 	 */
 	public DataPath(String segment) {
-		this(Collections.singletonList(Validate.notEmpty(segment, "segment is null or empty")), true);
+		this(
+				Collections.singletonList(Validate.notEmpty(segment, "segment is null or empty")),
+				true
+		);
 	}
 
 	/**
@@ -56,11 +66,11 @@ public final class DataPath {
 	 * @param segments
 	 *            the segments, not <code>null</code>
 	 */
-	public DataPath(List<String> segments) {
+	public DataPath(List<? extends @NonNull String> segments) {
 		this(segments, false);
 	}
 
-	private DataPath(List<String> segments, boolean assumeSafe) {
+	private DataPath(List<? extends @NonNull String> segments, boolean assumeSafe) {
 		if (assumeSafe) {
 			this.segments = segments;
 		} else {
@@ -77,7 +87,7 @@ public final class DataPath {
 	 * 
 	 * @return the segments, not <code>null</code>, can be empty
 	 */
-	public List<String> getSegments() {
+	public List<? extends @NonNull String> getSegments() {
 		return segments;
 	}
 
@@ -104,7 +114,7 @@ public final class DataPath {
 	 * 
 	 * @return the first segment, or <code>null</code> if this path is empty
 	 */
-	public String getFirstSegment() {
+	public @Nullable String getFirstSegment() {
 		return this.isEmpty() ? null : segments.get(0);
 	}
 
@@ -113,7 +123,7 @@ public final class DataPath {
 	 * 
 	 * @return the last segment, or <code>null</code> if this path is empty
 	 */
-	public String getLastSegment() {
+	public @Nullable String getLastSegment() {
 		return this.isEmpty() ? null : segments.get(segments.size() - 1);
 	}
 
@@ -122,7 +132,7 @@ public final class DataPath {
 	 * 
 	 * @return the parent path, or <code>null</code> if this path is empty
 	 */
-	public DataPath getParentPath() {
+	public @Nullable DataPath getParentPath() {
 		return this.isEmpty() ? null : this.getSubPath(0, segments.size() - 1);
 	}
 
@@ -131,13 +141,13 @@ public final class DataPath {
 	 * 
 	 * @return the child path, or <code>null</code> if this path is empty
 	 */
-	public DataPath getChildPath() {
+	public @Nullable DataPath getChildPath() {
 		return this.isEmpty() ? null : this.getSubPath(1, segments.size());
 	}
 
 	/**
-	 * Gets a new path that consists of the segments between the specified {@code fromIndex} (inclusive) and
-	 * {@code toIndex} (exclusive).
+	 * Gets a new path that consists of the segments between the specified {@code fromIndex}
+	 * (inclusive) and {@code toIndex} (exclusive).
 	 * <p>
 	 * If {@code fromIndex} and {@code toIndex} are equal, the returned path is empty.
 	 * 
@@ -162,7 +172,9 @@ public final class DataPath {
 	 */
 	public DataPath append(String segment) {
 		Validate.notEmpty(segment, "segment is null or empty");
-		List<String> newSegments = CollectionUtils.unmodifiableCopyAndAdd(segments, segment);
+		List<? extends @NonNull String> newSegments = CollectionUtils.unmodifiableCopyAndAdd(
+				segments, segment
+		);
 		return new DataPath(newSegments, true);
 	}
 
@@ -177,25 +189,27 @@ public final class DataPath {
 		Validate.notNull(path, "path is null");
 		if (this.isEmpty()) return path;
 		if (path.isEmpty()) return this;
-		List<String> newSegments = CollectionUtils.unmodifiableCopyAndAddAll(segments, path.getSegments());
+		List<? extends @NonNull String> newSegments = CollectionUtils.unmodifiableCopyAndAddAll(
+				segments, path.getSegments()
+		);
 		return new DataPath(newSegments, true);
 	}
 
 	/**
 	 * Resolves this path against the given data object.
 	 * <p>
-	 * This returns the object pointed to by this path relative to the given object by traversing the hierarchical
-	 * structure of the given object as specified by this path.
+	 * This returns the object pointed to by this path relative to the given object by traversing
+	 * the hierarchical structure of the given object as specified by this path.
 	 * 
 	 * @param dataObject
 	 *            the data object to resolve this path against, can be <code>null</code>
 	 * @return the resolved data object, or <code>null</code> if no object is found for this path
 	 */
-	public Object resolve(Object dataObject) {
+	public @Nullable Object resolve(@Nullable Object dataObject) {
 		if (dataObject == null) return null;
 		if (this.isEmpty()) return dataObject;
 
-		String nextSegment = this.getFirstSegment();
+		String nextSegment = Unsafe.assertNonNull(this.getFirstSegment());
 		Object nextElement = null;
 
 		DataContainer dataContainer = DataContainer.of(dataObject);
@@ -213,7 +227,8 @@ public final class DataPath {
 		}
 
 		if (nextElement != null) {
-			return this.getChildPath().resolve(nextElement);
+			DataPath childPath = Unsafe.assertNonNull(this.getChildPath());
+			return childPath.resolve(nextElement);
 		} else {
 			return null;
 		}
@@ -228,7 +243,7 @@ public final class DataPath {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof DataPath)) return false;
 		DataPath other = (DataPath) obj;

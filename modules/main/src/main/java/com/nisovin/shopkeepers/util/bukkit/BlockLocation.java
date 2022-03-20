@@ -6,7 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -15,8 +17,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * The world name can also be {@link #hasWorldName() unset}.
  * <p>
- * This type is immutable, but has mutable subclasses such as {@link MutableBlockLocation}. Use {@link #immutable()} to
- * get a block location that is guaranteed to be immutable.
+ * This type is immutable, but has mutable subclasses such as {@link MutableBlockLocation}. Use
+ * {@link #immutable()} to get a block location that is guaranteed to be immutable.
  */
 public class BlockLocation {
 
@@ -34,14 +36,20 @@ public class BlockLocation {
 	 */
 	public static BlockLocation of(Block block) {
 		Validate.notNull(block, "block is null");
-		return new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+		return new BlockLocation(
+				block.getWorld().getName(),
+				block.getX(),
+				block.getY(),
+				block.getZ()
+		);
 	}
 
 	/**
 	 * Creates a new {@link BlockLocation} for the given {@link Location}.
 	 * <p>
-	 * If the given location stores no world, this returns a block location with unset world name. If the given location
-	 * stores a world, but the world has been unloaded by now, this throws an exception.
+	 * If the given location stores no world, this returns a block location with unset world name.
+	 * If the given location stores a world, but the world has been unloaded by now, this throws an
+	 * exception.
 	 * 
 	 * @param location
 	 *            the location, not <code>null</code>
@@ -51,12 +59,18 @@ public class BlockLocation {
 	 */
 	public static BlockLocation of(Location location) {
 		Validate.notNull(location, "location is null");
-		// Note: We do not check Location#isWorldLoaded here, because if the location references a world that has been
-		// unloaded by now, this is likely an error that we want to inform about via an exception.
+		// Note: We do not check Location#isWorldLoaded here, because if the location references a
+		// world that has been unloaded by now, this is likely an error that we want to inform about
+		// via an exception.
 		// This throws an exception if the world has been unloaded:
 		World world = location.getWorld();
 		String worldName = (world != null) ? world.getName() : null;
-		return new BlockLocation(worldName, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		return new BlockLocation(
+				worldName,
+				location.getBlockX(),
+				location.getBlockY(),
+				location.getBlockZ()
+		);
 	}
 
 	/**
@@ -72,7 +86,7 @@ public class BlockLocation {
 
 	/////
 
-	private String worldName; // Not empty, but can be null
+	private @Nullable String worldName; // Not empty, but can be null
 	private int x;
 	private int y;
 	private int z;
@@ -110,7 +124,7 @@ public class BlockLocation {
 	 * @param z
 	 *            the z coordinate
 	 */
-	public BlockLocation(String worldName, int x, int y, int z) {
+	public BlockLocation(@Nullable String worldName, int x, int y, int z) {
 		validateWorldName(worldName);
 		this.worldName = worldName;
 		this.x = x;
@@ -121,7 +135,8 @@ public class BlockLocation {
 	/**
 	 * Creates a new {@link BlockLocation} with unset world name.
 	 * <p>
-	 * The given precise coordinates are converted to block coordinates using {@link #toBlock(double)}.
+	 * The given precise coordinates are converted to block coordinates using
+	 * {@link #toBlock(double)}.
 	 * 
 	 * @param x
 	 *            the precise x coordinate
@@ -137,7 +152,8 @@ public class BlockLocation {
 	/**
 	 * Creates a new {@link BlockLocation}.
 	 * <p>
-	 * The given precise coordinates are converted to block coordinates using {@link #toBlock(double)}.
+	 * The given precise coordinates are converted to block coordinates using
+	 * {@link #toBlock(double)}.
 	 * 
 	 * @param worldName
 	 *            the non-empty world name, or <code>null</code>
@@ -148,11 +164,11 @@ public class BlockLocation {
 	 * @param z
 	 *            the precise z coordinate
 	 */
-	public BlockLocation(String worldName, double x, double y, double z) {
+	public BlockLocation(@Nullable String worldName, double x, double y, double z) {
 		this(worldName, toBlock(x), toBlock(y), toBlock(z));
 	}
 
-	private static void validateWorldName(String worldName) {
+	private static void validateWorldName(@Nullable String worldName) {
 		Validate.isTrue(worldName == null || !worldName.isEmpty(), "worldName is empty");
 	}
 
@@ -161,7 +177,7 @@ public class BlockLocation {
 	 * 
 	 * @return the non-empty world name, or <code>null</code> if the world name is not set
 	 */
-	public final String getWorldName() {
+	public final @Nullable String getWorldName() {
 		return worldName;
 	}
 
@@ -180,7 +196,7 @@ public class BlockLocation {
 	 * @param worldName
 	 *            the non-empty world name, or <code>null</code>
 	 */
-	protected void setWorldName(String worldName) {
+	protected void setWorldName(@Nullable String worldName) {
 		validateWorldName(worldName);
 		this.worldName = worldName;
 	}
@@ -243,7 +259,8 @@ public class BlockLocation {
 	}
 
 	/**
-	 * Checks if this location is empty, i.e. if it has no world name and all its coordinates are zero.
+	 * Checks if this location is empty, i.e. if it has no world name and all its coordinates are
+	 * zero.
 	 * 
 	 * @return <code>true</code> if this location is empty
 	 */
@@ -254,33 +271,36 @@ public class BlockLocation {
 	/**
 	 * Gets the {@link World} this block location is located in.
 	 * 
-	 * @return the world, or <code>null</code> if the world name of this block location is unset or if the world is not
-	 *         loaded currently
+	 * @return the world, or <code>null</code> if the world name of this block location is unset or
+	 *         if the world is not loaded currently
 	 */
-	public final World getWorld() {
+	public final @Nullable World getWorld() {
 		if (!this.hasWorldName()) return null;
-		return Bukkit.getWorld(worldName);
+		return Bukkit.getWorld(Unsafe.assertNonNull(worldName));
 	}
 
 	/**
 	 * Gets the {@link Block} that corresponds to this location.
 	 * 
-	 * @return the block, or <code>null</code> if the world name of this block location is unset or if the world is not
-	 *         loaded currently
+	 * @return the block, or <code>null</code> if the world name of this block location is unset or
+	 *         if the world is not loaded currently
 	 */
-	public final Block getBlock() {
+	public final @Nullable Block getBlock() {
 		World world = this.getWorld();
 		if (world == null) return null;
-		return world.getBlockAt(x, y, z); // Not null (even for coordinates outside the world's bounds)
+		// Not null (even for coordinates outside the world's bounds):
+		return world.getBlockAt(x, y, z);
 	}
 
 	/**
 	 * Gets the {@link ChunkCoords} of this location.
 	 * 
-	 * @return the {@link ChunkCoords}, or <code>null</code> if this location has no {@link #hasWorldName() world name}
+	 * @return the {@link ChunkCoords}, or <code>null</code> if this location has no
+	 *         {@link #hasWorldName() world name}
 	 */
-	public final ChunkCoords getChunkCoords() {
-		return this.hasWorldName() ? ChunkCoords.fromBlock(worldName, x, z) : null;
+	public final @Nullable ChunkCoords getChunkCoords() {
+		if (!this.hasWorldName()) return null;
+		return ChunkCoords.fromBlock(Unsafe.assertNonNull(worldName), x, z);
 	}
 
 	/**
@@ -296,7 +316,7 @@ public class BlockLocation {
 	 *            the z coordinate
 	 * @return <code>true</code> if the world name and coordinates match
 	 */
-	public final boolean matches(String worldName, int x, int y, int z) {
+	public final boolean matches(@Nullable String worldName, int x, int y, int z) {
 		if (this.x != x) return false;
 		if (this.y != y) return false;
 		if (this.z != z) return false;
@@ -312,7 +332,7 @@ public class BlockLocation {
 	 *            the block
 	 * @return <code>true</code> if the locations match
 	 */
-	public final boolean matches(Block block) {
+	public final boolean matches(@Nullable Block block) {
 		if (block == null) return false;
 		return this.matches(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
 	}
@@ -329,8 +349,8 @@ public class BlockLocation {
 	/**
 	 * Gets an immutable instance of this block location.
 	 * <p>
-	 * If this block location is already immutable, this returns the block location itself. Otherwise, an immutable copy
-	 * is returned.
+	 * If this block location is already immutable, this returns the block location itself.
+	 * Otherwise, an immutable copy is returned.
 	 * 
 	 * @return the immutable block location, not <code>null</code>
 	 */
@@ -359,7 +379,7 @@ public class BlockLocation {
 	public final int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + worldName.hashCode();
+		result = prime * result + (worldName != null ? worldName.hashCode() : 0);
 		result = prime * result + x;
 		result = prime * result + y;
 		result = prime * result + z;
@@ -367,7 +387,7 @@ public class BlockLocation {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public final boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof BlockLocation)) return false;
 		BlockLocation other = (BlockLocation) obj;

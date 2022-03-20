@@ -5,6 +5,8 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.debug.DebugOptions;
@@ -16,11 +18,12 @@ import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
- * Handles the temporary despawning and later respawning of shop objects that need to be despawned during world saves.
+ * Handles the temporary despawning and later respawning of shop objects that need to be despawned
+ * during world saves.
  */
 class WorldSaveDespawner {
 
-	private static final Predicate<AbstractShopkeeper> IS_DESPAWNED_DURING_WORLD_SAVE = (shopkeeper) -> {
+	private static final Predicate<@NonNull AbstractShopkeeper> IS_DESPAWNED_DURING_WORLD_SAVE = (shopkeeper) -> {
 		AbstractShopObjectType<?> objectType = shopkeeper.getShopObject().getType();
 		return objectType.mustDespawnDuringWorldSave();
 	};
@@ -29,7 +32,11 @@ class WorldSaveDespawner {
 	private final SKShopkeepersPlugin plugin;
 	private final SKShopkeeperRegistry shopkeeperRegistry;
 
-	WorldSaveDespawner(ShopkeeperSpawner spawner, SKShopkeepersPlugin plugin, SKShopkeeperRegistry shopkeeperRegistry) {
+	WorldSaveDespawner(
+			ShopkeeperSpawner spawner,
+			SKShopkeepersPlugin plugin,
+			SKShopkeeperRegistry shopkeeperRegistry
+	) {
 		Validate.notNull(spawner, "spawner is null");
 		Validate.notNull(plugin, "plugin is null");
 		Validate.notNull(shopkeeperRegistry, "shopkeeperRegistry is null");
@@ -42,10 +49,10 @@ class WorldSaveDespawner {
 
 	void onWorldUnload(World world) {
 		assert world != null;
-		// If there are no shopkeepers in the world, the shopkeeper spawner might already have removed the world
-		// data, and thereby also already cancelled the world save respawn task.
-		// However, if there are shopkeepers in the world, the world data entry is kept, and we then cancel any
-		// currently active world save respawn task here.
+		// If there are no shopkeepers in the world, the shopkeeper spawner might already have
+		// removed the world data, and thereby also already cancelled the world save respawn task.
+		// However, if there are shopkeepers in the world, the world data entry is kept, and we then
+		// cancel any currently active world save respawn task here.
 		String worldName = world.getName();
 		WorldData worldData = spawner.getWorldData(worldName);
 		if (worldData == null) return;
@@ -56,8 +63,9 @@ class WorldSaveDespawner {
 	void onWorldSave(World world) {
 		assert world != null;
 		String worldName = world.getName();
-		// Note: Shopkeepers can be added to the world while the world is being saved. To track whether the world is
-		// currently being saved, we start the respawn task even if the world does not yet contain any shopkeepers.
+		// Note: Shopkeepers can be added to the world while the world is being saved. To track
+		// whether the world is currently being saved, we start the respawn task even if the world
+		// does not yet contain any shopkeepers.
 		WorldData worldData = spawner.getOrCreateWorldData(worldName);
 		if (worldData.isWorldSaveRespawnPending()) {
 			// We are already processing a save of this world.
@@ -69,17 +77,24 @@ class WorldSaveDespawner {
 		}
 
 		// Set up the world save respawn task:
-		// This is done prior to the despawning of shopkeepers, because the presence of this task is also used to
-		// indicate that the world is currently being saved.
+		// This is done prior to the despawning of shopkeepers, because the presence of this task is
+		// also used to indicate that the world is currently being saved.
 		new RespawnShopkeepersAfterWorldSaveTask(worldData).start();
 
-		// Note: The chunks stays marked as active during the temporary despawning of the shopkeepers.
-		// Note: The shopkeepers remain ticking during the temporary despawning. Since we assume that the world save
-		// will be complete on the next tick, this should not be an issue, even if one of the shop objects is ticked and
-		// respawns itself before our respawn task is run. However, to prevent this inconsistent respawning
-		// responsibility anyway, we set the shopkeeper to state 'world-save-respawn-pending', so that the shop object
-		// can skip any respawn attempts while our respawn task is still pending.
-		spawner.despawnShopkeepersInWorld(worldName, "world saving", IS_DESPAWNED_DURING_WORLD_SAVE, this::setPendingWorldSaveRespawn);
+		// Note: The chunks stays marked as active during the temporary despawning of the
+		// shopkeepers.
+		// Note: The shopkeepers remain ticking during the temporary despawning. Since we assume
+		// that the world save will be complete on the next tick, this should not be an issue, even
+		// if one of the shop objects is ticked and respawns itself before our respawn task is run.
+		// However, to prevent this inconsistent respawning responsibility anyway, we set the
+		// shopkeeper to state 'world-save-respawn-pending', so that the shop object can skip any
+		// respawn attempts while our respawn task is still pending.
+		spawner.despawnShopkeepersInWorld(
+				worldName,
+				"world saving",
+				IS_DESPAWNED_DURING_WORLD_SAVE,
+				this::setPendingWorldSaveRespawn
+		);
 	}
 
 	private void setPendingWorldSaveRespawn(AbstractShopkeeper shopkeeper) {
@@ -91,7 +106,7 @@ class WorldSaveDespawner {
 	class RespawnShopkeepersAfterWorldSaveTask implements Runnable {
 
 		private final WorldData worldData;
-		private BukkitTask task;
+		private @Nullable BukkitTask task;
 
 		RespawnShopkeepersAfterWorldSaveTask(WorldData worldData) {
 			assert worldData != null;
@@ -109,15 +124,23 @@ class WorldSaveDespawner {
 			// Assert: World is still loaded (the task is cancelled on world unload).
 			worldData.setWorldSaveRespawnTask(null);
 
-			// In order to not have players wait for shopkeepers to respawn after world saves, we respawn the
-			// shopkeepers immediately in this case:
-			spawner.spawnShopkeepersInWorld(worldData.getWorldName(), "world saving finished", IS_DESPAWNED_DURING_WORLD_SAVE, true);
+			// In order to not have players wait for shopkeepers to respawn after world saves, we
+			// respawn the shopkeepers immediately in this case:
+			spawner.spawnShopkeepersInWorld(
+					worldData.getWorldName(),
+					"world saving finished",
+					IS_DESPAWNED_DURING_WORLD_SAVE,
+					true
+			);
 		}
 
 		public void cancel() {
-			task.cancel();
-			task = null;
-			this.onCancelled();
+			if (task != null) {
+				task.cancel();
+				task = null;
+				worldData.setWorldSaveRespawnTask(null);
+				this.onCancelled();
+			}
 		}
 
 		private void onCancelled() {

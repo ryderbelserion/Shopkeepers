@@ -5,19 +5,20 @@ import java.util.Collection;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.user.User;
 
 /**
- * This event is called whenever a player is detected to be inactive and their {@link PlayerShopkeeper shopkeepers} are
- * about to be deleted.
+ * This event is called whenever a player is detected to be inactive and their
+ * {@link PlayerShopkeeper shopkeepers} are about to be deleted.
  */
 public class PlayerInactiveEvent extends Event implements Cancellable {
 
 	private final User user;
-	private final Collection<? extends PlayerShopkeeper> shopkeepers;
+	private final Collection<? extends @NonNull PlayerShopkeeper> shopkeepers;
 	private boolean cancelled = false;
 
 	/**
@@ -26,9 +27,10 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	 * @param user
 	 *            the inactive user, not <code>null</code>
 	 * @param shopkeepers
-	 *            the user's owned shopkeepers that are about to be deleted, not <code>null</code> but can be empty
+	 *            the user's owned shopkeepers that are about to be deleted, not <code>null</code>
+	 *            but can be empty
 	 */
-	public PlayerInactiveEvent(User user, Collection<? extends PlayerShopkeeper> shopkeepers) {
+	public PlayerInactiveEvent(User user, Collection<? extends @NonNull PlayerShopkeeper> shopkeepers) {
 		Preconditions.checkNotNull(user, "user is null");
 		Preconditions.checkNotNull(shopkeepers, "shopkeepers is null");
 		this.user = user;
@@ -47,12 +49,12 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	/**
 	 * Gets the shopkeepers that are about to be deleted.
 	 * <p>
-	 * The returned collection is modifiable: Removing shopkeepers from it will skip their deletion. Adding shopkeepers
-	 * to the list is not supported.
+	 * The returned collection is modifiable: Removing shopkeepers from it will skip their deletion.
+	 * Adding shopkeepers to the list is not supported.
 	 * 
 	 * @return the shopkeepers that are about to be deleted, not <code>null</code> but may be empty
 	 */
-	public Collection<? extends PlayerShopkeeper> getShopkeepers() {
+	public Collection<? extends @NonNull PlayerShopkeeper> getShopkeepers() {
 		return shopkeepers;
 	}
 

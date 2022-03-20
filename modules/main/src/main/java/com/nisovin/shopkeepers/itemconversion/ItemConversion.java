@@ -8,46 +8,55 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemSerialization;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class ItemConversion {
+public final class ItemConversion {
 
-	private ItemConversion() {
-	}
-
-	// Converts the given ItemStack to conform to Spigot's internal data format by running it through Spigot's item
-	// de/serialization. Use oldItemStack.isSimilar(newItemStack) to test whether the item has changed.
-	// Note: This is performing much better compared to serializing and deserializing a YAML config containing the item.
-	public static ItemStack convertItem(@ReadOnly ItemStack itemStack) {
+	// Converts the given ItemStack to conform to Spigot's internal data format by running it
+	// through Spigot's item de/serialization. Use oldItemStack.isSimilar(newItemStack) to test
+	// whether the item has changed.
+	// Note: This is performing much better compared to serializing and deserializing a YAML config
+	// containing the item.
+	public static @Nullable ItemStack convertItem(@ReadOnly @Nullable ItemStack itemStack) {
 		if (itemStack == null) return null;
 		ItemMeta itemMeta = itemStack.getItemMeta(); // Can be null
-		Map<String, Object> serializedItemMeta = ItemSerialization.serializeItemMeta(itemMeta); // Can be null
+		// Can be null:
+		Map<? extends @NonNull String, @NonNull ?> serializedItemMeta = ItemSerialization.serializeItemMeta(itemMeta);
 		if (serializedItemMeta == null) {
 			// Item has no ItemMeta that could get converted:
 			return itemStack;
 		}
-		ItemMeta deserializedItemMeta = ItemSerialization.deserializeItemMeta(serializedItemMeta); // Can be null
-		// TODO Avoid copy (also copies the metadata again) by serializing and deserializing the complete ItemStack?
+		// Can be null:
+		ItemMeta deserializedItemMeta = ItemSerialization.deserializeItemMeta(serializedItemMeta);
+		// TODO Avoid copy (also copies the metadata again) by serializing and deserializing the
+		// complete ItemStack?
 		ItemStack convertedItemStack = itemStack.clone();
 		convertedItemStack.setItemMeta(deserializedItemMeta);
 		return convertedItemStack;
 	}
 
-	public static int convertItems(@ReadWrite ItemStack @ReadOnly [] contents, Predicate<@ReadOnly ItemStack> filter) {
+	public static int convertItems(
+			@ReadOnly @Nullable ItemStack @ReadWrite [] contents,
+			Predicate<@ReadOnly ? super @NonNull ItemStack> filter
+	) {
 		Validate.notNull(contents, "contents is null");
-		filter = PredicateUtils.orAlwaysTrue(filter);
+		Validate.notNull(filter, "filter is null");
 		int convertedStacks = 0;
 		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack slotItem = contents[slot];
 			if (ItemUtils.isEmpty(slotItem)) continue;
+			slotItem = Unsafe.assertNonNull(slotItem);
 			if (!filter.test(slotItem)) continue;
+
 			ItemStack convertedItem = convertItem(slotItem);
 			if (!slotItem.isSimilar(convertedItem)) {
 				contents[slot] = convertedItem;
@@ -57,12 +66,16 @@ public class ItemConversion {
 		return convertedStacks;
 	}
 
-	public static int convertItems(Inventory inventory, Predicate<@ReadOnly ItemStack> filter, boolean updateViewers) {
+	public static int convertItems(
+			Inventory inventory,
+			Predicate<@ReadOnly ? super @NonNull ItemStack> filter,
+			boolean updateViewers
+	) {
 		Validate.notNull(inventory, "inventory is null");
-		filter = PredicateUtils.orAlwaysTrue(filter);
+		Validate.notNull(filter, "filter is null");
 
 		// Convert inventory contents (includes armor and off hand slots for player inventories):
-		ItemStack[] contents = inventory.getContents();
+		@Nullable ItemStack[] contents = Unsafe.castNonNull(inventory.getContents());
 		int convertedStacks = convertItems(contents, filter);
 		if (convertedStacks > 0) {
 			// Apply changes back to the inventory:
@@ -71,7 +84,7 @@ public class ItemConversion {
 
 		if (inventory instanceof PlayerInventory) {
 			// Also convert the item on the cursor:
-			Player player = (Player) ((PlayerInventory) inventory).getHolder();
+			Player player = Unsafe.castNonNull(((PlayerInventory) inventory).getHolder());
 			ItemStack cursor = player.getItemOnCursor();
 			if (!ItemUtils.isEmpty(cursor) && filter.test(cursor)) {
 				ItemStack convertedCursor = convertItem(cursor);
@@ -86,5 +99,8 @@ public class ItemConversion {
 			InventoryUtils.updateInventoryLater(inventory);
 		}
 		return convertedStacks;
+	}
+
+	private ItemConversion() {
 	}
 }

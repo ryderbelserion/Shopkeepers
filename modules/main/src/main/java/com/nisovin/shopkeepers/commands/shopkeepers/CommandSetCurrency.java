@@ -42,7 +42,7 @@ class CommandSetCurrency extends PlayerCommand {
 		Player player = (Player) input.getSender();
 
 		Currency currency;
-		String currencyType = context.get(ARGUMENT_CURRENCY);
+		String currencyType = context.getOrNull(ARGUMENT_CURRENCY);
 		if (currencyType != null) {
 			currency = Currencies.getById(StringUtils.normalize(currencyType));
 			if (currency == null) {

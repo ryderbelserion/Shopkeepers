@@ -2,21 +2,24 @@ package com.nisovin.shopkeepers.util.data.container.value;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * A container for a single non-<code>null</code> value of data.
  * <p>
- * An implementation may either store the value itself, or it may provide a view on the value that is stored in an
- * underlying data structure, such as in an entry of a {@link DataContainer}.
+ * An implementation may either store the value itself, or it may provide a view on the value that
+ * is stored in an underlying data structure, such as in an entry of a {@link DataContainer}.
  * <p>
  * The value may or may not be {@link #isPresent() present}.
  * <p>
  * Some implementations may not allow {@link #set(Object) setting} the value.
  * <p>
- * In order to serve as an intermediate representation of data, independent of any concrete storage format, the same
- * limitations apply to the stored value as for values stored by {@link DataContainer}s. Directly serializing
- * {@link DataValue}s themselves might not be supported.
+ * In order to serve as an intermediate representation of data, independent of any concrete storage
+ * format, the same limitations apply to the stored value as for values stored by
+ * {@link DataContainer}s. Directly serializing {@link DataValue}s themselves might not be
+ * supported.
  * <p>
  * {@link Object#equals(Object)} compares {@link DataValue}s based on their stored value.
  * 
@@ -40,7 +43,7 @@ public interface DataValue {
 	 *            the initially stored value, or <code>null</code>
 	 * @return the newly created {@link DataValue}
 	 */
-	public static DataValue of(Object value) {
+	public static DataValue of(@Nullable Object value) {
 		return new SimpleDataValue(value);
 	}
 
@@ -60,7 +63,7 @@ public interface DataValue {
 	 * 
 	 * @return the value, or <code>null</code> if the value is not present
 	 */
-	public default Object get() {
+	public default @Nullable Object get() {
 		return this.getOrDefault(null);
 	}
 
@@ -73,7 +76,7 @@ public interface DataValue {
 	 *            the default value, can be <code>null</code>
 	 * @return the value, or the given default value if the value is not present
 	 */
-	public Object getOrDefault(Object defaultValue);
+	public @Nullable Object getOrDefault(@Nullable Object defaultValue);
 
 	/**
 	 * Checks if the value is present and of the specified type.
@@ -95,7 +98,7 @@ public interface DataValue {
 	 *            the expected type of the value
 	 * @return the value, or <code>null</code> if the value is not of the specified type
 	 */
-	public default <T> T getOfType(Class<T> type) {
+	public default <T> @Nullable T getOfType(Class<T> type) {
 		return this.getOfTypeOrDefault(type, null);
 	}
 
@@ -112,7 +115,7 @@ public interface DataValue {
 	 *            the default value, can be <code>null</code>
 	 * @return the value, or the given default value if the value is not of the specified type
 	 */
-	public <T> T getOfTypeOrDefault(Class<T> type, T defaultValue);
+	public <T> @Nullable T getOfTypeOrDefault(Class<T> type, @Nullable T defaultValue);
 
 	/**
 	 * Checks if the value is present and a {@link String}.
@@ -131,7 +134,7 @@ public interface DataValue {
 	 * 
 	 * @return the String, or <code>null</code> if the value cannot be converted to a String
 	 */
-	public default String getString() {
+	public default @Nullable String getString() {
 		return this.getStringOrDefault(null);
 	}
 
@@ -144,7 +147,7 @@ public interface DataValue {
 	 *            the default value, can be <code>null</code>
 	 * @return the String, or the given default value if the value cannot be converted to a String
 	 */
-	public String getStringOrDefault(String defaultValue);
+	public @Nullable String getStringOrDefault(@Nullable String defaultValue);
 
 	/**
 	 * Checks if the value is present and a {@link Number}.
@@ -161,7 +164,8 @@ public interface DataValue {
 	/**
 	 * Gets the value converted to an {@link Integer}.
 	 * 
-	 * @return the Integer (not <code>null</code>), or <code>0</code> if the value cannot be converted to an Integer
+	 * @return the Integer (not <code>null</code>), or <code>0</code> if the value cannot be
+	 *         converted to an Integer
 	 */
 	public default int getInt() {
 		return this.getIntOrDefault(0);
@@ -174,15 +178,16 @@ public interface DataValue {
 	 * 
 	 * @param defaultValue
 	 *            the default value
-	 * @return the Integer (not <code>null</code>), or the given default value if the value cannot be converted to an
-	 *         Integer
+	 * @return the Integer (not <code>null</code>), or the given default value if the value cannot
+	 *         be converted to an Integer
 	 */
 	public int getIntOrDefault(int defaultValue);
 
 	/**
 	 * Gets the value converted to a {@link Long}.
 	 * 
-	 * @return the Long (not <code>null</code>), or <code>0L</code> if the value cannot be converted to a Long
+	 * @return the Long (not <code>null</code>), or <code>0L</code> if the value cannot be converted
+	 *         to a Long
 	 */
 	public default long getLong() {
 		return this.getLongOrDefault(0L);
@@ -195,14 +200,16 @@ public interface DataValue {
 	 * 
 	 * @param defaultValue
 	 *            the default value
-	 * @return the Long (not <code>null</code>), or the given default value if the value cannot be converted to a Long
+	 * @return the Long (not <code>null</code>), or the given default value if the value cannot be
+	 *         converted to a Long
 	 */
 	public long getLongOrDefault(long defaultValue);
 
 	/**
 	 * Gets the value converted to a {@link Float}.
 	 * 
-	 * @return the Float (not <code>null</code>), or <code>0.0F</code> if the value cannot be converted to a Float
+	 * @return the Float (not <code>null</code>), or <code>0.0F</code> if the value cannot be
+	 *         converted to a Float
 	 */
 	public default float getFloat() {
 		return this.getFloatOrDefault(0.0F);
@@ -215,14 +222,16 @@ public interface DataValue {
 	 * 
 	 * @param defaultValue
 	 *            the default value
-	 * @return the Float (not <code>null</code>), or the given default value if the value cannot be converted to a Float
+	 * @return the Float (not <code>null</code>), or the given default value if the value cannot be
+	 *         converted to a Float
 	 */
 	public float getFloatOrDefault(float defaultValue);
 
 	/**
 	 * Gets the value converted to a {@link Double}.
 	 * 
-	 * @return the Double (not <code>null</code>), or <code>0.0D</code> if the value cannot be converted to a Double
+	 * @return the Double (not <code>null</code>), or <code>0.0D</code> if the value cannot be
+	 *         converted to a Double
 	 */
 	public default double getDouble() {
 		return this.getDoubleOrDefault(0.0D);
@@ -235,8 +244,8 @@ public interface DataValue {
 	 * 
 	 * @param defaultValue
 	 *            the default value
-	 * @return the Double (not <code>null</code>), or the given default value if the value cannot be converted to a
-	 *         Double
+	 * @return the Double (not <code>null</code>), or the given default value if the value cannot be
+	 *         converted to a Double
 	 */
 	public double getDoubleOrDefault(double defaultValue);
 
@@ -255,7 +264,8 @@ public interface DataValue {
 	/**
 	 * Gets the value converted to a {@link Boolean}.
 	 * 
-	 * @return the Boolean (not <code>null</code>), or <code>false</code> if the value cannot be converted to a Boolean
+	 * @return the Boolean (not <code>null</code>), or <code>false</code> if the value cannot be
+	 *         converted to a Boolean
 	 */
 	public default boolean getBoolean() {
 		return this.getBooleanOrDefault(false);
@@ -268,8 +278,8 @@ public interface DataValue {
 	 * 
 	 * @param defaultValue
 	 *            the default value
-	 * @return the Boolean (not <code>null</code>), or the given default value if the value cannot be converted to a
-	 *         Boolean
+	 * @return the Boolean (not <code>null</code>), or the given default value if the value cannot
+	 *         be converted to a Boolean
 	 */
 	public boolean getBooleanOrDefault(boolean defaultValue);
 
@@ -288,7 +298,7 @@ public interface DataValue {
 	 * 
 	 * @return the List, or <code>null</code> if the value is not a List
 	 */
-	public default List<?> getList() {
+	public default @Nullable List<?> getList() {
 		return this.getListOrDefault(null);
 	}
 
@@ -301,7 +311,7 @@ public interface DataValue {
 	 *            the default value, can be <code>null</code>
 	 * @return the List, or the given default value if the value is not a List
 	 */
-	public default List<?> getListOrDefault(List<?> defaultValue) {
+	public default @Nullable List<?> getListOrDefault(@Nullable List<?> defaultValue) {
 		Object value = this.get();
 		if (value instanceof List) {
 			return (List<?>) value;
@@ -311,7 +321,8 @@ public interface DataValue {
 	}
 
 	/**
-	 * Checks if the value is present and can be {@link DataContainer#of(Object) converted} to a {@link DataContainer}.
+	 * Checks if the value is present and can be {@link DataContainer#of(Object) converted} to a
+	 * {@link DataContainer}.
 	 * 
 	 * @return <code>true</code> if the value is present and can be converted to a data container
 	 */
@@ -323,16 +334,17 @@ public interface DataValue {
 	/**
 	 * Gets the value {@link DataContainer#of(Object) converted} to a {@link DataContainer}.
 	 * 
-	 * @return the data container, or <code>null</code> if the value cannot be converted to a data container
+	 * @return the data container, or <code>null</code> if the value cannot be converted to a data
+	 *         container
 	 */
-	public default DataContainer getContainer() {
+	public default @Nullable DataContainer getContainer() {
 		Object value = this.get();
 		return DataContainer.of(value);
 	}
 
 	/**
-	 * Creates a new empty {@link DataContainer} and stores its {@link DataContainer#serialize() serialized form} as
-	 * value.
+	 * Creates a new empty {@link DataContainer} and stores its {@link DataContainer#serialize()
+	 * serialized form} as value.
 	 * <p>
 	 * The returned data container reads and writes through to its stored serialized form.
 	 * <p>
@@ -353,20 +365,20 @@ public interface DataValue {
 	 * <p>
 	 * This will replace any other value that may currently be stored.
 	 * <p>
-	 * If the given value is <code>null</code>, this will clear the currently stored value by delegating the method call
-	 * to {@link #clear()}.
+	 * If the given value is <code>null</code>, this will clear the currently stored value by
+	 * delegating the method call to {@link #clear()}.
 	 * <p>
-	 * Because {@link DataContainer}s and {@link DataValue}s themselves are not guaranteed to be serializable and
-	 * storing them instead of their {@link DataContainer#serialize() serialized form} or underlying {@link #get()
-	 * value} is a commonly overlooked error, this method catches this error early by not allowing to store a
-	 * {@link DataContainer} or {@link DataValue}.
+	 * Because {@link DataContainer}s and {@link DataValue}s themselves are not guaranteed to be
+	 * serializable and storing them instead of their {@link DataContainer#serialize() serialized
+	 * form} or underlying {@link #get() value} is a commonly overlooked error, this method catches
+	 * this error early by not allowing to store a {@link DataContainer} or {@link DataValue}.
 	 * 
 	 * @param value
 	 *            the value to set, or <code>null</code> to remove any currently stored value
 	 * @throws UnsupportedOperationException
 	 *             if this {@link DataValue} is unmodifiable
 	 */
-	public void set(Object value);
+	public void set(@Nullable Object value);
 
 	/**
 	 * Clears the value.

@@ -16,11 +16,14 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -80,7 +83,8 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
  * Implementation hints:<br>
  * <ul>
  * <li>Make sure to follow the initialization instructions outlined in the constructor description.
- * <li>Make sure to call {@link #markDirty()} on every change of data that might need to be persisted.
+ * <li>Make sure to call {@link #markDirty()} on every change of data that might need to be
+ * persisted.
  * </ul>
  */
 public abstract class AbstractShopkeeper implements Shopkeeper {
@@ -99,11 +103,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// Shopkeeper tick visualization:
 	// Particles of different colors indicate the different ticking groups.
-	// Note: The client seems to randomly change the color slightly each time a dust particle is spawned.
+	// Note: The client seems to randomly change the color slightly each time a dust particle is
+	// spawned.
 	// Note: The particle size also determines the effect duration.
 	private static final DustOptions[] TICK_VISUALIZATION_DUSTS = new DustOptions[ShopkeeperTicker.TICKING_GROUPS];
 	static {
-		// Even distribution of colors in the HSB color space: Ensures a distinct color for each ticking group.
+		// Even distribution of colors in the HSB color space: Ensures a distinct color for each
+		// ticking group.
 		float hueStep = (1.0F / ShopkeeperTicker.TICKING_GROUPS);
 		for (int i = 0; i < ShopkeeperTicker.TICKING_GROUPS; ++i) {
 			float hue = i * hueStep; // Starts with red
@@ -114,7 +120,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Gets a short prefix that can be used for log messages related to the shopkeeper with the given id.
+	 * Gets a short prefix that can be used for log messages related to the shopkeeper with the
+	 * given id.
 	 * 
 	 * @param shopkeeperId
 	 *            the shopkeeper id
@@ -127,30 +134,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private boolean initialized = false;
 
 	private int id; // Valid and constant after initialization
-	private UUID uniqueId; // Not null and constant after initialization
-	private AbstractShopObject shopObject; // Not null after initialization
+	private UUID uniqueId = Unsafe.uncheckedNull(); // Not null and constant after initialization
+	private AbstractShopObject shopObject = Unsafe.uncheckedNull(); // Not null after initialization
 	// TODO Move location information into ShopObject?
 	// Immutable instances, null for virtual shops, always has a world name:
-	private BlockLocation location;
+	private @Nullable BlockLocation location;
 	private float yaw;
 
-	private ChunkCoords chunkCoords; // Null for virtual shops
+	private @Nullable ChunkCoords chunkCoords; // Null for virtual shops
 	// The ChunkCoords by which the shopkeeper is currently stored:
-	private ChunkCoords lastChunkCoords = null;
+	private @Nullable ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
 
-	private final List<SKShopkeeperSnapshot> snapshots = new ArrayList<>();
-	private final List<? extends SKShopkeeperSnapshot> snapshotsView = Collections.unmodifiableList(snapshots);
+	private final List<@NonNull SKShopkeeperSnapshot> snapshots = new ArrayList<>();
+	private final List<? extends @NonNull SKShopkeeperSnapshot> snapshotsView = Collections.unmodifiableList(snapshots);
 
-	private final ShopkeeperComponentHolder components = new ShopkeeperComponentHolder(this);
+	private final ShopkeeperComponentHolder components = new ShopkeeperComponentHolder(Unsafe.initialized(this));
 
 	// Map of dynamically evaluated message arguments:
-	private final Map<String, Supplier<Object>> messageArgumentsMap = new HashMap<>();
+	private final Map<@NonNull String, @NonNull Supplier<@NonNull ?>> messageArgumentsMap = new HashMap<>();
 	private final MessageArguments messageArguments = MessageArguments.ofMap(messageArgumentsMap);
 
-	// Whether there have been changes to the shopkeeper's data that the storage is not yet aware of. A value of 'false'
-	// only indicates that the storage is aware of the latest data of the shopkeeper, not that it has actually persisted
-	// the data to disk yet.
+	// Whether there have been changes to the shopkeeper's data that the storage is not yet aware
+	// of. A value of 'false' only indicates that the storage is aware of the latest data of the
+	// shopkeeper, not that it has actually persisted the data to disk yet.
 	private boolean dirty = false;
 	// Is currently registered:
 	private boolean valid = false;
@@ -158,7 +165,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private boolean ticking = false;
 
 	// UI type identifier -> UI handler
-	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
+	private final Map<@NonNull String, @NonNull UIHandler> uiHandlers = new HashMap<>();
 
 	// Internally used for load balancing purposes:
 	private final int tickingGroup = ShopkeeperTicker.nextTickingGroup();
@@ -169,8 +176,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Creates a shopkeeper.
 	 * <p>
 	 * Important: Depending on whether the shopkeeper gets freshly created or loaded, either
-	 * {@link #initOnCreation(int, ShopCreationData)} or {@link #initOnLoad(ShopkeeperData)} needs to be called to
-	 * complete the initialization.
+	 * {@link #initOnCreation(int, ShopCreationData)} or {@link #initOnLoad(ShopkeeperData)} needs
+	 * to be called to complete the initialization.
 	 */
 	protected AbstractShopkeeper() {
 	}
@@ -189,13 +196,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @see AbstractShopType#createShopkeeper(int, ShopCreationData)
 	 * @see #loadFromCreationData(int, ShopCreationData)
 	 */
-	final void initOnCreation(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	final void initOnCreation(
+			int id,
+			ShopCreationData shopCreationData
+	) throws ShopkeeperCreateException {
 		this.loadFromCreationData(id, shopCreationData);
 		this.commonSetup();
 	}
 
 	/**
-	 * Initializes this shopkeeper by loading its previously saved state from the given {@link ShopkeeperData}.
+	 * Initializes this shopkeeper by loading its previously saved state from the given
+	 * {@link ShopkeeperData}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -239,7 +250,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *             if the shopkeeper cannot be properly initialized
 	 * @see AbstractShopType#createShopkeeper(int, ShopCreationData)
 	 */
-	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected void loadFromCreationData(int id, ShopCreationData shopCreationData)
+			throws ShopkeeperCreateException {
 		this.getType().validateCreationData(shopCreationData);
 		this.initialize();
 
@@ -247,8 +259,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.uniqueId = UUID.randomUUID();
 
 		if (shopCreationData.getShopType() != this.getType()) {
-			throw new ShopkeeperCreateException("The shopCreationData is for a different shop type (expected: "
-					+ this.getType().getIdentifier() + ", got: " + shopCreationData.getShopType().getIdentifier() + ")!");
+			throw new ShopkeeperCreateException(
+					"The shopCreationData is for a different shop type (expected: "
+							+ this.getType().getIdentifier() + ", got: "
+							+ shopCreationData.getShopType().getIdentifier() + ")!"
+			);
 		}
 
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
@@ -261,32 +276,37 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.location = null;
 			this.yaw = 0.0F;
 		} else {
-			Location spawnLocation = shopCreationData.getSpawnLocation();
-			assert spawnLocation != null && spawnLocation.getWorld() != null;
+			Location spawnLocation = Unsafe.assertNonNull(shopCreationData.getSpawnLocation());
+			assert spawnLocation.getWorld() != null;
 			this.location = BlockLocation.of(spawnLocation);
 			assert this.location.hasWorldName();
 			this.yaw = spawnLocation.getYaw();
 		}
 		this.updateChunkCoords();
 
-		this.shopObject = this.createShopObject((AbstractShopObjectType<?>) shopObjectType, shopCreationData);
+		this.shopObject = this.createShopObject(
+				(AbstractShopObjectType<?>) shopObjectType,
+				shopCreationData
+		);
 
 		// Automatically mark new shopkeepers as dirty:
 		this.markDirty();
 	}
 
 	/**
-	 * This is called at the end of construction, after the shopkeeper data has been loaded, and can be used to perform
-	 * any remaining setup.
+	 * This is called at the end of construction, after the shopkeeper data has been loaded, and can
+	 * be used to perform any remaining setup.
 	 * <p>
-	 * This might set up defaults for some things, if not yet specified by the sub-classes. So if you are overriding
-	 * this method, consider doing your own setup before calling the overridden method. And also take into account that
-	 * further sub-classes might perform their setup prior to calling your setup method as well. So don't replace any
-	 * components that have already been set up by further sub-classes.
+	 * This might set up defaults for some things, if not yet specified by the sub-classes. So if
+	 * you are overriding this method, consider doing your own setup before calling the overridden
+	 * method. And also take into account that further sub-classes might perform their setup prior
+	 * to calling your setup method as well. So don't replace any components that have already been
+	 * set up by further sub-classes.
 	 * <p>
-	 * The shopkeeper has not yet been registered at this point! If the registration fails, or if the shopkeeper is
-	 * created for some other purpose, the {@link #onRemoval(ShopkeeperRemoveEvent.Cause)} and {@link #onDeletion()}
-	 * methods may never get called for this shopkeeper. For any setup that relies on cleanup during
+	 * The shopkeeper has not yet been registered at this point! If the registration fails, or if
+	 * the shopkeeper is created for some other purpose, the
+	 * {@link #onRemoval(ShopkeeperRemoveEvent.Cause)} and {@link #onDeletion()} methods may never
+	 * get called for this shopkeeper. For any setup that relies on cleanup during
 	 * {@link #onRemoval(ShopkeeperRemoveEvent.Cause)} or {@link #onDeletion()},
 	 * {@link #onAdded(ShopkeeperAddedEvent.Cause)} may be better suited.
 	 */
@@ -298,7 +318,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This is called after {@link #setup()} and can be used to perform any setup that needs to happen last.
+	 * This is called after {@link #setup()} and can be used to perform any setup that needs to
+	 * happen last.
 	 */
 	protected void postSetup() {
 		// Inform shop object:
@@ -308,7 +329,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// STORAGE
 
 	/**
-	 * Initializes this shopkeeper by loading its previously saved state from the given {@link ShopkeeperData}.
+	 * Initializes this shopkeeper by loading its previously saved state from the given
+	 * {@link ShopkeeperData}.
 	 * <p>
 	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
@@ -340,16 +362,20 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		// Not null, even if the world name is null:
 		// Gets set to null afterwards if this shopkeeper is virtual.
-		this.location = shopkeeperData.get(LOCATION);
-		assert this.location != null;
+		BlockLocation location = shopkeeperData.get(LOCATION);
+		assert location != null;
+		this.location = location;
 		this.yaw = shopkeeperData.get(YAW);
 
 		if (objectType instanceof VirtualShopObjectType) {
 			if (!location.isEmpty() || yaw != 0.0F) {
-				// TODO Allow virtual shopkeeper to store a location? This could later enable us to allow users to
-				// dynamically change the shop object type, including from virtual to non-virtual.
-				throw new InvalidDataException("Shopkeeper is virtual, but stores a non-empty location: "
-						+ TextUtils.getLocationString(location, yaw));
+				// TODO Allow virtual shopkeeper to store a location? This could later enable us to
+				// allow users to dynamically change the shop object type, including from virtual to
+				// non-virtual.
+				throw new InvalidDataException(
+						"Shopkeeper is virtual, but stores a non-empty location: "
+								+ TextUtils.getLocationString(location, yaw)
+				);
 			}
 			this.location = null;
 		} else {
@@ -368,23 +394,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.loadDynamicState(shopkeeperData);
 	}
 
-	private AbstractShopType<?> getAndValidateShopType(ShopkeeperData shopkeeperData) throws InvalidDataException {
+	private AbstractShopType<?> getAndValidateShopType(ShopkeeperData shopkeeperData)
+			throws InvalidDataException {
 		assert shopkeeperData != null;
 		AbstractShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
 		assert shopType != null;
 		if (shopType != this.getType()) {
-			throw new InvalidDataException("The shopkeeper data is for a different shop type (expected: "
-					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
+			throw new InvalidDataException(
+					"The shopkeeper data is for a different shop type (expected: "
+							+ this.getType().getIdentifier() + ", got: "
+							+ shopType.getIdentifier() + ")!"
+			);
 		}
 		return shopType;
 	}
 
 	// shopCreationData can be null if the shopkeeper is getting loaded.
-	private AbstractShopObject createShopObject(AbstractShopObjectType<?> objectType, ShopCreationData shopCreationData) {
+	private AbstractShopObject createShopObject(
+			AbstractShopObjectType<?> objectType,
+			@Nullable ShopCreationData shopCreationData
+	) {
 		assert objectType != null;
 		AbstractShopObject shopObject = objectType.createObject(this, shopCreationData);
-		Validate.State.notNull(shopObject, this.getLogPrefix() + "Shop object type '" + objectType.getIdentifier()
-				+ "' created null shop object!");
+		Validate.State.notNull(shopObject, this.getLogPrefix() + "Shop object type '"
+				+ objectType.getIdentifier() + "' created null shop object!");
 		return shopObject;
 	}
 
@@ -393,15 +426,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * <p>
 	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
-	 * The given shopkeeper data is expected to contain the shopkeeper's shop type identifier. If the given data was
-	 * originally meant for a different shop type, loading fails. Any other non-dynamic shopkeeper data that the given
-	 * {@link ShopkeeperData} may contain is silently ignored. If the given shopkeeper data contains data for a shop
-	 * object of a different type, the given object data is silently ignored as well.
+	 * The given shopkeeper data is expected to contain the shopkeeper's shop type identifier. If
+	 * the given data was originally meant for a different shop type, loading fails. Any other
+	 * non-dynamic shopkeeper data that the given {@link ShopkeeperData} may contain is silently
+	 * ignored. If the given shopkeeper data contains data for a shop object of a different type,
+	 * the given object data is silently ignored as well.
 	 * <p>
-	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements (such as for example
-	 * item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the shopkeeper,
-	 * nor in contexts outside the shopkeeper. If the shopkeeper can guarantee not to modify these data elements, it is
-	 * allowed to directly store them without copying them first.
+	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements
+	 * (such as for example item stacks, etc.) and collections of data elements are assumed to not
+	 * be modified, neither by the shopkeeper, nor in contexts outside the shopkeeper. If the
+	 * shopkeeper can guarantee not to modify these data elements, it is allowed to directly store
+	 * them without copying them first.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -425,8 +460,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				shopObject.load(shopObjectData);
 			} else {
 				// Skipping the incompatible shop object data.
-				Log.debug(() -> this.getLogPrefix() + "Ignoring shop object data of different type (expected: "
-						+ shopObject.getType().getIdentifier() + ", got: " + objectType.getIdentifier() + ")!");
+				Log.debug(() -> this.getLogPrefix()
+						+ "Ignoring shop object data of different type (expected: "
+						+ shopObject.getType().getIdentifier() + ", got: "
+						+ objectType.getIdentifier() + ")!");
 			}
 		}
 	}
@@ -434,17 +471,20 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Saves the shopkeeper's state to the given {@link ShopkeeperData}.
 	 * <p>
-	 * This also includes the shopkeeper's {@link #saveDynamicState(ShopkeeperData, boolean) dynamic state}.
+	 * This also includes the shopkeeper's {@link #saveDynamicState(ShopkeeperData, boolean) dynamic
+	 * state}.
 	 * <p>
-	 * Some types of shopkeepers or shop objects may rely on externally stored data and only save a reference to that
-	 * external data as part of their shopkeeper data. However, in some situations, such as when creating a
-	 * {@link #createSnapshot(String) shopkeeper snapshot}, it may be necessary to also save that external data as part
-	 * of the shopkeeper data in order to later be able to restore it. The {@code saveAll} parameter indicates whether
-	 * the shopkeeper should try to also save any external data.
+	 * Some types of shopkeepers or shop objects may rely on externally stored data and only save a
+	 * reference to that external data as part of their shopkeeper data. However, in some
+	 * situations, such as when creating a {@link #createSnapshot(String) shopkeeper snapshot}, it
+	 * may be necessary to also save that external data as part of the shopkeeper data in order to
+	 * later be able to restore it. The {@code saveAll} parameter indicates whether the shopkeeper
+	 * should try to also save any external data.
 	 * <p>
-	 * It is assumed that the data stored in the given {@link ShopkeeperData} does not change afterwards and can be
-	 * serialized asynchronously. The shopkeeper must therefore ensure that this data is not modified, for example by
-	 * only inserting immutable data, or always making copies of the inserted data.
+	 * It is assumed that the data stored in the given {@link ShopkeeperData} does not change
+	 * afterwards and can be serialized asynchronously. The shopkeeper must therefore ensure that
+	 * this data is not modified, for example by only inserting immutable data, or always making
+	 * copies of the inserted data.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -471,21 +511,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Saves the shopkeeper's dynamic state to the given {@link ShopkeeperData}.
 	 * <p>
-	 * The dynamic state comprises at least every portion of state that the shop owner, an admin, an API user, or the
-	 * shopkeeper itself might dynamically change at runtime. State that is currently part of the non-dynamic portion,
-	 * such as the shopkeeper's type, location, or object type, might be moved to the dynamic portion in the future.
+	 * The dynamic state comprises at least every portion of state that the shop owner, an admin, an
+	 * API user, or the shopkeeper itself might dynamically change at runtime. State that is
+	 * currently part of the non-dynamic portion, such as the shopkeeper's type, location, or object
+	 * type, might be moved to the dynamic portion in the future.
 	 * <p>
-	 * Some types of shopkeepers or shop objects may rely on externally stored data and only save a reference to that
-	 * external data as part of their shopkeeper data. However, in some situations, such as when creating a
-	 * {@link #createSnapshot(String) shopkeeper snapshot}, it may be necessary to also save that external data as part
-	 * of the shopkeeper data in order to later be able to restore it. The {@code saveAll} parameter indicates whether
-	 * the shopkeeper should try to also save any external data.
+	 * Some types of shopkeepers or shop objects may rely on externally stored data and only save a
+	 * reference to that external data as part of their shopkeeper data. However, in some
+	 * situations, such as when creating a {@link #createSnapshot(String) shopkeeper snapshot}, it
+	 * may be necessary to also save that external data as part of the shopkeeper data in order to
+	 * later be able to restore it. The {@code saveAll} parameter indicates whether the shopkeeper
+	 * should try to also save any external data.
 	 * <p>
 	 * The saved dynamic state can be loaded again via {@link #loadDynamicState(ShopkeeperData)}.
 	 * <p>
-	 * It is assumed that the data stored in the given {@link ShopkeeperData} does not change afterwards and can be
-	 * serialized asynchronously. The shopkeeper must therefore ensure that this data is not modified, for example by
-	 * only inserting immutable data, or always making copies of the inserted data.
+	 * It is assumed that the data stored in the given {@link ShopkeeperData} does not change
+	 * afterwards and can be serialized asynchronously. The shopkeeper must therefore ensure that
+	 * this data is not modified, for example by only inserting immutable data, or always making
+	 * copies of the inserted data.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -498,7 +541,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopkeeperData.set(NAME, name);
 
 		// Shop object:
-		ShopObjectData shopObjectData = ShopObjectData.of(DataContainer.create());
+		ShopObjectData shopObjectData = ShopObjectData.ofNonNull(DataContainer.create());
 		shopObject.save(shopObjectData, saveAll);
 		shopkeeperData.set(SHOP_OBJECT_DATA, shopObjectData);
 	}
@@ -518,20 +561,21 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Marks this shopkeeper as 'dirty'.
 	 * <p>
-	 * This indicates that there have been changes to the shopkeeper's data that the storage is not yet aware of. The
-	 * shopkeeper and shop object implementations have to invoke this on every change of data that needs to be
-	 * persisted.
+	 * This indicates that there have been changes to the shopkeeper's data that the storage is not
+	 * yet aware of. The shopkeeper and shop object implementations have to invoke this on every
+	 * change of data that needs to be persisted.
 	 * <p>
-	 * If this shopkeeper is currently {@link #isValid() loaded}, or about to be loaded, its data is saved with the next
-	 * successful save of the {@link ShopkeeperStorage}. If the shopkeeper has already been deleted or unloaded,
-	 * invoking this method will have no effect on the data that is stored by the storage.
+	 * If this shopkeeper is currently {@link #isValid() loaded}, or about to be loaded, its data is
+	 * saved with the next successful save of the {@link ShopkeeperStorage}. If the shopkeeper has
+	 * already been deleted or unloaded, invoking this method will have no effect on the data that
+	 * is stored by the storage.
 	 */
 	public final void markDirty() {
 		dirty = true;
 		// Inform the storage that the shopkeeper is dirty:
 		if (this.isValid()) {
-			// If the shopkeeper is marked as dirty during creation or loading (while it is not yet valid), the storage
-			// is informed once the shopkeeper becomes valid.
+			// If the shopkeeper is marked as dirty during creation or loading (while it is not yet
+			// valid), the storage is informed once the shopkeeper becomes valid.
 			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().markDirty(this);
 		}
 	}
@@ -539,8 +583,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Checks whether this shopkeeper had changes to its data that the storage is not yet aware of.
 	 * <p>
-	 * A return value of {@code false} indicates that the {@link ShopkeeperStorage} is aware of the shopkeeper's latest
-	 * data, but not necessarily that this data has already been successfully persisted to disk.
+	 * A return value of {@code false} indicates that the {@link ShopkeeperStorage} is aware of the
+	 * shopkeeper's latest data, but not necessarily that this data has already been successfully
+	 * persisted to disk.
 	 * 
 	 * @return <code>true</code> if there are data changes that the storage is not yet aware of
 	 */
@@ -548,8 +593,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return dirty;
 	}
 
-	// Called by shopkeeper storage when it has retrieved the shopkeeper's latest data for the next save. The data might
-	// not yet have been persisted at that point.
+	// Called by shopkeeper storage when it has retrieved the shopkeeper's latest data for the next
+	// save. The data might not yet have been persisted at that point.
 	// This may not be called if the shopkeeper was deleted.
 	public final void onSave() {
 		dirty = false;
@@ -577,8 +622,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		assert !valid;
 		valid = true;
 
-		// If the shopkeeper has been marked as dirty earlier (e.g. due to data migrations during loading, or when being
-		// newly created), we inform the storage here:
+		// If the shopkeeper has been marked as dirty earlier (e.g. due to data migrations during
+		// loading, or when being newly created), we inform the storage here:
 		if (this.isDirty()) {
 			this.markDirty();
 		}
@@ -609,12 +654,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This is called when the shopkeeper is about to be removed from the {@link ShopkeeperRegistry}.
+	 * This is called when the shopkeeper is about to be removed from the
+	 * {@link ShopkeeperRegistry}.
 	 * <p>
-	 * The shopkeeper has already been deactivated at this point, i.e. its ticking has been stopped and, if the shop
-	 * object's spawning is {@link AbstractShopObjectType#mustBeSpawned() managed} by the Shopkeepers plugin, it has
-	 * already been despawned. If the shop object handles its spawning itself, it may still be spawned and is then
-	 * responsible to {@link AbstractShopObject#remove() unregister} itself during this call.
+	 * The shopkeeper has already been deactivated at this point, i.e. its ticking has been stopped
+	 * and, if the shop object's spawning is {@link AbstractShopObjectType#mustBeSpawned() managed}
+	 * by the Shopkeepers plugin, it has already been despawned. If the shop object handles its
+	 * spawning itself, it may still be spawned and is then responsible to
+	 * {@link AbstractShopObject#remove() unregister} itself during this call.
 	 * 
 	 * @param cause
 	 *            the cause of the removal, not <code>null</code>
@@ -630,7 +677,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// TODO Make this final and provide the involved player to the onDeletion method somehow.
 	@Override
-	public void delete(Player player) {
+	public void delete(@Nullable Player player) {
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().deleteShopkeeper(this);
 	}
 
@@ -682,10 +729,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Shop type, derived from the serialized {@link #SHOP_TYPE_ID shop type id}.
 	 */
-	public static final Property<AbstractShopType<?>> SHOP_TYPE = new BasicProperty<AbstractShopType<?>>()
-			.dataKeyAccessor(DATA_KEY_SHOP_TYPE, new DataSerializer<AbstractShopType<?>>() {
+	public static final Property<@NonNull AbstractShopType<?>> SHOP_TYPE = new BasicProperty<@NonNull AbstractShopType<?>>()
+			.dataKeyAccessor(DATA_KEY_SHOP_TYPE, new DataSerializer<@NonNull AbstractShopType<?>>() {
 				@Override
-				public Object serialize(AbstractShopType<?> value) {
+				public @Nullable Object serialize(AbstractShopType<?> value) {
 					Validate.notNull(value, "value is null");
 					return value.getIdentifier();
 				}
@@ -693,7 +740,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				@Override
 				public AbstractShopType<?> deserialize(Object data) throws InvalidDataException {
 					String shopTypeId = StringSerializers.STRICT_NON_EMPTY.deserialize(data);
-					AbstractShopType<?> shopType = SKShopkeepersPlugin.getInstance().getShopTypeRegistry().get(shopTypeId);
+					SKShopTypesRegistry shopTypeRegistry = SKShopkeepersPlugin.getInstance().getShopTypeRegistry();
+					AbstractShopType<?> shopType = shopTypeRegistry.get(shopTypeId);
 					if (shopType == null) {
 						throw new InvalidDataException("Unknown shop type: " + shopTypeId);
 					}
@@ -707,51 +755,59 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// ATTRIBUTES
 
-	public static final Property<Integer> ID = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> ID = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("id", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.POSITIVE)
 			.build();
-	public static final Property<UUID> UNIQUE_ID = new BasicProperty<UUID>()
+	public static final Property<@NonNull UUID> UNIQUE_ID = new BasicProperty<@NonNull UUID>()
 			.dataKeyAccessor("uniqueId", UUIDSerializers.LENIENT)
 			.build();
-	public static final Property<String> WORLD_NAME = new BasicProperty<String>()
+	public static final Property<@Nullable String> WORLD_NAME = new BasicProperty<@Nullable String>()
 			.dataAccessor(new DataKeyAccessor<>("world", StringSerializers.SCALAR)
 					.emptyDataPredicate(EmptyDataPredicates.EMPTY_STRING)
 			)
 			.nullable() // For virtual shopkeepers
 			.build();
-	public static final Property<Integer> LOCATION_X = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> LOCATION_X = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("x", NumberSerializers.INTEGER)
 			.useDefaultIfMissing() // For virtual shopkeepers
 			.defaultValue(0)
 			.build();
-	public static final Property<Integer> LOCATION_Y = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> LOCATION_Y = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("y", NumberSerializers.INTEGER)
 			.useDefaultIfMissing() // For virtual shopkeepers
 			.defaultValue(0)
 			.build();
-	public static final Property<Integer> LOCATION_Z = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> LOCATION_Z = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("z", NumberSerializers.INTEGER)
 			.useDefaultIfMissing() // For virtual shopkeepers
 			.defaultValue(0)
 			.build();
-	public static final Property<Float> YAW = new BasicProperty<Float>()
+	public static final Property<@NonNull Float> YAW = new BasicProperty<@NonNull Float>()
 			.dataKeyAccessor("yaw", NumberSerializers.FLOAT)
-			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (e.g. in pre 2.13.4 versions)
+			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (e.g. in pre 2.13.4
+									 // versions)
 			.defaultValue(0.0F) // South
 			.build();
 	// This always loads a non-null location, even for virtual shopkeepers.
-	// This ensures that we can inspect and validate the loaded coordinates even if the world name is null.
-	public static final Property<BlockLocation> LOCATION = new BasicProperty<BlockLocation>()
+	// This ensures that we can inspect and validate the loaded coordinates even if the world name
+	// is null.
+	public static final Property<@NonNull BlockLocation> LOCATION = new BasicProperty<@NonNull BlockLocation>()
 			.name("location")
-			.dataAccessor(new DataAccessor<BlockLocation>() {
+			.dataAccessor(new DataAccessor<@NonNull BlockLocation>() {
 				@Override
-				public void save(DataContainer dataContainer, BlockLocation value) {
-					assert value != null;
-					dataContainer.set(WORLD_NAME, value.getWorldName());
-					dataContainer.set(LOCATION_X, value.getX());
-					dataContainer.set(LOCATION_Y, value.getY());
-					dataContainer.set(LOCATION_Z, value.getZ());
+				public void save(DataContainer dataContainer, @Nullable BlockLocation value) {
+					if (value != null) {
+						dataContainer.set(WORLD_NAME, value.getWorldName());
+						dataContainer.set(LOCATION_X, value.getX());
+						dataContainer.set(LOCATION_Y, value.getY());
+						dataContainer.set(LOCATION_Z, value.getZ());
+					} else {
+						dataContainer.set(WORLD_NAME, null);
+						dataContainer.set(LOCATION_X, null);
+						dataContainer.set(LOCATION_Y, null);
+						dataContainer.set(LOCATION_Z, null);
+					}
 				}
 
 				@Override
@@ -801,12 +857,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public final boolean isVirtual() {
-		assert (location != null && location.hasWorldName()) ^ (location == null && shopObject instanceof VirtualShopObject);
+		assert (location != null && location.hasWorldName())
+				^ (location == null && shopObject instanceof VirtualShopObject);
 		return (location == null);
 	}
 
 	@Override
-	public String getWorldName() {
+	public @Nullable String getWorldName() {
 		return (location != null) ? location.getWorldName() : null;
 	}
 
@@ -833,12 +890,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public String getPositionString() {
 		if (this.isVirtual()) return VIRTUAL_SHOPKEEPER_MARKER;
-		return TextUtils.getLocationString(location);
+		return TextUtils.getLocationString(Unsafe.assertNonNull(location));
 	}
 
 	@Override
-	public Location getLocation() {
+	public @Nullable Location getLocation() {
 		if (this.isVirtual()) return null;
+		BlockLocation location = Unsafe.assertNonNull(this.location);
 		assert location != null && location.hasWorldName();
 		World world = location.getWorld();
 		if (world == null) return null;
@@ -848,11 +906,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Gets the shopkeeper's location.
 	 * <p>
-	 * Unlike {@link #getLocation()}, this returns a location even if the shopkeeper's world is not loaded currently.
+	 * Unlike {@link #getLocation()}, this returns a location even if the shopkeeper's world is not
+	 * loaded currently.
 	 * 
 	 * @return the shopkeeper's block location, or <code>null</code> if the shopkeeper is virtual
 	 */
-	public BlockLocation getBlockLocation() {
+	public @Nullable BlockLocation getBlockLocation() {
 		return location;
 	}
 
@@ -860,12 +919,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Sets the stored location and yaw of this shopkeeper.
 	 * 
 	 * @param location
-	 *            the new stored location of this shopkeeper
+	 *            the new stored location of this shopkeeper, not <code>null</code>
 	 * @see #setLocation(BlockLocation)
 	 * @see #setYaw(float)
 	 */
 	public final void setLocation(Location location) {
-		// This validates the given location, and throws an exception if the location's world is no longer loaded:
+		// This validates the given location, and throws an exception if the location's world is no
+		// longer loaded:
 		this.setLocation(BlockLocation.of(location));
 		assert location != null;
 		this.setYaw(location.getYaw());
@@ -874,19 +934,20 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Sets the stored location of this shopkeeper.
 	 * <p>
-	 * This will not actually move the shop object on its own, until the next time it is spawned or teleported to its
-	 * new location.
+	 * This will not actually move the shop object on its own, until the next time it is spawned or
+	 * teleported to its new location.
 	 * 
 	 * @param location
-	 *            the new stored location of this shopkeeper
+	 *            the new stored location of this shopkeeper, not <code>null</code>
 	 */
 	public final void setLocation(BlockLocation location) {
 		Validate.State.isTrue(!this.isVirtual(), "Cannot set location of virtual shopkeeper!");
 		Validate.notNull(location, "location is null");
 		Validate.isTrue(location.hasWorldName(), "location has not world name");
 
-		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
-		// which currently use the shopkeeper's world name to locate their container.
+		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for
+		// example player shops which currently use the shopkeeper's world name to locate their
+		// container.
 		this.location = location.immutable(); // Immutable copy if necessary
 
 		this.updateChunkCoords();
@@ -910,7 +971,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Sets the yaw of this shopkeeper.
 	 * <p>
-	 * This will not automatically rotate the shop object until the next time it is spawned or teleported.
+	 * This will not automatically rotate the shop object until the next time it is spawned or
+	 * teleported.
 	 * 
 	 * @param yaw
 	 *            the new yaw
@@ -922,12 +984,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public ChunkCoords getChunkCoords() {
+	public @Nullable ChunkCoords getChunkCoords() {
 		return chunkCoords;
 	}
 
 	private void updateChunkCoords() {
-		this.chunkCoords = this.isVirtual() ? null : location.getChunkCoords();
+		if (this.isVirtual()) {
+			this.chunkCoords = null;
+		} else {
+			this.chunkCoords = Unsafe.assertNonNull(location).getChunkCoords();
+		}
 	}
 
 	/**
@@ -937,7 +1003,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @return the chunk coordinates, can be <code>null</code>
 	 */
-	public final ChunkCoords getLastChunkCoords() {
+	public final @Nullable ChunkCoords getLastChunkCoords() {
 		return lastChunkCoords;
 	}
 
@@ -949,18 +1015,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param chunkCoords
 	 *            the chunk coordinates, can be <code>null</code>
 	 */
-	public final void setLastChunkCoords(ChunkCoords chunkCoords) {
+	public final void setLastChunkCoords(@Nullable ChunkCoords chunkCoords) {
 		this.lastChunkCoords = chunkCoords;
 	}
 
 	/**
 	 * Gets the {@link MessageArguments} for this shopkeeper.
 	 * <p>
-	 * The provided message arguments may be {@link Supplier Suppliers} that lazily and dynamically calculate the actual
-	 * message arguments only when they are requested.
+	 * The provided message arguments may be {@link Supplier Suppliers} that lazily and dynamically
+	 * calculate the actual message arguments only when they are requested.
 	 * 
 	 * @param contextPrefix
-	 *            this prefix is added in front of all message keys, not <code>null</code>, but may be empty
+	 *            this prefix is added in front of all message keys, not <code>null</code>, but may
+	 *            be empty
 	 * @return the message arguments
 	 */
 	public final MessageArguments getMessageArguments(String contextPrefix) {
@@ -975,18 +1042,21 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Populates the given {@link Map} with the possible message arguments for this shopkeeper.
 	 * <p>
-	 * In order to not calculate all message arguments in advance when they might not actually be required, the message
-	 * arguments are meant to be {@link Supplier Suppliers} that lazily calculate the actual message arguments only when
-	 * they are requested.
+	 * In order to not calculate all message arguments in advance when they might not actually be
+	 * required, the message arguments are meant to be {@link Supplier Suppliers} that lazily
+	 * calculate the actual message arguments only when they are requested.
 	 * <p>
-	 * In order to be able to reuse the once populated Map, these {@link Supplier Suppliers} are also meant to be
-	 * stateless: Any message arguments that depend on dynamic state of this shopkeeper are meant to dynamically
-	 * retrieve the current values whenever their {@link Supplier Suppliers} are invoked.
+	 * In order to be able to reuse the once populated Map, these {@link Supplier Suppliers} are
+	 * also meant to be stateless: Any message arguments that depend on dynamic state of this
+	 * shopkeeper are meant to dynamically retrieve the current values whenever their
+	 * {@link Supplier Suppliers} are invoked.
 	 * 
 	 * @param messageArguments
 	 *            the Map of lazily and dynamically evaluated message arguments
 	 */
-	protected void populateMessageArguments(Map<String, Supplier<Object>> messageArguments) {
+	protected void populateMessageArguments(
+			Map<@NonNull String, @NonNull Supplier<@NonNull ?>> messageArguments
+	) {
 		messageArguments.put("id", this::getId);
 		messageArguments.put("uuid", this::getUniqueId);
 		messageArguments.put("name", this::getName);
@@ -1004,7 +1074,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// NAMING
 
-	public static final Property<String> NAME = new BasicProperty<String>()
+	public static final Property<@NonNull String> NAME = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("name", ColoredStringSerializers.SCALAR)
 			.useDefaultIfMissing()
 			.defaultValue("")
@@ -1016,12 +1086,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public void setName(String newName) {
+	public void setName(@Nullable String newName) {
 		this._setName(newName);
 		this.markDirty();
 	}
 
-	private void _setName(String newName) {
+	private void _setName(@Nullable String newName) {
 		// Prepare and apply the new name:
 		String preparedName = this.prepareName(newName);
 		this.name = preparedName;
@@ -1030,7 +1100,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopObject.setName(preparedName);
 	}
 
-	private String prepareName(String name) {
+	private String prepareName(@Nullable String name) {
 		String preparedName = (name != null) ? name : "";
 		preparedName = TextUtils.colorize(preparedName);
 		preparedName = this.trimName(preparedName);
@@ -1043,12 +1113,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			return name;
 		}
 		String trimmedName = name.substring(0, MAX_NAME_LENGTH);
-		Log.warning(this.getLogPrefix() + "Name is more than " + MAX_NAME_LENGTH + " characters long ('"
-				+ name + "'). Name is trimmed to '" + trimmedName + "'.");
+		Log.warning(this.getLogPrefix() + "Name is more than " + MAX_NAME_LENGTH
+				+ " characters long ('" + name + "'). Name is trimmed to '" + trimmedName + "'.");
 		return trimmedName;
 	}
 
-	public boolean isValidName(String name) {
+	public boolean isValidName(@Nullable String name) {
 		return (name != null && name.length() <= MAX_NAME_LENGTH
 				&& Settings.DerivedSettings.shopNamePattern.matcher(name).matches());
 	}
@@ -1058,16 +1128,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Shop object data.
 	 */
-	public static final Property<ShopObjectData> SHOP_OBJECT_DATA = new BasicProperty<ShopObjectData>()
-			.dataKeyAccessor("object", new DataSerializer<ShopObjectData>() {
+	public static final Property<@NonNull ShopObjectData> SHOP_OBJECT_DATA = new BasicProperty<@NonNull ShopObjectData>()
+			.dataKeyAccessor("object", new DataSerializer<@NonNull ShopObjectData>() {
 				@Override
-				public Object serialize(ShopObjectData value) {
+				public @Nullable Object serialize(ShopObjectData value) {
 					return DataContainerSerializers.DEFAULT.serialize(value);
 				}
 
 				@Override
 				public ShopObjectData deserialize(Object data) throws InvalidDataException {
-					return ShopObjectData.of(DataContainerSerializers.DEFAULT.deserialize(data));
+					DataContainer dataContainer = DataContainerSerializers.DEFAULT.deserialize(data);
+					return ShopObjectData.ofNonNull(dataContainer);
 				}
 			})
 			.build();
@@ -1079,17 +1150,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// SNAPSHOTS
 
-	public static final Property<List<? extends SKShopkeeperSnapshot>> SNAPSHOTS = new BasicProperty<List<? extends SKShopkeeperSnapshot>>()
+	public static final Property<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>> SNAPSHOTS = new BasicProperty<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>>()
 			.dataKeyAccessor("snapshots", SKShopkeeperSnapshot.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
 			.build();
 
 	static {
-		ShopkeeperDataMigrator.registerMigration(new Migration("snapshots", MigrationPhase.DEFAULT) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"snapshots",
+				MigrationPhase.DEFAULT
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
-				List<? extends SKShopkeeperSnapshot> snapshots = shopkeeperData.get(SNAPSHOTS);
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
+				List<? extends @NonNull SKShopkeeperSnapshot> snapshots = shopkeeperData.get(SNAPSHOTS);
 				if (snapshots.isEmpty()) return false;
 
 				int shopkeeperId = shopkeeperData.get(ID);
@@ -1098,7 +1175,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				boolean migrated = false;
 				int snapshotId = 1;
 				for (SKShopkeeperSnapshot snapshot : snapshots) {
-					String snapshotLogPrefix = shopkeeperPrefix + "Snapshot " + snapshotId + " ('" + snapshot.getName() + "'): ";
+					String snapshotLogPrefix = shopkeeperPrefix + "Snapshot " + snapshotId
+							+ " ('" + snapshot.getName() + "'): ";
 					migrated |= snapshot.getShopkeeperData().migrate(snapshotLogPrefix);
 					snapshotId++;
 				}
@@ -1109,7 +1187,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private void loadSnapshots(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		List<? extends SKShopkeeperSnapshot> loadedSnapshots = shopkeeperData.get(SNAPSHOTS);
+		List<? extends @NonNull SKShopkeeperSnapshot> loadedSnapshots = shopkeeperData.get(SNAPSHOTS);
 		snapshots.clear();
 		try {
 			// Applies additional shopkeeper specific validations:
@@ -1127,8 +1205,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		int snapshotsCount = this.getSnapshots().size();
 		if (snapshotsCount > SNAPSHOTS_WARNING_LIMIT) {
 			Log.warning(this.getLogPrefix() + "This shopkeeper has has more than "
-					+ SNAPSHOTS_WARNING_LIMIT + " snapshots (" + snapshotsCount
-					+ ")! Consider to delete no longer needed snapshots to save memory and storage space.");
+					+ SNAPSHOTS_WARNING_LIMIT + " snapshots (" + snapshotsCount + ")! "
+					+ "Consider deleting no longer needed snapshots to save memory and storage space.");
 		}
 	}
 
@@ -1138,7 +1216,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public List<? extends ShopkeeperSnapshot> getSnapshots() {
+	public List<? extends @NonNull ShopkeeperSnapshot> getSnapshots() {
 		return snapshotsView;
 	}
 
@@ -1162,7 +1240,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public ShopkeeperSnapshot getSnapshot(String name) {
+	public @Nullable ShopkeeperSnapshot getSnapshot(String name) {
 		int index = this.getSnapshotIndex(name);
 		return (index != -1) ? this.getSnapshot(index) : null;
 	}
@@ -1171,7 +1249,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public ShopkeeperSnapshot createSnapshot(String name) {
 		// The name is validated during the creation of the snapshot.
 		Instant timestamp = Instant.now();
-		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.of(DataContainer.create());
+		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.ofNonNull(DataContainer.create());
 		this.saveDynamicState(dynamicShopkeeperData, true); // Save all data
 		return new SKShopkeeperSnapshot(name, timestamp, dynamicShopkeeperData);
 	}
@@ -1191,10 +1269,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		try {
 			this.getAndValidateShopType(skSnapshot.getShopkeeperData());
 		} catch (InvalidDataException e) {
-			Validate.error(e.getMessage());
+			Validate.error("Invalid snapshot shop type: " + e.getMessage());
 		}
 
-		// The name is assumed to be valid, since it has already been validated during the creation of the snapshot.
+		// The name is assumed to be valid, since it has already been validated during the creation
+		// of the snapshot.
 		String snapshotName = snapshot.getName();
 		Validate.isTrue(this.getSnapshot(snapshotName) == null,
 				() -> "There already exists a snapshot with this name: " + snapshotName);
@@ -1218,8 +1297,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public void applySnapshot(ShopkeeperSnapshot snapshot) throws ShopkeeperLoadException {
 		Validate.notNull(snapshot, "snapshot is null");
-		// Note: The given snapshot is not necessarily stored by or based on this shopkeeper. Its application may fail
-		// if it is not compatible with this shopkeeper.
+		// Note: The given snapshot is not necessarily stored by or based on this shopkeeper. Its
+		// application may fail if it is not compatible with this shopkeeper.
 		// TODO Inform players.
 		SKShopkeepersPlugin.getInstance().getUIRegistry().abortUISessions(this);
 		try {
@@ -1227,24 +1306,27 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		} catch (InvalidDataException e) {
 			throw new ShopkeeperLoadException(e.getMessage(), e);
 		}
-		// Note: We don't respawn the shop object here. Loading the data is expected to already update any currently
-		// spawned object, similar to when a player manually edits the shop object. This also avoids the brief visual
-		// glitching that would be caused by the shopkeeper object being respawned.
+		// Note: We don't respawn the shop object here. Loading the data is expected to already
+		// update any currently spawned object, similar to when a player manually edits the shop
+		// object. This also avoids the brief visual glitching that would be caused by the
+		// shopkeeper object being respawned.
 		this.markDirty();
 	}
 
 	// TRADING
 
 	@Override
-	public abstract boolean hasTradingRecipes(Player player);
+	public abstract boolean hasTradingRecipes(@Nullable Player player);
 
 	@Override
-	public abstract List<? extends TradingRecipe> getTradingRecipes(Player player);
+	public abstract List<? extends @NonNull TradingRecipe> getTradingRecipes(
+			@Nullable Player player
+	);
 
 	// USER INTERFACES
 
 	@Override
-	public Collection<? extends UISession> getUISessions() {
+	public Collection<? extends @NonNull UISession> getUISessions() {
 		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISessions(this);
 	}
 
@@ -1259,9 +1341,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Registers an {@link UIHandler} which handles a specific type of user interface for this shopkeeper.
+	 * Registers an {@link UIHandler} which handles a specific type of user interface for this
+	 * shopkeeper.
 	 * <p>
-	 * This replaces any {@link UIHandler} which has been previously registered for the same {@link UIType}.
+	 * This replaces any {@link UIHandler} which has been previously registered for the same
+	 * {@link UIType}.
 	 * 
 	 * @param uiHandler
 	 *            the UI handler
@@ -1278,7 +1362,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the UI type
 	 * @return the UI handler, or <code>null</code> if none is available
 	 */
-	public UIHandler getUIHandler(UIType uiType) {
+	public @Nullable UIHandler getUIHandler(UIType uiType) {
 		Validate.notNull(uiType, "uiType is null");
 		return uiHandlers.get(uiType.getIdentifier());
 	}
@@ -1355,7 +1439,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
 	 */
 	public final void informStopTicking() {
-		// If the shopkeeper is currently processing a tick, this flag can also be used to abort the processing:
+		// If the shopkeeper is currently processing a tick, this flag can also be used to abort the
+		// processing:
 		ticking = false;
 		this.onStopTicking();
 	}
@@ -1368,8 +1453,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Checks if the shopkeeper is currently ticking, i.e. its ticking has been {@link #onStartTicking() started} and
-	 * not yet {@link #onStopTicking() stopped} again.
+	 * Checks if the shopkeeper is currently ticking, i.e. its ticking has been
+	 * {@link #onStartTicking() started} and not yet {@link #onStopTicking() stopped} again.
 	 * <p>
 	 * The return value does NOT indicate whether the shopkeeper is currently processing a tick.
 	 * 
@@ -1407,8 +1492,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopObject.onTickStart();
 	}
 
-	// TODO Maybe also tick shopkeepers if the container chunk is loaded? This might make sense once a shopkeeper can be
-	// linked to multiple containers, and for virtual player shopkeepers.
+	// TODO Maybe also tick shopkeepers if the container chunk is loaded? This might make sense once
+	// a shopkeeper can be linked to multiple containers, and for virtual player shopkeepers.
 	// TODO Maybe also (optionally) tick virtual shopkeepers.
 	// TODO Indicate tick activity, similar to shop objects.
 	/**
@@ -1416,23 +1501,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * <p>
 	 * This is not called for {@link Shopkeeper#isVirtual() virtual} shopkeepers currently.
 	 * <p>
-	 * This can for example be used for checks that need to happen periodically, such as checking if the container of a
-	 * player shop still exists.
+	 * This can for example be used for checks that need to happen periodically, such as checking if
+	 * the container of a player shop still exists.
 	 * <p>
-	 * If the checks to perform are potentially costly performance-wise, or not required to happen every second, the
-	 * shopkeeper may decide to run them only every X invocations.
+	 * If the checks to perform are potentially costly performance-wise, or not required to happen
+	 * every second, the shopkeeper may decide to run them only every X invocations.
 	 * <p>
-	 * The ticking of shopkeepers in active chunks may be spread across multiple ticks and might therefore not happen
-	 * for all shopkeepers within the same tick.
+	 * The ticking of shopkeepers in active chunks may be spread across multiple ticks and might
+	 * therefore not happen for all shopkeepers within the same tick.
 	 * <p>
-	 * If the shopkeeper is marked as {@link #isDirty() dirty}, a {@link ShopkeeperStorage#saveDelayed() delayed save}
-	 * will subsequently be triggered.
+	 * If the shopkeeper is marked as {@link #isDirty() dirty}, a
+	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
 	 * <p>
 	 * When overriding this method, consider calling the parent class version of this method.
 	 */
 	protected void onTick() {
-		// Abort if the ticking has already been stopped again (e.g. if the shopkeeper has been deleted or its ticking
-		// stopped due to or during the onTick implementations of the sub-classes):
+		// Abort if the ticking has already been stopped again (e.g. if the shopkeeper has been
+		// deleted or its ticking stopped due to or during the onTick implementations of the
+		// sub-classes):
 		if (!this.isTicking()) return;
 
 		// Tick the shop object:
@@ -1465,7 +1551,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Visualizes the shopkeeper's own activity during the last tick.
 	 * <p>
-	 * To also visualize the activity of other components of this shopkeeper, see {@link #visualizeLastTick()}.
+	 * To also visualize the activity of other components of this shopkeeper, see
+	 * {@link #visualizeLastTick()}.
 	 */
 	protected void visualizeLastShopkeeperTick() {
 		Location particleLocation = shopObject.getTickVisualizationParticleLocation();
@@ -1496,7 +1583,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public final boolean equals(@Nullable Object obj) {
 		return (this == obj); // Identity based comparison
 	}
 }

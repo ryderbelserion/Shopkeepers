@@ -18,18 +18,24 @@ public interface ValueChangeListener<T> {
 	/**
 	 * This is called when the value of a {@link PropertyValue} has changed.
 	 * <p>
-	 * This method might not be invoked for calls to {@link PropertyValue#setValue(Object, Set)} if the value did not
-	 * actually change.
+	 * This method might not be invoked for calls to {@link PropertyValue#setValue(Object, Set)} if
+	 * the value did not actually change.
 	 * 
 	 * @param property
 	 *            the involved property, not <code>null</code>
 	 * @param oldValue
-	 *            the old value, can be <code>null</code> for the first initialization of the value of the
-	 *            {@link PropertyValue} even if the property is not {@link Property#isNullable nullable}
+	 *            the old value, can be <code>null</code> for the first initialization of the value
+	 *            of the {@link PropertyValue} even if the property is not
+	 *            {@link Property#isNullable nullable}
 	 * @param newValue
 	 *            the new value, valid according to {@link Property#validateValue(Object)}
 	 * @param updateFlags
 	 *            the update flags, not <code>null</code>, not meant to be modified
 	 */
-	public void onValueChanged(PropertyValue<T> property, T oldValue, T newValue, Set<? extends UpdateFlag> updateFlags);
+	public void onValueChanged(
+			PropertyValue<T> property,
+			T oldValue,
+			T newValue,
+			Set<? extends UpdateFlag> updateFlags
+	);
 }

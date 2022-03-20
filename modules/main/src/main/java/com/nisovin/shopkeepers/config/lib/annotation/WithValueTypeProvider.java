@@ -17,8 +17,9 @@ import com.nisovin.shopkeepers.config.lib.value.ValueTypeProvider;
  * <p>
  * The specified value type provider has to provide a no-args constructor.
  * <p>
- * Default value type providers specified by this annotation are inherited to subclasses. The first provider (starting
- * with those specified at the most specific class) that can provide a {@link ValueType} is used.
+ * Default value type providers specified by this annotation are inherited to subclasses. The first
+ * provider (starting with those specified at the most specific class) that can provide a
+ * {@link ValueType} is used.
  */
 @Target(ElementType.TYPE)
 @Repeatable(WithValueTypeProviders.class)

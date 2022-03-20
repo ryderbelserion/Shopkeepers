@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class StringValue extends ValueType<String> {
+public class StringValue extends ValueType<@NonNull String> {
 
 	public static final StringValue INSTANCE = new StringValue();
 
@@ -13,13 +16,13 @@ public class StringValue extends ValueType<String> {
 	}
 
 	@Override
-	public String load(Object configValue) throws ValueLoadException {
+	public @Nullable String load(@Nullable Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		return configValue.toString();
 	}
 
 	@Override
-	public Object save(String value) {
+	public @Nullable Object save(@Nullable String value) {
 		return value;
 	}
 

@@ -1,22 +1,25 @@
 package com.nisovin.shopkeepers.config.lib;
 
 import org.bukkit.configuration.Configuration;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.bukkit.BukkitConfigData;
 import com.nisovin.shopkeepers.util.data.container.ConfigBasedDataContainer;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link DataContainer} that stores configuration data and provides additional configuration specific functionality,
- * such as access to default values.
+ * A {@link DataContainer} that stores configuration data and provides additional configuration
+ * specific functionality, such as access to default values.
  */
 public interface ConfigData extends DataContainer {
 
 	/**
 	 * Creates a new empty {@link ConfigData} instance.
 	 * <p>
-	 * This factory method has the same effect as {@link #of(DataContainer) creating a new ConfigData instance} based on
-	 * a {@link DataContainer#create() newly created empty DataContainer}.
+	 * This factory method has the same effect as {@link #of(DataContainer) creating a new
+	 * ConfigData instance} based on a {@link DataContainer#create() newly created empty
+	 * DataContainer}.
 	 * 
 	 * @return the new config data
 	 */
@@ -25,17 +28,19 @@ public interface ConfigData extends DataContainer {
 	}
 
 	/**
-	 * Creates a new {@link ConfigData} instance that uses the given {@link DataContainer} to store its config values.
+	 * Creates a new {@link ConfigData} instance that uses the given {@link DataContainer} to store
+	 * its config values.
 	 * <p>
-	 * If the given data container is a {@link ConfigBasedDataContainer}, this returns a {@link ConfigData}
-	 * implementation that can retrieve default values from the underlying Bukkit {@link Configuration}.
+	 * If the given data container is a {@link ConfigBasedDataContainer}, this returns a
+	 * {@link ConfigData} implementation that can retrieve default values from the underlying Bukkit
+	 * {@link Configuration}.
 	 * 
 	 * @param dataContainer
-	 *            the underlying data container that stores the config data, can be <code>null</code>
-	 * @return the config data, or <code>null</code> if the given data container is <code>null</code>
+	 *            the underlying data container that stores the config data, not <code>null</code>
+	 * @return the config data, not <code>null</code>
 	 */
 	public static ConfigData of(DataContainer dataContainer) {
-		if (dataContainer == null) return null;
+		Validate.notNull(dataContainer, "dataContainer is null");
 		if (dataContainer instanceof ConfigBasedDataContainer) {
 			return new BukkitConfigData((ConfigBasedDataContainer) dataContainer);
 		} else {
@@ -46,15 +51,16 @@ public interface ConfigData extends DataContainer {
 	/**
 	 * Creates a new {@link ConfigData} instance for the given data source.
 	 * <p>
-	 * This factory method has the same effect as {@link #of(DataContainer) creating a new ConfigData} based on the
-	 * {@link DataContainer#of(Object) DataContainer created for the given data source}.
+	 * This factory method has the same effect as {@link #of(DataContainer) creating a new
+	 * ConfigData} based on the {@link DataContainer#of(Object) DataContainer created for the given
+	 * data source}.
 	 * 
 	 * @param dataSource
-	 *            the data source, can be <code>null</code>
-	 * @return the config data, or <code>null</code> if the given data source is not a valid data container
+	 *            the data source, not <code>null</code>
+	 * @return the config data, not <code>null</code>
 	 */
 	public static ConfigData of(Object dataSource) {
-		return of(DataContainer.of(dataSource));
+		return of(DataContainer.ofNonNull(dataSource));
 	}
 
 	/////
@@ -64,13 +70,14 @@ public interface ConfigData extends DataContainer {
 	 * 
 	 * @return the default values, or <code>null</code> if there are no default values
 	 */
-	public DataContainer getDefaults();
+	public @Nullable DataContainer getDefaults();
 
 	/**
 	 * Sets the default values for this configuration data.
 	 * 
 	 * @param defaults
-	 *            the default values, can be <code>null</code> to unset any previously set default values
+	 *            the default values, can be <code>null</code> to unset any previously set default
+	 *            values
 	 */
-	public void setDefaults(DataContainer defaults);
+	public void setDefaults(@Nullable DataContainer defaults);
 }

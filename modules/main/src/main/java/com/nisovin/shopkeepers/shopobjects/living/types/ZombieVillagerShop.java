@@ -8,7 +8,10 @@ import org.bukkit.entity.Villager.Profession;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -26,19 +29,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
+public class ZombieVillagerShop extends ZombieShop<@NonNull ZombieVillager> {
 
-	public static final Property<Profession> PROFESSION = new BasicProperty<Profession>()
+	public static final Property<@NonNull Profession> PROFESSION = new BasicProperty<@NonNull Profession>()
 			.dataKeyAccessor("profession", EnumSerializers.lenient(Profession.class))
 			.defaultValue(Profession.NONE)
 			.build();
 
-	private final PropertyValue<Profession> professionProperty = new PropertyValue<>(PROFESSION)
-			.onValueChanged(this::applyProfession)
+	private final PropertyValue<@NonNull Profession> professionProperty = new PropertyValue<>(PROFESSION)
+			.onValueChanged(Unsafe.initialized(this)::applyProfession)
 			.build(properties);
 
-	public ZombieVillagerShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieVillagerShop> livingObjectType,
-								AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public ZombieVillagerShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull ZombieVillagerShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -61,8 +68,8 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getProfessionEditorButton());
 		return editorButtons;
 	}
@@ -78,7 +85,9 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 	}
 
 	public void cycleProfession(boolean backwards) {
-		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards));
+		this.setProfession(
+				EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards)
+		);
 	}
 
 	private void applyProfession() {
@@ -139,19 +148,25 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonZombieVillagerProfession, Messages.buttonZombieVillagerProfessionLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonZombieVillagerProfession,
+				Messages.buttonZombieVillagerProfessionLore
+		);
 		return iconItem;
 	}
 
 	private Button getProfessionEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getProfessionEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleProfession(backwards);
 				return true;

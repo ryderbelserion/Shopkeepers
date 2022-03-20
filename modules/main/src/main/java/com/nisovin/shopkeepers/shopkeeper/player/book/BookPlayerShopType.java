@@ -3,15 +3,22 @@ package com.nisovin.shopkeepers.shopkeeper.player.book;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public final class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopkeeper> {
+public final class BookPlayerShopType
+		extends AbstractPlayerShopType<@NonNull SKBookPlayerShopkeeper> {
 
 	public BookPlayerShopType() {
-		super("book", Collections.emptyList(), ShopkeepersPlugin.PLAYER_BOOK_PERMISSION,
-				SKBookPlayerShopkeeper.class);
+		super(
+				"book",
+				Collections.emptyList(),
+				ShopkeepersPlugin.PLAYER_BOOK_PERMISSION,
+				SKBookPlayerShopkeeper.class
+		);
 	}
 
 	@Override
@@ -30,7 +37,7 @@ public final class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlaye
 	}
 
 	@Override
-	public List<String> getTradeSetupDescription() {
+	public List<? extends @NonNull String> getTradeSetupDescription() {
 		return Messages.tradeSetupDescBook;
 	}
 

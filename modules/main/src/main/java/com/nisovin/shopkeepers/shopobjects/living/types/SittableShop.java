@@ -7,7 +7,10 @@ import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Sittable;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -25,19 +28,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // Using Babyable as common super type of all sittable mobs for now.
-public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> {
+public class SittableShop<E extends @NonNull Ageable & Sittable> extends BabyableShop<E> {
 
-	public static final Property<Boolean> SITTING = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> SITTING = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("sitting", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Boolean> sittingProperty = new PropertyValue<>(SITTING)
-			.onValueChanged(this::applySitting)
+	private final PropertyValue<@NonNull Boolean> sittingProperty = new PropertyValue<>(SITTING)
+			.onValueChanged(Unsafe.initialized(this)::applySitting)
 			.build(properties);
 
-	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<? extends SittableShop<E>> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public SittableShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<? extends @NonNull SittableShop<E>> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -60,8 +67,8 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSittingEditorButton());
 		return editorButtons;
 	}
@@ -88,19 +95,26 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 
 	private ItemStack getSittingEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.IRON_HORSE_ARMOR);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSitting, Messages.buttonSittingLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonSitting,
+				Messages.buttonSittingLore
+		);
 		return iconItem;
 	}
 
 	private Button getSittingEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getSittingEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleSitting();
 				return true;
 			}

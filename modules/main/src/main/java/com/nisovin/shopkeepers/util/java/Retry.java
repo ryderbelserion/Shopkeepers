@@ -2,21 +2,28 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.Callable;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+
 public final class Retry {
 
 	public interface Callback {
 		/**
-		 * Gets invoked after every failed execution attempt of {@link Retry#retry(Callable, int, Retry.Callback)}.
+		 * Gets invoked after every failed execution attempt of
+		 * {@link Retry#retry(Callable, int, Retry.Callback)}.
 		 * <p>
-		 * This can be used to process the failed attempt (e.g. log it) and to prepare a subsequent reattempt.
+		 * This can be used to process the failed attempt (e.g. log it) and to prepare a subsequent
+		 * reattempt.
 		 * 
 		 * @param attemptNumber
-		 *            the number of the last failed attempt, starting at <code>1</code> for the first failed attempt
+		 *            the number of the last failed attempt, starting at <code>1</code> for the
+		 *            first failed attempt
 		 * @param exception
 		 *            the exception thrown during of the last failed attempt
 		 * @param retry
-		 *            <code>true</code> if there will be a subsequent retry, <code>false</code> if this was the final
-		 *            attempt
+		 *            <code>true</code> if there will be a subsequent retry, <code>false</code> if
+		 *            this was the final attempt
 		 * @throws Exception
 		 *             aborts the retrying with this exception
 		 */
@@ -26,12 +33,13 @@ public final class Retry {
 	/**
 	 * Runs the given {@link Callable} and returns its return value.
 	 * <p>
-	 * If the callable throws an {@link Exception} (checked or unchecked), the exception is silently ignored and the
-	 * callable is executed another time, up until the specified limit of attempts is reached. Any other type of
-	 * {@link Throwable} is forwarded to the caller and does not trigger another reattempt.
+	 * If the callable throws an {@link Exception} (checked or unchecked), the exception is silently
+	 * ignored and the callable is executed another time, up until the specified limit of attempts
+	 * is reached. Any other type of {@link Throwable} is forwarded to the caller and does not
+	 * trigger another reattempt.
 	 * <p>
-	 * In case of success, the return value of the callable is returned. In case of failure, the exception thrown by the
-	 * callable during the last failed attempt is forwarded.
+	 * In case of success, the return value of the callable is returned. In case of failure, the
+	 * exception thrown by the callable during the last failed attempt is forwarded.
 	 * 
 	 * @param <T>
 	 *            the callable's return type
@@ -51,17 +59,19 @@ public final class Retry {
 	/**
 	 * Runs the given {@link Callable} and returns its return value.
 	 * <p>
-	 * If the callable throws an {@link Exception} (checked or unchecked), the exception is silently ignored and the
-	 * callable is executed another time, up until the specified limit of attempts is reached. Any other type of
-	 * {@link Throwable} is forwarded to the caller and does not trigger another reattempt.
+	 * If the callable throws an {@link Exception} (checked or unchecked), the exception is silently
+	 * ignored and the callable is executed another time, up until the specified limit of attempts
+	 * is reached. Any other type of {@link Throwable} is forwarded to the caller and does not
+	 * trigger another reattempt.
 	 * <p>
-	 * In case of success, the return value of the callable is returned. In case of failure, the exception thrown by the
-	 * callable during the last failed attempt is forwarded.
+	 * In case of success, the return value of the callable is returned. In case of failure, the
+	 * exception thrown by the callable during the last failed attempt is forwarded.
 	 * <p>
-	 * Optionally, a {@link Retry.Callback} can be provided which gets run after every failed execution attempt. It
-	 * provides the number of the last failed attempt together with the thrown exception. This can be used to process
-	 * failed attempts and to perform preparation for any subsequent reattempt. Any exception thrown by the
-	 * {@link Retry.Callback} itself will abort the retrying with that exception.
+	 * Optionally, a {@link Retry.Callback} can be provided which gets run after every failed
+	 * execution attempt. It provides the number of the last failed attempt together with the thrown
+	 * exception. This can be used to process failed attempts and to perform preparation for any
+	 * subsequent reattempt. Any exception thrown by the {@link Retry.Callback} itself will abort
+	 * the retrying with that exception.
 	 * 
 	 * @param <T>
 	 *            the callable's return type
@@ -73,9 +83,14 @@ public final class Retry {
 	 *            the callback to invoke on every failed attempt, or <code>null</code>
 	 * @return the return value of the callable in case of successful execution
 	 * @throws Exception
-	 *             forwarded exception thrown by the callable or the retry callback during the last failed attempt
+	 *             forwarded exception thrown by the callable or the retry callback during the last
+	 *             failed attempt
 	 */
-	public static <T> T retry(Callable<T> callable, int maxAttempts, Retry.Callback retryCallback) throws Exception {
+	public static <T> T retry(
+			Callable<T> callable,
+			int maxAttempts,
+			@Nullable Callback retryCallback
+	) throws Exception {
 		Validate.isTrue(maxAttempts > 0, "maxAttempts has to be positive");
 		int currentAttempt = 0;
 		Exception lastException = null;
@@ -89,7 +104,11 @@ public final class Retry {
 				// Inform the retry callback:
 				if (retryCallback != null) {
 					try {
-						retryCallback.onFailure(currentAttempt, lastException, currentAttempt < maxAttempts);
+						retryCallback.onFailure(
+								currentAttempt,
+								lastException,
+								currentAttempt < maxAttempts
+						);
 					} catch (Exception e2) {
 						// Abort retrying with this exception:
 						lastException = e2;
@@ -99,8 +118,7 @@ public final class Retry {
 				// Continue with the next attempt if the limit is not yet reached.
 			}
 		}
-		assert lastException != null;
-		throw lastException;
+		throw Unsafe.assertNonNull(lastException);
 	}
 
 	private Retry() {

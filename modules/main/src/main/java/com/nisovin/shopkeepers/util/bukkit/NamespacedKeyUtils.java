@@ -3,8 +3,10 @@ package com.nisovin.shopkeepers.util.bukkit;
 import java.util.Locale;
 
 import org.bukkit.NamespacedKey;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class NamespacedKeyUtils {
 
@@ -31,28 +33,29 @@ public final class NamespacedKeyUtils {
 	/**
 	 * Parses a {@link NamespacedKey} from the given input String.
 	 * <p>
-	 * The given input String is formatted in a way that matches valid {@link NamespacedKey NamespacedKeys} (see
-	 * {@link #normalizeNamespacedKey(String)}).
+	 * The given input String is formatted in a way that matches valid {@link NamespacedKey
+	 * NamespacedKeys} (see {@link #normalizeNamespacedKey(String)}).
 	 * <p>
 	 * If no namespace is specified, this uses {@link NamespacedKey#MINECRAFT} as namespace.
 	 * <p>
-	 * If the namespace is {@link NamespacedKey#MINECRAFT} (either specified or due to default), dashes in the key are
-	 * converted to underscores, because this is what Minecraft uses for its keys (see
-	 * {@link #normalizeMinecraftNamespacedKey(String)}) For any other namespace, they are kept as is, because they
-	 * might be valid keys.
+	 * If the namespace is {@link NamespacedKey#MINECRAFT} (either specified or due to default),
+	 * dashes in the key are converted to underscores, because this is what Minecraft uses for its
+	 * keys (see {@link #normalizeMinecraftNamespacedKey(String)}) For any other namespace, they are
+	 * kept as is, because they might be valid keys.
 	 *
 	 * @param input
 	 *            the input String
 	 * @return the parsed {@link NamespacedKey}, or <code>null</code> if the input is invalid
 	 */
-	public static NamespacedKey parse(String input) {
-		if (input == null || input.isEmpty()) return null;
+	public static @Nullable NamespacedKey parse(String input) {
+		Validate.notNull(input, "input is null");
+		if (input.isEmpty()) return null;
 
 		// General formatting:
-		input = normalizeNamespacedKey(input);
+		String normalizedInput = normalizeNamespacedKey(input);
 
 		// Split at separator:
-		String[] components = input.split(NAMESPACED_KEY_SEPARATOR, 3);
+		String[] components = normalizedInput.split(NAMESPACED_KEY_SEPARATOR, 3);
 		// We expect at most two components (namespace and key):
 		if (components.length > 2) {
 			return null;
@@ -83,15 +86,15 @@ public final class NamespacedKeyUtils {
 		}
 		assert !namespace.isEmpty() && !key.isEmpty();
 
-		// We know that Minecraft's namespaced keys use underscores, so we can convert dashes to underscores (allows for
-		// more lenient parsing):
+		// We know that Minecraft's namespaced keys use underscores, so we can convert dashes to
+		// underscores (allows for more lenient parsing):
 		if (namespace.equals(NamespacedKey.MINECRAFT)) {
 			key = key.replace('-', '_');
 		}
 
 		// Create the NamespacedKey:
-		// This performs additional validation internally and throws an IllegalArgumentException if the namespaced key
-		// is invalid.
+		// This performs additional validation internally and throws an IllegalArgumentException if
+		// the namespaced key is invalid.
 		NamespacedKey namespacedKey;
 		try {
 			namespacedKey = NamespacedKeyUtils.create(namespace, key);
@@ -102,42 +105,45 @@ public final class NamespacedKeyUtils {
 	}
 
 	/**
-	 * Formats the given input String in a way that matches valid {@link NamespacedKey NamespacedKeys}.
+	 * Formats the given input String in a way that matches valid {@link NamespacedKey
+	 * NamespacedKeys}.
 	 * <p>
-	 * Leading and trailing whitespace is removed. All remaining whitespace is converted to underscores, since this is
-	 * what Minecraft's namespaced keys use. All characters are converted to lower case.
+	 * Leading and trailing whitespace is removed. All remaining whitespace is converted to
+	 * underscores, since this is what Minecraft's namespaced keys use. All characters are converted
+	 * to lower case.
 	 * 
 	 * @param namespacedKey
-	 *            the input String
-	 * @return the formatted String, or <code>null</code> if the input String is <code>null</code>
+	 *            the input String, not <code>null</code>
+	 * @return the formatted String, not <code>null</code>
 	 */
 	public static String normalizeNamespacedKey(String namespacedKey) {
-		if (namespacedKey == null) return null;
-		namespacedKey = namespacedKey.trim();
-		// Without further contextual knowledge, we don't know what kind of separator the namespaced key is supposed to
-		// use. We normalize whitespace to underscores because this is what Minecraft uses for its own keys:
-		namespacedKey = StringUtils.replaceWhitespace(namespacedKey, "_");
-		namespacedKey = namespacedKey.toLowerCase(Locale.ROOT);
-		return namespacedKey;
+		Validate.notNull(namespacedKey, "namespacedKey is null");
+		String normalized = namespacedKey.trim();
+		// Without further contextual knowledge, we don't know what kind of separator the namespaced
+		// key is supposed to use. We normalize whitespace to underscores because this is what
+		// Minecraft uses for its own keys:
+		normalized = StringUtils.replaceWhitespace(normalized, "_");
+		normalized = normalized.toLowerCase(Locale.ROOT);
+		return normalized;
 	}
 
 	/**
-	 * Formats the given input String in a way that matches valid {@link NamespacedKey NamespacedKeys} as they are used
-	 * by Minecraft.
+	 * Formats the given input String in a way that matches valid {@link NamespacedKey
+	 * NamespacedKeys} as they are used by Minecraft.
 	 * <p>
-	 * This formats the given String in the same way as {@link #normalizeNamespacedKey(String)}, but additionally
-	 * replaces all dashes ('{@code -}') with underscores ('{@code _}').
+	 * This formats the given String in the same way as {@link #normalizeNamespacedKey(String)}, but
+	 * additionally replaces all dashes ('{@code -}') with underscores ('{@code _}').
 	 * 
 	 * @param namespacedKey
-	 *            the input String
-	 * @return the formatted String, or <code>null</code> if the input String is <code>null</code>
+	 *            the input String, not <code>null</code>
+	 * @return the formatted String, not <code>null</code>
 	 */
 	public static String normalizeMinecraftNamespacedKey(String namespacedKey) {
-		if (namespacedKey == null) return null;
-		namespacedKey = normalizeNamespacedKey(namespacedKey);
+		Validate.notNull(namespacedKey, "namespacedKey is null");
+		String normalized = normalizeNamespacedKey(namespacedKey);
 		// Minecraft's namespaced keys use underscores:
-		namespacedKey = namespacedKey.replace('-', '_');
-		return namespacedKey;
+		normalized = normalized.replace('-', '_');
+		return normalized;
 	}
 
 	private NamespacedKeyUtils() {

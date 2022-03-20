@@ -5,20 +5,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link DataContainer} that is implemented on top of a {@link Map}.
  * <p>
- * This class implements the read-only portion of the {@link Map} interface by delegating to the underlying Map that
- * stores the values. Implementing the Map interface ensures that this {@link DataContainer} is directly serializable by
- * SnakeYaml without requiring additional conversions.
+ * This class implements the read-only portion of the {@link Map} interface by delegating to the
+ * underlying Map that stores the values. Implementing the Map interface ensures that this
+ * {@link DataContainer} is directly serializable by SnakeYaml without requiring additional
+ * conversions.
  */
 public class MapBasedDataContainer extends AbstractDataContainer {
 
-	private final Map<String, Object> dataMap;
-	private Set<String> keysView = null; // Lazily setup
-	private Map<String, Object> mapView = null; // Lazily setup
+	private final Map<@NonNull String, @NonNull Object> dataMap;
+	private @Nullable Set<? extends @NonNull String> keysView = null; // Lazily set up
+	private @Nullable Map<? extends @NonNull String, @NonNull ?> mapView = null; // Lazily set up
 
 	/**
 	 * Creates a new {@link MapBasedDataContainer}.
@@ -30,19 +34,19 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	/**
 	 * Creates a new {@link MapBasedDataContainer}.
 	 * <p>
-	 * The given map is assumed to be mutable (if this data container is supposed to be modifiable) and only contain
-	 * valid data container entries.
+	 * The given map is assumed to be mutable (if this data container is supposed to be modifiable)
+	 * and only contain valid data container entries.
 	 * 
 	 * @param dataMap
 	 *            the underlying data map, not <code>null</code>
 	 */
-	public MapBasedDataContainer(Map<String, Object> dataMap) {
+	public MapBasedDataContainer(Map<@NonNull String, @NonNull Object> dataMap) {
 		Validate.notNull(dataMap, "dataMap is null");
 		this.dataMap = dataMap;
 	}
 
 	@Override
-	public Object getOrDefault(String key, Object defaultValue) {
+	public @Nullable Object getOrDefault(String key, @Nullable Object defaultValue) {
 		Validate.notEmpty(key, "key is empty");
 		Object value = dataMap.get(key);
 		return (value != null) ? value : defaultValue;
@@ -74,28 +78,30 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<String> getKeys() {
+	public Set<? extends @NonNull String> getKeys() {
 		if (keysView == null) {
 			keysView = Collections.unmodifiableSet(dataMap.keySet());
 		}
+		assert keysView != null;
 		return keysView;
 	}
 
 	@Override
-	public Map<String, Object> getValues() {
+	public Map<? extends @NonNull String, @NonNull ?> getValues() {
 		if (mapView == null) {
 			mapView = Collections.unmodifiableMap(dataMap);
 		}
+		assert mapView != null;
 		return mapView;
 	}
 
 	@Override
-	public Map<String, Object> getValuesCopy() {
+	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
 		return new LinkedHashMap<>(dataMap);
 	}
 
 	@Override
-	public Object serialize() {
+	public @Nullable Object serialize() {
 		return this.getValues();
 	}
 
@@ -114,7 +120,7 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (obj == this) return true;
 		if (!(obj instanceof DataContainer)) return false;
 		DataContainer otherContainer = (DataContainer) obj;

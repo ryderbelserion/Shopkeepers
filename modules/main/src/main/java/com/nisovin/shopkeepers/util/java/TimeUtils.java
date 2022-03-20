@@ -10,7 +10,8 @@ public final class TimeUtils {
 	public static final long NANOS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
 
 	/**
-	 * Converts a duration between the given {@link TimeUnit time units} while preserving double precision.
+	 * Converts a duration between the given {@link TimeUnit time units} while preserving double
+	 * precision.
 	 * 
 	 * @param duration
 	 *            the duration in the source time unit

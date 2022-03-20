@@ -7,11 +7,12 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class Timer implements Timings {
 
-	// Note: When a timer operation is called during an unexpected state, we only log a (verbose) error instead of
-	// throwing an actual exception, because any issues with the timer potentially yielding wrong values are usually
-	// less important compared to issues that could be caused by an exception unexpectedly aborting some external
-	// operation. In order to avoid spamming the log with errors when an unexpected timer state is retained and also
-	// affects all future timer operations, we only log the error once and then disable all future timer state checks.
+	// Note: When a timer operation is called during an unexpected state, we only log a (verbose)
+	// error instead of throwing an actual exception, because any issues with the timer potentially
+	// yielding wrong values are usually less important compared to issues that could be caused by
+	// an exception unexpectedly aborting some external operation. In order to avoid spamming the
+	// log with errors when an unexpected timer state is retained and also affects all future timer
+	// operations, we only log the error once and then disable all future timer state checks.
 
 	private long counter = 0L;
 	private long totalTimeNanos = 0L;
@@ -29,7 +30,8 @@ public class Timer implements Timings {
 	}
 
 	private void validateState(boolean expectedStated) {
-		// We only log the first encountered state error and then skip all future timer state checks:
+		// We only log the first encountered state error and then skip all future timer state
+		// checks:
 		if (stateErrorEncountered) return;
 		if (!expectedStated) {
 			stateErrorEncountered = true;

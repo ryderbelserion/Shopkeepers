@@ -5,6 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -12,8 +16,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class SimpleCommandContext implements CommandContext {
 
-	protected final Map<String, Object> values = new LinkedHashMap<>();
-	private final CommandContextView view = new CommandContextView(this);
+	protected final Map<@NonNull String, @NonNull Object> values = new LinkedHashMap<>();
+	private final CommandContextView view = new CommandContextView(Unsafe.initialized(this));
 
 	/**
 	 * Creates a new and empty {@link SimpleCommandContext}.
@@ -29,22 +33,30 @@ public class SimpleCommandContext implements CommandContext {
 	}
 
 	@Override
+	public <T> @NonNull T get(String key) {
+		@Nullable T value = this.getOrNull(key);
+		Validate.State.notNull(value, () -> "Missing value for key '" + key + "'.");
+		return Unsafe.assertNonNull(value);
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T> T get(String key) {
+	@Override
+	public <T> @Nullable T getOrNull(String key) {
 		return (T) values.get(key);
 	}
 
 	@Override
-	public <T> T getOrDefault(String key, T defaultValue) {
-		T value = this.get(key);
+	public <T> @Nullable T getOrDefault(String key, @Nullable T defaultValue) {
+		@Nullable T value = this.getOrNull(key);
 		return (value != null) ? value : defaultValue;
 	}
 
 	@Override
-	public <T> T getOrDefault(String key, Supplier<T> defaultValueSupplier) {
-		T value = this.get(key);
+	public <T> @Nullable T getOrDefault(String key, Supplier<@Nullable T> defaultValueSupplier) {
+		@Nullable T value = this.getOrNull(key);
 		if (value != null) return value;
-		if (defaultValueSupplier == null) return null;
+		Validate.notNull(defaultValueSupplier, "defaultValueSupplier is null");
+		assert defaultValueSupplier != null;
 		return defaultValueSupplier.get();
 	}
 
@@ -54,7 +66,7 @@ public class SimpleCommandContext implements CommandContext {
 	}
 
 	@Override
-	public Map<String, Object> getMapView() {
+	public Map<? extends @NonNull String, @NonNull ?> getMapView() {
 		return Collections.unmodifiableMap(values);
 	}
 

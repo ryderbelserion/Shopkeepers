@@ -21,10 +21,12 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 class ChunkActivationListener implements Listener {
 
-	// TODO: Unload shopkeepers on HIGHEST priority instead, so that monitoring plugins can determine the actually
-	// unloaded (saved) entities / blocks? However, it is important to not unload them if the event gets cancelled.
-	// Possible workaround: Unload on HIGHEST priority and then check and respawn on MONITOR priority in case the event
-	// got cancelled? For now, keep it at MONITOR until an actual use case comes up.
+	// TODO: Unload shopkeepers on HIGHEST priority instead, so that monitoring plugins can
+	// determine the actually unloaded (saved) entities / blocks? However, it is important to not
+	// unload them if the event gets cancelled.
+	// Possible workaround: Unload on HIGHEST priority and then check and respawn on MONITOR
+	// priority in case the event got cancelled? For now, keep it at MONITOR until an actual use
+	// case comes up.
 
 	private final ShopkeeperChunkActivator chunkActivator;
 
@@ -57,12 +59,13 @@ class ChunkActivationListener implements Listener {
 		chunkActivator.onWorldUnload(world);
 	}
 
-	// We react to player joins and teleports in order to quickly activate chunks around players that suddenly appear
-	// near shopkeepers:
+	// We react to player joins and teleports in order to quickly activate chunks around players
+	// that suddenly appear near shopkeepers:
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerJoin(PlayerJoinEvent event) {
-		// Check if the player is still online (some other plugin might have kicked the player during the event):
+		// Check if the player is still online (some other plugin might have kicked the player
+		// during the event):
 		Player player = event.getPlayer();
 		if (!player.isOnline()) return; // Player is no longer online
 
@@ -72,8 +75,8 @@ class ChunkActivationListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerTeleport(PlayerTeleportEvent event) {
-		// The target location can be null in some circumstances (e.g. when a player enters an end gateway, but there is
-		// no end world). We ignore the event in this case.
+		// The target location can be null in some circumstances (e.g. when a player enters an end
+		// gateway, but there is no end world). We ignore the event in this case.
 		Location targetLocation = event.getTo();
 		if (targetLocation == null) return;
 

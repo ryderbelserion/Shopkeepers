@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -33,13 +36,13 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 	/**
 	 * Checks if the given {@link ShopkeeperSnapshot} name is valid.
 	 * <p>
-	 * The tested constraints are not fixed and might change or be extended in the future. Currently, this performs at
-	 * least the following checks:
+	 * The tested constraints are not fixed and might change or be extended in the future.
+	 * Currently, this performs at least the following checks:
 	 * <ul>
 	 * <li>The name is not <code>null</code> or empty.
 	 * <li>The name's length does not exceed {@link #MAX_NAME_LENGTH}.
-	 * <li>The name does not contain the color code character {@link ChatColor#COLOR_CHAR} (character '&amp;' is
-	 * allowed).
+	 * <li>The name does not contain the color code character {@link ChatColor#COLOR_CHAR}
+	 * (character '&amp;' is allowed).
 	 * </ul>
 	 * 
 	 * @param name
@@ -69,28 +72,27 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 		Validate.notEmpty(name, "name is null or empty");
 		Validate.isTrue(name.length() <= MAX_NAME_LENGTH,
 				() -> "name is more than " + MAX_NAME_LENGTH + " characters long: " + name);
-		Validate.isTrue(!TextUtils.containsColorChar(name), () -> "name contains color code character '§': " + name);
+		Validate.isTrue(!TextUtils.containsColorChar(name),
+				() -> "name contains color code character '§': " + name);
 	}
 
-	private static final Property<String> NAME = new BasicProperty<String>()
+	private static final Property<@NonNull String> NAME = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("name", StringSerializers.SCALAR)
-			.validator((property, value) -> {
-				validateName(value);
-			})
+			.validator(SKShopkeeperSnapshot::validateName)
 			.build();
-	private static final Property<Instant> TIMESTAMP = new BasicProperty<Instant>()
+	private static final Property<@NonNull Instant> TIMESTAMP = new BasicProperty<@NonNull Instant>()
 			.dataKeyAccessor("timestamp", InstantSerializers.ISO)
 			.build();
-	private static final Property<DataContainer> DATA = new BasicProperty<DataContainer>()
+	private static final Property<@NonNull DataContainer> DATA = new BasicProperty<@NonNull DataContainer>()
 			.dataKeyAccessor("data", DataContainerSerializers.DEFAULT)
 			.build();
 
 	/**
 	 * A {@link DataSerializer} for {@link SKShopkeeperSnapshot} values.
 	 */
-	public static final DataSerializer<SKShopkeeperSnapshot> SERIALIZER = new DataSerializer<SKShopkeeperSnapshot>() {
+	public static final DataSerializer<@NonNull SKShopkeeperSnapshot> SERIALIZER = new DataSerializer<@NonNull SKShopkeeperSnapshot>() {
 		@Override
-		public Object serialize(SKShopkeeperSnapshot value) {
+		public @Nullable Object serialize(SKShopkeeperSnapshot value) {
 			Validate.notNull(value, "value is null");
 			DataContainer dataContainer = DataContainer.create();
 			dataContainer.set(NAME, value.getName());
@@ -105,7 +107,7 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 			try {
 				String name = dataContainer.get(NAME);
 				Instant timestamp = dataContainer.get(TIMESTAMP);
-				ShopkeeperData shopkeeperData = ShopkeeperData.of(dataContainer.get(DATA));
+				ShopkeeperData shopkeeperData = ShopkeeperData.ofNonNull(dataContainer.get(DATA));
 				return new SKShopkeeperSnapshot(name, timestamp, shopkeeperData);
 			} catch (MissingDataException e) {
 				throw new InvalidDataException(e.getMessage(), e);
@@ -118,28 +120,37 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 	 * <p>
 	 * All contained elements are expected to not be <code>null</code>.
 	 */
-	public static final DataSerializer<@ReadOnly List<? extends SKShopkeeperSnapshot>> LIST_SERIALIZER = new DataSerializer<List<? extends SKShopkeeperSnapshot>>() {
+	public static final DataSerializer<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>> LIST_SERIALIZER = new DataSerializer<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>>() {
 		@Override
-		public Object serialize(List<? extends SKShopkeeperSnapshot> value) {
+		public @Nullable Object serialize(
+				@ReadOnly List<? extends @NonNull SKShopkeeperSnapshot> value
+		) {
 			Validate.notNull(value, "value is null");
 			List<Object> snapshotListData = new ArrayList<>(value.size());
 			value.forEach(snapshot -> {
-				snapshotListData.add(SERIALIZER.serialize(snapshot));
+				Object snapshotData = Unsafe.assertNonNull(SERIALIZER.serialize(snapshot));
+				snapshotListData.add(snapshotData);
 			});
 			return snapshotListData;
 		}
 
 		@Override
-		public List<? extends SKShopkeeperSnapshot> deserialize(Object data) throws InvalidDataException {
+		public List<? extends @NonNull SKShopkeeperSnapshot> deserialize(
+				Object data
+		) throws InvalidDataException {
 			Validate.notNull(data, "data is null");
 			if (!(data instanceof List)) {
 				throw new InvalidDataException("Data is not a List, but of type "
 						+ data.getClass().getName() + "!");
 			}
 			List<?> snapshotListData = (List<?>) data;
-			List<SKShopkeeperSnapshot> snapshots = new ArrayList<>(snapshotListData.size());
+			List<@NonNull SKShopkeeperSnapshot> snapshots = new ArrayList<>(snapshotListData.size());
 			for (Object snapshotData : snapshotListData) {
 				try {
+					if (snapshotData == null) {
+						throw new InvalidDataException("Data is null!");
+					}
+					assert snapshotData != null;
 					SKShopkeeperSnapshot snapshot = SERIALIZER.deserialize(snapshotData);
 					snapshots.add(snapshot);
 				} catch (InvalidDataException e) {
@@ -217,7 +228,7 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public final boolean equals(@Nullable Object obj) {
 		return super.equals(obj);
 	}
 }

@@ -6,7 +6,10 @@ import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
@@ -21,7 +24,8 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<PriceOffer> {
+	private static class TradingRecipesAdapter
+			extends DefaultTradingRecipesAdapter<@NonNull PriceOffer> {
 
 		private final SKSellingPlayerShopkeeper shopkeeper;
 
@@ -31,10 +35,11 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		public List<TradingRecipeDraft> getTradingRecipes() {
+		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
 			// Add the shopkeeper's offers:
-			List<? extends PriceOffer> offers = shopkeeper.getOffers();
-			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+			List<? extends @NonNull PriceOffer> offers = shopkeeper.getOffers();
+			// With heuristic initial capacity:
+			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
 			offers.forEach(offer -> {
 				ItemStack tradedItem = offer.getItem().asItemStack();
 				TradingRecipeDraft recipe = createTradingRecipeDraft(tradedItem, offer.getPrice());
@@ -43,13 +48,16 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 			// Add new empty recipe drafts for items from the container without existing offer:
 			// We only add one recipe per similar item:
-			List<ItemStack> newRecipes = new ArrayList<>();
-			ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+			List<@NonNull ItemStack> newRecipes = new ArrayList<>();
+			// Empty if the container is not found:
+			@Nullable ItemStack[] containerContents = shopkeeper.getContainerContents();
 			for (ItemStack containerItem : containerContents) {
-				if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+				// Ignore empty ItemStacks:
+				if (containerItem == null) continue;
+				if (ItemUtils.isEmpty(containerItem)) continue;
 
 				// Replace placeholder item, if this is one:
-				containerItem = PlaceholderItems.replace(containerItem);
+				containerItem = PlaceholderItems.replaceNonNull(containerItem);
 
 				// Ignore currency items:
 				if (Currencies.matchesAny(containerItem)) {
@@ -67,7 +75,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				}
 
 				// Add new empty recipe:
-				containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
+				containerItem = ItemUtils.copySingleItem(containerItem);
 				TradingRecipeDraft recipe = createTradingRecipeDraft(containerItem, 0);
 				recipes.add(recipe);
 				newRecipes.add(containerItem);
@@ -77,27 +85,28 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		protected List<? extends PriceOffer> getOffers() {
+		protected List<? extends @NonNull PriceOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<PriceOffer> newOffers) {
+		protected void setOffers(List<? extends @NonNull PriceOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 
 		@Override
-		protected PriceOffer createOffer(TradingRecipeDraft recipe) {
+		protected @Nullable PriceOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
 			int price = getPrice(recipe);
 			if (price <= 0) return null; // Invalid recipe
 
 			// We can reuse the trading recipe draft's items without copying them first.
-			UnmodifiableItemStack resultItem = recipe.getResultItem();
+			// Not null because the recipe is valid:
+			UnmodifiableItemStack resultItem = Unsafe.assertNonNull(recipe.getResultItem());
 			// Replace placeholder item, if this is one:
-			// Note: We also replace placeholder items in selling shopkeepers, because this allows the setup of trades
-			// before the player has all the required items.
-			resultItem = PlaceholderItems.replace(resultItem);
+			// Note: We also replace placeholder items in selling shopkeepers, because this allows
+			// the setup of trades before the player has all the required items.
+			resultItem = PlaceholderItems.replaceNonNull(resultItem);
 
 			return PriceOffer.create(resultItem, price);
 		}

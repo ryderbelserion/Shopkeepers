@@ -11,9 +11,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -42,15 +45,23 @@ public class TradeNotifications implements Listener {
 	private static class TradeContext {
 
 		private final MergedTrades mergedTrades;
-		private final Lazy<MessageArguments> shopMessageArguments;
-		private final Lazy<Map<String, Object>> tradeMessageArguments;
-		private final Lazy<Boolean> isResultItemCurrency;
+		private final Lazy<@NonNull MessageArguments> shopMessageArguments;
+		private final Lazy<@NonNull Map<@NonNull String, @NonNull Object>> tradeMessageArguments;
+		private final Lazy<@NonNull Boolean> isResultItemCurrency;
 
 		TradeContext(MergedTrades mergedTrades) {
 			this.mergedTrades = mergedTrades;
-			shopMessageArguments = new Lazy<>(() -> ((AbstractShopkeeper) this.getShopkeeper()).getMessageArguments("shop_"));
-			tradeMessageArguments = new Lazy<>(() -> createTradeMessageArguments(this));
-			isResultItemCurrency = new Lazy<>(() -> Currencies.getBase().getItemData().matches(this.getResultItem()));
+			shopMessageArguments = new Lazy<>(() -> {
+				return ((AbstractShopkeeper) Unsafe.initialized(this).getShopkeeper())
+						.getMessageArguments("shop_");
+			});
+			tradeMessageArguments = new Lazy<>(() -> {
+				return createTradeMessageArguments(Unsafe.initialized(this));
+			});
+			isResultItemCurrency = new Lazy<>(() -> {
+				return Currencies.getBase().getItemData()
+						.matches(Unsafe.initialized(this).getResultItem());
+			});
 		}
 
 		public Player getTradingPlayer() {
@@ -62,8 +73,8 @@ public class TradeNotifications implements Listener {
 		}
 
 		/**
-		 * Gets the result item of the trades. See {@link ShopkeeperTradeEvent#getTradingRecipe()} and
-		 * {@link TradingRecipe#getResultItem()}.
+		 * Gets the result item of the trades. See {@link ShopkeeperTradeEvent#getTradingRecipe()}
+		 * and {@link TradingRecipe#getResultItem()}.
 		 * 
 		 * @return an unmodifiable view on the result item, not <code>null</code> or empty
 		 */
@@ -76,7 +87,8 @@ public class TradeNotifications implements Listener {
 		}
 
 		/**
-		 * Gets the first offered item of the trades. See {@link ShopkeeperTradeEvent#getOfferedItem1()}.
+		 * Gets the first offered item of the trades. See
+		 * {@link ShopkeeperTradeEvent#getOfferedItem1()}.
 		 * 
 		 * @return an unmodifiable view on the first offered item, not <code>null</code> or empty
 		 */
@@ -85,11 +97,12 @@ public class TradeNotifications implements Listener {
 		}
 
 		/**
-		 * Gets the second offered item of the trades. See {@link ShopkeeperTradeEvent#getOfferedItem2()}.
+		 * Gets the second offered item of the trades. See
+		 * {@link ShopkeeperTradeEvent#getOfferedItem2()}.
 		 * 
 		 * @return an unmodifiable view on the second offered item, or <code>null</code>
 		 */
-		public UnmodifiableItemStack getOfferedItem2() {
+		public @Nullable UnmodifiableItemStack getOfferedItem2() {
 			return mergedTrades.getOfferedItem2();
 		}
 
@@ -105,22 +118,54 @@ public class TradeNotifications implements Listener {
 			return shopMessageArguments.get();
 		}
 
-		public Map<String, Object> getTradeMessageArguments() {
+		// Returns a modifiable map.
+		public Map<@NonNull String, @NonNull Object> getTradeMessageArguments() {
 			return tradeMessageArguments.get();
 		}
 	}
 
-	private static Map<String, Object> createTradeMessageArguments(TradeContext tradeContext) {
+	private static Map<@NonNull String, @NonNull Object> createTradeMessageArguments(
+			TradeContext tradeContext
+	) {
 		Player player = tradeContext.getTradingPlayer();
-		Map<String, Object> msgArgs = new HashMap<>();
-		msgArgs.put("player", player.getName());
-		msgArgs.put("playerId", (Supplier<Object>) () -> player.getUniqueId().toString());
-		msgArgs.put("resultItem", (Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getResultItem()));
-		msgArgs.put("resultItemAmount", (Supplier<Object>) () -> tradeContext.getResultItem().getAmount());
-		msgArgs.put("item1", (Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getOfferedItem1()));
-		msgArgs.put("item1Amount", (Supplier<Object>) () -> tradeContext.getOfferedItem1().getAmount());
-		msgArgs.put("item2", (Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getOfferedItem2()));
-		msgArgs.put("item2Amount", (Supplier<Object>) () -> ItemUtils.getItemStackAmount(tradeContext.getOfferedItem2()));
+		Map<@NonNull String, @NonNull Object> msgArgs = new HashMap<>();
+		msgArgs.put("player", Unsafe.assertNonNull(player.getName()));
+		msgArgs.put(
+				"playerId",
+				(Supplier<@NonNull Object>) () -> player.getUniqueId().toString()
+		);
+		msgArgs.put(
+				"resultItem",
+				(Supplier<@NonNull Object>) () -> {
+					return TextUtils.getItemText(tradeContext.getResultItem());
+				}
+		);
+		msgArgs.put(
+				"resultItemAmount",
+				(Supplier<@NonNull Object>) () -> tradeContext.getResultItem().getAmount()
+		);
+		msgArgs.put(
+				"item1",
+				(Supplier<@NonNull Object>) () -> {
+					return TextUtils.getItemText(tradeContext.getOfferedItem1());
+				}
+		);
+		msgArgs.put(
+				"item1Amount",
+				(Supplier<@NonNull Object>) () -> tradeContext.getOfferedItem1().getAmount()
+		);
+		msgArgs.put(
+				"item2",
+				(Supplier<@NonNull Object>) () -> {
+					return TextUtils.getItemText(tradeContext.getOfferedItem2());
+				}
+		);
+		msgArgs.put(
+				"item2Amount",
+				(Supplier<@NonNull Object>) () -> {
+					return ItemUtils.getItemStackAmount(tradeContext.getOfferedItem2());
+				}
+		);
 		return msgArgs;
 	}
 
@@ -138,8 +183,11 @@ public class TradeNotifications implements Listener {
 		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 		this.userPreferences = new NotificationUserPreferences(plugin);
-		this.tradeMerger = new TradeMerger(plugin, MergeMode.DURATION, this::onTradesCompleted)
-				.withMergeDurations(TRADE_MERGE_DURATION_TICKS, NEXT_MERGE_TIMEOUT_TICKS);
+		this.tradeMerger = new TradeMerger(
+				plugin,
+				MergeMode.DURATION,
+				Unsafe.initialized(this)::onTradesCompleted
+		).withMergeDurations(TRADE_MERGE_DURATION_TICKS, NEXT_MERGE_TIMEOUT_TICKS);
 	}
 
 	public void onEnable() {
@@ -186,17 +234,21 @@ public class TradeNotifications implements Listener {
 			shopOwner = ((PlayerShopkeeper) tradeContext.getShopkeeper()).getOwner();
 		}
 
-		Lazy<Text> tradeNotification = new Lazy<>(() -> this.getTradeNotificationMessage(tradeContext));
+		Lazy<@NonNull Text> tradeNotification = new Lazy<>(
+				() -> this.getTradeNotificationMessage(tradeContext)
+		);
 		for (Player player : Bukkit.getOnlinePlayers()) {
+			assert player != null;
 			// Avoid notifying the shop owner twice.
-			// Note that the shop owner may have deactivated the trade notification for this particular shopkeeper. In
-			// this case, they will not receive either type of trade notification.
+			// Note that the shop owner may have deactivated the trade notification for this
+			// particular shopkeeper. In this case, they will not receive either type of trade
+			// notification.
 			if (player == shopOwner && Settings.notifyShopOwnersAboutTrades) continue;
 			if (!userPreferences.isNotifyOnTrades(player)) continue;
 			if (!PermissionUtils.hasPermission(player, tradeNotificationPermission)) continue;
 
-			// Note: We also send trade notifications for own trades (i.e. when the trading player matches the recipient
-			// of the notification).
+			// Note: We also send trade notifications for own trades (i.e. when the trading player
+			// matches the recipient of the notification).
 			TextUtils.sendMessage(player, tradeNotification.get());
 			Settings.tradeNotificationSound.play(player);
 			this.sendDisableTradeNotificationsHint(player);
@@ -208,8 +260,8 @@ public class TradeNotifications implements Listener {
 		Shopkeeper shopkeeper = tradeContext.getShopkeeper();
 
 		Text message;
-		// We avoid checking for specific shop types (e.g. buying shop) and instead check if the result item is
-		// currency:
+		// We avoid checking for specific shop types (e.g. buying shop) and instead check if the
+		// result item is currency:
 		if (tradeContext.isResultItemCurrency()) {
 			if (tradeContext.hasOfferedItem2()) {
 				message = Messages.buyNotificationTwoItems;
@@ -247,14 +299,19 @@ public class TradeNotifications implements Listener {
 		return this.getTradeNotificationMessage(tradeContext, message, shopText, tradeCountText);
 	}
 
-	private Text getTradeNotificationMessage(TradeContext tradeContext, Text message, Text shopText, Text tradeCountText) {
-		assert tradeContext != null;
+	private Text getTradeNotificationMessage(
+			TradeContext tradeContext,
+			Text message,
+			Text shopText,
+			Text tradeCountText
+	) {
 		MessageArguments shopMsgArgs = tradeContext.getShopMessageArguments();
-		Map<String, Object> tradeMsgArgs = tradeContext.getTradeMessageArguments();
+		Map<@NonNull String, @NonNull Object> tradeMsgArgs = tradeContext.getTradeMessageArguments();
 
 		shopText.setPlaceholderArguments(shopMsgArgs);
-		// TODO Display more shop information as hover text? Add a click event or insertion text to automatically copy
-		// the shop coordinates or id, or insert a teleport command to teleport to the shop?
+		// TODO Display more shop information as hover text? Add a click event or insertion text to
+		// automatically copy the shop coordinates or id, or insert a teleport command to teleport
+		// to the shop?
 		tradeMsgArgs.put("shop", shopText);
 
 		tradeCountText.setPlaceholderArguments("count", tradeContext.getTradeCount());
@@ -262,7 +319,6 @@ public class TradeNotifications implements Listener {
 
 		message.setPlaceholderArguments(tradeMsgArgs);
 		message.setPlaceholderArguments(shopMsgArgs);
-
 		return message;
 	}
 
@@ -277,8 +333,8 @@ public class TradeNotifications implements Listener {
 		if (owner == null) return; // Owner is offline
 		if (!userPreferences.isNotifyOnTrades(owner)) return;
 
-		// Note: We also send trade notifications for own trades (i.e. when the trading player matches the recipient of
-		// the notification).
+		// Note: We also send trade notifications for own trades (i.e. when the trading player
+		// matches the recipient of the notification).
 		Text message = this.getOwnerTradeNotificationMessage(tradeContext);
 		TextUtils.sendMessage(owner, message);
 		Settings.shopOwnerTradeNotificationSound.play(owner);
@@ -289,8 +345,8 @@ public class TradeNotifications implements Listener {
 		assert tradeContext != null;
 		Shopkeeper shopkeeper = tradeContext.getShopkeeper();
 
-		// We avoid checking for specific shop types (e.g. buying shop) and instead check if the result item is
-		// currency:
+		// We avoid checking for specific shop types (e.g. buying shop) and instead check if the
+		// result item is currency:
 		boolean isBuy = tradeContext.isResultItemCurrency();
 		Text message;
 		if (isBuy) {
@@ -331,14 +387,19 @@ public class TradeNotifications implements Listener {
 	}
 
 	private void sendDisableTradeNotificationsHint(Player player) {
-		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.NOTIFY_TRADES_PERMISSION)) return;
+		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.NOTIFY_TRADES_PERMISSION)) {
+			return;
+		}
 
 		// We only send this once per session:
 		if (userPreferences.hasReceivedDisableTradeNotificationsHint(player)) return;
 		userPreferences.setReceivedDisableTradeNotificationsHint(player, true);
 
-		Text command = Messages.disableTradeNotificationsHintCommand.copy(); // TODO Avoid this copy
-		Text commandText = Text.clickEvent(Action.SUGGEST_COMMAND, command.toPlainText()).next(command).getRoot();
-		TextUtils.sendMessage(player, Messages.disableTradeNotificationsHint, "command", commandText);
+		Text command = Messages.disableTradeNotificationsHintCommand.copy(); // TODO Avoid copy
+		Text commandText = Text.clickEvent(Action.SUGGEST_COMMAND, command.toPlainText())
+				.next(command).getRoot();
+		TextUtils.sendMessage(player, Messages.disableTradeNotificationsHint,
+				"command", commandText
+		);
 	}
 }

@@ -6,6 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -17,15 +21,22 @@ import com.nisovin.shopkeepers.util.logging.Log;
 class ShopkeeperChunkMap {
 
 	/**
-	 * An instance of this can be registered during the construction of the {@link ShopkeeperChunkMap} and is then
-	 * invoked whenever a shopkeeper is added or removed from the chunk map.
+	 * An instance of this can be registered during the construction of the
+	 * {@link ShopkeeperChunkMap} and is then invoked whenever a shopkeeper is added or removed from
+	 * the chunk map.
 	 */
 	static class ChangeListener {
 
-		public void onShopkeeperAdded(AbstractShopkeeper shopkeeper, ChunkShopkeepers chunkShopkeepers) {
+		public void onShopkeeperAdded(
+				AbstractShopkeeper shopkeeper,
+				ChunkShopkeepers chunkShopkeepers
+		) {
 		}
 
-		public void onShopkeeperRemoved(AbstractShopkeeper shopkeeper, ChunkShopkeepers chunkShopkeepers) {
+		public void onShopkeeperRemoved(
+				AbstractShopkeeper shopkeeper,
+				ChunkShopkeepers chunkShopkeepers
+		) {
 		}
 
 		public void onWorldAdded(WorldShopkeepers worldShopkeepers) {
@@ -42,8 +53,8 @@ class ShopkeeperChunkMap {
 	}
 
 	// By world name:
-	private final Map<String, WorldShopkeepers> shopkeepersByWorld = new LinkedHashMap<>();
-	private final Set<String> shopkeeperWorldsView = Collections.unmodifiableSet(shopkeepersByWorld.keySet());
+	private final Map<@NonNull String, @NonNull WorldShopkeepers> shopkeepersByWorld = new LinkedHashMap<>();
+	private final Set<@NonNull String> shopkeeperWorldsView = Collections.unmodifiableSet(shopkeepersByWorld.keySet());
 
 	private final ChangeListener changeListener; // Not null
 
@@ -57,12 +68,14 @@ class ShopkeeperChunkMap {
 	}
 
 	// Returns null if there are no shopkeepers in the specified world.
+	@Nullable
 	WorldShopkeepers getWorldShopkeepers(String worldName) {
 		return shopkeepersByWorld.get(worldName);
 	}
 
 	// Returns null if there are no shopkeepers in the specified chunk:
-	ChunkShopkeepers getChunkShopkeepers(ChunkCoords chunkCoords) {
+	@Nullable
+	ChunkShopkeepers getChunkShopkeepers(@Nullable ChunkCoords chunkCoords) {
 		if (chunkCoords == null) return null;
 		String worldName = chunkCoords.getWorldName();
 		WorldShopkeepers worldShopkeepers = this.getWorldShopkeepers(worldName);
@@ -74,10 +87,13 @@ class ShopkeeperChunkMap {
 	ChunkShopkeepers addShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null && !shopkeeper.isVirtual();
 		assert shopkeeper.getLastChunkCoords() == null;
-		String worldName = shopkeeper.getWorldName();
-		assert worldName != null;
-		assert worldName.equals(shopkeeper.getChunkCoords().getWorldName());
-		WorldShopkeepers worldShopkeepers = shopkeepersByWorld.computeIfAbsent(worldName, WorldShopkeepers::new);
+		String worldName = Unsafe.assertNonNull(shopkeeper.getWorldName());
+		ChunkCoords shopkeeperChunk = Unsafe.assertNonNull(shopkeeper.getChunkCoords());
+		assert worldName.equals(shopkeeperChunk.getWorldName());
+		WorldShopkeepers worldShopkeepers = shopkeepersByWorld.computeIfAbsent(
+				worldName,
+				WorldShopkeepers::new
+		);
 		assert worldShopkeepers != null;
 		ChunkShopkeepers chunkShopkeepers = worldShopkeepers.addShopkeeper(shopkeeper);
 
@@ -93,14 +109,17 @@ class ShopkeeperChunkMap {
 	}
 
 	// Only called for non-virtual shopkeepers.
+	@Nullable
 	ChunkShopkeepers removeShopkeeper(AbstractShopkeeper shopkeeper) {
 		return this.removeShopkeeper(shopkeeper, false);
 	}
 
-	private ChunkShopkeepers removeShopkeeper(AbstractShopkeeper shopkeeper, boolean skipWorldCleanup) {
+	private @Nullable ChunkShopkeepers removeShopkeeper(
+			AbstractShopkeeper shopkeeper,
+			boolean skipWorldCleanup
+	) {
 		assert shopkeeper != null && !shopkeeper.isVirtual();
-		ChunkCoords lastChunkCoords = shopkeeper.getLastChunkCoords();
-		assert lastChunkCoords != null;
+		ChunkCoords lastChunkCoords = Unsafe.assertNonNull(shopkeeper.getLastChunkCoords());
 		String worldName = lastChunkCoords.getWorldName();
 		WorldShopkeepers worldShopkeepers = shopkeepersByWorld.get(worldName);
 		if (worldShopkeepers == null) return null; // Could not find the shopkeeper
@@ -123,20 +142,20 @@ class ShopkeeperChunkMap {
 		return chunkShopkeepers;
 	}
 
-	// Updates the shopkeeper's location inside the chunk map, moving it from its previous chunk to its current chunk.
+	// Updates the shopkeeper's location inside the chunk map, moving it from its previous chunk to
+	// its current chunk.
 	// Returns true if the shopkeeper was moved to a different chunk.
 	boolean moveShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		ChunkCoords oldChunk = shopkeeper.getLastChunkCoords();
-		assert oldChunk != null;
-		ChunkCoords newChunk = shopkeeper.getChunkCoords();
-		assert newChunk != null;
+		ChunkCoords oldChunk = Unsafe.assertNonNull(shopkeeper.getLastChunkCoords());
+		ChunkCoords newChunk = Unsafe.assertNonNull(shopkeeper.getChunkCoords());
 		if (newChunk.equals(oldChunk)) {
 			// The shopkeeper's chunk did not change.
 			return false;
 		}
 
-		// If the shopkeeper is moved from one chunk to another within the same world, we skip any world data cleanup.
+		// If the shopkeeper is moved from one chunk to another within the same world, we skip any
+		// world data cleanup.
 		boolean skipWorldCleanup = oldChunk.getWorldName().equals(newChunk.getWorldName());
 		this.removeShopkeeper(shopkeeper, skipWorldCleanup);
 		this.addShopkeeper(shopkeeper);
@@ -152,7 +171,7 @@ class ShopkeeperChunkMap {
 
 	// QUERIES
 
-	public Collection<String> getWorldsWithShopkeepers() {
+	public Collection<? extends @NonNull String> getWorldsWithShopkeepers() {
 		return shopkeeperWorldsView;
 	}
 }

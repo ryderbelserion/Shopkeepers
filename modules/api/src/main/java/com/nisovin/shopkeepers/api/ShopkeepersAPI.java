@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.api;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
@@ -33,9 +34,9 @@ public final class ShopkeepersAPI {
 	/**
 	 * Checks whether the API has already been enabled.
 	 * <p>
-	 * If this is called early during plugin startup (e.g. during the {@link Plugin#onLoad() loading phase} of plugins,
-	 * or while the Shopkeepers plugin itself is still getting enabled), the API may not yet be safe for use even if
-	 * this returns <code>true</code>.
+	 * If this is called early during plugin startup (e.g. during the {@link Plugin#onLoad() loading
+	 * phase} of plugins, or while the Shopkeepers plugin itself is still getting enabled), the API
+	 * may not yet be safe for use even if this returns <code>true</code>.
 	 * 
 	 * @return <code>true</code> if enabled
 	 */
@@ -48,7 +49,8 @@ public final class ShopkeepersAPI {
 	 * 
 	 * @return the plugin instance, not <code>null</code>
 	 * @throws IllegalStateException
-	 *             if the API is not enabled currently, e.g. because the plugin is not enabled currently
+	 *             if the API is not enabled currently, e.g. because the plugin is not enabled
+	 *             currently
 	 */
 	public static ShopkeepersPlugin getPlugin() {
 		return InternalShopkeepersAPI.getPlugin();
@@ -163,16 +165,18 @@ public final class ShopkeepersAPI {
 	/**
 	 * Creates and spawns a new shopkeeper in the same way a player would create it.
 	 * <p>
-	 * This takes any limitations into account that might affect the creator or owner of the shopkeeper, and this sends
-	 * the creator messages if the shopkeeper creation fails for some reason.
+	 * This takes any limitations into account that might affect the creator or owner of the
+	 * shopkeeper, and this sends the creator messages if the shopkeeper creation fails for some
+	 * reason.
 	 * 
 	 * @param shopCreationData
-	 *            the shop creation data containing the necessary arguments (spawn location, object type, etc.) for
-	 *            creating this shopkeeper
-	 * @return the new shopkeeper, or <code>null</code> if the creation wasn't successful for some reason
+	 *            the shop creation data containing the necessary arguments (spawn location, object
+	 *            type, etc.) for creating this shopkeeper
+	 * @return the new shopkeeper, or <code>null</code> if the creation wasn't successful for some
+	 *         reason
 	 * @see ShopkeepersPlugin#handleShopkeeperCreation(ShopCreationData)
 	 */
-	public static Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
+	public static @Nullable Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
 		return getPlugin().handleShopkeeperCreation(shopCreationData);
 	}
 
@@ -181,8 +185,9 @@ public final class ShopkeepersAPI {
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
-	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
+	 * and therefore not copied before it is stored by the price offer. Otherwise, it is first
+	 * copied.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -199,7 +204,8 @@ public final class ShopkeepersAPI {
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored
+	 * by the price offer.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -216,8 +222,9 @@ public final class ShopkeepersAPI {
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
-	 * copied before they are stored by the trade offer. Otherwise, they are first copied.
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
+	 * and therefore not copied before they are stored by the trade offer. Otherwise, they are first
+	 * copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -229,15 +236,19 @@ public final class ShopkeepersAPI {
 	 * @deprecated Use {@link TradeOffer#create(ItemStack, ItemStack, ItemStack)}
 	 */
 	@Deprecated
-	public static TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public static TradeOffer createTradeOffer(
+			ItemStack resultItem,
+			ItemStack item1,
+			ItemStack item2
+	) {
 		return getPlugin().createTradeOffer(resultItem, item1, item2);
 	}
 
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trade
-	 * offer.
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are
+	 * stored by the trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -246,10 +257,15 @@ public final class ShopkeepersAPI {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 * @return the new offer
-	 * @deprecated Use {@link TradeOffer#create(UnmodifiableItemStack, UnmodifiableItemStack, UnmodifiableItemStack)}
+	 * @deprecated Use
+	 *             {@link TradeOffer#create(UnmodifiableItemStack, UnmodifiableItemStack, UnmodifiableItemStack)}
 	 */
 	@Deprecated
-	public static TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+	public static TradeOffer createTradeOffer(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			UnmodifiableItemStack item2
+	) {
 		return getPlugin().createTradeOffer(resultItem, item1, item2);
 	}
 

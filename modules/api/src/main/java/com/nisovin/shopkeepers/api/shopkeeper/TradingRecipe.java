@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
@@ -30,7 +31,7 @@ public interface TradingRecipe {
 	 * 
 	 * @return an unmodifiable view on the second required item, can be <code>null</code>
 	 */
-	public UnmodifiableItemStack getItem2();
+	public @Nullable UnmodifiableItemStack getItem2();
 
 	/**
 	 * Checks whether this trading recipe requires two input items.
@@ -59,7 +60,11 @@ public interface TradingRecipe {
 	 *            the second item
 	 * @return <code>true</code> if the items are equal
 	 */
-	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2);
+	public boolean areItemsEqual(
+			@Nullable ItemStack resultItem,
+			@Nullable ItemStack item1,
+			@Nullable ItemStack item2
+	);
 
 	/**
 	 * Checks if the given items are equal to the items of this trading recipe.
@@ -72,7 +77,11 @@ public interface TradingRecipe {
 	 *            the second item
 	 * @return <code>true</code> if the items are equal
 	 */
-	public boolean areItemsEqual(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2);
+	public boolean areItemsEqual(
+			@Nullable UnmodifiableItemStack resultItem,
+			@Nullable UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	);
 
 	/**
 	 * Checks if the items of this and the given trading recipe are equal.
@@ -81,5 +90,5 @@ public interface TradingRecipe {
 	 *            the other trading recipe
 	 * @return <code>true</code> if the items are equal
 	 */
-	public boolean areItemsEqual(TradingRecipe otherRecipe);
+	public boolean areItemsEqual(@Nullable TradingRecipe otherRecipe);
 }

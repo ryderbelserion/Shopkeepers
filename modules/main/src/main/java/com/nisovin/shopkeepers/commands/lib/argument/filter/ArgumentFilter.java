@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.commands.lib.argument.filter;
 
 import java.util.function.Predicate;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.text.Text;
 
@@ -13,9 +15,9 @@ import com.nisovin.shopkeepers.text.Text;
  */
 public abstract class ArgumentFilter<T> implements Predicate<T> {
 
-	private static final ArgumentFilter<Object> ACCEPT_ANY = new ArgumentFilter<Object>() {
+	private static final ArgumentFilter<@Nullable Object> ACCEPT_ANY = new ArgumentFilter<@Nullable Object>() {
 		@Override
-		public boolean test(Object value) {
+		public boolean test(@Nullable Object value) {
 			return true;
 		}
 	};
@@ -35,36 +37,49 @@ public abstract class ArgumentFilter<T> implements Predicate<T> {
 	/**
 	 * Gets the 'invalid argument' error message for the given parsed but declined value.
 	 * <p>
-	 * When overriding this method, consider using {@link CommandArgument#getDefaultErrorMsgArgs()} for the common
-	 * message arguments.
+	 * When overriding this method, consider using {@link CommandArgument#getDefaultErrorMsgArgs()}
+	 * for the common message arguments.
 	 * <p>
-	 * Consider using an {@link ArgumentRejectedException} when using the returned message for an exception.
+	 * Consider using an {@link ArgumentRejectedException} when using the returned message for an
+	 * exception.
 	 * 
 	 * @param argument
 	 *            the argument using this filter, not <code>null</code>
 	 * @param argumentInput
 	 *            the argument input, not <code>null</code>
 	 * @param value
-	 *            the corresponding parsed but declined value, can be <code>null</code>
+	 *            the corresponding parsed but declined value
 	 * @return the error message
 	 */
-	public Text getInvalidArgumentErrorMsg(CommandArgument<T> argument, String argumentInput, T value) {
+	public Text getInvalidArgumentErrorMsg(
+			CommandArgument<?> argument,
+			String argumentInput,
+			T value
+	) {
 		return argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 
 	/**
 	 * Gets a {@link ArgumentRejectedException} that uses this filter's
-	 * {@link #getInvalidArgumentErrorMsg(CommandArgument, String, Object) invalid argument error message}.
+	 * {@link #getInvalidArgumentErrorMsg(CommandArgument, String, Object) invalid argument error
+	 * message}.
 	 * 
 	 * @param argument
 	 *            the argument using this filter, not <code>null</code>
 	 * @param argumentInput
 	 *            the argument input, not <code>null</code>
 	 * @param value
-	 *            the corresponding parsed but declined value, can be <code>null</code>
+	 *            the corresponding parsed but declined value
 	 * @return the {@link ArgumentRejectedException}
 	 */
-	public ArgumentRejectedException rejectedArgumentException(CommandArgument<T> argument, String argumentInput, T value) {
-		return new ArgumentRejectedException(argument, this.getInvalidArgumentErrorMsg(argument, argumentInput, value));
+	public ArgumentRejectedException rejectedArgumentException(
+			CommandArgument<?> argument,
+			String argumentInput,
+			T value
+	) {
+		return new ArgumentRejectedException(
+				argument,
+				this.getInvalidArgumentErrorMsg(argument, argumentInput, value)
+		);
 	}
 }

@@ -49,14 +49,14 @@ class CommandConvertItems extends Command {
 				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.CONVERT_ITEMS_OTHERS_PERMISSION);
 	}
 
-	// TODO Add a per-player timeout to prevent command spamming? Because this command might be performance heavy.
+	// TODO Add a per-player timeout to prevent command spamming? Because this command might be
+	// performance heavy.
 
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
 		Player targetPlayer = context.get(ARGUMENT_PLAYER);
-		assert targetPlayer != null;
 		boolean targetSelf = (sender.equals(targetPlayer));
 
 		boolean convertAll = context.has(ARGUMENT_ALL);
@@ -70,18 +70,21 @@ class CommandConvertItems extends Command {
 
 		PlayerInventory inventory = targetPlayer.getInventory();
 		int convertedStacks = 0;
-		// Note: This command converts all items, regardless of the 'convert-player-items' and related settings.
+		// Note: This command converts all items, regardless of the 'convert-player-items' and
+		// related settings.
 		if (convertAll) {
 			// Handles content, armor and off hand items, cursor item, and inventory updating:
 			long startNanos = System.nanoTime();
 			convertedStacks = ItemConversion.convertItems(inventory, (item) -> true, true);
 			long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 			final int finalConvertedStacks = convertedStacks;
-			// Note: The conversion always has some performance impact, even if no items got actually converted. We
-			// therefore always print the debug messages to allow debugging the item conversion times.
+			// Note: The conversion always has some performance impact, even if no items got
+			// actually converted. We therefore always print the debug messages to allow debugging
+			// the item conversion times.
 			Log.debug(DebugOptions.itemConversions,
-					() -> "Converted " + finalConvertedStacks + " item stacks in the inventory of player '"
-							+ targetPlayer.getName() + "' (took " + durationMillis + " ms)."
+					() -> "Converted " + finalConvertedStacks
+							+ " item stacks in the inventory of player '" + targetPlayer.getName()
+							+ "' (took " + durationMillis + " ms)."
 			);
 		} else {
 			// Only convert the held item:
@@ -95,8 +98,9 @@ class CommandConvertItems extends Command {
 					inventory.setItemInMainHand(convertedItem);
 					targetPlayer.updateInventory();
 				}
-				// Note: The conversion always has some performance impact, even if no items got actually converted. We
-				// therefore always print the debug messages to allow debugging the item conversion times.
+				// Note: The conversion always has some performance impact, even if no items got
+				// actually converted. We therefore always print the debug messages to allow
+				// debugging the item conversion times.
 				Log.debug(DebugOptions.itemConversions,
 						() -> "Converted the held item stack of player '" + targetPlayer.getName()
 								+ "' (took " + durationMillis + " ms)."

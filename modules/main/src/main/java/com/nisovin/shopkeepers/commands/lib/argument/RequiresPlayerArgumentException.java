@@ -1,10 +1,12 @@
 package com.nisovin.shopkeepers.commands.lib.argument;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.text.Text;
 
 /**
- * An {@link ArgumentParseException} that indicates that parsing failed due to the argument requiring a player to
- * execute the command.
+ * An {@link ArgumentParseException} that indicates that parsing failed due to the argument
+ * requiring a player to execute the command.
  */
 public class RequiresPlayerArgumentException extends ArgumentParseException {
 
@@ -14,7 +16,11 @@ public class RequiresPlayerArgumentException extends ArgumentParseException {
 		this(argument, message, null);
 	}
 
-	public RequiresPlayerArgumentException(CommandArgument<?> argument, Text message, Throwable cause) {
+	public RequiresPlayerArgumentException(
+			CommandArgument<?> argument,
+			Text message,
+			@Nullable Throwable cause
+	) {
 		super(argument, message, cause);
 	}
 }

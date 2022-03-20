@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Animals;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
@@ -26,19 +29,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual Goal type once we only support Bukkit 1.17 upwards
-public class GoatShop extends BabyableShop<Animals> {
+public class GoatShop extends BabyableShop<@NonNull Animals> {
 
-	public static final Property<Boolean> SCREAMING = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> SCREAMING = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("screaming", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Boolean> screamingProperty = new PropertyValue<>(SCREAMING)
-			.onValueChanged(this::applyScreaming)
+	private final PropertyValue<@NonNull Boolean> screamingProperty = new PropertyValue<>(SCREAMING)
+			.onValueChanged(Unsafe.initialized(this)::applyScreaming)
 			.build(properties);
 
-	public GoatShop(LivingShops livingShops, SKLivingShopObjectType<GoatShop> livingObjectType,
-					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public GoatShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull GoatShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -61,8 +68,8 @@ public class GoatShop extends BabyableShop<Animals> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		// The screaming option is hidden if shopkeeper mobs are silent.
 		if (!Settings.silenceLivingShopEntities) {
 			editorButtons.add(this.getScreamingEditorButton());
@@ -87,7 +94,7 @@ public class GoatShop extends BabyableShop<Animals> {
 	private void applyScreaming() {
 		Animals entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setScreamingGoat(this.getEntity(), this.isScreaming());
+		NMSManager.getProvider().setScreamingGoat(entity, this.isScreaming());
 	}
 
 	private ItemStack getScreamingEditorItem() {
@@ -97,19 +104,25 @@ public class GoatShop extends BabyableShop<Animals> {
 		} else {
 			iconItem = new ItemStack(Material.PUMPKIN);
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonGoatScreaming, Messages.buttonGoatScreamingLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonGoatScreaming,
+				Messages.buttonGoatScreamingLore
+		);
 		return iconItem;
 	}
 
 	private Button getScreamingEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getScreamingEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleScreaming(backwards);
 				return true;

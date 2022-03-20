@@ -1,7 +1,10 @@
 package com.nisovin.shopkeepers.util.data.serialization;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
- * A general-purpose exception that can be used to indicate that there is an issue with some given data.
+ * A general-purpose exception that can be used to indicate that there is an issue with some given
+ * data.
  */
 public class InvalidDataException extends Exception {
 
@@ -13,7 +16,7 @@ public class InvalidDataException extends Exception {
 	 * @param message
 	 *            the detail message
 	 */
-	public InvalidDataException(String message) {
+	public InvalidDataException(@Nullable String message) {
 		super(message);
 	}
 
@@ -25,7 +28,7 @@ public class InvalidDataException extends Exception {
 	 * @param cause
 	 *            the cause
 	 */
-	public InvalidDataException(String message, Throwable cause) {
+	public InvalidDataException(@Nullable String message, @Nullable Throwable cause) {
 		super(message, cause);
 	}
 }

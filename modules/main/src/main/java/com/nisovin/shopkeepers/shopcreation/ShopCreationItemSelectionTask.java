@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -18,13 +20,14 @@ class ShopCreationItemSelectionTask implements Runnable {
 	/**
 	 * The time in ticks before we send the shop creation item selection message.
 	 * <p>
-	 * We only send the message if the player is still holding the item after this delay. This avoids message spam when
-	 * the player quickly scrolls through the items on the hotbar via the mouse wheel.
+	 * We only send the message if the player is still holding the item after this delay. This
+	 * avoids message spam when the player quickly scrolls through the items on the hotbar via the
+	 * mouse wheel.
 	 */
 	private static final long DELAY_TICKS = 5L; // 0.25 seconds
 
 	// By player UUID:
-	private static final Map<UUID, ShopCreationItemSelectionTask> activeTasks = new HashMap<>();
+	private static final Map<@NonNull UUID, @NonNull ShopCreationItemSelectionTask> activeTasks = new HashMap<>();
 
 	/**
 	 * Starts this task for the given player.
@@ -39,9 +42,11 @@ class ShopCreationItemSelectionTask implements Runnable {
 	static void start(Plugin plugin, Player player) {
 		assert plugin != null && player != null;
 		// If there is already an active task, we cancel and restart it (i.e. we reuse it):
-		ShopCreationItemSelectionTask task = activeTasks.computeIfAbsent(player.getUniqueId(), (uuid) -> {
-			return new ShopCreationItemSelectionTask(plugin, player);
-		});
+		ShopCreationItemSelectionTask task = activeTasks.computeIfAbsent(
+				player.getUniqueId(),
+				uuid -> new ShopCreationItemSelectionTask(plugin, player)
+		);
+		assert task != null;
 		task.start();
 	}
 
@@ -65,8 +70,8 @@ class ShopCreationItemSelectionTask implements Runnable {
 	 * This cleans up any currently active tasks.
 	 */
 	static void onDisable() {
-		// Note: It is not required to manually cancel the active tasks on plugin disable. They are cancelled
-		// anyways.
+		// Note: It is not required to manually cancel the active tasks on plugin disable. They are
+		// cancelled anyways.
 		activeTasks.clear();
 	}
 
@@ -78,7 +83,7 @@ class ShopCreationItemSelectionTask implements Runnable {
 
 	private final Plugin plugin;
 	private final Player player;
-	private BukkitTask bukkitTask = null;
+	private @Nullable BukkitTask bukkitTask = null;
 
 	// Use the static 'start' factory method.
 	private ShopCreationItemSelectionTask(Plugin plugin, Player player) {
@@ -107,15 +112,15 @@ class ShopCreationItemSelectionTask implements Runnable {
 		cleanup(player);
 
 		if (!player.isOnline()) return; // No longer online
-		if (!Settings.shopCreationItem.matches(player.getEquipment().getItemInMainHand())) {
+		if (!Settings.shopCreationItem.matches(player.getInventory().getItemInMainHand())) {
 			// No longer holding the shop creation item in hand:
 			return;
 		}
 
-		// Note: We do not check if the player has the permission to create shops here again. We checked that
-		// earlier already, before starting this task. Even if there has been a change to that in the meantime,
-		// there is no major harm caused by sending the selection message anyways. The task's delay is short enough that
-		// this does not matter.
+		// Note: We do not check if the player has the permission to create shops here again. We
+		// checked that earlier already, before starting this task. Even if there has been a change
+		// to that in the meantime, there is no major harm caused by sending the selection message
+		// anyways. The task's delay is short enough that this does not matter.
 
 		// Inform the player about the shop creation item's usage:
 		TextUtils.sendMessage(player, Messages.creationItemSelected);

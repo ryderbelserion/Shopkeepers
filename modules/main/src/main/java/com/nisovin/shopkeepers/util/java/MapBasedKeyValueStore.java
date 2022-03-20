@@ -3,12 +3,15 @@ package com.nisovin.shopkeepers.util.java;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A {@link KeyValueStore} that is implemented around a {@link Map}.
  */
 public class MapBasedKeyValueStore implements KeyValueStore {
 
-	private final Map<String, Object> map;
+	private final Map<@NonNull String, @NonNull Object> map;
 
 	/**
 	 * Creates a new {@link MapBasedKeyValueStore} based on a new {@link HashMap}.
@@ -25,20 +28,20 @@ public class MapBasedKeyValueStore implements KeyValueStore {
 	 * @param map
 	 *            the map to use as key-value storage, not <code>null</code>
 	 */
-	public MapBasedKeyValueStore(Map<String, Object> map) {
+	public MapBasedKeyValueStore(Map<@NonNull String, @NonNull Object> map) {
 		Validate.notNull(map, "map is null");
 		this.map = map;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T get(String key) {
+	public <T> @Nullable T get(String key) {
 		Validate.notEmpty(key, "key is null or empty");
 		return (T) map.get(key);
 	}
 
 	@Override
-	public void set(String key, Object value) {
+	public void set(String key, @Nullable Object value) {
 		Validate.notEmpty(key, "key is null or empty");
 		if (value == null) {
 			// Clear the previous value for the given key:
@@ -63,7 +66,7 @@ public class MapBasedKeyValueStore implements KeyValueStore {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof MapBasedKeyValueStore)) return false;
 		MapBasedKeyValueStore other = (MapBasedKeyValueStore) obj;

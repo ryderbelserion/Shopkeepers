@@ -4,7 +4,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -36,7 +39,7 @@ public class ConfigBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Object getOrDefault(String key, Object defaultValue) {
+	public @Nullable Object getOrDefault(String key, @Nullable Object defaultValue) {
 		Validate.notEmpty(key, "key is empty");
 		Object value = config.get(key, null);
 		return (value != null) ? value : defaultValue;
@@ -65,24 +68,24 @@ public class ConfigBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<String> getKeys() {
+	public Set<? extends @NonNull String> getKeys() {
 		// TODO This is wasteful.
-		return config.getKeys(false);
+		return Unsafe.cast(config.getKeys(false));
 	}
 
 	@Override
-	public Map<String, Object> getValues() {
+	public Map<? extends @NonNull String, @NonNull ?> getValues() {
 		// TODO This is wasteful.
-		return config.getValues(false);
+		return this.getValuesCopy();
 	}
 
 	@Override
-	public Map<String, Object> getValuesCopy() {
-		return config.getValues(false);
+	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
+		return ConfigUtils.getValues(config);
 	}
 
 	@Override
-	public Object serialize() {
+	public @Nullable Object serialize() {
 		return config;
 	}
 
@@ -101,7 +104,7 @@ public class ConfigBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (obj == this) return true;
 		if (!(obj instanceof DataContainer)) return false;
 		DataContainer otherContainer = (DataContainer) obj;

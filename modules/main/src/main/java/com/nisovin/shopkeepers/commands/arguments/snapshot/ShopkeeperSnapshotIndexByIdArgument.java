@@ -4,6 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -23,34 +27,59 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Determines the index of a shopkeeper {@link Shopkeeper#getSnapshots() snapshot} by a given id.
  * <p>
- * The shopkeeper whose snapshots are considered is derived from the {@link CommandContext} using a given command
- * argument.
+ * The shopkeeper whose snapshots are considered is derived from the {@link CommandContext} using a
+ * given command argument.
  * <p>
  * Invalid ids (i.e. ids that are out of bounds) are rejected.
  */
-public class ShopkeeperSnapshotIndexByIdArgument extends ObjectByIdArgument<Integer, Integer> {
+public class ShopkeeperSnapshotIndexByIdArgument
+		extends ObjectByIdArgument<@NonNull Integer, @NonNull Integer> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 1;
 
-	private final CommandArgument<? extends Shopkeeper> shopkeeperArgument;
+	private final CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument;
 
-	public ShopkeeperSnapshotIndexByIdArgument(String name, CommandArgument<? extends Shopkeeper> shopkeeperArgument) {
+	public ShopkeeperSnapshotIndexByIdArgument(
+			String name,
+			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument
+	) {
 		this(name, shopkeeperArgument, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperSnapshotIndexByIdArgument(	String name, CommandArgument<? extends Shopkeeper> shopkeeperArgument,
-												int minimumCompletionInput) {
+	public ShopkeeperSnapshotIndexByIdArgument(
+			String name,
+			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			int minimumCompletionInput
+	) {
 		super(name, ArgumentFilter.acceptAny(), new IdArgumentArgs(minimumCompletionInput));
 		Validate.notNull(shopkeeperArgument, "shopkeeperArgument is null");
 		this.shopkeeperArgument = shopkeeperArgument;
 	}
 
 	@Override
-	protected ObjectIdArgument<Integer> createIdArgument(String name, IdArgumentArgs args) {
-		return new ObjectIdArgument<Integer>(name, new PositiveIntegerArgument(name + ":id"), ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
+	protected ObjectIdArgument<@NonNull Integer> createIdArgument(
+			@UnknownInitialization ShopkeeperSnapshotIndexByIdArgument this,
+			String name,
+			IdArgumentArgs args
+	) {
+		return new ObjectIdArgument<@NonNull Integer>(
+				name,
+				new PositiveIntegerArgument(name + ":id"),
+				ArgumentFilter.acceptAny(),
+				args.minimumCompletionInput
+		) {
 			@Override
-			protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return ShopkeeperSnapshotIndexByIdArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
+			protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+					CommandInput input,
+					CommandContextView context,
+					String idPrefix
+			) {
+				return ShopkeeperSnapshotIndexByIdArgument.this.getCompletionSuggestions(
+						input,
+						context,
+						minimumCompletionInput,
+						idPrefix
+				);
 			}
 
 			@Override
@@ -60,8 +89,11 @@ public class ShopkeeperSnapshotIndexByIdArgument extends ObjectByIdArgument<Inte
 		};
 	}
 
-	private Shopkeeper getShopkeeperScope(CommandInput input, CommandContextView context) {
-		Object shopkeeper = context.get(shopkeeperArgument.getName());
+	private @Nullable Shopkeeper getShopkeeperScope(
+			CommandInput input,
+			CommandContextView context
+	) {
+		Object shopkeeper = context.getOrNull(shopkeeperArgument.getName());
 		if (shopkeeper instanceof Shopkeeper) return (Shopkeeper) shopkeeper;
 		return null;
 	}
@@ -72,7 +104,11 @@ public class ShopkeeperSnapshotIndexByIdArgument extends ObjectByIdArgument<Inte
 	}
 
 	@Override
-	protected Integer getObject(CommandInput input, CommandContextView context, Integer id) throws ArgumentParseException {
+	protected @Nullable Integer getObject(
+			CommandInput input,
+			CommandContextView context,
+			Integer id
+	) throws ArgumentParseException {
 		assert id != null && id > 0;
 		Shopkeeper shopkeeper = this.getShopkeeperScope(input, context);
 		if (shopkeeper == null) return null;
@@ -82,8 +118,12 @@ public class ShopkeeperSnapshotIndexByIdArgument extends ObjectByIdArgument<Inte
 	}
 
 	@Override
-	protected Iterable<Integer> getCompletionSuggestions(	CommandInput input, CommandContextView context,
-															int minimumCompletionInput, String idPrefix) {
+	protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String idPrefix
+	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (idPrefix.length() < minimumCompletionInput) {
 			return Collections.emptyList();

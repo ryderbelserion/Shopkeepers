@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.FileUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -16,8 +17,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Base type for {@link DataStore} implementations.
  * <p>
- * This is an interface with default methods instead of an abstract class in order to allow data store implementations
- * to additionally derive from some concrete {@link DataContainer} implementation.
+ * This is an interface with default methods instead of an abstract class in order to allow data
+ * store implementations to additionally derive from some concrete {@link DataContainer}
+ * implementation.
  */
 public interface DataStoreBase extends DataStore {
 
@@ -30,7 +32,7 @@ public interface DataStoreBase extends DataStore {
 	@Override
 	public default void load(Path path) throws IOException, InvalidDataFormatException {
 		Validate.notNull(path, "path is null");
-		this.load(Files.newBufferedReader(path, StandardCharsets.UTF_8));
+		this.load(Unsafe.assertNonNull(Files.newBufferedReader(path, StandardCharsets.UTF_8)));
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public interface DataStoreBase extends DataStore {
 	public default void save(Path path) throws IOException {
 		Validate.notNull(path, "path is null");
 		FileUtils.createParentDirectories(path);
-		this.save(Files.newBufferedWriter(path, StandardCharsets.UTF_8));
+		this.save(Unsafe.assertNonNull(Files.newBufferedWriter(path, StandardCharsets.UTF_8)));
 	}
 
 	@Override

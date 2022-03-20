@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
@@ -42,17 +43,25 @@ class CommandCheckItem extends PlayerCommand {
 		ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
 		player.sendMessage(ChatColor.YELLOW + "Item in main hand / off hand:");
-		player.sendMessage("- Similar to off-hand item: " + toDisplayString(ItemUtils.isSimilar(mainHandItem, offHandItem)));
-		player.sendMessage("- Matching off-hand item: " + toDisplayString(ItemUtils.matchesData(mainHandItem, offHandItem)));
-		player.sendMessage("- MC matching off-hand item: " + toDisplayString(NMSManager.getProvider().matches(mainHandItem, offHandItem)));
-		player.sendMessage("- Is shop creation item: " + checkItems(mainHandItem, offHandItem, Settings.shopCreationItem::matches));
+		player.sendMessage("- Similar to off-hand item: "
+				+ toDisplayString(ItemUtils.isSimilar(mainHandItem, offHandItem)));
+		player.sendMessage("- Matching off-hand item: "
+				+ toDisplayString(ItemUtils.matchesData(mainHandItem, offHandItem)));
+		player.sendMessage("- MC matching off-hand item: "
+				+ toDisplayString(NMSManager.getProvider().matches(mainHandItem, offHandItem)));
+		player.sendMessage("- Is shop creation item: "
+				+ checkItems(mainHandItem, offHandItem, Settings.shopCreationItem::matches));
 		for (Currency currency : Currencies.getAll()) {
 			player.sendMessage("- Is currency item '" + currency.getId() + "': "
 					+ checkItems(mainHandItem, offHandItem, currency.getItemData()::matches));
 		}
 	}
 
-	private static String checkItems(ItemStack mainHand, ItemStack offHand, Predicate<ItemStack> check) {
+	private static String checkItems(
+			ItemStack mainHand,
+			ItemStack offHand,
+			Predicate<? super @NonNull ItemStack> check
+	) {
 		return toDisplayString(check.test(mainHand)) + " / " + toDisplayString(check.test(offHand));
 	}
 

@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -13,38 +16,38 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class LiteralArgument extends CommandArgument<String> {
+public class LiteralArgument extends CommandArgument<@NonNull String> {
 
 	public static final String FORMAT_PREFIX = "'";
 	public static final String FORMAT_SUFFIX = "'";
 
 	// Not null nor containing null or empty literals, combines the argument name and aliases:
-	private final List<String> literals;
+	private final List<@NonNull String> literals;
 
 	public LiteralArgument(String name) {
-		this(name, null);
+		this(name, Collections.emptyList());
 	}
 
-	public LiteralArgument(String name, List<String> aliases) {
+	public LiteralArgument(String name, List<? extends @NonNull String> aliases) {
 		super(name);
 
 		// Initialize literals:
-		this.literals = new ArrayList<>(1 + (aliases == null ? 0 : aliases.size()));
+		this.literals = new ArrayList<>(aliases.size() + 1);
 		literals.add(name);
-		if (aliases != null) {
-			for (String alias : aliases) {
-				if (alias == null) continue;
-				alias = StringUtils.removeWhitespace(alias);
-				if (alias.isEmpty()) continue;
-				literals.add(alias);
-			}
+		for (String alias : aliases) {
+			Validate.notNull(alias, "alias is null");
+			alias = StringUtils.removeWhitespace(alias);
+			assert alias != null;
+			if (alias.isEmpty()) continue;
+			literals.add(alias);
 		}
 	}
 
 	@Override
-	public CommandArgument<String> setDisplayName(String displayName) {
+	public CommandArgument<@NonNull String> setDisplayName(@Nullable String displayName) {
 		if (displayName != null) {
-			Validate.isTrue(literals.contains(displayName), "displayName does not match any of the literals of this LiteralArgument");
+			Validate.isTrue(literals.contains(displayName),
+					"displayName does not match any of the literals of this LiteralArgument");
 		}
 		return super.setDisplayName(displayName);
 	}
@@ -55,7 +58,11 @@ public class LiteralArgument extends CommandArgument<String> {
 	}
 
 	@Override
-	public String parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public String parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
@@ -75,12 +82,16 @@ public class LiteralArgument extends CommandArgument<String> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		if (argsReader.getRemainingSize() != 1) {
 			return Collections.emptyList();
 		}
 
-		List<String> suggestions = new ArrayList<>();
+		List<@NonNull String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		// Hiding the argument name if a different display name is used:
 		boolean skipName = (!this.getName().equals(this.getDisplayName()));

@@ -8,7 +8,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Cat;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -26,28 +29,32 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class CatShop extends SittableShop<Cat> {
+public class CatShop extends SittableShop<@NonNull Cat> {
 
-	public static final Property<Cat.Type> CAT_TYPE = new BasicProperty<Cat.Type>()
+	public static final Property<Cat.@NonNull Type> CAT_TYPE = new BasicProperty<Cat.@NonNull Type>()
 			.dataKeyAccessor("catType", EnumSerializers.lenient(Cat.Type.class))
 			.defaultValue(Cat.Type.TABBY)
 			.build();
 
-	public static final Property<DyeColor> COLLAR_COLOR = new BasicProperty<DyeColor>()
+	public static final Property<@Nullable DyeColor> COLLAR_COLOR = new BasicProperty<@Nullable DyeColor>()
 			.dataKeyAccessor("collarColor", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates 'no collar' / untamed
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<Cat.Type> catTypeProperty = new PropertyValue<>(CAT_TYPE)
-			.onValueChanged(this::applyCatType)
+	private final PropertyValue<Cat.@NonNull Type> catTypeProperty = new PropertyValue<>(CAT_TYPE)
+			.onValueChanged(Unsafe.initialized(this)::applyCatType)
 			.build(properties);
-	private final PropertyValue<DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
-			.onValueChanged(this::applyCollarColor)
+	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
+			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
 
-	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
-					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public CatShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull CatShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -73,8 +80,8 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getCatTypeEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
@@ -84,7 +91,7 @@ public class CatShop extends SittableShop<Cat> {
 
 	// MC 1.14: Conversion from ocelot types to similar cat types:
 	public static Cat.Type fromOcelotType(String ocelotType) {
-		if (ocelotType == null) ocelotType = "WILD_OCELOT"; // Default ocelot type
+		assert ocelotType != null;
 		switch (ocelotType) {
 		case "BLACK_CAT":
 			return Cat.Type.BLACK;
@@ -157,19 +164,25 @@ public class CatShop extends SittableShop<Cat> {
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonCatVariant, Messages.buttonCatVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonCatVariant,
+				Messages.buttonCatVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getCatTypeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getCatTypeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleCatType(backwards);
 				return true;
@@ -179,16 +192,22 @@ public class CatShop extends SittableShop<Cat> {
 
 	// COLLAR COLOR
 
-	public DyeColor getCollarColor() {
+	public @Nullable DyeColor getCollarColor() {
 		return collarColorProperty.getValue();
 	}
 
-	public void setCollarColor(DyeColor collarColor) {
+	public void setCollarColor(@Nullable DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
 	}
 
 	public void cycleCollarColor(boolean backwards) {
-		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCollarColor(), backwards));
+		this.setCollarColor(
+				EnumUtils.cycleEnumConstantNullable(
+						DyeColor.class,
+						this.getCollarColor(),
+						backwards
+				)
+		);
 	}
 
 	private void applyCollarColor() {
@@ -212,19 +231,25 @@ public class CatShop extends SittableShop<Cat> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(collarColor));
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonCollarColor, Messages.buttonCollarColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonCollarColor,
+				Messages.buttonCollarColorLore
+		);
 		return iconItem;
 	}
 
 	private Button getCollarColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getCollarColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleCollarColor(backwards);
 				return true;

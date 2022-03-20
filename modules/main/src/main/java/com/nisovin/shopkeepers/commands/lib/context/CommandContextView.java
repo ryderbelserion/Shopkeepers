@@ -3,6 +3,9 @@ package com.nisovin.shopkeepers.commands.lib.context;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -26,21 +29,28 @@ public class CommandContextView implements CommandContext {
 
 	@Override
 	public void put(String key, Object value) {
-		throw new UnsupportedOperationException("This CommandContext does not allow modifications!");
+		throw new UnsupportedOperationException(
+				"This CommandContext does not allow modifications!"
+		);
 	}
 
 	@Override
-	public <T> T get(String key) {
+	public <T> @NonNull T get(String key) {
 		return context.get(key);
 	}
 
 	@Override
-	public <T> T getOrDefault(String key, T defaultValue) {
+	public <T> @Nullable T getOrNull(String key) {
+		return context.getOrNull(key);
+	}
+
+	@Override
+	public <T> @Nullable T getOrDefault(String key, @Nullable T defaultValue) {
 		return context.getOrDefault(key, defaultValue);
 	}
 
 	@Override
-	public <T> T getOrDefault(String key, Supplier<T> defaultValueSupplier) {
+	public <T> @Nullable T getOrDefault(String key, Supplier<@Nullable T> defaultValueSupplier) {
 		return context.getOrDefault(key, defaultValueSupplier);
 	}
 
@@ -50,7 +60,7 @@ public class CommandContextView implements CommandContext {
 	}
 
 	@Override
-	public Map<String, Object> getMapView() {
+	public Map<? extends @NonNull String, @NonNull ?> getMapView() {
 		return context.getMapView();
 	}
 

@@ -3,15 +3,22 @@ package com.nisovin.shopkeepers.shopkeeper.player.buy;
 import java.util.Arrays;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public final class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerShopkeeper> {
+public final class BuyingPlayerShopType
+		extends AbstractPlayerShopType<@NonNull SKBuyingPlayerShopkeeper> {
 
 	public BuyingPlayerShopType() {
-		super("buy", Arrays.asList("buying"), ShopkeepersPlugin.PLAYER_BUY_PERMISSION,
-				SKBuyingPlayerShopkeeper.class);
+		super(
+				"buy",
+				Arrays.asList("buying"),
+				ShopkeepersPlugin.PLAYER_BUY_PERMISSION,
+				SKBuyingPlayerShopkeeper.class
+		);
 	}
 
 	@Override
@@ -30,7 +37,7 @@ public final class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingP
 	}
 
 	@Override
-	public List<String> getTradeSetupDescription() {
+	public List<? extends @NonNull String> getTradeSetupDescription() {
 		return Messages.tradeSetupDescBuying;
 	}
 

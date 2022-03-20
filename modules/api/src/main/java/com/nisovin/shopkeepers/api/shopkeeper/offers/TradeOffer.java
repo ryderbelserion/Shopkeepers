@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.api.shopkeeper.offers;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -9,15 +10,17 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 /**
  * Stores information about one or two item stacks being traded for another item stack.
  * <p>
- * Instances of this are immutable. They can be created via {@link #create(ItemStack, ItemStack, ItemStack)}.
+ * Instances of this are immutable. They can be created via
+ * {@link #create(ItemStack, ItemStack, ItemStack)}.
  */
 public interface TradeOffer {
 
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
-	 * copied before they are stored by the trade offer. Otherwise, they are first copied.
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
+	 * and therefore not copied before they are stored by the trade offer. Otherwise, they are first
+	 * copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -27,15 +30,19 @@ public interface TradeOffer {
 	 *            the second buy item, can be empty
 	 * @return the new offer
 	 */
-	public static TradeOffer create(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public static TradeOffer create(
+			ItemStack resultItem,
+			ItemStack item1,
+			@Nullable ItemStack item2
+	) {
 		return ApiInternals.getInstance().createTradeOffer(resultItem, item1, item2);
 	}
 
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trade
-	 * offer.
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are
+	 * stored by the trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -45,7 +52,11 @@ public interface TradeOffer {
 	 *            the second buy item, can be empty
 	 * @return the new offer
 	 */
-	public static TradeOffer create(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+	public static TradeOffer create(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	) {
 		return ApiInternals.getInstance().createTradeOffer(resultItem, item1, item2);
 	}
 
@@ -70,7 +81,7 @@ public interface TradeOffer {
 	 * 
 	 * @return an unmodifiable view on the second required item, can be <code>null</code>
 	 */
-	public UnmodifiableItemStack getItem2();
+	public @Nullable UnmodifiableItemStack getItem2();
 
 	/**
 	 * Checks whether this trade offer requires two input items.
@@ -92,7 +103,7 @@ public interface TradeOffer {
 	 *            the second item
 	 * @return <code>true</code> if the items are equal
 	 */
-	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2);
+	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, @Nullable ItemStack item2);
 
 	/**
 	 * Checks if the given items are equal to the items of this trade offer.
@@ -105,7 +116,11 @@ public interface TradeOffer {
 	 *            the second item
 	 * @return <code>true</code> if the items are equal
 	 */
-	public boolean areItemsEqual(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2);
+	public boolean areItemsEqual(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	);
 
 	/**
 	 * Checks if the items of this offer and the given trading recipe are equal.

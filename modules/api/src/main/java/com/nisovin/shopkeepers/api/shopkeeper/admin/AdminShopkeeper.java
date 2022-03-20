@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.shopkeeper.admin;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
@@ -8,19 +10,21 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 public interface AdminShopkeeper extends Shopkeeper {
 
 	/**
-	 * Gets the permission that is required, additionally to the normal trading permission, to trade with this
-	 * {@link AdminShopkeeper}.
+	 * Gets the permission that is required, additionally to the normal trading permission, to trade
+	 * with this {@link AdminShopkeeper}.
 	 * 
-	 * @return the permission (not empty), or <code>null</code> if no additional permission is required
+	 * @return the permission (not empty), or <code>null</code> if no additional permission is
+	 *         required
 	 */
-	public String getTradePermission();
+	public @Nullable String getTradePermission();
 
 	/**
-	 * Sets the permission that is required, additionally to the normal trading permission, to trade with this
-	 * {@link AdminShopkeeper}.
+	 * Sets the permission that is required, additionally to the normal trading permission, to trade
+	 * with this {@link AdminShopkeeper}.
 	 * 
 	 * @param tradePermission
-	 *            the permission, or empty or <code>null</code> if no additional permission is required
+	 *            the permission, or empty or <code>null</code> if no additional permission is
+	 *            required
 	 */
-	public void setTradePermission(String tradePermission);
+	public void setTradePermission(@Nullable String tradePermission);
 }

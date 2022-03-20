@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers.snapshot;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -37,7 +38,7 @@ class CommandSnapshotRestore extends Command {
 		this.setDescription(Messages.commandDescriptionSnapshotRestore);
 
 		// Arguments:
-		CommandArgument<Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
+		CommandArgument<@NonNull Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		);
@@ -49,7 +50,6 @@ class CommandSnapshotRestore extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 		int snapshotIndex = context.get(ARGUMENT_SNAPSHOT);
 		assert snapshotIndex >= 0 && snapshotIndex < shopkeeper.getSnapshots().size();
 		int snapshotId = snapshotIndex + 1;
@@ -62,7 +62,9 @@ class CommandSnapshotRestore extends Command {
 			TextUtils.sendMessage(sender, Messages.snapshotRestoreFailed,
 					"id", snapshotId,
 					"name", snapshot.getName(),
-					"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(snapshot.getTimestamp())
+					"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(
+							snapshot.getTimestamp()
+					)
 			);
 			Log.warning(shopkeeper.getLogPrefix() + "Failed to restore snapshot " + snapshotId
 					+ " ('" + snapshot.getName() + "')!", e);
@@ -71,7 +73,9 @@ class CommandSnapshotRestore extends Command {
 		TextUtils.sendMessage(sender, Messages.snapshotRestored,
 				"id", snapshotId,
 				"name", snapshot.getName(),
-				"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(snapshot.getTimestamp())
+				"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(
+						snapshot.getTimestamp()
+				)
 		);
 	}
 }

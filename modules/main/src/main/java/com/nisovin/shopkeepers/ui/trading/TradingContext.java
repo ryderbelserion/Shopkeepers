@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.util.java.KeyValueStore;
@@ -11,7 +12,8 @@ import com.nisovin.shopkeepers.util.java.MapBasedKeyValueStore;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * Information about an inventory interaction and its processing that might trigger zero, one, or multiple trades.
+ * Information about an inventory interaction and its processing that might trigger zero, one, or
+ * multiple trades.
  */
 public final class TradingContext {
 
@@ -23,7 +25,7 @@ public final class TradingContext {
 	private final KeyValueStore metadata = new MapBasedKeyValueStore();
 
 	private int tradeCount = 0;
-	private Trade currentTrade = null;
+	private @Nullable Trade currentTrade = null;
 
 	/**
 	 * Creates a new {@link TradingContext}.
@@ -93,7 +95,8 @@ public final class TradingContext {
 	}
 
 	/**
-	 * Gets the {@link KeyValueStore} that stores additional arbitrary metadata related to this {@link TradingContext}.
+	 * Gets the {@link KeyValueStore} that stores additional arbitrary metadata related to this
+	 * {@link TradingContext}.
 	 * 
 	 * @return the metadata key-value store, not <code>null</code>
 	 */
@@ -104,11 +107,12 @@ public final class TradingContext {
 	/**
 	 * Gets the number of trades that were triggered in this {@link TradingContext} so far.
 	 * <p>
-	 * This returns {@code 0} if no trades have been processed yet, and {@code 1} if only one trade has been or is
-	 * currently being processed.
+	 * This returns {@code 0} if no trades have been processed yet, and {@code 1} if only one trade
+	 * has been or is currently being processed.
 	 * <p>
-	 * The processing of the last trade attempt might not be complete yet and the trade might still get aborted. Whether
-	 * or not the currently processed trade attempt has been aborted is not reflected by the returned number.
+	 * The processing of the last trade attempt might not be complete yet and the trade might still
+	 * get aborted. Whether or not the currently processed trade attempt has been aborted is not
+	 * reflected by the returned number.
 	 * 
 	 * @return the number of trades processed so far
 	 */
@@ -119,20 +123,21 @@ public final class TradingContext {
 	/**
 	 * Gets the last {@link Trade} that was or is currently being processed.
 	 * <p>
-	 * The current trade is reset to <code>null</code> whenever the processing of a new trade attempt starts.
+	 * The current trade is reset to <code>null</code> whenever the processing of a new trade
+	 * attempt starts.
 	 * 
-	 * @return the current trade, or <code>null</code> if no trade has been processed yet or if no {@link Trade}
-	 *         instance has been created yet for the current trade attempt
+	 * @return the current trade, or <code>null</code> if no trade has been processed yet or if no
+	 *         {@link Trade} instance has been created yet for the current trade attempt
 	 */
-	public Trade getCurrentTrade() {
+	public @Nullable Trade getCurrentTrade() {
 		return currentTrade;
 	}
 
 	/**
 	 * Starts the processing of a new trade.
 	 * <p>
-	 * This increments the {@link #getTradeCount() trade count} and resets the {@link #getCurrentTrade() current trade}
-	 * to <code>null</code>.
+	 * This increments the {@link #getTradeCount() trade count} and resets the
+	 * {@link #getCurrentTrade() current trade} to <code>null</code>.
 	 */
 	void startNewTrade() {
 		tradeCount += 1;

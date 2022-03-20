@@ -5,13 +5,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.activation.ShopkeeperChunkActivator;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * Queries that combine information from the {@link ShopkeeperChunkMap} and the {@link ShopkeeperChunkActivator}.
+ * Queries that combine information from the {@link ShopkeeperChunkMap} and the
+ * {@link ShopkeeperChunkActivator}.
  */
 public class ActiveChunkQueries {
 
@@ -19,23 +23,32 @@ public class ActiveChunkQueries {
 	private final ShopkeeperChunkActivator shopkeeperActivator;
 
 	// Note: Already unmodifiable.
-	private final Set<? extends AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<AbstractShopkeeper>() {
+	private final Set<? extends @NonNull AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<@NonNull AbstractShopkeeper>() {
 		@Override
 		public Iterator<AbstractShopkeeper> iterator() {
-			return shopkeeperChunkMap.getWorldsWithShopkeepers().stream()
-					.<AbstractShopkeeper>flatMap(worldName -> getShopkeepersInActiveChunks(worldName).stream())
-					.iterator();
+			return Unsafe.assertNonNull(shopkeeperChunkMap).getWorldsWithShopkeepers().stream()
+					.<AbstractShopkeeper>flatMap(worldName -> {
+						return Unsafe.initialized(ActiveChunkQueries.this)
+								.getShopkeepersInActiveChunks(worldName)
+								.stream();
+					}).iterator();
 		}
 
 		@Override
 		public int size() {
-			return shopkeeperChunkMap.getWorldsWithShopkeepers().stream()
-					.mapToInt(worldName -> getShopkeepersInActiveChunks(worldName).size())
-					.sum();
+			return Unsafe.assertNonNull(shopkeeperChunkMap).getWorldsWithShopkeepers().stream()
+					.mapToInt(worldName -> {
+						return Unsafe.initialized(ActiveChunkQueries.this)
+								.getShopkeepersInActiveChunks(worldName)
+								.size();
+					}).sum();
 		}
 	};
 
-	ActiveChunkQueries(ShopkeeperChunkMap shopkeeperChunkMap, ShopkeeperChunkActivator shopkeeperActivator) {
+	ActiveChunkQueries(
+			ShopkeeperChunkMap shopkeeperChunkMap,
+			ShopkeeperChunkActivator shopkeeperActivator
+	) {
 		Validate.notNull(shopkeeperChunkMap, "shopkeeperChunkMap is null");
 		Validate.notNull(shopkeeperActivator, "shopkeeperActivator is null");
 		this.shopkeeperChunkMap = shopkeeperChunkMap;
@@ -49,23 +62,23 @@ public class ActiveChunkQueries {
 
 	// QUERIES
 
-	public Set<? extends AbstractShopkeeper> getShopkeepersInActiveChunks() {
+	public Set<? extends @NonNull AbstractShopkeeper> getShopkeepersInActiveChunks() {
 		return shopkeepersInActiveChunksView;
 	}
 
 	// TODO Cache these query objects per world?
 
-	public Set<ChunkCoords> getActiveChunks(String worldName) {
+	public Set<? extends @NonNull ChunkCoords> getActiveChunks(String worldName) {
 		WorldShopkeepers worldShopkeepers = shopkeeperChunkMap.getWorldShopkeepers(worldName);
 		if (worldShopkeepers == null) return Collections.emptySet();
 
 		// Note: Already unmodifiable.
-		Set<ChunkCoords> activeChunksView = new AbstractSet<ChunkCoords>() {
+		Set<? extends @NonNull ChunkCoords> activeChunksView = new AbstractSet<@NonNull ChunkCoords>() {
 			@Override
 			public Iterator<ChunkCoords> iterator() {
-				return worldShopkeepers.getShopkeepersByChunk().keySet().stream()
+				return Unsafe.cast(worldShopkeepers.getShopkeepersByChunk().keySet().stream()
 						.filter(ActiveChunkQueries.this::isChunkActive)
-						.iterator();
+						.iterator());
 			}
 
 			@Override
@@ -79,12 +92,12 @@ public class ActiveChunkQueries {
 		return activeChunksView;
 	}
 
-	public Set<? extends AbstractShopkeeper> getShopkeepersInActiveChunks(String worldName) {
+	public Set<? extends @NonNull AbstractShopkeeper> getShopkeepersInActiveChunks(String worldName) {
 		WorldShopkeepers worldShopkeepers = shopkeeperChunkMap.getWorldShopkeepers(worldName);
 		if (worldShopkeepers == null) return Collections.emptySet();
 
 		// Note: Already unmodifiable.
-		Set<? extends AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<AbstractShopkeeper>() {
+		Set<? extends @NonNull AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<@NonNull AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
 				return worldShopkeepers.getShopkeepersByChunk().entrySet().stream()

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -16,13 +17,14 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link FallbackArgument} that returns the sender's name if it is a player, without consuming any arguments.
+ * A {@link FallbackArgument} that returns the sender's name if it is a player, without consuming
+ * any arguments.
  * <p>
  * If the sender is not a player, a {@link RequiresPlayerArgumentException} is thrown.
  */
-public class SenderPlayerNameFallback extends TypedFallbackArgument<String> {
+public class SenderPlayerNameFallback extends TypedFallbackArgument<@NonNull String> {
 
-	public static class SenderPlayerNameArgument extends CommandArgument<String> {
+	public static class SenderPlayerNameArgument extends CommandArgument<@NonNull String> {
 
 		public SenderPlayerNameArgument(String name) {
 			super(name);
@@ -34,7 +36,11 @@ public class SenderPlayerNameFallback extends TypedFallbackArgument<String> {
 		}
 
 		@Override
-		public String parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		public String parseValue(
+				CommandInput input,
+				CommandContextView context,
+				ArgumentsReader argsReader
+		) throws ArgumentParseException {
 			CommandSender sender = input.getSender();
 			if (!(sender instanceof Player)) {
 				throw this.requiresPlayerError();
@@ -44,12 +50,19 @@ public class SenderPlayerNameFallback extends TypedFallbackArgument<String> {
 		}
 
 		@Override
-		public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		public List<? extends @NonNull String> complete(
+				CommandInput input,
+				CommandContextView context,
+				ArgumentsReader argsReader
+		) {
 			return Collections.emptyList();
 		}
 	}
 
-	public SenderPlayerNameFallback(CommandArgument<String> argument) {
-		super(argument, new SenderPlayerNameArgument(Validate.notNull(argument, "argument is null").getName()));
+	public SenderPlayerNameFallback(CommandArgument<@NonNull String> argument) {
+		super(
+				Validate.notNull(argument, "argument is null"),
+				new SenderPlayerNameArgument(argument.getName())
+		);
 	}
 }

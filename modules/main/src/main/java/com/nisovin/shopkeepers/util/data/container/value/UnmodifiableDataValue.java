@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.data.container.value;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * An unmodifiable view of another {@link DataValue}.
  */
@@ -20,7 +22,7 @@ public final class UnmodifiableDataValue extends DelegateDataValue {
 	}
 
 	@Override
-	public void set(Object value) {
+	public void set(@Nullable Object value) {
 		throw unmodifiableException();
 	}
 

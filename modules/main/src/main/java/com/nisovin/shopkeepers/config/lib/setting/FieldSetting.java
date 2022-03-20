@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.config.lib.setting;
 
 import java.lang.reflect.Field;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
@@ -78,14 +79,14 @@ public class FieldSetting<T> implements Setting<T> {
 		if (value != null) {
 			Class<?> fieldType = field.getType();
 			if (!ClassUtils.isAssignableFrom(fieldType, value.getClass())) {
-				throw new ValueLoadException("Value is of wrong type: Got " + value.getClass().getName()
-						+ ", expected " + fieldType.getName());
+				throw new ValueLoadException("Value is of wrong type: Got "
+						+ value.getClass().getName() + ", expected " + fieldType.getName());
 			}
 		}
 
 		try {
 			// Note: The config instance is ignored if the field is static.
-			field.set(config, value);
+			field.set(config, Unsafe.nullableAsNonNull(value));
 		} catch (Exception e) {
 			throw new ValueLoadException("Could not set the value of the setting's field!", e);
 		}

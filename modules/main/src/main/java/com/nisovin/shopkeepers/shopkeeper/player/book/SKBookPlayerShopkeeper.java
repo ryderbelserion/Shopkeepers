@@ -13,7 +13,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -34,14 +37,15 @@ import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
-import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
+public class SKBookPlayerShopkeeper
+		extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
 	// Contains only one offer for a specific book (book title):
-	private final List<BookOffer> offers = new ArrayList<>();
-	private final List<? extends BookOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<@NonNull BookOffer> offers = new ArrayList<>();
+	private final List<? extends @NonNull BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a new and not yet initialized {@link SKBookPlayerShopkeeper}.
@@ -80,16 +84,16 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public boolean hasTradingRecipes(Player player) {
+	public boolean hasTradingRecipes(@Nullable Player player) {
 		return !this.getOffers().isEmpty();
 	}
 
 	@Override
-	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
-		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
+	public List<? extends @NonNull TradingRecipe> getTradingRecipes(@Nullable Player player) {
+		Map<? extends @NonNull String, ? extends @NonNull ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
-		List<? extends BookOffer> offers = this.getOffers();
-		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<? extends @NonNull BookOffer> offers = this.getOffers();
+		List<@NonNull TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
@@ -102,10 +106,15 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 				assert BookItems.isCopyableBook(bookItem);
 				bookItem = BookItems.copyBook(bookItem);
 			}
-			assert bookItem != null;
+			bookItem = Unsafe.assertNonNull(bookItem);
 			// Assert: bookItem is a copy.
 
-			TradingRecipe recipe = this.createSellingRecipe(UnmodifiableItemStack.of(bookItem), bookOffer.getPrice(), outOfStock);
+			UnmodifiableItemStack unmodifiableBookItem = UnmodifiableItemStack.ofNonNull(bookItem);
+			TradingRecipe recipe = this.createSellingRecipe(
+					unmodifiableBookItem,
+					bookOffer.getPrice(),
+					outOfStock
+			);
 			if (recipe != null) {
 				recipes.add(recipe);
 			} // Else: Price is invalid (cannot be represented by currency items).
@@ -114,26 +123,30 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	/**
-	 * Gets the {@link BookItems#isCopyableBook(ItemStack) copyable} {@link BookItems#isWrittenBook(ItemStack) written
-	 * book} items from the shopkeeper's {@link PlayerShopkeeper#getContainer() container}.
+	 * Gets the {@link BookItems#isCopyableBook(ItemStack) copyable}
+	 * {@link BookItems#isWrittenBook(ItemStack) written book} items from the shopkeeper's
+	 * {@link PlayerShopkeeper#getContainer() container}.
 	 * <p>
-	 * Book items without title are omitted. If multiple book items share the same title, only the first encountered
-	 * book item with that title is returned.
+	 * Book items without title are omitted. If multiple book items share the same title, only the
+	 * first encountered book item with that title is returned.
 	 * 
 	 * @return the book items mapped by their title, or an empty Map if the container is not found
 	 */
-	protected Map<String, ItemStack> getCopyableBooksFromContainer() {
+	protected Map<? extends @NonNull String, ? extends @NonNull ItemStack> getCopyableBooksFromContainer() {
 		// Linked Map: Preserves the order of encountered items.
-		Map<String, ItemStack> booksByTitle = new LinkedHashMap<>();
-		ItemStack[] contents = this.getContainerContents(); // Empty if the container is not found
+		Map<@NonNull String, @NonNull ItemStack> booksByTitle = new LinkedHashMap<>();
+		// Empty if the container is not found:
+		@Nullable ItemStack[] contents = this.getContainerContents();
 		for (ItemStack itemStack : contents) {
+			if (itemStack == null) continue;
 			BookMeta bookMeta = BookItems.getBookMeta(itemStack);
 			if (bookMeta == null) continue; // Not a written book
 			if (!BookItems.isCopyable(bookMeta)) continue;
 			String title = BookItems.getTitle(bookMeta);
 			if (title == null) continue;
 
-			// The item is ignored if we already encountered another book item with the same title before:
+			// The item is ignored if we already encountered another book item with the same title
+			// before:
 			booksByTitle.putIfAbsent(title, itemStack);
 		}
 		return booksByTitle;
@@ -152,11 +165,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	/**
-	 * Creates a dummy book {@link ItemStack} that acts as substitute representation of the book item with the given
-	 * title.
+	 * Creates a dummy book {@link ItemStack} that acts as substitute representation of the book
+	 * item with the given title.
 	 * <p>
-	 * This dummy book item is used as a replacement in the shopkeeper editor and trading interface if no actual book
-	 * item with the given title is found in the shopkeeper's container.
+	 * This dummy book item is used as a replacement in the shopkeeper editor and trading interface
+	 * if no actual book item with the given title is found in the shopkeeper's container.
 	 * 
 	 * @param title
 	 *            the book title
@@ -164,7 +177,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	 */
 	protected ItemStack createDummyBook(String title) {
 		ItemStack bookItem = new ItemStack(Material.WRITTEN_BOOK, 1);
-		BookMeta bookMeta = (BookMeta) bookItem.getItemMeta();
+		BookMeta bookMeta = Unsafe.castNonNull(bookItem.getItemMeta());
 		bookMeta.setTitle(title);
 		bookMeta.setAuthor(Messages.unknownBookAuthor);
 		bookMeta.setGeneration(Generation.TATTERED);
@@ -173,7 +186,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	/**
-	 * Checks if the given {@link BookMeta} corresponds to a {@link #createDummyBook(String) dummy book item}.
+	 * Checks if the given {@link BookMeta} corresponds to a {@link #createDummyBook(String) dummy
+	 * book item}.
 	 * 
 	 * @param bookMeta
 	 *            the book meta, not <code>null</code>
@@ -188,7 +202,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "offers";
-	public static final Property<List<? extends BookOffer>> OFFERS = new BasicProperty<List<? extends BookOffer>>()
+	public static final Property<@NonNull List<? extends @NonNull BookOffer>> OFFERS = new BasicProperty<@NonNull List<? extends @NonNull BookOffer>>()
 			.dataKeyAccessor(DATA_KEY_OFFERS, SKBookOffer.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
@@ -196,11 +210,19 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	static {
 		// Register shopkeeper data migrations:
-		ShopkeeperDataMigrator.registerMigration(new Migration("book-offers",
-				MigrationPhase.ofShopkeeperClass(SKBookPlayerShopkeeper.class)) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"book-offers",
+				MigrationPhase.ofShopkeeperClass(SKBookPlayerShopkeeper.class)
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
-				return SKBookOffer.migrateOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), logPrefix);
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
+				return SKBookOffer.migrateOffers(
+						shopkeeperData.getDataValue(DATA_KEY_OFFERS),
+						logPrefix
+				);
 			}
 		});
 	}
@@ -216,12 +238,12 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public List<? extends BookOffer> getOffers() {
+	public List<? extends @NonNull BookOffer> getOffers() {
 		return offersView;
 	}
 
 	@Override
-	public BookOffer getOffer(@ReadOnly ItemStack bookItem) {
+	public @Nullable BookOffer getOffer(@ReadOnly ItemStack bookItem) {
 		Validate.notNull(bookItem, "bookItem is null");
 		String bookTitle = BookItems.getBookTitle(bookItem);
 		if (bookTitle == null) return null; // Not a written book, or has no title
@@ -229,12 +251,13 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public BookOffer getOffer(UnmodifiableItemStack bookItem) {
-		return this.getOffer(ItemUtils.asItemStackOrNull(bookItem));
+	public @Nullable BookOffer getOffer(UnmodifiableItemStack bookItem) {
+		Validate.notNull(bookItem, "bookItem is null");
+		return this.getOffer(bookItem.asItemStack());
 	}
 
 	@Override
-	public BookOffer getOffer(String bookTitle) {
+	public @Nullable BookOffer getOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
 		for (BookOffer offer : this.getOffers()) {
 			if (offer.getBookTitle().equals(bookTitle)) {
@@ -247,7 +270,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	public void removeOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
-		Iterator<BookOffer> iterator = offers.iterator();
+		Iterator<@NonNull BookOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			if (iterator.next().getBookTitle().equals(bookTitle)) {
 				iterator.remove();
@@ -268,15 +291,15 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public void setOffers(@ReadOnly List<? extends BookOffer> offers) {
+	public void setOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(@ReadOnly List<? extends BookOffer> offers) {
-		assert offers != null && !offers.contains(null);
+	private void _setOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
+		assert offers != null && !CollectionUtils.containsNull(offers);
 		this._clearOffers();
 		this._addOffers(offers);
 	}
@@ -302,15 +325,15 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public void addOffers(@ReadOnly List<? extends BookOffer> offers) {
+	public void addOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(@ReadOnly List<? extends BookOffer> offers) {
-		assert offers != null && !offers.contains(null);
+	private void _addOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
+		assert offers != null && !CollectionUtils.containsNull(offers);
 		// This replaces any previous offers for the same books:
 		offers.forEach(this::_addOffer);
 	}

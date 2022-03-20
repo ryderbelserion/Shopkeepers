@@ -1,24 +1,27 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class EnumValue<E extends Enum<E>> extends ValueType<E> {
+public class EnumValue<E extends @NonNull Enum<E>> extends ValueType<E> {
 
 	private static final StringValue STRING_VALUE = new StringValue();
 
-	private final Class<E> enumType;
+	private final Class<@NonNull E> enumType;
 
-	public EnumValue(Class<E> enumType) {
+	public EnumValue(Class<@NonNull E> enumType) {
 		Validate.notNull(enumType, "enumType is null");
 		this.enumType = enumType;
 	}
 
 	@Override
-	public E load(Object configValue) throws ValueLoadException {
+	public @Nullable E load(@Nullable Object configValue) throws ValueLoadException {
 		String enumValueName = STRING_VALUE.load(configValue);
 		if (enumValueName == null) return null;
 
@@ -29,18 +32,21 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 		}
 	}
 
-	protected ValueLoadException newInvalidEnumValueException(String valueName, ValueParseException parseException) {
+	protected ValueLoadException newInvalidEnumValueException(
+			String valueName,
+			ValueParseException parseException
+	) {
 		return new ValueLoadException(parseException.getMessage(), parseException);
 	}
 
 	@Override
-	public Object save(E value) {
+	public @Nullable Object save(@Nullable E value) {
 		if (value == null) return null;
 		return value.name();
 	}
 
 	@Override
-	public String format(E value) {
+	public String format(@Nullable E value) {
 		if (value == null) return "null";
 		return value.name();
 	}
@@ -58,7 +64,7 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 	}
 
 	@Override
-	public E parse(String input) throws ValueParseException {
+	public @NonNull E parse(String input) throws ValueParseException {
 		Validate.notNull(input, "input is null");
 		String normalized = this.normalize(input);
 		try {

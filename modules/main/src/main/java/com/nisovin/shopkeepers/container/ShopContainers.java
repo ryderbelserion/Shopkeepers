@@ -35,8 +35,8 @@ public class ShopContainers {
 	 * <p>
 	 * For double chests this returns the complete double chest inventory.
 	 * <p>
-	 * The returned inventory is directly backed by the container in the world and any changes to the inventory are
-	 * therefore directly reflected.
+	 * The returned inventory is directly backed by the container in the world and any changes to
+	 * the inventory are therefore directly reflected.
 	 * 
 	 * @param containerBlock
 	 *            the container block

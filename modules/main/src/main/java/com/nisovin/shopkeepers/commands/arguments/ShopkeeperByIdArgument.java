@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -15,26 +18,48 @@ import com.nisovin.shopkeepers.text.Text;
 /**
  * Determines a shopkeeper by the given id input.
  */
-public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeeper> {
+public class ShopkeeperByIdArgument
+		extends ObjectByIdArgument<@NonNull Integer, @NonNull Shopkeeper> {
 
 	public ShopkeeperByIdArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperByIdArgument(String name, ArgumentFilter<Shopkeeper> filter) {
+	public ShopkeeperByIdArgument(String name, ArgumentFilter<? super @NonNull Shopkeeper> filter) {
 		this(name, filter, ShopkeeperIdArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperByIdArgument(String name, ArgumentFilter<Shopkeeper> filter, int minimumCompletionInput) {
+	public ShopkeeperByIdArgument(
+			String name,
+			ArgumentFilter<? super @NonNull Shopkeeper> filter,
+			int minimumCompletionInput
+	) {
 		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<Integer> createIdArgument(String name, IdArgumentArgs args) {
-		return new ShopkeeperIdArgument(name, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
+	protected ObjectIdArgument<@NonNull Integer> createIdArgument(
+			@UnknownInitialization ShopkeeperByIdArgument this,
+			String name,
+			IdArgumentArgs args
+	) {
+		return new ShopkeeperIdArgument(
+				name,
+				ArgumentFilter.acceptAny(),
+				args.minimumCompletionInput
+		) {
 			@Override
-			protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return ShopkeeperByIdArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
+			protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+					CommandInput input,
+					CommandContextView context,
+					String idPrefix
+			) {
+				return ShopkeeperByIdArgument.this.getCompletionSuggestions(
+						input,
+						context,
+						minimumCompletionInput,
+						idPrefix
+				);
 			}
 		};
 	}
@@ -45,13 +70,27 @@ public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeep
 	}
 
 	@Override
-	protected Shopkeeper getObject(CommandInput input, CommandContextView context, Integer id) throws ArgumentParseException {
+	protected @Nullable Shopkeeper getObject(
+			CommandInput input,
+			CommandContextView context,
+			Integer id
+	) throws ArgumentParseException {
 		return ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperById(id);
 	}
 
 	@Override
-	protected Iterable<Integer> getCompletionSuggestions(	CommandInput input, CommandContextView context,
-															int minimumCompletionInput, String idPrefix) {
-		return ShopkeeperIdArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
+	protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String idPrefix
+	) {
+		return ShopkeeperIdArgument.getDefaultCompletionSuggestions(
+				input,
+				context,
+				minimumCompletionInput,
+				idPrefix,
+				filter
+		);
 	}
 }

@@ -18,23 +18,28 @@ import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.SimplePluginManager;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public final class EventUtils {
 
 	/**
-	 * Sets the {@link Cancellable#setCancelled(boolean) cancellation state} of the given {@link Event} if it is
-	 * {@link Cancellable}.
+	 * Sets the {@link Cancellable#setCancelled(boolean) cancellation state} of the given
+	 * {@link Event} if it is {@link Cancellable}.
 	 * 
 	 * @param event
-	 *            the event, can be <code>null</code>
+	 *            the event, not <code>null</code>
 	 * @param cancel
 	 *            the cancellation state to set
-	 * @return <code>true</code> if the cancellation state has been set, <code>false</code> otherwise
+	 * @return <code>true</code> if the cancellation state has been set, <code>false</code>
+	 *         otherwise
 	 */
 	public static boolean setCancelled(Event event, boolean cancel) {
+		Validate.notNull(event, "event is null");
 		if (event instanceof Cancellable) {
 			((Cancellable) event).setCancelled(cancel);
 			return true;
@@ -44,7 +49,8 @@ public final class EventUtils {
 	}
 
 	/**
-	 * Creates a new {@link EventExecutor} that forwards events of the specified type to the given {@link Consumer}.
+	 * Creates a new {@link EventExecutor} that forwards events of the specified type to the given
+	 * {@link Consumer}.
 	 * 
 	 * @param <E>
 	 *            the event type
@@ -55,14 +61,18 @@ public final class EventUtils {
 	 * @return the event executor, not <code>null</code>
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E extends Event> EventExecutor eventExecutor(Class<E> eventClass, Consumer<E> eventConsumer) {
+	public static <E extends @NonNull Event> EventExecutor eventExecutor(
+			Class<? extends E> eventClass,
+			Consumer<? super @NonNull E> eventConsumer
+	) {
 		Validate.notNull(eventClass, "eventClass is null");
 		Validate.notNull(eventConsumer, "eventConsumer is null");
 		return (listener, event) -> {
 			if (!eventClass.isAssignableFrom(event.getClass())) {
 				return;
 			}
-			// We already checked that the event class is assignment compatible, so this unchecked cast is safe:
+			// We already checked that the event class is assignment compatible, so this unchecked
+			// cast is safe:
 			eventConsumer.accept((E) event);
 		};
 	}
@@ -70,7 +80,8 @@ public final class EventUtils {
 	/**
 	 * Gets the {@link HandlerList} for the specified type of event.
 	 * <p>
-	 * This mimics Bukkit's implementation to find and retrieve the HandlerList (see {@link SimplePluginManager}).
+	 * This mimics Bukkit's implementation to find and retrieve the HandlerList (see
+	 * {@link SimplePluginManager}).
 	 * 
 	 * @param eventClass
 	 *            the event class, not <code>null</code>
@@ -79,7 +90,7 @@ public final class EventUtils {
 	 *             if we cannot find or retrieve the handler list for the given event class
 	 * @see #getEventRegistrationClass(Class)
 	 */
-	public static HandlerList getHandlerList(Class<? extends Event> eventClass) {
+	public static HandlerList getHandlerList(Class<? extends @NonNull Event> eventClass) {
 		// The following call checks if the event class is null, so this is not required here:
 		Class<? extends Event> eventRegistrationClass = getEventRegistrationClass(eventClass);
 		assert eventRegistrationClass != null;
@@ -88,23 +99,26 @@ public final class EventUtils {
 		try {
 			Method method = eventRegistrationClass.getDeclaredMethod("getHandlerList");
 			method.setAccessible(true);
-			handlerList = (HandlerList) method.invoke(null);
+			handlerList = (HandlerList) method.invoke(Unsafe.uncheckedNull());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not retrieve the handler list from the event registration class for event "
-					+ eventClass.getName());
+			throw new IllegalArgumentException(
+					"Could not retrieve the handler list from the event registration class for event "
+							+ eventClass.getName()
+			);
 		}
 		if (handlerList == null) {
-			throw new IllegalArgumentException("The event registration class for event " + eventClass.getName()
-					+ " returned a null handler list!");
+			throw new IllegalArgumentException("The event registration class for event "
+					+ eventClass.getName() + " returned a null handler list!");
 		}
 		return handlerList;
 	}
 
 	/**
-	 * Gets the class that provides the {@link HandlerList} at which handlers for the specified type of event are
-	 * registered.
+	 * Gets the class that provides the {@link HandlerList} at which handlers for the specified type
+	 * of event are registered.
 	 * <p>
-	 * This searches the given class and its parent classes for a class that provides the handler list.
+	 * This searches the given class and its parent classes for a class that provides the handler
+	 * list.
 	 * <p>
 	 * This mimics Bukkit's implementation (see {@link SimplePluginManager}).
 	 * 
@@ -114,26 +128,31 @@ public final class EventUtils {
 	 * @throws IllegalArgumentException
 	 *             if the event registration class cannot be found
 	 */
-	public static Class<? extends Event> getEventRegistrationClass(Class<? extends Event> eventClass) {
+	public static Class<? extends @NonNull Event> getEventRegistrationClass(
+			Class<? extends @NonNull Event> eventClass
+	) {
 		Validate.notNull(eventClass, "eventClass is null");
 		try {
 			eventClass.getDeclaredMethod("getHandlerList");
 			return eventClass;
 		} catch (NoSuchMethodException e) {
-			if (eventClass.getSuperclass() != null
-					&& !eventClass.getSuperclass().equals(Event.class)
-					&& Event.class.isAssignableFrom(eventClass.getSuperclass())) {
-				return getEventRegistrationClass(eventClass.getSuperclass().asSubclass(Event.class));
+			Class<?> superClass = eventClass.getSuperclass();
+			if (superClass != null
+					&& !superClass.equals(Event.class)
+					&& Event.class.isAssignableFrom(superClass)) {
+				return getEventRegistrationClass(superClass.asSubclass(Event.class));
 			} else {
-				throw new IllegalArgumentException("Could not find the event registration class for event "
-						+ eventClass.getName());
+				throw new IllegalArgumentException(
+						"Could not find the event registration class for event "
+								+ eventClass.getName()
+				);
 			}
 		}
 	}
 
 	/**
-	 * Ensures that the event handlers of the specified {@link Listener} for the specified event at the specified
-	 * {@link EventPriority} are executed prior to any other event handlers.
+	 * Ensures that the event handlers of the specified {@link Listener} for the specified event at
+	 * the specified {@link EventPriority} are executed prior to any other event handlers.
 	 * 
 	 * @param eventClass
 	 *            the event class, not <code>null</code>
@@ -145,14 +164,22 @@ public final class EventUtils {
 	 *             if we cannot find or retrieve the handler list for the given event class
 	 * @see #enforceExecuteFirst(Class, EventPriority, Predicate)
 	 */
-	public static void enforceExecuteFirst(Class<? extends Event> eventClass, EventPriority eventPriority, Listener listener) {
+	public static void enforceExecuteFirst(
+			Class<? extends @NonNull Event> eventClass,
+			EventPriority eventPriority,
+			Listener listener
+	) {
 		Validate.notNull(listener, "listener is null");
-		enforceExecuteFirst(eventClass, eventPriority, registeredListener -> registeredListener.getListener() == listener);
+		enforceExecuteFirst(
+				eventClass,
+				eventPriority,
+				registeredListener -> registeredListener.getListener() == listener
+		);
 	}
 
 	/**
-	 * Ensures that the event handlers of the specified {@link Plugin} for the specified event at the specified
-	 * {@link EventPriority} are executed prior to any other event handlers.
+	 * Ensures that the event handlers of the specified {@link Plugin} for the specified event at
+	 * the specified {@link EventPriority} are executed prior to any other event handlers.
 	 * 
 	 * @param eventClass
 	 *            the event class, not <code>null</code>
@@ -164,30 +191,42 @@ public final class EventUtils {
 	 *             if we cannot find or retrieve the handler list for the given event class
 	 * @see #enforceExecuteFirst(Class, EventPriority, Predicate)
 	 */
-	public static void enforceExecuteFirst(Class<? extends Event> eventClass, EventPriority eventPriority, Plugin plugin) {
+	public static void enforceExecuteFirst(
+			Class<? extends @NonNull Event> eventClass,
+			EventPriority eventPriority,
+			Plugin plugin
+	) {
 		Validate.notNull(plugin, "plugin is null");
-		enforceExecuteFirst(eventClass, eventPriority, registeredListener -> registeredListener.getPlugin() == plugin);
+		enforceExecuteFirst(
+				eventClass,
+				eventPriority,
+				registeredListener -> registeredListener.getPlugin() == plugin
+		);
 	}
 
 	/**
-	 * Ensures that the event handlers that match the specified {@link Predicate} for the specified event at the
-	 * specified {@link EventPriority} are executed prior to any other event handlers.
+	 * Ensures that the event handlers that match the specified {@link Predicate} for the specified
+	 * event at the specified {@link EventPriority} are executed prior to any other event handlers.
 	 * <p>
-	 * This moves any other event handlers to the back of the handler list by unregistering and re-register them. The
-	 * order of these other event handlers, as well as the order of the matching event handlers, preserve their
-	 * execution order among each other.
+	 * This moves any other event handlers to the back of the handler list by unregistering and
+	 * re-register them. The order of these other event handlers, as well as the order of the
+	 * matching event handlers, preserve their execution order among each other.
 	 * 
 	 * @param eventClass
 	 *            the event class, not <code>null</code>
 	 * @param eventPriority
 	 *            the affected event priority, not <code>null</code>
 	 * @param affectedEventHandlers
-	 *            the Predicate that specifies the event handlers that are to be executed first, not <code>null</code>
+	 *            the Predicate that specifies the event handlers that are to be executed first, not
+	 *            <code>null</code>
 	 * @throws IllegalArgumentException
 	 *             if we cannot find or retrieve the handler list for the given event class
 	 */
-	public static void enforceExecuteFirst(	Class<? extends Event> eventClass, EventPriority eventPriority,
-											Predicate<RegisteredListener> affectedEventHandlers) {
+	public static void enforceExecuteFirst(
+			Class<? extends @NonNull Event> eventClass,
+			EventPriority eventPriority,
+			Predicate<? super @NonNull RegisteredListener> affectedEventHandlers
+	) {
 		Validate.notNull(eventClass, "eventClass is null");
 
 		// Retrieve the handler list:
@@ -198,36 +237,45 @@ public final class EventUtils {
 	}
 
 	/**
-	 * Ensures that the event handlers that match the specified {@link Predicate} in the given {@link HandlerList} at
-	 * the specified {@link EventPriority} are executed prior to any other event handlers.
+	 * Ensures that the event handlers that match the specified {@link Predicate} in the given
+	 * {@link HandlerList} at the specified {@link EventPriority} are executed prior to any other
+	 * event handlers.
 	 * <p>
-	 * This moves any other event handlers to the back of the handler list by unregistering and re-register them. The
-	 * order of these other event handlers, as well as the order of the matching event handlers, preserve their
-	 * execution order among each other.
+	 * This moves any other event handlers to the back of the handler list by unregistering and
+	 * re-register them. The order of these other event handlers, as well as the order of the
+	 * matching event handlers, preserve their execution order among each other.
 	 * 
 	 * @param handlerList
 	 *            the handler list, not <code>null</code>
 	 * @param eventClass
-	 *            the event class, or <code>null</code> if unknown (this is used for additional context in log messages)
+	 *            the event class, or <code>null</code> if unknown (this is used for additional
+	 *            context in log messages)
 	 * @param eventPriority
 	 *            the affected event priority, not <code>null</code>
 	 * @param affectedEventHandlers
-	 *            the Predicate that specifies the event handlers that are to be executed first, not <code>null</code>
+	 *            the Predicate that specifies the event handlers that are to be executed first, not
+	 *            <code>null</code>
 	 * @param verbose
 	 *            <code>true</code> to print additional debug output
 	 */
-	public static void enforceExecuteFirst(	HandlerList handlerList, Class<? extends Event> eventClass, EventPriority eventPriority,
-											Predicate<RegisteredListener> affectedEventHandlers, boolean verbose) {
+	public static void enforceExecuteFirst(
+			HandlerList handlerList,
+			@Nullable Class<? extends @NonNull Event> eventClass,
+			EventPriority eventPriority,
+			Predicate<? super @NonNull RegisteredListener> affectedEventHandlers,
+			boolean verbose
+	) {
 		Validate.notNull(handlerList, "handlerList is null");
 		Validate.notNull(eventPriority, "eventPriority is null");
 		Validate.notNull(affectedEventHandlers, "affectedEventHandlers is null");
 
-		// Synchronization on the HandlerList guards against a race condition that would otherwise make it possible for
-		// the listeners to miss an async event, or process it the wrong order, while the listeners are being reordered.
+		// Synchronization on the HandlerList guards against a race condition that would otherwise
+		// make it possible for the listeners to miss an async event, or process it the wrong order,
+		// while the listeners are being reordered.
 		synchronized (handlerList) {
-			// Note: The HandlerList creates a new array whenever it detects changes to the registered listeners. We can
-			// therefore safely iterate this array while doing changes to the HandlerList without being affected by
-			// concurrent modifications.
+			// Note: The HandlerList creates a new array whenever it detects changes to the
+			// registered listeners. We can therefore safely iterate this array while doing changes
+			// to the HandlerList without being affected by concurrent modifications.
 			RegisteredListener[] registeredListeners = handlerList.getRegisteredListeners();
 			final int eventHandlerCount = registeredListeners.length;
 
@@ -244,9 +292,11 @@ public final class EventUtils {
 					// We found an affected event handler:
 					lastAffectedEventHandlerIndex = i;
 					if (foundUnaffectedEventHandler) {
-						// We already found an unaffected event handler earlier, so a reorder is required:
+						// We already found an unaffected event handler earlier, so a reorder is
+						// required:
 						reorderRequired = true;
-						// No break here because we also want to find the index of the last affected event handler.
+						// No break here because we also want to find the index of the last affected
+						// event handler.
 					}
 				} else {
 					foundUnaffectedEventHandler = true;
@@ -270,13 +320,16 @@ public final class EventUtils {
 				if (i < lastAffectedEventHandlerIndex && verbose) {
 					Log.debug(() -> "Moving a handler for event "
 							+ ((eventClass != null) ? "'" + eventClass.getSimpleName() + "'" : "<unspecified>")
-							+ " at priority " + eventPriority.name() + " in front of an event handler of plugin "
+							+ " at priority " + eventPriority.name()
+							+ " in front of an event handler of plugin "
 							+ registeredListener.getPlugin().getName());
 				}
-				// Else: The reorder has no noticeable effect for this event handler nor the affected ones, but is still
-				// required to preserve the order among all reordered event handlers.
+				// Else: The reorder has no noticeable effect for this event handler nor the
+				// affected ones, but is still required to preserve the order among all reordered
+				// event handlers.
 
-				// Unregister and register: This moves the event handler to the back of the handler list.
+				// Unregister and register: This moves the event handler to the back of the handler
+				// list.
 				handlerList.unregister(registeredListener);
 				try {
 					handlerList.register(registeredListener);
@@ -285,38 +338,47 @@ public final class EventUtils {
 							+ registeredListener.getPlugin().getName() + "' for event "
 							+ ((eventClass != null) ? "'" + eventClass.getName() + "'" : "<unspecified>")
 							+ " at priority " + eventPriority.name() + "!", e);
-					Log.severe("This issue might be caused by one of your other plugins on your server."
-							+ " Check below for anything that indicates the involvement of one of your plugins.");
-					inspectHandlerListInternals(handlerList, eventClass, eventPriority, registeredListener);
+					Log.severe("This issue might be caused by one of your other plugins on your "
+							+ "server. Check below for anything that indicates the involvement of "
+							+ "one of your plugins.");
+					inspectHandlerListInternals(
+							handlerList,
+							eventClass,
+							eventPriority,
+							registeredListener
+					);
 				}
 			}
 		}
 	}
 
 	// eventClass can be null.
-	private static void inspectHandlerListInternals(HandlerList handlerList, Class<? extends Event> eventClass,
-													EventPriority eventPriority, RegisteredListener targetListener) {
-		assert handlerList != null && eventClass != null && eventPriority != null && targetListener != null;
+	private static void inspectHandlerListInternals(
+			HandlerList handlerList,
+			@Nullable Class<? extends @NonNull Event> eventClass,
+			EventPriority eventPriority,
+			RegisteredListener targetListener
+	) {
+		assert handlerList != null && eventPriority != null && targetListener != null;
 		assert eventClass == null || getHandlerList(eventClass) == handlerList;
 		Log.info("Inspecting the HandlerList internals of event "
 				+ ((eventClass != null) ? "'" + eventClass.getName() + "'" : "<unspecified>")
 				+ " and priority " + eventPriority + ":");
 		try {
-			Log.info("  Target RegisteredListener implementation: " + targetListener.getClass().getName());
+			Log.info("  Target RegisteredListener implementation: "
+					+ targetListener.getClass().getName());
 			Log.info("  HandlerList implementation: " + handlerList.getClass().getName());
 
 			Field handlerslotsField = HandlerList.class.getDeclaredField("handlerslots");
 			handlerslotsField.setAccessible(true);
-			Object handlerslots = handlerslotsField.get(handlerList);
+			Object handlerslots = Unsafe.assertNonNull(handlerslotsField.get(handlerList));
 			Log.info("  handlerslots implementation: " + handlerslots.getClass().getName());
 
-			@SuppressWarnings("unchecked")
-			Map<EventPriority, ?> handlerslotsMap = (Map<EventPriority, ?>) handlerslots;
-			Object handlerslotsList = handlerslotsMap.get(eventPriority);
+			Map<EventPriority, ?> handlerslotsMap = Unsafe.castNonNull(handlerslots);
+			Object handlerslotsList = Unsafe.assertNonNull(handlerslotsMap.get(eventPriority));
 			Log.info("  handlerslots list implementation: " + handlerslotsList.getClass().getName());
 
-			@SuppressWarnings("unchecked")
-			List<RegisteredListener> registeredListeners = (List<RegisteredListener>) handlerslotsList;
+			List<RegisteredListener> registeredListeners = Unsafe.castNonNull(handlerslotsList);
 			Set<String> registeredListenerClasses = new LinkedHashSet<>();
 			for (RegisteredListener registeredListener : registeredListeners) {
 				registeredListenerClasses.add(registeredListener.getClass().getName());
@@ -331,8 +393,10 @@ public final class EventUtils {
 		HandlerList handlerList = event.getHandlers();
 		Log.info("Registered listeners for event " + event.getEventName() + ":");
 		for (RegisteredListener rl : handlerList.getRegisteredListeners()) {
-			Log.info(" - " + rl.getPlugin().getName() + " (" + rl.getListener().getClass().getName() + ")"
-					+ ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
+			Log.info(" - " + rl.getPlugin().getName()
+					+ " (" + rl.getListener().getClass().getName() + ")"
+					+ ", priority: " + rl.getPriority()
+					+ ", ignoring cancelled: " + rl.isIgnoringCancelled());
 		}
 	}
 

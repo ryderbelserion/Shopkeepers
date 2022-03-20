@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.java;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A mutable wrapper for a {@code long} value.
  */
@@ -73,7 +75,7 @@ public final class MutableLong implements Comparable<Number> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof MutableLong)) return false;
 		MutableLong other = (MutableLong) obj;

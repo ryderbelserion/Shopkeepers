@@ -4,20 +4,23 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.debug.Debug;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class Log {
 
 	// Gets set early on plugin startup and then (ideally) never unset.
 	// -> Volatile is therefore not expected to be required.
-	private static Logger logger = null;
+	private static @Nullable Logger logger = null;
 
-	public static void setLogger(Logger logger) {
+	public static void setLogger(@Nullable Logger logger) {
 		Log.logger = logger;
 	}
 
 	public static Logger getLogger() {
-		return logger;
+		return Validate.State.notNull(logger, "No logger instance set!");
 	}
 
 	public static void info(String message) {
@@ -28,11 +31,11 @@ public final class Log {
 		getLogger().info(msgSupplier);
 	}
 
-	public static void info(String message, Throwable throwable) {
+	public static void info(String message, @Nullable Throwable throwable) {
 		getLogger().log(Level.INFO, message, throwable);
 	}
 
-	public static void info(Throwable throwable, Supplier<String> msgSupplier) {
+	public static void info(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
 		getLogger().log(Level.INFO, throwable, msgSupplier);
 	}
 
@@ -44,33 +47,41 @@ public final class Log {
 		debug((String) null, msgSupplier);
 	}
 
-	public static void debug(String message, Throwable throwable) {
+	public static void debug(String message, @Nullable Throwable throwable) {
 		debug(null, message, throwable);
 	}
 
-	public static void debug(Throwable throwable, Supplier<String> msgSupplier) {
+	public static void debug(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
 		debug(null, throwable, msgSupplier);
 	}
 
-	public static void debug(String debugOption, String message) {
+	public static void debug(@Nullable String debugOption, String message) {
 		if (Debug.isDebugging(debugOption)) {
 			info(message);
 		}
 	}
 
-	public static void debug(String debugOption, Supplier<String> msgSupplier) {
+	public static void debug(@Nullable String debugOption, Supplier<String> msgSupplier) {
 		if (Debug.isDebugging(debugOption)) {
 			info(msgSupplier);
 		}
 	}
 
-	public static void debug(String debugOption, String message, Throwable throwable) {
+	public static void debug(
+			@Nullable String debugOption,
+			String message,
+			@Nullable Throwable throwable
+	) {
 		if (Debug.isDebugging(debugOption)) {
 			info(message, throwable);
 		}
 	}
 
-	public static void debug(String debugOption, Throwable throwable, Supplier<String> msgSupplier) {
+	public static void debug(
+			@Nullable String debugOption,
+			@Nullable Throwable throwable,
+			Supplier<String> msgSupplier
+	) {
 		if (Debug.isDebugging(debugOption)) {
 			info(throwable, msgSupplier);
 		}
@@ -84,11 +95,11 @@ public final class Log {
 		getLogger().warning(msgSupplier);
 	}
 
-	public static void warning(String message, Throwable throwable) {
+	public static void warning(String message, @Nullable Throwable throwable) {
 		getLogger().log(Level.WARNING, message, throwable);
 	}
 
-	public static void warning(Throwable throwable, Supplier<String> msgSupplier) {
+	public static void warning(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
 		getLogger().log(Level.WARNING, throwable, msgSupplier);
 	}
 
@@ -100,11 +111,11 @@ public final class Log {
 		getLogger().severe(msgSupplier);
 	}
 
-	public static void severe(String message, Throwable throwable) {
+	public static void severe(String message, @Nullable Throwable throwable) {
 		getLogger().log(Level.SEVERE, message, throwable);
 	}
 
-	public static void severe(Throwable throwable, Supplier<String> msgSupplier) {
+	public static void severe(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
 		getLogger().log(Level.SEVERE, throwable, msgSupplier);
 	}
 

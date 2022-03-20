@@ -12,8 +12,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -31,19 +34,19 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.Trait;
 
 /**
- * The {@link NPCAddTraitEvent} and {@link NPCRemoveTraitEvent} don't provide the player who adds or removes the trait.
- * We require the player to be able to send feedback messages about the creation and deletion of the corresponding
- * shopkeeper.
+ * The {@link NPCAddTraitEvent} and {@link NPCRemoveTraitEvent} don't provide the player who adds or
+ * removes the trait. We require the player to be able to send feedback messages about the creation
+ * and deletion of the corresponding shopkeeper.
  * <p>
  * We therefore handle trait additions and removals deferred and additionally react to the
- * {@link NPCTraitCommandAttachEvent} (called <b>after</b> a player added a trait via command) and the
- * {@link PlayerCreateNPCEvent} (called when a player creates a NPC via command, which might result in traits, specified
- * in the NPC creation command, getting added <b>afterwards</b>) to try to (heuristically) figure out the player
- * responsible for adding or removing the trait.
+ * {@link NPCTraitCommandAttachEvent} (called <b>after</b> a player added a trait via command) and
+ * the {@link PlayerCreateNPCEvent} (called when a player creates a NPC via command, which might
+ * result in traits, specified in the NPC creation command, getting added <b>afterwards</b>) to try
+ * to (heuristically) figure out the player responsible for adding or removing the trait.
  * <p>
- * Unfortunately there are no Citizens events for when a player removes a trait or NPC. If we cannot determine the
- * player who is adding or removing the trait, we still create or delete the corresponding shopkeeper, but no player
- * receives any feedback messages about it.
+ * Unfortunately there are no Citizens events for when a player removes a trait or NPC. If we cannot
+ * determine the player who is adding or removing the trait, we still create or delete the
+ * corresponding shopkeeper, but no player receives any feedback messages about it.
  */
 class CitizensListener implements Listener {
 
@@ -52,12 +55,13 @@ class CitizensListener implements Listener {
 		private final ShopkeepersPlugin plugin;
 
 		// The uuids of the last NPC and the last player encountered in relevant events:
-		private UUID lastNPCId = null;
-		private UUID lastPlayerId = null;
+		private @Nullable UUID lastNPCId = null;
+		private @Nullable UUID lastPlayerId = null;
 		// The shopkeeper trait awaiting to be handled:
-		private CitizensShopkeeperTrait pendingTrait = null;
-		// The task which handles the pending trait if we don't end up handling it within the current tick:
-		private BukkitTask pendingTraitTask = null;
+		private @Nullable CitizensShopkeeperTrait pendingTrait = null;
+		// The task which handles the pending trait if we don't end up handling it within the
+		// current tick:
+		private @Nullable BukkitTask pendingTraitTask = null;
 
 		PendingTraitState(ShopkeepersPlugin plugin) {
 			assert plugin != null;
@@ -94,7 +98,8 @@ class CitizensListener implements Listener {
 
 		private void handlePendingTrait() {
 			if (pendingTrait != null) {
-				assert lastPlayerId == null; // Otherwise the pending trait would have been handled already.
+				// Otherwise the pending trait would have been handled already:
+				assert lastPlayerId == null;
 				CitizensShopkeeperTrait trait = pendingTrait;
 				pendingTrait = null;
 				this.reset();
@@ -119,22 +124,26 @@ class CitizensListener implements Listener {
 		}
 
 		private void tryHandlePendingTraitWithPlayer() {
-			// Check if we have all the information available to associate the trait with a specific player:
+			// Check if we have all the information available to associate the trait with a specific
+			// player:
+			UUID lastPlayerId = this.lastPlayerId;
 			if (lastPlayerId != null && pendingTrait != null) {
 				CitizensShopkeeperTrait trait = pendingTrait;
-				Player player = Bukkit.getPlayer(lastPlayerId); // Can be null (e.g. if player is no longer online)
+				// Can be null if the player is no longer online:
+				Player player = Bukkit.getPlayer(lastPlayerId);
 				pendingTrait = null;
 				this.reset();
 				this.handleTrait(trait, player); // Handle with player (can be null though)
 			} else {
-				// The task should get reset before we reach this state. We check for this anyways just in case.
+				// The task should get reset before we reach this state. We check for this anyways
+				// just in case.
 				assert pendingTraitTask == null;
-				if (pendingTraitTask == null || pendingTraitTask.isCancelled()) {
+				if (pendingTraitTask == null || Unsafe.assertNonNull(pendingTraitTask).isCancelled()) {
 					pendingTraitTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
 						pendingTraitTask = null; // Reset
 						reset(); // Handles any currently pending trait
 					}, 1L);
-				} // Else: There is already an active task which will handle the pending trait later.
+				} // Else: There is already an active task that will handle the pending trait later.
 			}
 		}
 
@@ -152,7 +161,7 @@ class CitizensListener implements Listener {
 		}
 
 		// The player can be null.
-		protected abstract void handleTrait(CitizensShopkeeperTrait trait, Player player);
+		protected abstract void handleTrait(CitizensShopkeeperTrait trait, @Nullable Player player);
 	}
 
 	private final CitizensShops citizensShops;
@@ -163,7 +172,7 @@ class CitizensListener implements Listener {
 		this.citizensShops = citizensShops;
 		pendingTraitAddition = new PendingTraitState(plugin) {
 			@Override
-			protected void handleTrait(CitizensShopkeeperTrait trait, Player player) {
+			protected void handleTrait(CitizensShopkeeperTrait trait, @Nullable Player player) {
 				trait.onTraitAdded(player);
 			}
 		};
@@ -179,16 +188,19 @@ class CitizensListener implements Listener {
 	// Handling of trait additions:
 
 	// Traits can also be added during NPC creation. This is called before these traits get added.
-	// Heuristic: We assume that any directly following NPCAddTraitEvents for the same NPC and within the current
-	// tick are caused by the player of this event.
+	// Heuristic: We assume that any directly following NPCAddTraitEvents for the same NPC and
+	// within the current tick are caused by the player of this event.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerCreateNPC(PlayerCreateNPCEvent event) {
-		pendingTraitAddition.updateLastPlayer(event.getNPC(), event.getCreator());
+		NPC npc = Unsafe.assertNonNull(event.getNPC());
+		Player creator = Unsafe.assertNonNull(event.getCreator());
+		pendingTraitAddition.updateLastPlayer(npc, creator);
 	}
 
 	// This is called for every trait addition (not only by players).
 	// This is also called whenever a trait gets added after the NPC got reloaded.
-	// This is called after the trait got added and linked to the NPC (after Trait#onAttach has been called).
+	// This is called after the trait got added and linked to the NPC (after Trait#onAttach has been
+	// called).
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTraitAdded(NPCAddTraitEvent event) {
 		NPC npc = event.getNPC();
@@ -200,9 +212,9 @@ class CitizensListener implements Listener {
 			return;
 		}
 		if (trait != eventTrait) {
-			// The current trait instance does not match the event's trait. This may happen if the trait got removed
-			// and re-added again during event handling. There should have been another event for the current trait
-			// then.
+			// The current trait instance does not match the event's trait. This may happen if the
+			// trait got removed and re-added again during event handling. There should have been
+			// another event for the current trait then.
 			return;
 		}
 
@@ -215,7 +227,7 @@ class CitizensListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTraitAddedByPlayer(NPCTraitCommandAttachEvent event) {
 		if (!(event.getCommandSender() instanceof Player)) return;
-		Player player = (Player) event.getCommandSender();
+		@NonNull Player player = Unsafe.cast(event.getCommandSender());
 		NPC npc = event.getNPC();
 		Class<? extends Trait> traitClass = event.getTraitClass();
 		Trait trait = npc.getTraitNullable(traitClass);
@@ -224,21 +236,24 @@ class CitizensListener implements Listener {
 			return;
 		}
 		if (trait instanceof CitizensShopkeeperTrait) {
-			// The NPCTraitCommandAttachEvent is called right after the corresponding NPCAddTraitEvent.
+			// The NPCTraitCommandAttachEvent is called right after the corresponding
+			// NPCAddTraitEvent.
 			assert trait == pendingTraitAddition.pendingTrait;
 			pendingTraitAddition.updateLastPlayer(npc, player);
-			// Note: Updating of the pendingTrait is only done by the NPCAddTraitEvent event handler.
+			// Note: Updating of the pendingTrait is only done by the NPCAddTraitEvent event
+			// handler.
 		}
 	}
 
 	// Handling of trait and NPC removals:
 
-	// TODO There are currently no Citizens events which could provide us the player involved in the removal of the
-	// trait or NPC. We therefore remove the corresponding shopkeeper without a player.
+	// TODO There are currently no Citizens events which could provide us the player involved in the
+	// removal of the trait or NPC. We therefore remove the corresponding shopkeeper without a
+	// player.
 
 	// Called after trait removal (but before Trait#onRemove() has been called).
-	// Unlike NPCAddTraitEvent, which is also called when traits get added after reloading a NPC, this is only called
-	// when the trait gets permanently removed.
+	// Unlike NPCAddTraitEvent, which is also called when traits get added after reloading a NPC,
+	// this is only called when the trait gets permanently removed.
 	// This is not called when the traits get removed due to the deletion of the NPC.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTraitRemoved(NPCRemoveTraitEvent event) {
@@ -255,17 +270,18 @@ class CitizensListener implements Listener {
 	void onNPCRemoved(NPCRemoveEvent event) {
 		pendingTraitAddition.reset(); // Handles any currently pending trait
 		NPC npc = event.getNPC();
-		CitizensShopkeeperTrait shopkeeperTrait = npc.getTraitNullable(CitizensShopkeeperTrait.class);
+		CitizensShopkeeperTrait shopkeeperTrait = Unsafe.cast(npc.getTraitNullable(CitizensShopkeeperTrait.class));
 		if (shopkeeperTrait != null) {
 			shopkeeperTrait.onTraitDeleted(null); // Handle without player
 		} else {
 			// Delete the corresponding shopkeeper(s):
 			// If there are multiple associated shopkeepers, we delete all of them.
-			List<? extends Shopkeeper> shopkeepers = citizensShops.getShopkeepers(npc);
+			List<? extends @NonNull Shopkeeper> shopkeepers = citizensShops.getShopkeepers(npc);
 			if (!shopkeepers.isEmpty()) {
 				new ArrayList<>(shopkeepers).forEach(shopkeeper -> {
 					assert shopkeeper.getShopObject() instanceof SKCitizensShopObject;
-					((SKCitizensShopObject) shopkeeper.getShopObject()).onNPCDeleted(null); // Handle without player
+					// Handle the deletion without a player:
+					((SKCitizensShopObject) shopkeeper.getShopObject()).onNPCDeleted(null);
 				});
 			}
 		}
@@ -285,6 +301,7 @@ class CitizensListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onNPCSpawned(NPCSpawnEvent event) {
 		NPC npc = event.getNPC();
+		assert npc != null;
 		Shopkeeper shopkeeper = citizensShops.getShopkeeper(npc);
 		if (shopkeeper == null) return;
 
@@ -301,6 +318,7 @@ class CitizensListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onNPCDepawn(NPCDespawnEvent event) {
 		NPC npc = event.getNPC();
+		assert npc != null;
 		Shopkeeper shopkeeper = citizensShops.getShopkeeper(npc);
 		if (shopkeeper == null) return;
 
@@ -316,7 +334,10 @@ class CitizensListener implements Listener {
 	@EventHandler
 	void onNPCTeleport(NPCTeleportEvent event) {
 		NPC npc = event.getNPC();
-		this.updateShopkeeperLocations(npc, event.getTo());
+		assert npc != null;
+		Location toLocation = event.getTo();
+		assert toLocation != null;
+		this.updateShopkeeperLocations(npc, toLocation);
 	}
 
 	private void updateShopkeeperLocations(NPC npc, Location toLocation) {

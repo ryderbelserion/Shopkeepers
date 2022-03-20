@@ -12,8 +12,10 @@ import java.util.logging.Logger;
 
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.text.Text;
@@ -24,7 +26,8 @@ public class TextTest extends AbstractBukkitTest {
 
 	private static final Logger LOGGER = Logger.getLogger(TextTest.class.getCanonicalName());
 
-	// Tests the Text parsing and backwards conversion with the actual messages of the default language file
+	// Tests the Text parsing and backwards conversion with the actual messages of the default
+	// language file
 	@Test
 	public void testRealMessageConversions() throws IOException {
 		// Load default language file:
@@ -35,7 +38,7 @@ public class TextTest extends AbstractBukkitTest {
 			config = YamlConfiguration.loadConfiguration(reader);
 		}
 
-		Set<String> configKeys = config.getKeys(false);
+		Set<@NonNull String> configKeys = Unsafe.castNonNull(config.getKeys(false));
 		int tested = 0;
 		for (String key : configKeys) {
 			Object value = config.get(key);
@@ -44,10 +47,17 @@ public class TextTest extends AbstractBukkitTest {
 			tested++;
 			String stringText = TextUtils.colorize((String) value);
 			Text text = Text.parse(stringText);
-			assertEquals("Plain format text does not match parsing input for: " + key, stringText, text.toPlainFormatText());
-			assertEquals("Plain text does not match parsing input for: " + key, stringText, text.toPlainText());
+			assertEquals(
+					"Plain format text does not match parsing input for: " + key,
+					stringText, text.toPlainFormatText()
+			);
+			assertEquals(
+					"Plain text does not match parsing input for: " + key,
+					stringText, text.toPlainText()
+			);
 		}
-		LOGGER.info("Tested config messages: " + tested + " / " + configKeys.size() + " (total config entries)");
+		LOGGER.info("Tested config messages: " + tested + " / " + configKeys.size()
+				+ " (total config entries)");
 		assertTrue("The test didn't actually test anything!", tested > 0);
 	}
 }

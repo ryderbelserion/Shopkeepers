@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.ChestedHorse;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -23,19 +26,23 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
+public class ChestedHorseShop<E extends @NonNull ChestedHorse> extends BabyableShop<E> {
 
-	public static final Property<Boolean> CARRYING_CHEST = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> CARRYING_CHEST = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("carryingChest", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Boolean> carryingChestProperty = new PropertyValue<>(CARRYING_CHEST)
-			.onValueChanged(this::applyCarryingChest)
+	private final PropertyValue<@NonNull Boolean> carryingChestProperty = new PropertyValue<>(CARRYING_CHEST)
+			.onValueChanged(Unsafe.initialized(this)::applyCarryingChest)
 			.build(properties);
 
-	public ChestedHorseShop(LivingShops livingShops, SKLivingShopObjectType<? extends ChestedHorseShop<E>> livingObjectType,
-							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public ChestedHorseShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<? extends @NonNull ChestedHorseShop<E>> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -58,8 +65,8 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getCarryingChestEditorButton());
 		return editorButtons;
 	}
@@ -79,26 +86,32 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	}
 
 	private void applyCarryingChest() {
-		E entity = this.getEntity();
+		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
 		entity.setCarryingChest(this.isCarryingChest());
 	}
 
 	private ItemStack getCarryingChestEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.CHEST);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonCarryingChest, Messages.buttonCarryingChestLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonCarryingChest,
+				Messages.buttonCarryingChestLore
+		);
 		return iconItem;
 	}
 
 	private Button getCarryingChestEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getCarryingChestEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleCarryingChest();
 				return true;
 			}

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.debug.DebugOptions;
@@ -27,15 +28,17 @@ public class ShopkeeperTicker {
 	/**
 	 * The number of ticking groups.
 	 * <p>
-	 * For load balancing purposes, we tick more frequently, but then only process a subset of all active shopkeepers
-	 * each time. Each of these subsets is called a "ticking group".
+	 * For load balancing purposes, we tick more frequently, but then only process a subset of all
+	 * active shopkeepers each time. Each of these subsets is called a "ticking group".
 	 * <p>
-	 * This number is chosen as a balance between {@code 1} group (all shopkeepers are ticked within the same tick; no
-	 * load balancing), and the maximum of {@code 20} groups (groups are as small as possible for the tick rate of once
-	 * every second, i.e. once every {@code 20} ticks; best load balancing; but this is associated with a large overhead
-	 * due to having to do some processing each Minecraft tick).
+	 * This number is chosen as a balance between {@code 1} group (all shopkeepers are ticked within
+	 * the same tick; no load balancing), and the maximum of {@code 20} groups (groups are as small
+	 * as possible for the tick rate of once every second, i.e. once every {@code 20} ticks; best
+	 * load balancing; but this is associated with a large overhead due to having to do some
+	 * processing each Minecraft tick).
 	 * <p>
-	 * With {@code 4} ticking groups, one fourth of the active shopkeepers are processed every {@code 5} ticks.
+	 * With {@code 4} ticking groups, one fourth of the active shopkeepers are processed every
+	 * {@code 5} ticks.
 	 */
 	public static final int TICKING_GROUPS = 4;
 	private static final CyclicCounter tickingGroupCounter = new CyclicCounter(TICKING_GROUPS);
@@ -46,12 +49,12 @@ public class ShopkeeperTicker {
 
 	private static final class TickingGroup {
 
-		private final Set<AbstractShopkeeper> shopkeepers = new LinkedHashSet<>();
+		private final Set<@NonNull AbstractShopkeeper> shopkeepers = new LinkedHashSet<>();
 
 		TickingGroup() {
 		}
 
-		Collection<? extends AbstractShopkeeper> getShopkeepers() {
+		Collection<? extends @NonNull AbstractShopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 
@@ -72,12 +75,13 @@ public class ShopkeeperTicker {
 
 	private final SKShopkeepersPlugin plugin;
 
-	private final List<TickingGroup> tickingGroups = new ArrayList<>(TICKING_GROUPS);
+	private final List<? extends @NonNull TickingGroup> tickingGroups;
 	{
-		// Initialization:
+		List<@NonNull TickingGroup> tickingGroups = new ArrayList<>(TICKING_GROUPS);
 		for (int i = 0; i < TICKING_GROUPS; i++) {
 			tickingGroups.add(new TickingGroup());
 		}
+		this.tickingGroups = tickingGroups;
 	}
 
 	private final CyclicCounter activeTickingGroup = new CyclicCounter(TICKING_GROUPS);
@@ -85,10 +89,11 @@ public class ShopkeeperTicker {
 	private boolean dirty;
 
 	// True: Ticking started, False: Ticking stopped
-	// Note: The start/stop-ticking callbacks for these pending changes have already been invoked and only the actual
-	// registration change is deferred, because if a shopkeeper changes its ticking state multiple times during the same
-	// tick we would otherwise lose the callbacks for the intermediate ticking state changes.
-	private final Map<AbstractShopkeeper, Boolean> pendingTickingChanges = new LinkedHashMap<>();
+	// Note: The start/stop-ticking callbacks for these pending changes have already been invoked
+	// and only the actual registration change is deferred, because if a shopkeeper changes its
+	// ticking state multiple times during the same tick we would otherwise lose the callbacks for
+	// the intermediate ticking state changes.
+	private final Map<@NonNull AbstractShopkeeper, @NonNull Boolean> pendingTickingChanges = new LinkedHashMap<>();
 
 	public ShopkeeperTicker(SKShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -96,9 +101,10 @@ public class ShopkeeperTicker {
 	}
 
 	public void onEnable() {
-		// Resetting the ticking group counter ensures that shopkeepers retain their ticking group across reloads (if
-		// there are no changes in the order of the loaded shopkeepers). This ensures that the particle colors of our
-		// tick visualization remain the same across reloads (avoids possible confusion for users).
+		// Resetting the ticking group counter ensures that shopkeepers retain their ticking group
+		// across reloads (if there are no changes in the order of the loaded shopkeepers). This
+		// ensures that the particle colors of our tick visualization remain the same across reloads
+		// (avoids possible confusion for users).
 		tickingGroupCounter.reset();
 		activeTickingGroup.setValue(0);
 
@@ -107,9 +113,10 @@ public class ShopkeeperTicker {
 	}
 
 	public void onDisable() {
-		// Usually, there should be no need to clean up the registered ticking shopkeepers here, since shopkeepers
-		// should stop their ticking automatically once they are deactivated. However, if the plugin is shut down during
-		// shopkeeper ticking, we can end up with still pending registration changes.
+		// Usually, there should be no need to clean up the registered ticking shopkeepers here,
+		// since shopkeepers should stop their ticking automatically once they are deactivated.
+		// However, if the plugin is shut down during shopkeeper ticking, we can end up with still
+		// pending registration changes.
 		if (currentlyTicking) {
 			// Reset:
 			currentlyTicking = false;
@@ -122,7 +129,9 @@ public class ShopkeeperTicker {
 	}
 
 	private void ensureEmpty() {
-		if (tickingGroups.stream().anyMatch(tickingGroup -> !tickingGroup.getShopkeepers().isEmpty())) {
+		boolean anyNonEmptyTickingGroup = tickingGroups.stream()
+				.anyMatch(tickingGroup -> !tickingGroup.getShopkeepers().isEmpty());
+		if (anyNonEmptyTickingGroup) {
 			Log.warning("Some ticking shopkeepers were not properly unregistered!");
 			tickingGroups.forEach(TickingGroup::clear);
 		}
@@ -134,7 +143,9 @@ public class ShopkeeperTicker {
 
 	private TickingGroup getTickingGroup(int tickingGroupIndex) {
 		assert tickingGroupIndex >= 0 && tickingGroupIndex < tickingGroups.size();
-		return tickingGroups.get(tickingGroupIndex);
+		TickingGroup tickingGroup = tickingGroups.get(tickingGroupIndex);
+		assert tickingGroup != null;
+		return tickingGroup;
 	}
 
 	private TickingGroup getTickingGroup(AbstractShopkeeper shopkeeper) {
@@ -254,8 +265,8 @@ public class ShopkeeperTicker {
 
 	private void tickShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		// Skip if the shopkeeper is no longer ticking (e.g. if it got removed or deactivated while it was pending to be
-		// ticked):
+		// Skip if the shopkeeper is no longer ticking (e.g. if it got removed or deactivated while
+		// it was pending to be ticked):
 		if (!shopkeeper.isTicking()) return;
 
 		// Tick the shopkeeper:

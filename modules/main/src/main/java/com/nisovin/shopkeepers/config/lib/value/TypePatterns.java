@@ -3,6 +3,9 @@ package com.nisovin.shopkeepers.config.lib.value;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class TypePatterns {
@@ -59,29 +62,30 @@ public class TypePatterns {
 		}
 	}
 
-	public static TypePattern parameterized(Class<?> clazz, TypePattern... typeParameters) {
+	public static TypePattern parameterized(
+			Class<?> clazz,
+			@NonNull TypePattern... typeParameters
+	) {
 		return new ParameterizedTypePattern(clazz, typeParameters);
 	}
 
-	public static TypePattern parameterized(Class<?> clazz, Class<?>... typeParameters) {
-		TypePattern[] typePatterns = null;
-		if (typeParameters != null) {
-			typePatterns = new TypePattern[typeParameters.length];
-			for (int i = 0; i < typeParameters.length; ++i) {
-				Class<?> typeParameter = typeParameters[i];
-				Validate.notNull(typeParameter, "typeParameters contains null");
-				typePatterns[i] = TypePatterns.forClass(typeParameter);
-			}
+	public static TypePattern parameterized(Class<?> clazz, @NonNull Class<?>... typeParameters) {
+		Validate.notNull(typeParameters, "typeParameters is null");
+		TypePattern[] typePatterns = new TypePattern[typeParameters.length];
+		for (int i = 0; i < typeParameters.length; ++i) {
+			Class<?> typeParameter = typeParameters[i];
+			Validate.notNull(typeParameter, "typeParameters contains null");
+			typePatterns[i] = TypePatterns.forClass(typeParameter);
 		}
-		// This results in an IllegalArgumentException if typeParameters is null:
-		return parameterized(clazz, typePatterns);
+		// This results in an IllegalArgumentException if typeParameters/typePatterns is null:
+		return parameterized(clazz, Unsafe.<@NonNull TypePattern @NonNull []>cast(typePatterns));
 	}
 
 	private static class ParameterizedTypePattern extends ClassTypePattern {
 
-		private final TypePattern[] typeParameters; // Not null
+		private final @NonNull TypePattern[] typeParameters; // Not null
 
-		public ParameterizedTypePattern(Class<?> clazz, TypePattern... typeParameters) {
+		public ParameterizedTypePattern(Class<?> clazz, @NonNull TypePattern... typeParameters) {
 			super(clazz);
 			Validate.notNull(typeParameters, "typeParameters is null");
 			Validate.isTrue(typeParameters.length > 0, "typeParameters is empty");
@@ -94,12 +98,13 @@ public class TypePatterns {
 			if (!(type instanceof ParameterizedType)) {
 				return false;
 			}
-			Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
-			if (typeArguments == null || typeArguments.length != this.typeParameters.length) {
+			@NonNull Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+			assert typeArguments != null;
+			if (typeArguments.length != typeParameters.length) {
 				return false;
 			}
 			for (int i = 0; i < typeParameters.length; ++i) {
-				if (!this.typeParameters[i].matches(typeArguments[i])) {
+				if (!typeParameters[i].matches(typeArguments[i])) {
 					return false;
 				}
 			}

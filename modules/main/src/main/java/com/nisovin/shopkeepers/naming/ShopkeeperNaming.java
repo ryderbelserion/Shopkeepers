@@ -66,37 +66,37 @@ public class ShopkeeperNaming {
 		if (!shopkeeper.isValid()) return false;
 
 		// Prepare the new name:
-		newName = newName.trim();
+		String preparedName = newName.trim();
 
 		// Update name:
-		if (newName.isEmpty() || newName.equals("-")) {
+		if (preparedName.isEmpty() || preparedName.equals("-")) {
 			// Remove name:
-			newName = "";
+			preparedName = "";
 		} else {
 			// Validate name:
-			if (!((AbstractShopkeeper) shopkeeper).isValidName(newName)) {
-				String newNameFinal = newName;
+			if (!((AbstractShopkeeper) shopkeeper).isValidName(preparedName)) {
+				String newNameFinal = preparedName;
 				Log.debug(() -> shopkeeper.getLogPrefix() + "Player " + player.getName()
 						+ " tried to set an invalid name: '" + newNameFinal + "'");
-				TextUtils.sendMessage(player, Messages.nameInvalid, "name", newName);
+				TextUtils.sendMessage(player, Messages.nameInvalid, "name", preparedName);
 				return false;
 			}
 		}
 
 		// Apply the new name:
 		String oldName = shopkeeper.getName();
-		shopkeeper.setName(newName);
+		shopkeeper.setName(preparedName);
 		// Get the actual new name that has been set, in case the shopkeeper modified it:
-		newName = shopkeeper.getName();
+		String actualNewName = shopkeeper.getName();
 
 		// Compare the new name to the previous name:
-		if (oldName.equals(newName)) {
-			TextUtils.sendMessage(player, Messages.nameHasNotChanged, "name", newName);
+		if (oldName.equals(actualNewName)) {
+			TextUtils.sendMessage(player, Messages.nameHasNotChanged, "name", actualNewName);
 			return false;
 		}
 
 		// Inform player:
-		TextUtils.sendMessage(player, Messages.nameSet, "name", newName);
+		TextUtils.sendMessage(player, Messages.nameSet, "name", actualNewName);
 
 		// Close all open windows:
 		shopkeeper.abortUISessionsDelayed(); // TODO Really needed?
@@ -106,7 +106,6 @@ public class ShopkeeperNaming {
 
 		// Save:
 		shopkeeper.save();
-
 		return true;
 	}
 }

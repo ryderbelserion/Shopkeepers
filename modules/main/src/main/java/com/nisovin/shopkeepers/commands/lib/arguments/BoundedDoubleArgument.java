@@ -21,7 +21,11 @@ public class BoundedDoubleArgument extends DoubleArgument {
 	// TODO More descriptive error messages
 
 	@Override
-	public Double parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public Double parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		Double value = super.parseValue(input, context, argsReader);
 		assert value != null;
 		if (value < min || value > max) {

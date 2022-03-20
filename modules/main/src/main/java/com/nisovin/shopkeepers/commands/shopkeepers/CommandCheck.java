@@ -14,9 +14,11 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
@@ -80,7 +82,8 @@ class CommandCheck extends Command {
 		LivingEntityAI livingEntityAI = plugin.getLivingShops().getLivingEntityAI();
 
 		int totalChunksWithShopkeepers = shopkeeperRegistry.getWorldsWithShopkeepers().stream()
-				.map(worldName -> shopkeeperRegistry.getShopkeepersByChunks(worldName))
+				// TODO Explicit type: Workaround for a limitation of CheckerFramework
+				.<@NonNull Map<?, ?>>map(worldName -> shopkeeperRegistry.getShopkeepersByChunks(worldName))
 				.mapToInt(byChunk -> byChunk.size())
 				.sum();
 
@@ -113,26 +116,30 @@ class CommandCheck extends Command {
 
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();
-		sender.sendMessage("  Total AI timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
+		sender.sendMessage("  Total AI timings (per " + Settings.mobBehaviorTickPeriod
+				+ " ticks) (avg | max): "
 				+ TextUtils.format(avgTotalAITimings) + " ms"
 				+ " | " + TextUtils.format(maxTotalAITiming) + " ms");
 
 		// Note: These are per activation, which happens only every 20 ticks (not per tick).
 		double avgAIActivationTimings = livingEntityAI.getActivationTimings().getAverageTimeMillis();
 		double maxAIActivationTiming = livingEntityAI.getActivationTimings().getMaxTimeMillis();
-		sender.sendMessage("    AI activation timings (per " + LivingEntityAI.AI_ACTIVATION_TICK_RATE + " ticks) (avg | max): "
+		sender.sendMessage("    AI activation timings (per "
+				+ LivingEntityAI.AI_ACTIVATION_TICK_RATE + " ticks) (avg | max): "
 				+ TextUtils.format(avgAIActivationTimings) + " ms"
 				+ " | " + TextUtils.format(maxAIActivationTiming) + " ms");
 
 		double avgGravityTimings = livingEntityAI.getGravityTimings().getAverageTimeMillis();
 		double maxGravityTiming = livingEntityAI.getGravityTimings().getMaxTimeMillis();
-		sender.sendMessage("    Gravity timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
+		sender.sendMessage("    Gravity timings (per " + Settings.mobBehaviorTickPeriod
+				+ " ticks) (avg | max): "
 				+ TextUtils.format(avgGravityTimings) + " ms"
 				+ " | " + TextUtils.format(maxGravityTiming) + " ms");
 
 		double avgAITimings = livingEntityAI.getAITimings().getAverageTimeMillis();
 		double maxAITiming = livingEntityAI.getAITimings().getMaxTimeMillis();
-		sender.sendMessage("    AI timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
+		sender.sendMessage("    AI timings (per " + Settings.mobBehaviorTickPeriod
+				+ " ticks) (avg | max): "
 				+ TextUtils.format(avgAITimings) + " ms"
 				+ " | " + TextUtils.format(maxAITiming) + " ms");
 
@@ -163,8 +170,8 @@ class CommandCheck extends Command {
 			int worldLoadedChunksWithShopkeepers = 0;
 			int worldShopkeepersInLoadedChunks = 0;
 
-			Map<ChunkCoords, ? extends Collection<? extends Shopkeeper>> shopkeepersByChunks = shopkeeperRegistry.getShopkeepersByChunks(worldName);
-			for (Entry<ChunkCoords, ? extends Collection<? extends Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
+			Map<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> shopkeepersByChunks = shopkeeperRegistry.getShopkeepersByChunks(worldName);
+			for (Entry<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
 				ChunkCoords chunkCoords = chunkEntry.getKey();
 				Collection<? extends Shopkeeper> chunkShopkeepers = chunkEntry.getValue();
 
@@ -173,30 +180,36 @@ class CommandCheck extends Command {
 					worldLoadedChunksWithShopkeepers++;
 					worldShopkeepersInLoadedChunks += chunkShopkeepers.size();
 				}
-
 			}
 
 			sender.sendMessage(ChatColor.YELLOW + "Shopkeepers in world '" + world.getName() + "':");
 			sender.sendMessage("  Total: " + worldTotalShopkeepers);
-			sender.sendMessage("  Entities | invalid | dead: " + worldEntities.size() + " | " + worldInvalidEntities + " | " + worldDeadEntities);
-			sender.sendMessage("  Entities in chunks (invalid | dead): " + worldInvalidEntitiesInChunks + " | " + worldDeadEntitiesInChunks);
+			sender.sendMessage("  Entities | invalid | dead: " + worldEntities.size() + " | "
+					+ worldInvalidEntities + " | " + worldDeadEntities);
+			sender.sendMessage("  Entities in chunks (invalid | dead): "
+					+ worldInvalidEntitiesInChunks + " | " + worldDeadEntitiesInChunks);
 			sender.sendMessage("  Loaded chunks: " + worldLoadedChunks.length);
 			if (worldTotalShopkeepers > 0) {
-				sender.sendMessage("  Chunks with shopkeepers | loaded | active: " + worldChunksWithShopkeepers + " | " + worldLoadedChunksWithShopkeepers + " | " + worldActiveChunks);
-				sender.sendMessage("  Shopkeepers in chunks (loaded | active): " + worldShopkeepersInLoadedChunks + " | " + worldShopkeepersInActiveChunks);
+				sender.sendMessage("  Chunks with shopkeepers | loaded | active: "
+						+ worldChunksWithShopkeepers + " | " + worldLoadedChunksWithShopkeepers
+						+ " | " + worldActiveChunks);
+				sender.sendMessage("  Shopkeepers in chunks (loaded | active): "
+						+ worldShopkeepersInLoadedChunks + " | " + worldShopkeepersInActiveChunks);
 			}
 
 			// List all chunks containing shopkeepers:
 			if (isConsole && listChunks && worldTotalShopkeepers > 0) {
 				sender.sendMessage("  Listing of all chunks with shopkeepers:");
 				int line = 0;
-				for (Entry<ChunkCoords, ? extends Collection<? extends Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
+				for (Entry<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
 					ChunkCoords chunkCoords = chunkEntry.getKey();
 					Collection<? extends Shopkeeper> chunkShopkeepers = chunkEntry.getValue();
 
 					line++;
 					ChatColor lineColor = (line % 2 == 0 ? ChatColor.WHITE : ChatColor.GRAY);
-					sender.sendMessage("    (" + lineColor + chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ() + ChatColor.RESET + ") ["
+					sender.sendMessage("    (" + lineColor
+							+ chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ()
+							+ ChatColor.RESET + ") ["
 							+ (chunkCoords.isChunkLoaded() ? ChatColor.GREEN + "loaded" : ChatColor.DARK_GRAY + "unloaded")
 							+ ChatColor.RESET + " | "
 							+ (shopkeeperRegistry.isChunkActive(chunkCoords) ? ChatColor.GREEN + "active" : ChatColor.DARK_GRAY + "inactive")
@@ -211,9 +224,9 @@ class CommandCheck extends Command {
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getActiveShopkeepers()) {
 				ShopObject shopObject = shopkeeper.getShopObject();
 				if (shopObject.isActive()) {
-					Location location = shopObject.getLocation();
-					assert location != null;
-					sender.sendMessage(shopkeeper.getLocatedLogPrefix() + "Active (" + TextUtils.getLocationString(location) + ")");
+					Location location = Unsafe.assertNonNull(shopObject.getLocation());
+					sender.sendMessage(shopkeeper.getLocatedLogPrefix() + "Active ("
+							+ TextUtils.getLocationString(location) + ")");
 				} else {
 					sender.sendMessage(shopkeeper.getLocatedLogPrefix() + "INACTIVE");
 				}

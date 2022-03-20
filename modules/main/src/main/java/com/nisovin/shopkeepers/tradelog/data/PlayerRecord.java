@@ -3,14 +3,16 @@ package com.nisovin.shopkeepers.tradelog.data;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * An immutable snapshot of the general information about a player.
  * <p>
- * This information is not necessarily up-to-date, but represents the player's information at a certain point in time
- * (e.g. the name might not match the player's current name).
+ * This information is not necessarily up-to-date, but represents the player's information at a
+ * certain point in time (e.g. the name might not match the player's current name).
  */
 public class PlayerRecord {
 
@@ -23,7 +25,7 @@ public class PlayerRecord {
 	 */
 	public static PlayerRecord of(Player player) {
 		Validate.notNull(player, "player is null");
-		return of(player.getUniqueId(), player.getName());
+		return of(player.getUniqueId(), Unsafe.assertNonNull(player.getName()));
 	}
 
 	/**
@@ -97,7 +99,7 @@ public class PlayerRecord {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (!(obj instanceof PlayerRecord)) return false;

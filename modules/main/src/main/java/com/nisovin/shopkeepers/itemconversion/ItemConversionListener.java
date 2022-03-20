@@ -22,14 +22,16 @@ public class ItemConversionListener implements Listener {
 		ItemConversions.convertAffectedItems(player, shopkeeper, true);
 	}
 
-	// Notes regarding converting items on more circumstances with the goal of fixing item stacking issues:
-	// - We cannot use InventoryOpenEvent here because this does not get triggered for when a player opens his own
-	// inventory (this is client side only).
-	// - It is also not possible to catch all situations in which a player can receive an item (consider for example
-	// other plugins or commands directly adding items to the player's inventory).
-	// - The item conversion is not cheap performance wise. We therefore don't want to run it too frequently or under
-	// too many circumstances.
+	// Notes regarding converting items on more circumstances with the goal of fixing item stacking
+	// issues:
+	// - We cannot use InventoryOpenEvent here because this does not get triggered for when a player
+	// opens his own inventory (this is client side only).
+	// - It is also not possible to catch all situations in which a player can receive an item
+	// (consider for example other plugins or commands directly adding items to the player's
+	// inventory).
+	// - The item conversion is not cheap performance wise. We therefore don't want to run it too
+	// frequently or under too many circumstances.
 	//
-	// We therefore don't even attempt to achieve fixing item stacking related issues and instead limit ourselves to
-	// issues related to shopkeeper trading.
+	// We therefore don't even attempt to achieve fixing item stacking related issues and instead
+	// limit ourselves to issues related to shopkeeper trading.
 }

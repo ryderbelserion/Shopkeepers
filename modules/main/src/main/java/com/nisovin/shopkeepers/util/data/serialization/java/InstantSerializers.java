@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -18,9 +21,9 @@ public final class InstantSerializers {
 	 * <p>
 	 * This uses {@link DateTimeFormatter#ISO_INSTANT} to represent and reconstruct the instant.
 	 */
-	public static final DataSerializer<Instant> ISO = new DataSerializer<Instant>() {
+	public static final DataSerializer<@NonNull Instant> ISO = new DataSerializer<@NonNull Instant>() {
 		@Override
-		public Object serialize(Instant value) {
+		public @Nullable Object serialize(Instant value) {
 			Validate.notNull(value, "value is null");
 			return value.toString();
 		}
@@ -31,7 +34,8 @@ public final class InstantSerializers {
 			try {
 				return Instant.parse(instantString);
 			} catch (DateTimeParseException e) {
-				throw new InvalidDataException("Failed to parse timestamp from '" + instantString + "'!", e);
+				throw new InvalidDataException("Failed to parse timestamp from '"
+						+ instantString + "'!", e);
 			}
 		}
 	};

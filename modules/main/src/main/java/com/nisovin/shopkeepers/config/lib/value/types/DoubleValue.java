@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
-public class DoubleValue extends ValueType<Double> {
+public class DoubleValue extends ValueType<@NonNull Double> {
 
 	public static final DoubleValue INSTANCE = new DoubleValue();
 
@@ -13,7 +16,7 @@ public class DoubleValue extends ValueType<Double> {
 	}
 
 	@Override
-	public Double load(Object configValue) throws ValueLoadException {
+	public @Nullable Double load(@Nullable Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		Double value = ConversionUtils.toDouble(configValue);
 		if (value == null) {
@@ -23,7 +26,7 @@ public class DoubleValue extends ValueType<Double> {
 	}
 
 	@Override
-	public Object save(Double value) {
+	public @Nullable Object save(@Nullable Double value) {
 		return value;
 	}
 

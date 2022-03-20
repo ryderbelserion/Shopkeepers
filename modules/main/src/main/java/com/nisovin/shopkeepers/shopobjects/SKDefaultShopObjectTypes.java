@@ -3,13 +3,15 @@ package com.nisovin.shopkeepers.shopobjects;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObjectType;
 
-public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
+public final class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
 	// TODO Maybe change object type permissions to 'shopkeeper.object.<type>'?
 
@@ -20,8 +22,8 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	}
 
 	@Override
-	public List<AbstractShopObjectType<?>> getAll() {
-		List<AbstractShopObjectType<?>> shopObjectTypes = new ArrayList<>();
+	public List<? extends @NonNull AbstractShopObjectType<?>> getAll() {
+		List<@NonNull AbstractShopObjectType<?>> shopObjectTypes = new ArrayList<>();
 		shopObjectTypes.addAll(this.getLivingShopObjectTypes().getAll());
 		shopObjectTypes.add(this.getSignShopObjectType());
 		shopObjectTypes.add(this.getCitizensShopObjectType());

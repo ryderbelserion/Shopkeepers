@@ -16,8 +16,12 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -39,22 +43,22 @@ import com.nisovin.shopkeepers.util.timer.Timings;
 public class ShopkeeperChunkActivator {
 
 	/**
-	 * Spawning shopkeepers is relatively costly performance-wise. In order to not spawn shopkeepers for chunks that are
-	 * only loaded briefly, we defer the activation of chunks by this amount of ticks. This also accounts for players
-	 * who frequently cross chunk boundaries back and forth.
+	 * Spawning shopkeepers is relatively costly performance-wise. In order to not spawn shopkeepers
+	 * for chunks that are only loaded briefly, we defer the activation of chunks by this amount of
+	 * ticks. This also accounts for players who frequently cross chunk boundaries back and forth.
 	 */
 	private static final long CHUNK_ACTIVATION_DELAY_TICKS = 20;
 	/**
-	 * The radius in chunks around the player that we immediately activate when a player freshly joins, or teleports. A
-	 * radius of {@code zero} only activates the player's own chunk.
+	 * The radius in chunks around the player that we immediately activate when a player freshly
+	 * joins, or teleports. A radius of {@code zero} only activates the player's own chunk.
 	 * <p>
-	 * The actually used radius is the minimum of this setting and the server's {@link Server#getViewDistance() view
-	 * distance}.
+	 * The actually used radius is the minimum of this setting and the server's
+	 * {@link Server#getViewDistance() view distance}.
 	 */
 	private static final int IMMEDIATE_CHUNK_ACTIVATION_RADIUS = 2;
 
-	private static final Predicate<AbstractShopkeeper> SHOPKEEPER_IS_ACTIVE = AbstractShopkeeper::isActive;
-	private static final Predicate<AbstractShopkeeper> SHOPKEEPER_IS_INACTIVE = SHOPKEEPER_IS_ACTIVE.negate();
+	private static final Predicate<@NonNull AbstractShopkeeper> SHOPKEEPER_IS_ACTIVE = AbstractShopkeeper::isActive;
+	private static final Predicate<@NonNull AbstractShopkeeper> SHOPKEEPER_IS_INACTIVE = Unsafe.assertNonNull(SHOPKEEPER_IS_ACTIVE.negate());
 
 	private static final Location sharedLocation = new Location(null, 0, 0, 0);
 	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
@@ -63,21 +67,26 @@ public class ShopkeeperChunkActivator {
 	private final SKShopkeeperRegistry shopkeeperRegistry;
 	private final ShopkeeperTicker shopkeeperTicker;
 	private final ShopkeeperSpawner shopkeeperSpawner;
-	private final ChunkActivationListener listener = new ChunkActivationListener(this);
+	private final ChunkActivationListener listener = new ChunkActivationListener(Unsafe.initialized(this));
 
-	private final Map<ChunkCoords, ChunkData> chunks = new HashMap<>();
+	private final Map<@NonNull ChunkCoords, @NonNull ChunkData> chunks = new HashMap<>();
 
 	private boolean chunkActivationInProgress = false;
-	// This does not consider pending delayed chunk activation tasks, but only tracks actual activation requests while
-	// another chunk activation is in progress. The queue is expected to usually not contain many elements, so removing
-	// elements from the middle of the ArrayDeque should be sufficiently fast.
-	private final Queue<ChunkData> deferredChunkActivations = new ArrayDeque<>();
+	// This does not consider pending delayed chunk activation tasks, but only tracks actual
+	// activation requests while another chunk activation is in progress. The queue is expected to
+	// usually not contain many elements, so removing elements from the middle of the ArrayDeque
+	// should be sufficiently fast.
+	private final Queue<@NonNull ChunkData> deferredChunkActivations = new ArrayDeque<>();
 
 	private final Timer chunkActivationTimings = new Timer();
 	private int immediateChunkActivationRadius;
 
-	public ShopkeeperChunkActivator(SKShopkeepersPlugin plugin, SKShopkeeperRegistry shopkeeperRegistry,
-									ShopkeeperTicker shopkeeperTicker, ShopkeeperSpawner shopkeeperSpawner) {
+	public ShopkeeperChunkActivator(
+			SKShopkeepersPlugin plugin,
+			SKShopkeeperRegistry shopkeeperRegistry,
+			ShopkeeperTicker shopkeeperTicker,
+			ShopkeeperSpawner shopkeeperSpawner
+	) {
 		Validate.notNull(plugin, "plugin is null");
 		Validate.notNull(shopkeeperRegistry, "shopkeeperRegistry is null");
 		Validate.notNull(shopkeeperTicker, "shopkeeperTicker is null");
@@ -90,7 +99,10 @@ public class ShopkeeperChunkActivator {
 
 	public void onEnable() {
 		// Determine the immediate chunk activation radius:
-		immediateChunkActivationRadius = Math.min(IMMEDIATE_CHUNK_ACTIVATION_RADIUS, Bukkit.getViewDistance());
+		immediateChunkActivationRadius = Math.min(
+				IMMEDIATE_CHUNK_ACTIVATION_RADIUS,
+				Bukkit.getViewDistance()
+		);
 
 		Bukkit.getPluginManager().registerEvents(listener, plugin);
 	}
@@ -114,29 +126,32 @@ public class ShopkeeperChunkActivator {
 
 	// DATA
 
-	private ChunkData getChunkData(Chunk chunk) {
+	private @Nullable ChunkData getChunkData(Chunk chunk) {
 		assert chunk != null;
 		sharedChunkCoords.set(chunk);
 		return this.getChunkData(sharedChunkCoords);
 	}
 
-	private ChunkData getChunkData(String worldName, int chunkX, int chunkZ) {
+	private @Nullable ChunkData getChunkData(String worldName, int chunkX, int chunkZ) {
 		sharedChunkCoords.set(worldName, chunkX, chunkZ);
 		return this.getChunkData(sharedChunkCoords);
 	}
 
-	// Returns null if there is no data for the specified chunk, i.e. if there are no shopkeepers in this chunk.
-	private ChunkData getChunkData(ChunkCoords chunkCoords) {
+	// Returns null if there is no data for the specified chunk, i.e. if there are no shopkeepers in
+	// this chunk.
+	private @Nullable ChunkData getChunkData(ChunkCoords chunkCoords) {
 		assert chunkCoords != null;
 		return chunks.get(chunkCoords);
 	}
 
 	private ChunkData getOrCreateChunkData(ChunkCoords chunkCoords) {
 		assert chunkCoords != null;
-		return chunks.computeIfAbsent(chunkCoords, ChunkData::new);
+		ChunkData chunkData = chunks.computeIfAbsent(chunkCoords, ChunkData::new);
+		assert chunkData != null;
+		return chunkData;
 	}
 
-	private ChunkData removeChunkData(ChunkCoords chunkCoords) {
+	private @Nullable ChunkData removeChunkData(ChunkCoords chunkCoords) {
 		assert chunkCoords != null;
 		ChunkData chunkData = chunks.remove(chunkCoords);
 		if (chunkData != null) {
@@ -148,7 +163,8 @@ public class ShopkeeperChunkActivator {
 
 	// DATA SETUP
 
-	// Called by SKShopkeeperRegistry when a shopkeeper has been added to a new (previously empty) chunk.
+	// Called by SKShopkeeperRegistry when a shopkeeper has been added to a new (previously empty)
+	// chunk.
 	public void onShopkeeperChunkAdded(ChunkCoords chunkCoords) {
 		assert chunkCoords != null;
 		this.getOrCreateChunkData(chunkCoords);
@@ -157,22 +173,22 @@ public class ShopkeeperChunkActivator {
 	// Called by SKShopkeeperRegistry when the last shopkeeper has been removed from a chunk.
 	public void onShopkeeperChunkRemoved(ChunkCoords chunkCoords) {
 		assert chunkCoords != null;
-		// Note: We expect that the chunk data exists, i.e. that it has previously been set up immediately when the
-		// first shopkeeper was added to the chunk.
+		// Note: We expect that the chunk data exists, i.e. that it has previously been set up
+		// immediately when the first shopkeeper was added to the chunk.
 		this.removeChunkData(chunkCoords);
 	}
 
 	// SHOPKEEPER ACTIVATION
 
-	// Called when the shopkeeper has been added to a chunk, either because the shopkeeper has been newly added to the
-	// shopkeeper registry, or because it has been moved from one chunk to another.
+	// Called when the shopkeeper has been added to a chunk, either because the shopkeeper has been
+	// newly added to the shopkeeper registry, or because it has been moved from one chunk to
+	// another.
 	// This updates the shopkeeper's activation state to match its new chunk.
 	public void checkShopkeeperActivation(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		assert !shopkeeper.isVirtual();
-		ChunkCoords chunkCoords = shopkeeper.getLastChunkCoords();
-		ChunkData chunkData = this.getChunkData(chunkCoords);
-		assert chunkData != null;
+		ChunkCoords chunkCoords = Unsafe.assertNonNull(shopkeeper.getLastChunkCoords());
+		ChunkData chunkData = Unsafe.assertNonNull(this.getChunkData(chunkCoords));
 		if (chunkData.isActive()) {
 			this.activateShopkeeper(shopkeeper);
 		} else {
@@ -184,7 +200,8 @@ public class ShopkeeperChunkActivator {
 		assert shopkeeper != null;
 		assert !shopkeeper.isVirtual();
 		// We expect this to be called after the chunk data has been added:
-		assert this.getChunkData(shopkeeper.getLastChunkCoords()) != null;
+		assert shopkeeper.getLastChunkCoords() != null;
+		assert this.getChunkData(Unsafe.assertNonNull(shopkeeper.getLastChunkCoords())) != null;
 
 		if (shopkeeper.isActive()) return; // Already active
 
@@ -206,7 +223,8 @@ public class ShopkeeperChunkActivator {
 		assert shopkeeper != null;
 		assert !shopkeeper.isVirtual();
 		// We expect this to be called before the chunk data is removed:
-		assert this.getChunkData(shopkeeper.getLastChunkCoords()) != null;
+		assert shopkeeper.getLastChunkCoords() != null;
+		assert this.getChunkData(Unsafe.assertNonNull(shopkeeper.getLastChunkCoords())) != null;
 
 		if (!shopkeeper.isActive()) return; // Already inactive
 
@@ -254,16 +272,19 @@ public class ShopkeeperChunkActivator {
 		ChunkData chunkData = this.getChunkData(chunk);
 		if (chunkData == null) return; // There are no shopkeepers in this chunk
 
-		// The chunk is not expected to already be active or pending delayed activation (assuming that the server orders
-		// the chunk load and unload events consistently, and that we handle them correctly):
+		// The chunk is not expected to already be active or pending delayed activation (assuming
+		// that the server orders the chunk load and unload events consistently, and that we handle
+		// them correctly):
 		if (chunkData.isActive()) {
 			Log.debug(DebugOptions.shopkeeperActivation,
-					() -> "Detected chunk load for already active chunk: " + TextUtils.getChunkString(chunk)
+					() -> "Detected chunk load for already active chunk: "
+							+ TextUtils.getChunkString(chunk)
 			);
 			return;
 		} else if (chunkData.isActivationDelayed()) {
 			Log.debug(DebugOptions.shopkeeperActivation,
-					() -> "Detected chunk load for chunk with already delayed activation: " + TextUtils.getChunkString(chunk)
+					() -> "Detected chunk load for chunk with already delayed activation: "
+							+ TextUtils.getChunkString(chunk)
 			);
 			return;
 		}
@@ -283,7 +304,12 @@ public class ShopkeeperChunkActivator {
 
 		void start() {
 			assert !chunkData.isActive() && !chunkData.isActivationDelayed();
-			chunkData.setDelayedActivationTask(Bukkit.getScheduler().runTaskLater(plugin, this, CHUNK_ACTIVATION_DELAY_TICKS));
+			BukkitTask task = Bukkit.getScheduler().runTaskLater(
+					plugin,
+					this,
+					CHUNK_ACTIVATION_DELAY_TICKS
+			);
+			chunkData.setDelayedActivationTask(task);
 		}
 
 		@Override
@@ -318,7 +344,7 @@ public class ShopkeeperChunkActivator {
 	// Activates nearby chunks if they are currently pending a delayed activation:
 	private void activatePendingNearbyChunks(Player player) {
 		World world = player.getWorld();
-		Location location = player.getLocation(sharedLocation);
+		Location location = Unsafe.assertNonNull(player.getLocation(sharedLocation));
 		int chunkX = ChunkCoords.fromBlock(location.getBlockX());
 		int chunkZ = ChunkCoords.fromBlock(location.getBlockZ());
 		sharedLocation.setWorld(null); // Reset
@@ -326,7 +352,12 @@ public class ShopkeeperChunkActivator {
 	}
 
 	// Activates nearby chunks if they are currently pending a delayed activation:
-	private void activatePendingNearbyChunks(World world, int centerChunkX, int centerChunkZ, int chunkRadius) {
+	private void activatePendingNearbyChunks(
+			World world,
+			int centerChunkX,
+			int centerChunkZ,
+			int chunkRadius
+	) {
 		assert world != null && chunkRadius >= 0;
 		String worldName = world.getName();
 		int minChunkX = centerChunkX - chunkRadius;
@@ -353,8 +384,8 @@ public class ShopkeeperChunkActivator {
 	// This also reset's the chunk's 'should-be-active' state.
 	private void cancelDeferredActivation(ChunkData chunkData) {
 		assert chunkData != null;
-		// Minor optimization: If the chunk is not marked as 'should-be-active', we can assume that it is not pending a
-		// deferred activation.
+		// Minor optimization: If the chunk is not marked as 'should-be-active', we can assume that
+		// it is not pending a deferred activation.
 		if (chunkData.isShouldBeActive()) {
 			chunkData.setShouldBeActive(false);
 			deferredChunkActivations.remove(chunkData);
@@ -381,9 +412,10 @@ public class ShopkeeperChunkActivator {
 		if (chunkActivationInProgress) {
 			if (oldShouldBeActive) {
 				// The chunk is already about to be activated.
-				// Note: This does not necessarily indicate that the chunk is inside the deferredChunkActivations queue
-				// (e.g. when multiple chunks are activated in a single batch, they are all marked as
-				// 'should-be-active', but not added to the deferred chunk activations queue).
+				// Note: This does not necessarily indicate that the chunk is inside the
+				// deferredChunkActivations queue (e.g. when multiple chunks are activated in a
+				// single batch, they are all marked as 'should-be-active', but not added to the
+				// deferred chunk activations queue).
 				Log.debug(DebugOptions.shopkeeperActivation,
 						() -> "Ignoring activation request of chunk " + chunkCoords
 								+ ": The chunk is already pending activation.");
@@ -392,19 +424,20 @@ public class ShopkeeperChunkActivator {
 			assert !this.isActivationDeferred(chunkData);
 
 			Log.debug(DebugOptions.shopkeeperActivation,
-					() -> "Another chunk activation is already in progress. Deferring activation of chunk "
-							+ chunkCoords);
+					() -> "Another chunk activation is already in progress. "
+							+ "Deferring activation of chunk " + chunkCoords);
 			deferredChunkActivations.add(chunkData);
 			return;
 		}
-		// Deferred chunk activations can only be observed while another chunk activation is already in progress.
+		// Deferred chunk activations can only be observed while another chunk activation is already
+		// in progress.
 		assert !this.isActivationDeferred(chunkData);
 
 		chunkActivationInProgress = true;
 		chunkActivationTimings.start();
 
 		// Get the chunk shopkeepers:
-		Collection<? extends AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
+		Collection<? extends @NonNull AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
 
 		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Activating " + shopkeepers.size() + " shopkeepers in chunk "
@@ -429,9 +462,9 @@ public class ShopkeeperChunkActivator {
 					continue;
 				}
 
-				// Note: Even if the shopkeeper has changed its chunk in the meantime, we still need to complete its
-				// activation, because no one else does (we have already set its activation state earlier, so everyone
-				// else assumes that it is already active).
+				// Note: Even if the shopkeeper has changed its chunk in the meantime, we still need
+				// to complete its activation, because no one else does (we have already set its
+				// activation state earlier, so everyone else assumes that it is already active).
 
 				// Start ticking the shopkeepers:
 				shopkeeperTicker.startTicking(shopkeeper);
@@ -443,9 +476,15 @@ public class ShopkeeperChunkActivator {
 			}
 
 			// Spawn the shopkeepers that are still marked as active:
-			// In order to avoid spawning lots of shopkeepers at the same time, we don't actually spawn the shopkeepers
-			// immediately, but add them to the spawn queue instead.
-			shopkeeperSpawner.spawnChunkShopkeepers(chunkCoords, "activation", shopkeepers, SHOPKEEPER_IS_ACTIVE, false);
+			// In order to avoid spawning lots of shopkeepers at the same time, we don't actually
+			// spawn the shopkeepers immediately, but add them to the spawn queue instead.
+			shopkeeperSpawner.spawnChunkShopkeepers(
+					chunkCoords,
+					"activation",
+					shopkeepers,
+					SHOPKEEPER_IS_ACTIVE,
+					false
+			);
 		} finally {
 			chunkActivationTimings.stop();
 			chunkActivationInProgress = false;
@@ -481,8 +520,8 @@ public class ShopkeeperChunkActivator {
 			// The chunk is already inactive.
 			// Cancel any pending activations for the chunk:
 			// Note: This needs access to the chunk's previous 'should-be-active' state.
-			// This also resets the chunk's 'should-be-active' state, even if it is not pending a deferred chunk
-			// activation.
+			// This also resets the chunk's 'should-be-active' state, even if it is not pending a
+			// deferred chunk activation.
 			this.cancelDeferredActivation(chunkData);
 			chunkData.cancelDelayedActivation();
 			return;
@@ -495,7 +534,7 @@ public class ShopkeeperChunkActivator {
 		chunkData.setActive(false);
 
 		// Get the chunk shopkeepers:
-		Collection<? extends AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
+		Collection<? extends @NonNull AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
 
 		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Deactivating " + shopkeepers.size() + " shopkeepers in chunk "
@@ -516,9 +555,9 @@ public class ShopkeeperChunkActivator {
 				continue;
 			}
 
-			// Note: Even if the shopkeeper has changed its chunk in the meantime, we still need to complete its
-			// deactivation, because no one else does (we have already set its activation state earlier, so everyone
-			// else assumes that it is already inactive).
+			// Note: Even if the shopkeeper has changed its chunk in the meantime, we still need to
+			// complete its deactivation, because no one else does (we have already set its
+			// activation state earlier, so everyone else assumes that it is already inactive).
 
 			// Stop ticking the shopkeeper:
 			shopkeeperTicker.stopTicking(shopkeeper);
@@ -530,19 +569,28 @@ public class ShopkeeperChunkActivator {
 		}
 
 		// Despawn the shopkeepers:
-		shopkeeperSpawner.despawnChunkShopkeepers(chunkCoords, "deactivation", shopkeepers, SHOPKEEPER_IS_INACTIVE, null);
+		shopkeeperSpawner.despawnChunkShopkeepers(
+				chunkCoords,
+				"deactivation",
+				shopkeepers,
+				SHOPKEEPER_IS_INACTIVE,
+				null
+		);
 	}
 
 	// WORLD LOAD
 
 	// Called by SKShopkeepersPlugin during enable.
-	// TODO This might not be needed, because chunk entries for loaded chunks are automatically marked as active when
-	// the first shopkeeper is added, and any shopkeepers added to an already active chunk are immediately activated.
-	// But this also logs summary debug messages about the activated shopkeepers. Maybe disable automatic activation
-	// when loading shopkeepers and then activate them all in bulk via this method?
+	// TODO This might not be needed, because chunk entries for loaded chunks are automatically
+	// marked as active when the first shopkeeper is added, and any shopkeepers added to an already
+	// active chunk are immediately activated.
+	// But this also logs summary debug messages about the activated shopkeepers. Maybe disable
+	// automatic activation when loading shopkeepers and then activate them all in bulk via this
+	// method?
 	public void activateShopkeepersInAllWorlds() {
 		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
-		Bukkit.getWorlds().forEach(this::activateChunks);
+		List<? extends @NonNull World> worlds = Unsafe.castNonNull(Bukkit.getWorlds());
+		worlds.forEach(this::activateChunks);
 	}
 
 	void onWorldLoad(World world) {
@@ -561,13 +609,15 @@ public class ShopkeeperChunkActivator {
 				() -> "Activating " + shopkeeperCount + " shopkeepers in world '" + worldName + "'"
 		);
 
-		// We need to iterate over a snapshot of these chunks, because the chunk map can change during iteration.
-		List<ChunkCoords> chunks = new ArrayList<>(shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet());
+		// We need to iterate over a snapshot of these chunks, because the chunk map can change
+		// during iteration.
+		List<? extends @NonNull ChunkCoords> chunks = new ArrayList<>(
+				shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet()
+		);
 
 		// First, mark the chunks as 'should-be-active':
 		chunks.forEach(chunkCoords -> {
-			ChunkData chunkData = this.getChunkData(chunkCoords);
-			assert chunkData != null;
+			ChunkData chunkData = Unsafe.assertNonNull(this.getChunkData(chunkCoords));
 			if (chunkData.needsActivation()) {
 				chunkData.setShouldBeActive(true);
 			}
@@ -591,7 +641,8 @@ public class ShopkeeperChunkActivator {
 	// Called by SKShopkeepersPlugin during disable, before the shopkeepers are unloaded.
 	public void deactivateShopkeepersInAllWorlds() {
 		// Deactivate (despawn) shopkeepers in all loaded worlds:
-		Bukkit.getWorlds().forEach(this::deactivateChunks);
+		List<? extends @NonNull World> worlds = Unsafe.castNonNull(Bukkit.getWorlds());
+		worlds.forEach(this::deactivateChunks);
 	}
 
 	void onWorldUnload(World world) {
@@ -609,13 +660,15 @@ public class ShopkeeperChunkActivator {
 				() -> "Deactivating " + shopkeeperCount + " shopkeepers in world '" + worldName + "'"
 		);
 
-		// We need to iterate over a snapshot of these chunks, because the chunk map can change during iteration.
-		List<ChunkCoords> chunks = new ArrayList<>(shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet());
+		// We need to iterate over a snapshot of these chunks, because the chunk map can change
+		// during iteration.
+		List<? extends @NonNull ChunkCoords> chunks = new ArrayList<>(
+				shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet()
+		);
 
 		// First, mark the chunks as 'should-be-inactive':
 		chunks.forEach(chunkCoords -> {
-			ChunkData chunkData = this.getChunkData(chunkCoords);
-			assert chunkData != null;
+			ChunkData chunkData = Unsafe.assertNonNull(this.getChunkData(chunkCoords));
 			chunkData.setShouldBeActive(false);
 		});
 

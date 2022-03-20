@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
@@ -48,12 +49,9 @@ class CommandSnapshotList extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		AbstractShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 		int page = context.get(ARGUMENT_PAGE);
 
-		List<? extends ShopkeeperSnapshot> snapshots = shopkeeper.getSnapshots();
-		assert snapshots != null;
-
+		List<? extends @NonNull ShopkeeperSnapshot> snapshots = shopkeeper.getSnapshots();
 		int snapshotsCount = snapshots.size();
 		int maxPage = Math.max(1, (int) Math.ceil((double) snapshotsCount / ENTRIES_PER_PAGE));
 		page = Math.max(1, Math.min(page, maxPage));
@@ -72,7 +70,9 @@ class CommandSnapshotList extends Command {
 			TextUtils.sendMessage(sender, Messages.snapshotListEntry,
 					"id", (index + 1),
 					"name", snapshot.getName(),
-					"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(snapshot.getTimestamp())
+					"timestamp", (Supplier<?>) () -> DerivedSettings.dateTimeFormatter.format(
+							snapshot.getTimestamp()
+					)
 			);
 		}
 	}

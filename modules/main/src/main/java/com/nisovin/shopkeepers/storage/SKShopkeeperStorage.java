@@ -17,9 +17,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
@@ -28,6 +31,7 @@ import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.SingletonTask;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
@@ -37,6 +41,7 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.FileUtils;
 import com.nisovin.shopkeepers.util.java.Retry;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.ThrowableUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.java.VoidCallable;
@@ -48,14 +53,16 @@ import com.nisovin.shopkeepers.util.logging.Log;
  * Implementation notes:
  * <ul>
  * <li>There can at most be one thread doing file IO at the same time.
- * <li>Saving preparation always happens on the server's main thread. At most one save can be prepared and processed at
- * the same time.
- * <li>If there is a request for another <b>async</b> save while an async save is already in progress, a flag is set to
- * indicate that another save needs to take place once the current async save completes.
- * <li>If there is a request for a <b>sync</b> save while an async save is already in progress, the main thread waits
- * for the async save to finish (or aborts it), before preparing the next save.
- * <li>It is not safe to externally edit the save file while the plugin is running, because the plugin might still store
- * unsaved shopkeeper data in memory or overwrite the save file with new contents at any time.
+ * <li>Saving preparation always happens on the server's main thread. At most one save can be
+ * prepared and processed at the same time.
+ * <li>If there is a request for another <b>async</b> save while an async save is already in
+ * progress, a flag is set to indicate that another save needs to take place once the current async
+ * save completes.
+ * <li>If there is a request for a <b>sync</b> save while an async save is already in progress, the
+ * main thread waits for the async save to finish (or aborts it), before preparing the next save.
+ * <li>It is not safe to externally edit the save file while the plugin is running, because the
+ * plugin might still store unsaved shopkeeper data in memory or overwrite the save file with new
+ * contents at any time.
  * </ul>
  */
 public class SKShopkeeperStorage implements ShopkeeperStorage {
@@ -66,8 +73,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private static final String DATA_VERSION_KEY = "data-version";
 
-	private static final String HEADER = "This file is not intended to be manually modified! If you want to manually edit this"
-			+ " file anyways, ensure that the server is not running currently and that you have prepared a backup of this file.";
+	private static final String HEADER = "This file is not intended to be manually modified! If you"
+			+ " want to manually edit this file anyways, ensure that the server is not running"
+			+ " currently and that you have prepared a backup of this file.";
 
 	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
 
@@ -93,39 +101,41 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private int nextShopkeeperId = 1;
 
 	/* Unsaved changes */
-	// Whether we got an explicit save request. This triggers a write to the save file, even if there have been no
-	// changes to the shopkeeper data itself.
+	// Whether we got an explicit save request. This triggers a write to the save file, even if
+	// there have been no changes to the shopkeeper data itself.
 	private boolean pendingSaveRequest = false;
-	// Shopkeepers that had changes to their data that we did not yet apply to the storage's memory. These shopkeepers
-	// may no longer be loaded. This does not include shopkeepers that were deleted. This Set is swapped with another,
-	// empty Set when the shopkeepers are saved, so that we can track the shopkeepers that are marked as dirty in the
-	// meantime.
-	private Set<AbstractShopkeeper> dirtyShopkeepers = new LinkedHashSet<>();
-	// Shopkeepers (their ids) whose data we transferred to the storage, but which we were not yet able to save to disk.
+	// Shopkeepers that had changes to their data that we did not yet apply to the storage's memory.
+	// These shopkeepers may no longer be loaded. This does not include shopkeepers that were
+	// deleted. This Set is swapped with another, empty Set when the shopkeepers are saved, so that
+	// we can track the shopkeepers that are marked as dirty in the meantime.
+	private Set<@NonNull AbstractShopkeeper> dirtyShopkeepers = new LinkedHashSet<>();
+	// Shopkeepers (their ids) whose data we transferred to the storage, but which we were not yet
+	// able to save to disk.
 	// This Set is not modified while a save is in progress.
-	private final Set<Integer> unsavedShopkeepers = new HashSet<>();
-	// Shopkeepers (their ids) that got deleted since the last save. The next save will remove their data from the save
-	// file. This Set is not modified while a save is in progress.
-	private final Set<Integer> unsavedDeletedShopkeepers = new HashSet<>();
-	// Shopkeepers that got deleted during the last async save. Their data is removed from memory after the current save
-	// completes, and removed from the save file by the subsequent save.
-	private final Set<AbstractShopkeeper> shopkeepersToDelete = new LinkedHashSet<>();
+	private final Set<@NonNull Integer> unsavedShopkeepers = new HashSet<>();
+	// Shopkeepers (their ids) that got deleted since the last save. The next save will remove their
+	// data from the save file. This Set is not modified while a save is in progress.
+	private final Set<@NonNull Integer> unsavedDeletedShopkeepers = new HashSet<>();
+	// Shopkeepers that got deleted during the last async save. Their data is removed from memory
+	// after the current save completes, and removed from the save file by the subsequent save.
+	private final Set<@NonNull AbstractShopkeeper> shopkeepersToDelete = new LinkedHashSet<>();
 
 	/* Loading */
 	private boolean currentlyLoading = false;
 
 	/* Saving */
 	private final SaveTask saveTask;
-	// Flag to (temporarily) turn off saving. This can for example be set if there is an issue with loading the
-	// shopkeeper data, so that the save file doesn't get overwritten by any subsequent save requests.
+	// Flag to (temporarily) turn off saving. This can for example be set if there is an issue with
+	// loading the shopkeeper data, so that the save file doesn't get overwritten by any subsequent
+	// save requests.
 	private boolean savingDisabled = false;
-	private BukkitTask delayedSaveTask = null;
+	private @Nullable BukkitTask delayedSaveTask = null;
 
 	public SKShopkeeperStorage(SKShopkeepersPlugin plugin) {
 		DataVersion.init();
 		this.plugin = plugin;
-		this.saveFile = this._getSaveFile();
-		this.tempSaveFile = this._getTempSaveFile();
+		this.saveFile = Unsafe.initialized(this)._getSaveFile();
+		this.tempSaveFile = Unsafe.initialized(this)._getTempSaveFile();
 		this.saveTask = new SaveTask(plugin);
 	}
 
@@ -134,20 +144,20 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	private Path _getDataFolder() {
-		return this.getPluginDataFolder().resolve(DATA_FOLDER);
+		return Unsafe.assertNonNull(this.getPluginDataFolder().resolve(DATA_FOLDER));
 	}
 
 	private Path _getSaveFile() {
-		return this._getDataFolder().resolve(SAVE_FILE_NAME);
+		return Unsafe.assertNonNull(this._getDataFolder().resolve(SAVE_FILE_NAME));
 	}
 
 	private Path _getTempSaveFile() {
-		return this._getSaveFile().resolveSibling(TEMP_SAVE_FILE_NAME);
+		return Unsafe.assertNonNull(this._getSaveFile().resolveSibling(TEMP_SAVE_FILE_NAME));
 	}
 
 	// Gets the path relative to the plugin data folder.
 	private Path pluginDataRelative(Path path) {
-		return this.getPluginDataFolder().relativize(path);
+		return Unsafe.assertNonNull(this.getPluginDataFolder().relativize(path));
 	}
 
 	public void onEnable() {
@@ -162,18 +172,22 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		this.saveIfDirtyAndAwaitCompletion();
 
 		// Verify that the storage is actually no longer dirty:
-		// We may run into this if the previous save failed, or if there is a bug. In either case, it might indicate
-		// that data has been lost.
+		// We may run into this if the previous save failed, or if there is a bug. In either case,
+		// it might indicate that data has been lost.
 		if (this.isDirty()) {
-			Log.warning("The shopkeeper storage is still dirty (pendingSaveRequest=" + pendingSaveRequest
-					+ ", dirtyShopkeepers=" + dirtyShopkeepers.size() + ", unsavedShopkeepers=" + unsavedShopkeepers.size()
-					+ ", unsavedDeletedShopkeepers=" + unsavedDeletedShopkeepers.size() + ", shopkeepersToDelete=" + shopkeepersToDelete.size()
+			Log.warning("The shopkeeper storage is still dirty (pendingSaveRequest="
+					+ pendingSaveRequest
+					+ ", dirtyShopkeepers=" + dirtyShopkeepers.size()
+					+ ", unsavedShopkeepers=" + unsavedShopkeepers.size()
+					+ ", unsavedDeletedShopkeepers=" + unsavedDeletedShopkeepers.size()
+					+ ", shopkeepersToDelete=" + shopkeepersToDelete.size()
 					+ "). Did the previous save fail? Data might have been lost!");
 		}
 		// Also verify that the save task has actually completed its executions:
 		if (saveTask.isRunning() || saveTask.isExecutionPending()) {
-			Log.warning("There is still a save of shopkeeper data in progress (" + saveTask.isRunning()
-					+ ") or pending execution (" + saveTask.isExecutionPending() + ")!");
+			Log.warning("There is still a save of shopkeeper data in progress ("
+					+ saveTask.isRunning() + ") or pending execution ("
+					+ saveTask.isExecutionPending() + ")!");
 		}
 
 		// Reset a few things:
@@ -211,8 +225,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	/**
 	 * Gets an unused shopkeeper id that can be used for a new shopkeeper.
 	 * <p>
-	 * This does not increment the shopkeeper id counter on its own, because we do not want to increment it in case the
-	 * shopkeeper creation fails. Use {@link #onShopkeeperIdUsed(int)} once the id is actually being used.
+	 * This does not increment the shopkeeper id counter on its own, because we do not want to
+	 * increment it in case the shopkeeper creation fails. Use {@link #onShopkeeperIdUsed(int)} once
+	 * the id is actually being used.
 	 * 
 	 * @return the next unused shopkeeper id
 	 */
@@ -246,50 +261,53 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	/**
 	 * Checks if the given id is already used by any shopkeeper.
 	 * <p>
-	 * This also takes the shopkeepers into account that are not currently loaded (for example if they could not be
-	 * loaded for some reason, or if they were already unloaded again).
+	 * This also takes the shopkeepers into account that are not currently loaded (for example if
+	 * they could not be loaded for some reason, or if they were already unloaded again).
 	 * 
 	 * @param id
 	 *            the shopkeeper id
 	 * @return <code>true</code> if the shopkeeper id is not yet being used
 	 */
 	private boolean isUnusedId(int id) {
-		// Check if there is data for a shopkeeper with this id (this includes shopkeepers that could not be loaded for
-		// some reason, or are currently not loaded):
+		// Check if there is data for a shopkeeper with this id (this includes shopkeepers that
+		// could not be loaded for some reason, or are currently not loaded):
 		if (saveData.contains(String.valueOf(id))) return false;
 
-		// Check the unsaved deleted shopkeepers: As long as their deletion has not yet been persisted, we block their
-		// ids from being reused. This also applies if these deleted shopkeepers are currently being saved.
+		// Check the unsaved deleted shopkeepers: As long as their deletion has not yet been
+		// persisted, we block their ids from being reused. This also applies if these deleted
+		// shopkeepers are currently being saved.
 		if (unsavedDeletedShopkeepers.contains(id)) {
 			return false;
 		}
-		// Checking the shopkeepersToDelete is not necessarily required: If they have been saved before, the saveData
-		// should still contain their entry, so the above check already finds them. And if they have never been saved
-		// before, it might seem safe to reuse their ids. However, in order to maintain a consistent view on the used
-		// ids throughout the plugin (ids are expected to only represent a single shopkeeper throughout their lifetime),
-		// we nevertheless block these ids from being reused until their deletion has been fully processed.
+		// Checking the shopkeepersToDelete is not necessarily required: If they have been saved
+		// before, the saveData should still contain their entry, so the above check already finds
+		// them. And if they have never been saved before, it might seem safe to reuse their ids.
+		// However, in order to maintain a consistent view on the used ids throughout the plugin
+		// (ids are expected to only represent a single shopkeeper throughout their lifetime), we
+		// nevertheless block these ids from being reused until their deletion has been fully
+		// processed.
 		for (Shopkeeper shopkeeper : shopkeepersToDelete) {
 			if (shopkeeper.getId() == id) {
 				return false;
 			}
 		}
 
-		// Check the dirty shopkeepers (they might no longer be loaded, but their data might not have been added to the
-		// storage yet):
+		// Check the dirty shopkeepers (they might no longer be loaded, but their data might not
+		// have been added to the storage yet):
 		for (Shopkeeper shopkeeper : dirtyShopkeepers) {
 			if (shopkeeper.getId() == id) {
 				return false;
 			}
 		}
 
-		// Note: We are not checking the unsavedShopkeepers. Their data has already been added to the saveData, so the
-		// above check should find them.
-		// We are also not checking the dirty shopkeepers that may currently be getting saved. The saveData is prepared
-		// synchronously, and we don't expect shopkeepers to be created while this preparation is in progress. So the
-		// saveData should already contain them.
-		// And we are also not checking the currently loaded shopkeepers in the ShopkeeperRegistry: The saveData either
-		// already contains them, or they are part of the dirty shopkeepers (new shopkeepers are marked as dirty right
-		// away).
+		// Note: We are not checking the unsavedShopkeepers. Their data has already been added to
+		// the saveData, so the above check should find them.
+		// We are also not checking the dirty shopkeepers that may currently be getting saved. The
+		// saveData is prepared synchronously, and we don't expect shopkeepers to be created while
+		// this preparation is in progress. So the saveData should already contain them.
+		// And we are also not checking the currently loaded shopkeepers in the ShopkeeperRegistry:
+		// The saveData either already contains them, or they are part of the dirty shopkeepers (new
+		// shopkeepers are marked as dirty right away).
 
 		// We could not find a shopkeeper with this id, so it is unused:
 		return true;
@@ -298,7 +316,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	/**
 	 * Informs this storage that the given shopkeeper id is now being used.
 	 * <p>
-	 * This has to be called by the {@link ShopkeeperRegistry} whenever it creates or loads a shopkeeper.
+	 * This has to be called by the {@link ShopkeeperRegistry} whenever it creates or loads a
+	 * shopkeeper.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
@@ -323,14 +342,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		nextShopkeeperId = 1;
 	}
 
-	// We previously stored the save file within the plugin's root folder. If no save file exist at the expected
-	// location, we check the old save file location and migrate the save file if it is found.
+	// We previously stored the save file within the plugin's root folder. If no save file exist at
+	// the expected location, we check the old save file location and migrate the save file if it is
+	// found.
 	private Path getOldSaveFile() {
-		return this.getPluginDataFolder().resolve("save.yml");
+		return Unsafe.assertNonNull(this.getPluginDataFolder().resolve("save.yml"));
 	}
 
 	private Path getOldTempSaveFile() {
-		return this.getOldSaveFile().resolveSibling("save.temp");
+		return Unsafe.assertNonNull(this.getOldSaveFile().resolveSibling("save.temp"));
 	}
 
 	// Returns false if the migration failed.
@@ -355,12 +375,13 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// Move old save file to new location:
-		Log.info("Migrating old save file (" + this.pluginDataRelative(oldSaveFile) + ") to new location ("
-				+ this.pluginDataRelative(saveFile) + ")!");
+		Log.info("Migrating old save file (" + this.pluginDataRelative(oldSaveFile)
+				+ ") to new location (" + this.pluginDataRelative(saveFile) + ")!");
 		try {
 			FileUtils.moveFile(oldSaveFile, saveFile, Log.getLogger());
 		} catch (IOException e) {
-			Log.severe("Failed to migrate old save file! (" + this.pluginDataRelative(oldSaveFile) + ")", e);
+			Log.severe("Failed to migrate old save file! (" + this.pluginDataRelative(oldSaveFile)
+					+ ")", e);
 			return false;
 		}
 		// Migration succeeded:
@@ -374,9 +395,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			throw new IllegalStateException("Already loading right now!");
 		}
 
-		// To avoid concurrent access of the save file, we wait for any ongoing and pending saves to complete:
-		// TODO Skip the reload if we just triggered another save? The reloaded data is expected to match the data we
-		// just saved.
+		// To avoid concurrent access of the save file, we wait for any ongoing and pending saves to
+		// complete:
+		// TODO Skip the reload if we just triggered another save? The reloaded data is expected to
+		// match the data we just saved.
 		this.saveIfDirtyAndAwaitCompletion();
 
 		currentlyLoading = true;
@@ -384,7 +406,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		try {
 			result = this.doReload();
 		} catch (Exception e) {
-			Log.severe("Something completely unexpected went wrong during the loading of the saved shopkeepers data!", e);
+			Log.severe(
+					"Something unexpected went wrong during the loading of the saved shopkeepers data!",
+					e
+			);
 			result = false; // Error
 		} finally {
 			currentlyLoading = false;
@@ -392,8 +417,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		return result;
 	}
 
-	// TODO Move parts of this into the ShopkeeperRegistry (resolves the currently existing cyclic dependency between
-	// the storage and the registry).
+	// TODO Move parts of this into the ShopkeeperRegistry (resolves the currently existing cyclic
+	// dependency between the storage and the registry).
 	// Returns true on success, and false if there was some severe issue during loading.
 	private boolean doReload() {
 		// Unload all currently loaded shopkeepers:
@@ -405,16 +430,18 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		if (!Files.exists(saveFile)) {
 			if (Files.exists(tempSaveFile)) {
 				// Load from temporary save file instead:
-				Log.warning("Found no save file, but an existing temporary save file (" + this.pluginDataRelative(tempSaveFile) + ")!"
+				Log.warning("Found no save file, but an existing temporary save file ("
+						+ this.pluginDataRelative(tempSaveFile) + ")!"
 						+ " This might indicate an issue during a previous saving attempt!"
-						+ " We try to load the Shopkeepers data from this temporary save file instead!");
+						+ " We try to load the Shopkeepers data from this temporary save file"
+						+ " instead!");
 				saveFile = tempSaveFile;
 			} else if (!this.migrateOldSaveFile()) {
 				// Migration of old save file failed:
 				return false; // Disable without save
 			} else if (!Files.exists(saveFile)) {
-				// No save file exists yet (even after checking for it again, after the migration) -> No shopkeeper data
-				// available.
+				// No save file exists yet (even after checking for it again, after the migration)
+				// -> No shopkeeper data available.
 				// We silently set up the data version and abort:
 				saveData.set(DATA_VERSION_KEY, DataVersion.current().toString());
 				return true;
@@ -423,7 +450,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		// Load the save data with the specified encoding:
 		try (Reader reader = Files.newBufferedReader(saveFile, DerivedSettings.fileCharset)) {
-			// Since Bukkit 1.16.5, this automatically clears the save data before loading the new entries.
+			// Since Bukkit 1.16.5, this automatically clears the save data before loading the new
+			// entries.
 			saveData.load(reader);
 		} catch (Exception e) {
 			Log.severe("Failed to load the save file!", e);
@@ -431,10 +459,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// Insert the data version as the first (top) entry:
-		// Explicitly setting the 'missing' data version value here ensures that the data version will be the first
-		// entry in the save file, even if it is missing in the save file currently. If a data version is present in the
-		// loaded data, the 'missing' data version value is replaced with the actual data version afterwards.
-		Map<String, Object> saveDataEntries = saveData.getValuesCopy();
+		// Explicitly setting the 'missing' data version value here ensures that the data version
+		// will be the first entry in the save file, even if it is missing in the save file
+		// currently. If a data version is present in the loaded data, the 'missing' data version
+		// value is replaced with the actual data version afterwards.
+		Map<? extends @NonNull String, @NonNull ?> saveDataEntries = saveData.getValuesCopy();
 		saveData.clear();
 		saveData.set(DATA_VERSION_KEY, DataVersion.MISSING.toString());
 		saveData.setAll(saveDataEntries);
@@ -451,35 +480,41 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// Check if we can detect a server downgrade:
-		// TODO This check is often never reached, because Bukkit already fails to load the save file during server
-		// downgrades if it contains saved item stacks. This check only catches cases in which the save file contains no
-		// saved item stacks, or the item stacks are for some reason stored in an older data version.
+		// TODO This check is often never reached, because Bukkit already fails to load the save
+		// file during server downgrades if it contains saved item stacks. This check only catches
+		// cases in which the save file contains no saved item stacks, or the item stacks are for
+		// some reason stored in an older data version.
 		if (DataVersion.current().isMinecraftDowngrade(dataVersion)) {
 			Log.severe("Detected Minecraft server downgrade from data version '"
 					+ dataVersion + "' to '" + DataVersion.current()
-					+ "'! Server downgrades are not supported. Disabling the plugin in order to prevent data loss!");
+					+ "'! Server downgrades are not supported. "
+					+ "Disabling the plugin in order to prevent data loss!");
 			return false; // Disable without save
 		}
 
 		// Check if we can detect a Shopkeepers plugin downgrade:
-		// Even if the Minecraft server did not downgrade, plugin downgrades can also be problematic, because shopkeeper
-		// data other than item stacks can also be affected by backwards incompatible changes that have previously been
-		// applied by a newer Shopkeepers version. Note that even the addition of new shopkeeper attributes is a
-		// 'backwards incompatible' change: Even if the current plugin version simply ignores any additional data and
-		// would run fine, our current storage implementation does not keep track of unknown data. So with the next save
-		// this additional data would be lost.
-		// TODO This check can only detect changes for which we incremented the shopkeeper data version. Any external
-		// shopkeeper or shop object object implementations are not yet covered by this check. A possible solution could
-		// be to allow external add-ons to specify their data versions and then save those into the save file as well.
+		// Even if the Minecraft server did not downgrade, plugin downgrades can also be
+		// problematic, because shopkeeper data other than item stacks can also be affected by
+		// backwards incompatible changes that have previously been applied by a newer Shopkeepers
+		// version. Note that even the addition of new shopkeeper attributes is a 'backwards
+		// incompatible' change: Even if the current plugin version simply ignores any additional
+		// data and would run fine, our current storage implementation does not keep track of
+		// unknown data.
+		// So with the next save this additional data would be lost.
+		// TODO This check can only detect changes for which we incremented the shopkeeper data
+		// version. Any external shopkeeper or shop object object implementations are not yet
+		// covered by this check. A possible solution could be to allow external add-ons to specify
+		// their data versions and then save those into the save file as well.
 		if (DataVersion.current().isShopkeeperStorageDowngrade(dataVersion)
 				|| DataVersion.current().isShopkeeperDataDowngrade(dataVersion)) {
 			Log.severe("Detected Shopkeepers plugin downgrade from data version '"
 					+ dataVersion + "' to '" + DataVersion.current()
-					+ "'! Plugin downgrades are not supported. Disabling the plugin in order to prevent data loss!");
+					+ "'! Plugin downgrades are not supported. "
+					+ "Disabling the plugin in order to prevent data loss!");
 			return false; // Disable without save
 		}
 
-		Set<String> keys = saveData.getKeys();
+		Set<? extends @NonNull String> keys = saveData.getKeys();
 		// Contains at least the data-version entry:
 		assert keys.contains(DATA_VERSION_KEY);
 		int shopkeepersCount = (keys.size() - 1);
@@ -491,7 +526,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		Log.info("Loading the data of " + shopkeepersCount + " shopkeepers ...");
 
-		// Check if the data version has changed, and whether we need to trigger a full save of all shopkeeper data:
+		// Check if the data version has changed, and whether we need to trigger a full save of all
+		// shopkeeper data:
 		boolean dataVersionChanged = !DataVersion.current().equals(dataVersion);
 		boolean forceSaveAllShopkeepers = DataVersion.current().isMinecraftUpgrade(dataVersion)
 				|| DataVersion.current().isShopkeeperStorageUpgrade(dataVersion);
@@ -502,32 +538,37 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Update the data version:
 			saveData.set(DATA_VERSION_KEY, DataVersion.current().toString());
 
-			// Mark the storage as dirty so that the new data version is saved to disk even if none of the loaded
-			// shopkeepers is marked as dirty:
+			// Mark the storage as dirty so that the new data version is saved to disk even if none
+			// of the loaded shopkeepers is marked as dirty:
 			this.requestSave();
 		}
 
 		for (String key : keys) {
 			if (key.equals(DATA_VERSION_KEY)) continue; // Skip the data version entry
 
-			// If the shopkeeper cannot be loaded, it is skipped and the loading continues with the remaining
-			// shopkeepers:
+			// If the shopkeeper cannot be loaded, it is skipped and the loading continues with the
+			// remaining shopkeepers:
 			this.loadShopkeeper(key, forceSaveAllShopkeepers);
 		}
 		return true;
 	}
 
-	private ShopkeeperData getShopkeeperData(int shopkeeperId) {
+	private @Nullable ShopkeeperData getShopkeeperData(int shopkeeperId) {
 		DataContainer shopkeeperDataContainer = saveData.getContainer(String.valueOf(shopkeeperId));
 		if (shopkeeperDataContainer == null) {
 			return null;
 		}
 
-		// We create a shallow copy of the shopkeeper data and then re-insert the separately stored shopkeeper id:
-		// The copy is required because we don't want to insert the id into the data container that is stored by
-		// saveData, because that data container can end up being saved back to disk again (e.g. when the shopkeeper
+		// We create a shallow copy of the shopkeeper data and then re-insert the separately stored
+		// shopkeeper id:
+		// The copy is required because we don't want to insert the id into the data container that
+		// is stored by
+		// saveData, because that data container can end up being saved back to disk again (e.g.
+		// when the shopkeeper
 		// fails to load, or when it fails to save its state during shopkeeper saving).
-		ShopkeeperData shopkeeperData = ShopkeeperData.of(DataContainer.of(shopkeeperDataContainer.getValuesCopy()));
+		ShopkeeperData shopkeeperData = ShopkeeperData.ofNonNull(DataContainer.ofNonNull(
+				shopkeeperDataContainer.getValuesCopy()
+		));
 		shopkeeperData.set(AbstractShopkeeper.ID, shopkeeperId);
 		return shopkeeperData;
 	}
@@ -566,16 +607,17 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperData);
 			assert shopkeeper != null && shopkeeper.isValid();
 		} catch (InvalidDataException e) {
-			this.failedToLoadShopkeeper(key, e.getMessage());
+			this.failedToLoadShopkeeper(key, StringUtils.getOrEmpty(e.getMessage()));
 			return;
 		} catch (Exception e) {
 			this.failedToLoadShopkeeper(key, "Unexpected error!", e);
 			return;
 		}
 
-		// If the shopkeeper was migrated or a forced save is requested, mark the shopkeeper as dirty:
-		// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage has been
-		// marked as dirty.
+		// If the shopkeeper was migrated or a forced save is requested, mark the shopkeeper as
+		// dirty:
+		// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the
+		// storage has been marked as dirty.
 		if (migrated || forceSave) {
 			shopkeeper.markDirty();
 		}
@@ -585,13 +627,18 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		this.failedToLoadShopkeeper(idKey, reason, null);
 	}
 
-	private void failedToLoadShopkeeper(String idKey, String reason, Throwable throwable) {
+	private void failedToLoadShopkeeper(
+			String idKey,
+			String reason,
+			@Nullable Throwable throwable
+	) {
 		Log.warning("Failed to load shopkeeper '" + idKey + "': " + reason, throwable);
 	}
 
 	// SHOPKEEPER DATA CHANGES
 
-	// Note: This does not take into account any unsaved data that a save in progress might currently process.
+	// Note: This does not take into account any unsaved data that a save in progress might
+	// currently process.
 	@Override
 	public boolean isDirty() {
 		assert !saveTask.isPostProcessing();
@@ -602,7 +649,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// Dirty shopkeepers:
 		if (!dirtyShopkeepers.isEmpty()) return true;
 		if (!saveTask.isRunning()) {
-			// Only take the unsaved shopkeepers into account if there is currently no save in progress:
+			// Only take the unsaved shopkeepers into account if there is currently no save in
+			// progress:
 			if (!unsavedShopkeepers.isEmpty()) return true;
 		}
 
@@ -628,21 +676,22 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	 */
 	public void deleteShopkeeper(AbstractShopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		// If the save task is currently running (and not in its synchronous post-processing callback), we defer the
-		// deletion of the shopkeeper's data:
+		// If the save task is currently running (and not in its synchronous post-processing
+		// callback), we defer the deletion of the shopkeeper's data:
 		if (saveTask.isRunning() && !saveTask.isPostProcessing()) {
 			// Remember to remove the data after the current async save completes:
 			shopkeepersToDelete.add(shopkeeper);
-			// Note: We could check here if the saveData even contains data for the given shopkeeper. However, the
-			// result of this check would be unreliable, because the current save in progress might be about to save
-			// data for the shopkeeper, which we would then miss.
+			// Note: We could check here if the saveData even contains data for the given
+			// shopkeeper. However, the result of this check would be unreliable, because the
+			// current save in progress might be about to save data for the shopkeeper, which we
+			// would then miss.
 		} else {
 			int shopkeeperId = shopkeeper.getId();
 			String key = String.valueOf(shopkeeperId);
 
-			// Check if there is data for the deleted shopkeeper. If there is no data for it, we can assume right away
-			// that the shopkeeper has been deleted from the storage, and that there is also no data for it on disk,
-			// even without waiting for the next save.
+			// Check if there is data for the deleted shopkeeper. If there is no data for it, we can
+			// assume right away that the shopkeeper has been deleted from the storage, and that
+			// there is also no data for it on disk, even without waiting for the next save.
 			boolean shopkeeperDataExists = saveData.contains(key);
 
 			if (shopkeeperDataExists) {
@@ -653,14 +702,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				unsavedDeletedShopkeepers.add(shopkeeperId);
 			}
 
-			// Remove the shopkeeper from the dirty and unsaved shopkeepers (there is no need to save it anymore):
+			// Remove the shopkeeper from the dirty and unsaved shopkeepers (there is no need to
+			// save it anymore):
 			dirtyShopkeepers.remove(shopkeeper);
 			unsavedShopkeepers.remove(shopkeeperId);
 		}
 	}
 
 	/**
-	 * Gets the number of shopkeepers that were deleted, but whose deletions have not yet been persisted.
+	 * Gets the number of shopkeepers that were deleted, but whose deletions have not yet been
+	 * persisted.
 	 * <p>
 	 * This also includes any deleted shopkeepers that are currently being saved.
 	 * 
@@ -671,8 +722,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	/**
-	 * Informs this storage that the given shopkeeper had changes to its data that need to be persisted with the next
-	 * save.
+	 * Informs this storage that the given shopkeeper had changes to its data that need to be
+	 * persisted with the next save.
 	 * 
 	 * @param shopkeeper
 	 *            the shopkeeper
@@ -680,17 +731,21 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	public void markDirty(AbstractShopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		Validate.isTrue(shopkeeper.isValid(), "shopkeeper is invalid");
-		assert !unsavedDeletedShopkeepers.contains(shopkeeper.getId()) && !shopkeepersToDelete.contains(shopkeeper);
+		assert !unsavedDeletedShopkeepers.contains(shopkeeper.getId());
+		assert !shopkeepersToDelete.contains(shopkeeper);
 		dirtyShopkeepers.add(shopkeeper);
 
 		// Remove the shopkeeper from the unsavedShopkeepers: It's either dirty or unsaved.
 		if (!saveTask.isRunning()) {
 			unsavedShopkeepers.remove(shopkeeper.getId());
-		} // Else: The save task's post-processing will clean up the unsavedShopkeepers (if necessary).
+		}
+		// Else: The save task's post-processing will clean up the unsavedShopkeepers (if
+		// necessary).
 	}
 
 	/**
-	 * Gets the number of shopkeepers that had changes to their data, but whose changes have not yet been persisted.
+	 * Gets the number of shopkeepers that had changes to their data, but whose changes have not yet
+	 * been persisted.
 	 * <p>
 	 * This also includes any shopkeepers that are currently being saved. This does not include the
 	 * {@link #getUnsavedDeletedShopkeepersCount() unsaved deleted shopkeepers}.
@@ -700,18 +755,19 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	public int getUnsavedDirtyShopkeepersCount() {
 		int count = dirtyShopkeepers.size() + unsavedShopkeepers.size();
 		if (saveTask.isRunning()) {
-			// These Sets of shopkeepers might overlap, so we need to avoid counting their common elements multiple
-			// times:
+			// These Sets of shopkeepers might overlap, so we need to avoid counting their common
+			// elements multiple times:
 			for (AbstractShopkeeper shopkeeper : dirtyShopkeepers) {
 				if (unsavedShopkeepers.contains(shopkeeper.getId())) {
 					count--;
 				}
 			}
 			for (AbstractShopkeeper shopkeeper : saveTask.savingDirtyShopkeepers) {
-				// The dirty shopkeepers that are currently being saved are consistent (disjoint) with the
-				// unsavedShopkeepers:
+				// The dirty shopkeepers that are currently being saved are consistent (disjoint)
+				// with the unsavedShopkeepers:
 				assert !unsavedShopkeepers.contains(shopkeeper.getId());
-				// But they might overlap with the shopkeepers that have been marked as dirty in the meantime:
+				// But they might overlap with the shopkeepers that have been marked as dirty in the
+				// meantime:
 				if (!dirtyShopkeepers.contains(shopkeeper)) {
 					count++;
 				}
@@ -802,17 +858,18 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private class SaveTask extends SingletonTask {
 
-		// Previously dirty shopkeepers that we currently attempt to save. This Set is only modified synchronously, so
-		// it is safe to be accessed at any time by the storage.
-		Set<AbstractShopkeeper> savingDirtyShopkeepers = new LinkedHashSet<>();
+		// Previously dirty shopkeepers that we currently attempt to save. This Set is only modified
+		// synchronously, so it is safe to be accessed at any time by the storage.
+		Set<@NonNull AbstractShopkeeper> savingDirtyShopkeepers = new LinkedHashSet<>();
 		// The shopkeepers that we were not able to save for some reason:
-		private final Set<AbstractShopkeeper> failedToSave = new LinkedHashSet<>();
+		private final Set<@NonNull AbstractShopkeeper> failedToSave = new LinkedHashSet<>();
 
 		/* Last save */
 		// These variables get replaced during the next save.
-		// Note: Explicit synchronization is not needed for these variables, because they already get synchronized
-		// before they are used, either by the Bukkit Scheduler (when starting the async task and when going back to the
-		// main thread by starting a sync task), or/and via synchronization with the save task's lock.
+		// Note: Explicit synchronization is not needed for these variables, because they already
+		// get synchronized before they are used, either by the Bukkit Scheduler (when starting the
+		// async task and when going back to the main thread by starting a sync task), or/and via
+		// synchronization with the save task's lock.
 		private boolean savingSucceeded = false;
 		private long lastSaveErrorMsgMillis = 0L;
 
@@ -849,18 +906,19 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 
 			// Set up the file header:
-			// This replaces any previously existing and loaded header and thereby ensures that it is always up-to-date
-			// after we have saved the file.
+			// This replaces any previously existing and loaded header and thereby ensures that it
+			// is always up-to-date after we have saved the file.
 			saveData.getConfig().options().header(HEADER);
 
-			// Reset the pendingSaveRequest flag here (and not just after a successful save), so that we can track any
-			// save requests that occur in the meantime, which require another save later:
+			// Reset the pendingSaveRequest flag here (and not just after a successful save), so
+			// that we can track any save requests that occur in the meantime, which require another
+			// save later:
 			// Note: This flag is also reset to true if the current save attempt fails.
 			pendingSaveRequest = false;
 
 			// Swap the dirty shopkeepers sets:
 			assert savingDirtyShopkeepers.isEmpty();
-			Set<AbstractShopkeeper> newDirtyShopkeepers = savingDirtyShopkeepers;
+			Set<@NonNull AbstractShopkeeper> newDirtyShopkeepers = savingDirtyShopkeepers;
 			savingDirtyShopkeepers = dirtyShopkeepers;
 			dirtyShopkeepers = newDirtyShopkeepers;
 
@@ -875,7 +933,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			String key = String.valueOf(shopkeeper.getId());
 			Object previousData = saveData.get(key);
 			// This replaces the previous shopkeeper data:
-			ShopkeeperData newData = ShopkeeperData.of(saveData.createContainer(key));
+			ShopkeeperData newData = ShopkeeperData.ofNonNull(saveData.createContainer(key));
 			try {
 				shopkeeper.save(newData, false); // May reference externally stored data
 			} catch (Exception e) {
@@ -883,18 +941,19 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// Restore previous shopkeeper data and then skip this shopkeeper.
 				saveData.set(key, previousData);
 				Log.warning(shopkeeper.getLogPrefix() + "Saving failed!", e);
-				// We remember the shopkeeper and keep it marked as dirty, so that the next save of all shopkeepers
-				// attempts to save it again.
-				// However, we won't automatically initiate a new save for this shopkeeper as the risk is high that
-				// saving will fail again anyways.
+				// We remember the shopkeeper and keep it marked as dirty, so that the next save of
+				// all shopkeepers attempts to save it again.
+				// However, we won't automatically initiate a new save for this shopkeeper as the
+				// risk is high that saving will fail again anyways.
 				failedToSave.add(shopkeeper);
 				return;
 			}
 
 			// Remove the separately stored shopkeeper id from the shopkeeper data:
-			newData.set(AbstractShopkeeper.ID.unvalidated(), null);
+			newData.set(AbstractShopkeeper.ID.getUnvalidatedSaver(), null);
 
-			// We transferred the shopkeeper's data into the storage. Reset the shopkeeper's dirty flag:
+			// We transferred the shopkeeper's data into the storage. Reset the shopkeeper's dirty
+			// flag:
 			shopkeeper.onSave();
 		}
 
@@ -908,14 +967,18 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		private boolean saveToFile(DataStore saveData) {
 			try {
 				// Serialize data to String:
-				// TODO Do this on the main thread? Bukkit's serialization API is not strictly thread-safe..
-				// However, this should usually not be an issue if the serialized objects inside the save data are not
-				// accessed externally, and do not rely on external state during serialization.
+				// TODO Do this on the main thread? Bukkit's serialization API is not strictly
+				// thread-safe ...
+				// However, this should usually not be an issue if the serialized objects inside the
+				// save data are not accessed externally, and do not rely on external state during
+				// serialization.
 				String data;
 				try {
 					data = saveData.saveToString();
 				} catch (Exception e) {
-					throw new ShopkeeperStorageSaveException("Could not serialize shopkeeper data!", e);
+					throw new ShopkeeperStorageSaveException(
+							"Could not serialize shopkeeper data!", e
+					);
 				}
 
 				Retry.retry((VoidCallable) () -> {
@@ -923,8 +986,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				}, SAVING_MAX_ATTEMPTS, (attemptNumber, exception, retry) -> {
 					// Saving failed:
 					assert exception != null;
-					// Don't spam with errors and stacktraces: Only print them once for the first failed saving attempt
-					// (and again for the last failed attempt), and otherwise log a compact description of the issue:
+					// Don't spam with errors and stacktraces: Only print them once for the first
+					// failed saving attempt (and again for the last failed attempt), and otherwise
+					// log a compact description of the issue:
 					String errorMsg = "Failed to save shopkeepers (attempt " + attemptNumber + ")";
 					if (attemptNumber == 1) {
 						Log.severe(errorMsg, exception);
@@ -938,9 +1002,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 						try {
 							Thread.sleep(SAVING_ATTEMPTS_DELAY_MILLIS);
 						} catch (InterruptedException e) {
-							// Restore the interrupt status for anyone interested in it, but otherwise ignore the
-							// interrupt here, because we prefer to keep retrying to still save the data to disk after
-							// all:
+							// Restore the interrupt status for anyone interested in it, but
+							// otherwise ignore the interrupt here, because we prefer to keep
+							// retrying to still save the data to disk after all:
 							Thread.currentThread().interrupt();
 						}
 					}
@@ -954,20 +1018,34 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 		}
 
+		/**
+		 * Writes the given properly formatted shopkeeper data to disk.
+		 * <p>
+		 * Saving procedure:
+		 * <ul>
+		 * <li>If there already is a temporary save file:
+		 * <ul>
+		 * <li>If there is no save file: Rename temporary save file to save file (ideally atomic).
+		 * <li>Else: Remove temporary save file.
+		 * </ul>
+		 * <li>Create temporary save file's parent directories (if required).
+		 * <li>Create new temporary save file and write data to it.
+		 * <li>Sync temporary save file and containing directory (ensures that the data is persisted
+		 * to disk).
+		 * <li>Remove old save file (if it exists).
+		 * <li>Create save file's parent directories (if required).
+		 * <li>Rename temporary save file to save file (ideally atomic).
+		 * <li>Sync save file's parent directory (ensures that the rename operation is persisted to
+		 * disk).
+		 * </ul>
+		 * 
+		 * @param data
+		 *            the formatted data
+		 * @throws ShopkeeperStorageSaveException
+		 *             if something goes wrong
+		 */
 		private void doSaveToFile(String data) throws ShopkeeperStorageSaveException {
 			assert data != null;
-			// Saving procedure:
-			// * If there already is a temporary save file:
-			// * * If there is no save file: Rename temporary save file to save file (ideally atomic).
-			// * * Else: Remove temporary save file.
-			// * Create temporary save file's parent directories (if required).
-			// * Create new temporary save file and write data to it.
-			// * Sync temporary save file and containing directory (ensures that the data is persisted to disk).
-			// * Remove old save file (if it exists).
-			// * Create save file's parent directories (if required).
-			// * Rename temporary save file to save file (ideally atomic).
-			// * Sync save file's parent directory (ensures that the rename operation is persisted to disk).
-
 			// Handle already existing temporary save file:
 			this.handleExistingTempSaveFile();
 
@@ -976,10 +1054,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			// Check write permissions for the involved directories:
 			Path tempSaveFileDirectory = tempSaveFile.getParent();
-			this.wrapException(() -> FileUtils.checkIsDirectoryWritable(tempSaveFileDirectory));
+			if (tempSaveFileDirectory != null) {
+				this.wrapException(() -> FileUtils.checkIsDirectoryWritable(tempSaveFileDirectory));
+			}
 
 			Path saveFileDirectory = saveFile.getParent();
-			if (!tempSaveFileDirectory.equals(saveFileDirectory)) {
+			if (saveFileDirectory != null && !saveFileDirectory.equals(tempSaveFileDirectory)) {
 				this.wrapException(() -> FileUtils.checkIsDirectoryWritable(saveFileDirectory));
 			}
 
@@ -987,12 +1067,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			try (Writer writer = Files.newBufferedWriter(tempSaveFile, DerivedSettings.fileCharset)) {
 				writer.write(data);
 			} catch (IOException e) {
-				throw new ShopkeeperStorageSaveException("Could not write the shopkeeper data to the temporary save file ("
-						+ pluginDataRelative(tempSaveFile) + "): " + ThrowableUtils.getDescription(e), e);
+				throw new ShopkeeperStorageSaveException(
+						"Could not write the shopkeeper data to the temporary save file ("
+								+ pluginDataRelative(tempSaveFile) + "): "
+								+ ThrowableUtils.getDescription(e),
+						e
+				);
 			}
 
-			// Fsync the temporary save file and the containing directory (ensures that the data is actually persisted
-			// to disk):
+			// Fsync the temporary save file and the containing directory (ensures that the data is
+			// actually persisted to disk):
 			this.wrapException(() -> FileUtils.fsync(tempSaveFile));
 			this.wrapException(() -> FileUtils.fsyncParentDirectory(tempSaveFile));
 
@@ -1005,12 +1089,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Rename the temporary save file (ideally atomically):
 			this.wrapException(() -> FileUtils.moveFile(tempSaveFile, saveFile, Log.getLogger()));
 
-			// Fsync the save file's parent directory (ensures that the rename operation is persisted to disk):
+			// Fsync the save file's parent directory (ensures that the rename operation is
+			// persisted to disk):
 			this.wrapException(() -> FileUtils.fsyncParentDirectory(saveFile));
 		}
 
-		// If the temporary save file already exists, this might indicate an issue during a previous saving attempt.
-		// Depending on whether the save file exists, we either rename the temporary save file, or delete it.
+		// If the temporary save file already exists, this might indicate an issue during a previous
+		// saving attempt. Depending on whether the save file exists, we either rename the temporary
+		// save file, or delete it.
 		private void handleExistingTempSaveFile() throws ShopkeeperStorageSaveException {
 			if (!Files.exists(tempSaveFile)) return;
 
@@ -1018,29 +1104,32 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			this.wrapException(() -> FileUtils.checkIsFileWritable(tempSaveFile));
 
 			Path tempSaveFileDirectory = tempSaveFile.getParent();
-			this.wrapException(() -> FileUtils.checkIsDirectoryWritable(tempSaveFileDirectory));
+			if (tempSaveFileDirectory != null) {
+				this.wrapException(() -> FileUtils.checkIsDirectoryWritable(tempSaveFileDirectory));
+			}
 
 			Path saveFileDirectory = saveFile.getParent();
-			if (!tempSaveFileDirectory.equals(saveFileDirectory)) {
+			if (saveFileDirectory != null && !saveFileDirectory.equals(tempSaveFileDirectory)) {
 				this.wrapException(() -> FileUtils.checkIsDirectoryWritable(saveFileDirectory));
 			}
 
 			if (!Files.exists(saveFile)) {
-				// Renaming the temporary save file might have failed during an earlier saving attempt.
-				// It might contain the only backup of previously saved data -> Do not remove it!
-				// Instead, we try to rename it to make it the new 'old save data' and then continue the saving
-				// procedure.
-				Log.warning("Found an already existing temporary save file (" + pluginDataRelative(tempSaveFile)
-						+ "), but no old save file!"
+				// Renaming the temporary save file might have failed during an earlier saving
+				// attempt. It might contain the only backup of previously saved data.
+				// -> Do not remove it!
+				// Instead, we try to rename it to make it the new 'old save data' and then continue
+				// the saving procedure.
+				Log.warning("Found an already existing temporary save file ("
+						+ pluginDataRelative(tempSaveFile) + "), but no old save file!"
 						+ " This might indicate an issue during a previous saving attempt!"
-						+ " We rename the temporary save file and interpret it as existing old save data,"
-						+ " and then continue the saving!");
+						+ " We rename the temporary save file and interpret it as existing old save"
+						+ " data, and then continue the saving!");
 
 				// Rename the temporary save file:
 				this.wrapException(() -> FileUtils.moveFile(tempSaveFile, saveFile, Log.getLogger()));
 			} else {
-				Log.warning("Found an already existing temporary save file (" + pluginDataRelative(tempSaveFile)
-						+ "), but also a regular save file!"
+				Log.warning("Found an already existing temporary save file ("
+						+ pluginDataRelative(tempSaveFile) + "), but also a regular save file!"
 						+ " This might indicate an issue during a previous saving attempt!"
 						+ " We delete the temporary save file and then continue the saving!");
 
@@ -1075,30 +1164,34 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			} else {
 				// Saving failed:
 
-				// Remove any shopkeepers from the unsavedShopkeepers that have been marked as dirty again in the
-				// meantime. This is only required if there are shopkeepers that we couldn't save previously, and if
-				// this save has been unsuccessful (because otherwise we would completely clear the unsavedShopkeepers).
+				// Remove any shopkeepers from the unsavedShopkeepers that have been marked as dirty
+				// again in the meantime. This is only required if there are shopkeepers that we
+				// couldn't save previously, and if this save has been unsuccessful (because
+				// otherwise we would completely clear the unsavedShopkeepers).
 				if (!unsavedShopkeepers.isEmpty()) {
 					dirtyShopkeepers.forEach(shopkeeper -> unsavedShopkeepers.remove(shopkeeper.getId()));
 				}
 
-				// We do not mark the shopkeepers, which we failed to save to disk, as dirty again here. Their dirty
-				// flags only indicate whether the storage is aware of their latest data changes. Since we already
-				// transferred their data to the storage memory, we do not need to do that again during the next save
-				// (unless they are marked as dirty again in the meantime).
-				// However, for debugging purposes we still remember these shopkeepers:
+				// We do not mark the shopkeepers, which we failed to save to disk, as dirty again
+				// here. Their dirty flags only indicate whether the storage is aware of their
+				// latest data changes. Since we already transferred their data to the storage
+				// memory, we do not need to do that again during the next save (unless they are
+				// marked as dirty again in the meantime).
+				// However, for debugging purposes we nevertheless remember these shopkeepers:
 				savingDirtyShopkeepers.forEach(shopkeeper -> {
-					// If we failed to save the shopkeeper (i.e. failed to transfer its data to the storage's memory),
-					// we will keep track of it as part of the dirty shopkeepers. The 'unsaved' shopkeepers only
-					// contains the shopkeepers whose data we transferred, but failed to persist.
+					// If we failed to save the shopkeeper (i.e. failed to transfer its data to the
+					// storage's memory), we will keep track of it as part of the dirty shopkeepers.
+					// The 'unsaved' shopkeepers only contains the shopkeepers whose data we
+					// transferred, but failed to persist.
 					if (failedToSave.contains(shopkeeper)) return;
 
 					// Ignore the shopkeeper if it has been marked as dirty again in the meantime:
 					if (dirtyShopkeepers.contains(shopkeeper)) return;
 
 					unsavedShopkeepers.add(shopkeeper.getId());
-					// Note: If the shopkeeper has been deleted in the meantime, the subsequent processing of the
-					// shopkeepersToDelete will remove the shopkeeper again from the unsavedShopkeepers.
+					// Note: If the shopkeeper has been deleted in the meantime, the subsequent
+					// processing of the shopkeepersToDelete will remove the shopkeeper again from
+					// the unsavedShopkeepers.
 				});
 			}
 
@@ -1107,8 +1200,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Transfer the shopkeepers that we failed to save to the dirty shopkeepers:
 			dirtyShopkeepers.addAll(failedToSave);
 			failedToSave.clear();
-			// Note: Any shopkeepers that have been deleted in the meantime are removed again from the dirtyShopkeepers
-			// when the shopkeepersToDelete are processed in the following.
+			// Note: Any shopkeepers that have been deleted in the meantime are removed again from
+			// the dirtyShopkeepers when the shopkeepersToDelete are processed in the following.
 
 			// Cleanup the Set of processed dirty shopkeepers:
 			savingDirtyShopkeepers.clear();
@@ -1117,10 +1210,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			shopkeepersToDelete.forEach(SKShopkeeperStorage.this::deleteShopkeeper);
 			shopkeepersToDelete.clear();
 
-			// Any other remaining post-processing that should happen after the storage's state has been updated:
+			// Any other remaining post-processing that should happen after the storage's state has
+			// been updated:
 			if (!savingSucceeded) {
 				// Attempt the save again after a short delay (this requests another save):
-				// However, during the final save attempt during plugin disable, this is skipped and data might be lost.
+				// However, during the final save attempt during plugin disable, this is skipped and
+				// data might be lost.
 				saveDelayed();
 
 				// Inform admins about the saving issue:
@@ -1128,10 +1223,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				long nowMillis = System.currentTimeMillis();
 				if (Math.abs(nowMillis - lastSaveErrorMsgMillis) > SAVE_ERROR_MSG_THROTTLE_MILLIS) {
 					lastSaveErrorMsgMillis = nowMillis;
-					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shopkeepers failed!"
-							+ " Please check the server logs and look into the issue!";
+					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED
+							+ "Saving shopkeepers failed! "
+							+ "Please check the server log and look into the issue!";
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.hasPermission(ShopkeepersPlugin.ADMIN_PERMISSION)) {
+						assert player != null;
+						if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.ADMIN_PERMISSION)) {
 							player.sendMessage(errorMsg);
 						}
 					}

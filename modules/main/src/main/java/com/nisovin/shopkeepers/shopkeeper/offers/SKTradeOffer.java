@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -25,6 +28,7 @@ import com.nisovin.shopkeepers.util.data.serialization.bukkit.ItemStackSerialize
 import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -34,8 +38,9 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	/**
 	 * Creates a new {@link SKTradeOffer}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
-	 * copied before they are stored by the trade offer. Otherwise, they are first copied.
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
+	 * and therefore not copied before they are stored by the trade offer. Otherwise, they are first
+	 * copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -44,15 +49,19 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 */
-	public SKTradeOffer(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {
+	public SKTradeOffer(
+			@ReadOnly ItemStack resultItem,
+			@ReadOnly ItemStack item1,
+			@ReadOnly @Nullable ItemStack item2
+	) {
 		super(resultItem, item1, item2);
 	}
 
 	/**
 	 * Creates a new {@link SKTradeOffer}.
 	 * <p>
-	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trade
-	 * offer.
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are
+	 * stored by the trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -61,7 +70,11 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 */
-	public SKTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+	public SKTradeOffer(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	) {
 		super(resultItem, item1, item2);
 	}
 
@@ -84,7 +97,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!super.equals(obj)) return false;
 		if (!(obj instanceof SKTradeOffer)) return false;
@@ -106,18 +119,23 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	 */
 	public static TradingRecipe toTradingRecipe(TradeOffer offer, boolean outOfStock) {
 		// The items of the trade offer are immutable, so they do not need to be copied.
-		return new SKTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), outOfStock);
+		return new SKTradingRecipe(
+				offer.getResultItem(),
+				offer.getItem1(),
+				offer.getItem2(),
+				outOfStock
+		);
 	}
 
-	private static final Property<UnmodifiableItemStack> RESULT_ITEM = new BasicProperty<UnmodifiableItemStack>()
+	private static final Property<@NonNull UnmodifiableItemStack> RESULT_ITEM = new BasicProperty<@NonNull UnmodifiableItemStack>()
 			.dataKeyAccessor("resultItem", ItemStackSerializers.UNMODIFIABLE)
 			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
 			.build();
-	private static final Property<UnmodifiableItemStack> ITEM1 = new BasicProperty<UnmodifiableItemStack>()
+	private static final Property<@NonNull UnmodifiableItemStack> ITEM1 = new BasicProperty<@NonNull UnmodifiableItemStack>()
 			.dataKeyAccessor("item1", ItemStackSerializers.UNMODIFIABLE)
 			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
 			.build();
-	private static final Property<UnmodifiableItemStack> ITEM2 = new BasicProperty<UnmodifiableItemStack>()
+	private static final Property<@Nullable UnmodifiableItemStack> ITEM2 = new BasicProperty<@Nullable UnmodifiableItemStack>()
 			.dataKeyAccessor("item2", ItemStackSerializers.UNMODIFIABLE)
 			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
 			.nullable()
@@ -127,9 +145,9 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	/**
 	 * A {@link DataSerializer} for values of type {@link TradeOffer}.
 	 */
-	public static final DataSerializer<TradeOffer> SERIALIZER = new DataSerializer<TradeOffer>() {
+	public static final DataSerializer<@NonNull TradeOffer> SERIALIZER = new DataSerializer<@NonNull TradeOffer>() {
 		@Override
-		public Object serialize(TradeOffer value) {
+		public @Nullable Object serialize(TradeOffer value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerData = DataContainer.create();
 			// The items are assumed to be immutable.
@@ -143,7 +161,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		public TradeOffer deserialize(Object data) throws InvalidDataException {
 			DataContainer offerData = DataContainerSerializers.DEFAULT.deserialize(data);
 			try {
-				// The item stacks are assumed to be immutable and therefore do not need to be copied.
+				// The item stacks are assumed to be immutable and therefore do not need to be
+				// copied.
 				UnmodifiableItemStack resultItem = offerData.get(RESULT_ITEM);
 				UnmodifiableItemStack item1 = offerData.get(ITEM1);
 				UnmodifiableItemStack item2 = offerData.get(ITEM2); // Can be null
@@ -159,9 +178,9 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	 * <p>
 	 * All contained elements are expected to not be <code>null</code>.
 	 */
-	public static final DataSerializer<@ReadOnly List<? extends TradeOffer>> LIST_SERIALIZER = new DataSerializer<List<? extends TradeOffer>>() {
+	public static final DataSerializer<@NonNull List<? extends @NonNull TradeOffer>> LIST_SERIALIZER = new DataSerializer<@NonNull List<? extends @NonNull TradeOffer>>() {
 		@Override
-		public Object serialize(List<? extends TradeOffer> value) {
+		public @Nullable Object serialize(@ReadOnly List<? extends @NonNull TradeOffer> value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerListData = DataContainer.create();
 			int id = 1;
@@ -174,17 +193,22 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		}
 
 		@Override
-		public List<? extends TradeOffer> deserialize(Object data) throws InvalidDataException {
+		public List<? extends @NonNull TradeOffer> deserialize(
+				Object data
+		) throws InvalidDataException {
 			DataContainer offerListData = DataContainerSerializers.DEFAULT.deserialize(data);
-			Set<String> keys = offerListData.getKeys();
-			List<TradeOffer> offers = new ArrayList<>(keys.size());
+			Set<? extends @NonNull String> keys = offerListData.getKeys();
+			List<@NonNull TradeOffer> offers = new ArrayList<>(keys.size());
 			for (String id : keys) {
-				Object offerData = offerListData.get(id);
+				Object offerData = Unsafe.assertNonNull(offerListData.get(id));
 				TradeOffer offer;
 				try {
 					offer = SERIALIZER.deserialize(offerData);
 				} catch (InvalidDataException e) {
-					throw new InvalidDataException("Invalid trade offer " + id + ": " + e.getMessage(), e);
+					throw new InvalidDataException(
+							"Invalid trade offer " + id + ": " + e.getMessage(),
+							e
+					);
 				}
 				offers.add(offer);
 			}
@@ -192,7 +216,10 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		}
 	};
 
-	public static void saveOffers(DataValue dataValue, @ReadOnly List<? extends TradeOffer> offers) {
+	public static void saveOffers(
+			DataValue dataValue,
+			@ReadOnly @Nullable List<? extends @NonNull TradeOffer> offers
+	) {
 		Validate.notNull(dataValue, "dataValue is null");
 		if (offers == null) {
 			dataValue.clear();
@@ -203,23 +230,26 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		dataValue.set(offerListData);
 	}
 
-	public static List<? extends TradeOffer> loadOffers(DataValue dataValue) throws InvalidDataException {
+	public static List<? extends @NonNull TradeOffer> loadOffers(
+			DataValue dataValue
+	) throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
-
-		if (!dataValue.isPresent()) {
+		Object offerListData = dataValue.get();
+		if (offerListData == null) {
 			// No data. -> Return an empty list of offers.
 			return Collections.emptyList();
 		}
-
-		Object offerListData = dataValue.get();
 		return LIST_SERIALIZER.deserialize(offerListData);
 	}
 
 	// Returns true if the data has changed due to migrations.
-	public static boolean migrateOffers(DataValue dataValue, String logPrefix) throws InvalidDataException {
+	public static boolean migrateOffers(
+			DataValue dataValue,
+			String logPrefix
+	) throws InvalidDataException {
 		Validate.notNull(logPrefix, "logPrefix is null");
-		List<? extends TradeOffer> offers = loadOffers(dataValue);
-		List<? extends TradeOffer> migratedOffers = migrateItems(offers);
+		List<? extends @NonNull TradeOffer> offers = loadOffers(dataValue);
+		List<? extends @NonNull TradeOffer> migratedOffers = migrateItems(offers);
 		if (offers == migratedOffers) {
 			// No offers were migrated.
 			return false;
@@ -232,10 +262,12 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	private static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers) throws InvalidDataException {
+	private static List<? extends @NonNull TradeOffer> migrateItems(
+			@ReadOnly List<? extends @NonNull TradeOffer> offers
+	) throws InvalidDataException {
 		Validate.notNull(offers, "offers is null");
-		assert !offers.contains(null);
-		List<TradeOffer> migratedOffers = null;
+		assert !CollectionUtils.containsNull(offers);
+		List<@NonNull TradeOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
 			TradeOffer offer = offers.get(i);
@@ -245,25 +277,27 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			boolean migrationFailed = false;
 
 			// These items are assumed to be immutable.
-			UnmodifiableItemStack resultItem = offer.getResultItem();
-			UnmodifiableItemStack item1 = offer.getItem1();
+			@NonNull UnmodifiableItemStack resultItem = offer.getResultItem();
+			assert !ItemUtils.isEmpty(resultItem);
+			@NonNull UnmodifiableItemStack item1 = offer.getItem1();
+			assert !ItemUtils.isEmpty(item1);
 			UnmodifiableItemStack item2 = offer.getItem2();
 
 			UnmodifiableItemStack migratedResultItem = ItemMigration.migrateItemStack(resultItem);
 			if (!ItemUtils.isSimilar(resultItem, migratedResultItem)) {
-				if (ItemUtils.isEmpty(migratedResultItem) && !ItemUtils.isEmpty(resultItem)) {
+				if (ItemUtils.isEmpty(migratedResultItem)) {
 					migrationFailed = true;
 				} else {
-					resultItem = migratedResultItem;
+					resultItem = Unsafe.assertNonNull(migratedResultItem);
 					itemsMigrated = true;
 				}
 			}
 			UnmodifiableItemStack migratedItem1 = ItemMigration.migrateItemStack(item1);
 			if (!ItemUtils.isSimilar(item1, migratedItem1)) {
-				if (ItemUtils.isEmpty(migratedItem1) && !ItemUtils.isEmpty(item1)) {
+				if (ItemUtils.isEmpty(migratedItem1)) {
 					migrationFailed = true;
 				} else {
-					item1 = migratedItem1;
+					item1 = Unsafe.assertNonNull(migratedItem1);
 					itemsMigrated = true;
 				}
 			}
@@ -278,17 +312,19 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			}
 
 			if (migrationFailed) {
-				throw new InvalidDataException("Item migration failed for trade offer " + (i + 1) + ": " + offer);
+				throw new InvalidDataException(
+						"Item migration failed for trade offer " + (i + 1) + ": " + offer
+				);
 			}
 
 			if (itemsMigrated) {
-				// Lazily set up the list of migrated offers, and add the trades that were already processed but did not
-				// require migrations:
+				// Lazily set up the list of migrated offers, and add the trades that were already
+				// processed but did not require migrations:
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
 						TradeOffer oldOffer = offers.get(j);
-						if (oldOffer == null) continue; // Skip invalid entries
+						assert oldOffer != null;
 						migratedOffers.add(oldOffer);
 					}
 				}
@@ -297,7 +333,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(item1);
 				migratedOffers.add(new SKTradeOffer(resultItem, item1, item2));
 			} else if (migratedOffers != null) {
-				// Add the previous offer, which did not require any migrations, to the list of already migrated offers:
+				// Add the previous offer, which did not require any migrations, to the list of
+				// already migrated offers:
 				migratedOffers.add(offer);
 			}
 		}

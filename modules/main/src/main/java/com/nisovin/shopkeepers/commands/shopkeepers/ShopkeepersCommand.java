@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Collections;
-
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -12,6 +10,7 @@ import org.bukkit.util.RayTraceResult;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -36,6 +35,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.ObjectUtils;
 
 public class ShopkeepersCommand extends BaseCommand {
 
@@ -59,7 +59,7 @@ public class ShopkeepersCommand extends BaseCommand {
 
 		// Formatting:
 		this.setHelpTitleFormat(Messages.commandHelpTitle.setPlaceholderArguments(
-				Collections.singletonMap("version", plugin.getDescription().getVersion())
+				"version", plugin.getDescription().getVersion()
 		));
 		this.setHelpUsageFormat(Messages.commandHelpUsageFormat);
 		this.setHelpDescFormat(Messages.commandHelpDescriptionFormat);
@@ -70,7 +70,7 @@ public class ShopkeepersCommand extends BaseCommand {
 
 		// Register child commands:
 		CommandRegistry childCommands = this.getChildCommands();
-		childCommands.register(new CommandHelp(this));
+		childCommands.register(new CommandHelp(Unsafe.initialized(this)));
 		childCommands.register(new CommandReload(plugin));
 		childCommands.register(new CommandDebug());
 		childCommands.register(new CommandNotify());
@@ -100,32 +100,39 @@ public class ShopkeepersCommand extends BaseCommand {
 		childCommands.register(new CommandTestSpawn(plugin));
 	}
 
-	// This also hides the command from the help page if the player shop creation via command is disabled.
+	// This also hides the command from the help page if the player shop creation via command is
+	// disabled.
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
-		return Settings.createPlayerShopWithCommand || PermissionUtils.hasPermission(sender, ShopkeepersPlugin.ADMIN_PERMISSION);
+		return Settings.createPlayerShopWithCommand
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.ADMIN_PERMISSION);
 	}
 
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
-		CommandSender sender = input.getSender();
-		if (!(input.getSender() instanceof Player)) {
-			throw PlayerCommand.createCommandSourceRejectedException(sender);
+		Player player = ObjectUtils.castOrNull(input.getSender(), Player.class);
+		if (player == null) {
+			throw PlayerCommand.createCommandSourceRejectedException(input.getSender());
 		}
-		Player player = (Player) sender;
 
 		// Creating new shopkeeper:
 
 		// Get targeted block information:
-		// If the player is underwater or inside lava, we ignore fluid collisions to allow the placement of shopkeepers
-		// underwater or inside lava. Otherwise, we take fluids into account, which allows the placement of shopkeepers
-		// on top of water or lava, such as for example for striders.
+		// If the player is underwater or inside lava, we ignore fluid collisions to allow the
+		// placement of shopkeepers underwater or inside lava. Otherwise, we take fluids into
+		// account, which allows the placement of shopkeepers on top of water or lava, such as for
+		// example for striders.
 		Block playerBlock = player.getEyeLocation().getBlock();
-		boolean ignoreFluids = playerBlock.isLiquid();
-		FluidCollisionMode fluidCollisionMode = ignoreFluids ? FluidCollisionMode.NEVER : FluidCollisionMode.ALWAYS;
-		// This takes passable blocks (including fluids, depending on the collision mode) into account (i.e. collides
-		// with them):
+		FluidCollisionMode fluidCollisionMode;
+		if (playerBlock.isLiquid()) {
+			fluidCollisionMode = FluidCollisionMode.NEVER;
+		} else {
+			fluidCollisionMode = FluidCollisionMode.ALWAYS;
+		}
+
+		// This takes passable blocks (including fluids, depending on the collision mode) into
+		// account (i.e. collides with them):
 		RayTraceResult targetBlockInfo = player.rayTraceBlocks(10.0D, fluidCollisionMode);
 
 		// Check for valid targeted block:
@@ -133,19 +140,20 @@ public class ShopkeepersCommand extends BaseCommand {
 			TextUtils.sendMessage(player, Messages.mustTargetBlock);
 			return;
 		}
-		Block targetBlock = targetBlockInfo.getHitBlock();
-		BlockFace targetBlockFace = targetBlockInfo.getHitBlockFace();
-		assert targetBlock != null && !targetBlock.isEmpty();
-		assert targetBlockFace != null;
+		Block targetBlock = Unsafe.assertNonNull(targetBlockInfo.getHitBlock());
+		assert !targetBlock.isEmpty();
+		BlockFace targetBlockFace = Unsafe.assertNonNull(targetBlockInfo.getHitBlockFace());
 
-		ShopType<?> shopType = context.get(ARGUMENT_SHOP_TYPE);
-		ShopObjectType<?> shopObjType = context.get(ARGUMENT_OBJECT_TYPE);
+		ShopType<?> shopType = context.getOrNull(ARGUMENT_SHOP_TYPE);
+		ShopObjectType<?> shopObjType = context.getOrNull(ARGUMENT_OBJECT_TYPE);
 
-		// We use different defaults depending on whether the player might be trying to create a player or admin shop:
+		// We use different defaults depending on whether the player might be trying to create a
+		// player or admin shop:
 		boolean containerTargeted = ItemUtils.isContainer(targetBlock.getType());
 		boolean maybeCreatePlayerShop = containerTargeted;
 		if (maybeCreatePlayerShop) {
-			// Default shop type and shop object type: First usable player shop type and shop object type.
+			// Default shop type and shop object type: First usable player shop type and shop object
+			// type.
 			if (shopType == null) {
 				shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
 			}
@@ -180,16 +188,32 @@ public class ShopkeepersCommand extends BaseCommand {
 		}
 
 		// Determine spawn location:
-		Location spawnLocation = plugin.getShopkeeperCreation().determineSpawnLocation(player, targetBlock, targetBlockFace);
+		Location spawnLocation = plugin.getShopkeeperCreation().determineSpawnLocation(
+				player,
+				targetBlock,
+				targetBlockFace
+		);
 
 		// Shop creation data:
 		ShopCreationData shopCreationData;
 		if (isPlayerShopType) {
 			// Create player shopkeeper:
-			shopCreationData = PlayerShopCreationData.create(player, (PlayerShopType<?>) shopType, shopObjType, spawnLocation, targetBlockFace, targetBlock);
+			shopCreationData = PlayerShopCreationData.create(
+					player,
+					(PlayerShopType<?>) shopType,
+					shopObjType,
+					spawnLocation,
+					targetBlockFace,
+					targetBlock
+			);
 		} else {
 			// Create admin shopkeeper:
-			shopCreationData = AdminShopCreationData.create(player, (AdminShopType<?>) shopType, shopObjType, spawnLocation, targetBlockFace);
+			shopCreationData = AdminShopCreationData.create(
+					player,
+					(AdminShopType<?>) shopType,
+					shopObjType,
+					spawnLocation, targetBlockFace
+			);
 		}
 		assert shopCreationData != null;
 

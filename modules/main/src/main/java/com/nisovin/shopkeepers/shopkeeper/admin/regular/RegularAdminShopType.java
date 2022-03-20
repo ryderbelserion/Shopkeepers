@@ -3,15 +3,22 @@ package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
-public final class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
+public final class RegularAdminShopType
+		extends AbstractAdminShopType<@NonNull SKRegularAdminShopkeeper> {
 
 	public RegularAdminShopType() {
-		super("admin", Collections.emptyList(), ShopkeepersPlugin.ADMIN_PERMISSION,
-				SKRegularAdminShopkeeper.class);
+		super(
+				"admin",
+				Collections.emptyList(),
+				ShopkeepersPlugin.ADMIN_PERMISSION,
+				SKRegularAdminShopkeeper.class
+		);
 	}
 
 	@Override
@@ -30,12 +37,12 @@ public final class RegularAdminShopType extends AbstractAdminShopType<SKRegularA
 	}
 
 	@Override
-	public List<String> getTradeSetupDescription() {
+	public List<? extends @NonNull String> getTradeSetupDescription() {
 		return Messages.tradeSetupDescAdminRegular;
 	}
 
 	@Override
-	protected SKRegularAdminShopkeeper createNewShopkeeper()  {
+	protected SKRegularAdminShopkeeper createNewShopkeeper() {
 		return new SKRegularAdminShopkeeper();
 	}
 }

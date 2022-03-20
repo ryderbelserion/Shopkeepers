@@ -20,9 +20,12 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.ConfigData;
@@ -49,7 +52,7 @@ public class Settings extends Config {
 	public static int configVersion = 5;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
-	public static List<String> debugOptions = new ArrayList<>(0);
+	public static List<@NonNull String> debugOptions = new ArrayList<>(0);
 	public static boolean enableMetrics = true;
 
 	/*
@@ -65,7 +68,7 @@ public class Settings extends Config {
 
 	public static boolean convertPlayerItems = false;
 	public static boolean convertAllPlayerItems = true;
-	public static List<ItemData> convertPlayerItemsExceptions = new ArrayList<>();
+	public static List<@NonNull ItemData> convertPlayerItemsExceptions = new ArrayList<>();
 
 	/*
 	 * Plugin Compatibility
@@ -86,7 +89,11 @@ public class Settings extends Config {
 	/*
 	 * Shop Creation (and removal)
 	 */
-	public static ItemData shopCreationItem = new ItemData(Material.VILLAGER_SPAWN_EGG, c("&aShopkeeper"), null);
+	public static ItemData shopCreationItem = new ItemData(
+			Material.VILLAGER_SPAWN_EGG,
+			c("&aShopkeeper"),
+			null
+	);
 
 	public static boolean preventShopCreationItemRegularUsage = true;
 	public static boolean invertShopTypeAndObjectTypeSelection = false;
@@ -108,8 +115,9 @@ public class Settings extends Config {
 	/*
 	 * Shop (Object) Types
 	 */
-	// Villager is the default and therefore first. The other entity types are alphabetically sorted.
-	public static List<String> enabledLivingShops = CollectionUtils.addAll(
+	// Villager is the default and therefore first. The other entity types are alphabetically
+	// sorted.
+	public static List<@NonNull String> enabledLivingShops = CollectionUtils.addAll(
 			new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())),
 			CollectionUtils.sort(Arrays.asList(
 					EntityType.COW.name(),
@@ -184,11 +192,12 @@ public class Settings extends Config {
 	public static boolean disableGravity = false;
 	public static int gravityChunkRange = 4;
 
-	// A tick period of 4 and higher is clearly noticeable, especially when entities are affected by gravity.
-	// The total performance benefits of higher tick periods also become increasingly smaller and instead result in
-	// higher performance impacts per individual behavior update.
-	// The gravity updates at a tick period of 2 actually appear less smooth in my testing than at a period of 3 (maybe
-	// due to some interpolation artifact by the client).
+	// A tick period of 4 and higher is clearly noticeable, especially when entities are affected by
+	// gravity.
+	// The total performance benefits of higher tick periods also become increasingly smaller and
+	// instead result in higher performance impacts per individual behavior update.
+	// The gravity updates at a tick period of 2 actually appear less smooth in my testing than at a
+	// period of 3 (maybe due to some interpolation artifact by the client).
 	public static int mobBehaviorTickPeriod = 3;
 
 	public static boolean silenceLivingShopEntities = true;
@@ -294,8 +303,12 @@ public class Settings extends Config {
 	public static boolean simulateWanderingTraderAmbientSounds = false;
 	public static boolean simulateTradingSoundsOnlyForTheTradingPlayer = true;
 
-	public static SoundEffect tradeSucceededSound = new SoundEffect(Sound.UI_BUTTON_CLICK).withPitch(2.0f).withVolume(0.3f);
-	public static SoundEffect tradeFailedSound = new SoundEffect(Sound.BLOCK_BARREL_CLOSE).withPitch(2.0f).withVolume(0.5f);
+	public static SoundEffect tradeSucceededSound = new SoundEffect(Sound.UI_BUTTON_CLICK)
+			.withPitch(2.0f)
+			.withVolume(0.3f);
+	public static SoundEffect tradeFailedSound = new SoundEffect(Sound.BLOCK_BARREL_CLOSE)
+			.withPitch(2.0f)
+			.withVolume(0.5f);
 
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;
@@ -307,7 +320,8 @@ public class Settings extends Config {
 	public static SoundEffect tradeNotificationSound = SoundEffect.EMPTY;
 
 	public static boolean notifyShopOwnersAboutTrades = true;
-	public static SoundEffect shopOwnerTradeNotificationSound = new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).withVolume(0.25f);
+	public static SoundEffect shopOwnerTradeNotificationSound = new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP)
+			.withVolume(0.25f);
 
 	/*
 	 * Trade Log
@@ -334,39 +348,39 @@ public class Settings extends Config {
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
-		public static DateTimeFormatter dateTimeFormatter;
+		public static DateTimeFormatter dateTimeFormatter = Unsafe.uncheckedNull();
 
-		public static Charset fileCharset;
+		public static Charset fileCharset = Unsafe.uncheckedNull();
 
-		public static TradingRecipeDraft sellingEmptyTrade;
-		public static TradingRecipeDraft sellingEmptyTradeSlotItems;
-		public static TradingRecipeDraft buyingEmptyTrade;
-		public static TradingRecipeDraft buyingEmptyTradeSlotItems;
-		public static TradingRecipeDraft tradingEmptyTrade;
-		public static TradingRecipeDraft tradingEmptyTradeSlotItems;
-		public static TradingRecipeDraft bookEmptyTrade;
-		public static TradingRecipeDraft bookEmptyTradeSlotItems;
+		public static TradingRecipeDraft sellingEmptyTrade = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft sellingEmptyTradeSlotItems = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft buyingEmptyTrade = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft buyingEmptyTradeSlotItems = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft tradingEmptyTrade = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft tradingEmptyTradeSlotItems = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft bookEmptyTrade = Unsafe.uncheckedNull();
+		public static TradingRecipeDraft bookEmptyTradeSlotItems = Unsafe.uncheckedNull();
 
-		public static ItemData placeholderItemData;
+		public static ItemData placeholderItemData = Unsafe.uncheckedNull();
 
-		public static ItemData namingItemData;
+		public static ItemData namingItemData = Unsafe.uncheckedNull();
 
 		// Button items:
-		public static ItemData nameButtonItem;
-		public static ItemData containerButtonItem;
-		public static ItemData deleteButtonItem;
-		public static ItemData hireButtonItem;
+		public static ItemData nameButtonItem = Unsafe.uncheckedNull();
+		public static ItemData containerButtonItem = Unsafe.uncheckedNull();
+		public static ItemData deleteButtonItem = Unsafe.uncheckedNull();
+		public static ItemData hireButtonItem = Unsafe.uncheckedNull();
 
-		public static ItemData deleteVillagerButtonItem;
-		public static ItemData nameVillagerButtonItem;
-		public static ItemData villagerInventoryButtonItem;
+		public static ItemData deleteVillagerButtonItem = Unsafe.uncheckedNull();
+		public static ItemData nameVillagerButtonItem = Unsafe.uncheckedNull();
+		public static ItemData villagerInventoryButtonItem = Unsafe.uncheckedNull();
 
-		public static Pattern shopNamePattern;
+		public static Pattern shopNamePattern = Unsafe.uncheckedNull();
 
 		// Sorted in descending order:
-		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
+		public static final List<@NonNull MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
 
-		public static final Set<EntityType> enabledLivingShops = new LinkedHashSet<>();
+		public static final Set<@NonNull EntityType> enabledLivingShops = new LinkedHashSet<>();
 
 		static {
 			// Initial setup of default values:
@@ -375,26 +389,33 @@ public class Settings extends Config {
 
 		// Gets called after setting values have changed (e.g. after the config has been loaded):
 		private static void setup() {
-			// TODO This formatter uses the server's default time zone. Allow configuring the time zone?
+			// TODO This formatter uses the server's default time zone. Allow configuring the time
+			// zone?
 			try {
-				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat).withZone(ZoneId.systemDefault());
+				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat)
+						.withZone(Unsafe.assertNonNull(ZoneId.systemDefault()));
 			} catch (IllegalArgumentException e) {
-				Log.warning(Messages.getInstance().getLogPrefix() + "'date-time-format' is not a valid format pattern ('" + Messages.dateTimeFormat + "'). Reverting to default.");
+				Log.warning(Messages.getInstance().getLogPrefix()
+						+ "'date-time-format' is not a valid format pattern ('"
+						+ Messages.dateTimeFormat + "'). Reverting to default.");
 				Messages.dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat).withZone(ZoneId.systemDefault());
+				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat)
+						.withZone(Unsafe.assertNonNull(ZoneId.systemDefault()));
 			}
 
 			// Charset derived from specified file encoding:
 			if (StringUtils.isEmpty(fileEncoding)) {
-				Log.warning(INSTANCE.getLogPrefix() + "'file-encoding' is empty. Using default 'UTF-8'.");
+				Log.warning(INSTANCE.getLogPrefix() + "'file-encoding' is empty. "
+						+ "Using default 'UTF-8'.");
 				fileEncoding = "UTF-8";
 			}
 			try {
 				fileCharset = Charset.forName(fileEncoding);
 			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-				Log.warning(INSTANCE.getLogPrefix() + "Invalid or unsupported 'file-encoding' ('" + fileEncoding + "'). Using default 'UTF-8'.");
+				Log.warning(INSTANCE.getLogPrefix() + "Invalid or unsupported 'file-encoding' ('"
+						+ fileEncoding + "'). Using default 'UTF-8'.");
 				fileEncoding = "UTF-8";
-				fileCharset = StandardCharsets.UTF_8;
+				fileCharset = Unsafe.assertNonNull(StandardCharsets.UTF_8);
 			}
 
 			sellingEmptyTrade = new TradingRecipeDraft(
@@ -416,7 +437,8 @@ public class Settings extends Config {
 					) : sellingEmptyTradeItem2.createItemStack()
 			);
 			sellingEmptyTradeSlotItems = new TradingRecipeDraft(
-					// This item is never used, because the slot is never empty for a non-empty trade:
+					// This item is never used, because the slot is never empty for a non-empty
+					// trade:
 					null,
 					ItemUtils.setDisplayNameAndLore(
 							sellingEmptyItem1.createItemStack(),
@@ -441,7 +463,8 @@ public class Settings extends Config {
 							Messages.buyingEmptyTradeItem1,
 							Messages.buyingEmptyTradeItem1Lore
 					),
-					// The editor item can be configured, even though this slot is not used for anything:
+					// The editor item can be configured, even though this slot is not used for
+					// anything:
 					buyingEmptyTradeItem2.createItemStack()
 			);
 			buyingEmptyTradeSlotItems = new TradingRecipeDraft(
@@ -450,9 +473,11 @@ public class Settings extends Config {
 							Messages.buyingEmptyResultItem,
 							Messages.buyingEmptyResultItemLore
 					),
-					// This item is never used, because the slot is never empty for a non-empty trade:
+					// This item is never used, because the slot is never empty for a non-empty
+					// trade:
 					null,
-					// The editor item can be configured, even though this slot is not used for anything:
+					// The editor item can be configured, even though this slot is not used for
+					// anything:
 					buyingEmptyItem2.createItemStack()
 			);
 			tradingEmptyTrade = new TradingRecipeDraft(
@@ -508,7 +533,8 @@ public class Settings extends Config {
 					) : bookEmptyTradeItem2.createItemStack()
 			);
 			bookEmptyTradeSlotItems = new TradingRecipeDraft(
-					// This item is never used, because the slot is never empty for a non-empty trade:
+					// This item is never used, because the slot is never empty for a non-empty
+					// trade:
 					null,
 					ItemUtils.setDisplayNameAndLore(
 							bookEmptyItem1.createItemStack(),
@@ -524,34 +550,71 @@ public class Settings extends Config {
 			);
 
 			// Ignore (clear) the display name that is used to specify the substituted item type:
-			placeholderItemData = new ItemData(UnmodifiableItemStack.of(ItemUtils.setDisplayName(placeholderItem.createItemStack(), null)));
+			placeholderItemData = new ItemData(UnmodifiableItemStack.ofNonNull(
+					ItemUtils.setDisplayName(placeholderItem.createItemStack(), null)
+			));
 
-			// Ignore (clear) the display name that is used to specify the new shopkeeper name, but keep the lore:
-			namingItemData = new ItemData(UnmodifiableItemStack.of(ItemUtils.setDisplayName(nameItem.createItemStack(), null)));
+			// Ignore (clear) the display name that is used to specify the new shopkeeper name, but
+			// keep the lore:
+			namingItemData = new ItemData(UnmodifiableItemStack.ofNonNull(
+					ItemUtils.setDisplayName(nameItem.createItemStack(), null)
+			));
 
 			// Button items:
-			nameButtonItem = new ItemData(nameItem, Messages.buttonName, Messages.buttonNameLore);
-			containerButtonItem = new ItemData(containerItem, Messages.buttonContainer, Messages.buttonContainerLore);
-			deleteButtonItem = new ItemData(deleteItem, Messages.buttonDelete, Messages.buttonDeleteLore);
-			hireButtonItem = new ItemData(hireItem, Messages.buttonHire, Messages.buttonHireLore);
+			nameButtonItem = new ItemData(
+					nameItem,
+					Messages.buttonName,
+					Messages.buttonNameLore
+			);
+			containerButtonItem = new ItemData(
+					containerItem,
+					Messages.buttonContainer,
+					Messages.buttonContainerLore
+			);
+			deleteButtonItem = new ItemData(
+					deleteItem,
+					Messages.buttonDelete,
+					Messages.buttonDeleteLore
+			);
+			hireButtonItem = new ItemData(
+					hireItem,
+					Messages.buttonHire,
+					Messages.buttonHireLore
+			);
 
 			// Note: These use the same item types as the corresponding shopkeeper buttons.
-			deleteVillagerButtonItem = new ItemData(deleteItem, Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore);
-			nameVillagerButtonItem = new ItemData(nameItem, Messages.buttonNameVillager, Messages.buttonNameVillagerLore);
-			villagerInventoryButtonItem = new ItemData(containerItem, Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore);
+			deleteVillagerButtonItem = new ItemData(
+					deleteItem,
+					Messages.buttonDeleteVillager,
+					Messages.buttonDeleteVillagerLore
+			);
+			nameVillagerButtonItem = new ItemData(
+					nameItem,
+					Messages.buttonNameVillager,
+					Messages.buttonNameVillagerLore
+			);
+			villagerInventoryButtonItem = new ItemData(
+					containerItem,
+					Messages.buttonVillagerInventory,
+					Messages.buttonVillagerInventoryLore
+			);
 
 			// Shop name pattern:
 			try {
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			} catch (PatternSyntaxException e) {
-				Log.warning(INSTANCE.getLogPrefix() + "'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
+				Log.warning(INSTANCE.getLogPrefix()
+						+ "'name-regex' is not a valid regular expression ('" + Settings.nameRegex
+						+ "'). Reverting to default.");
 				Settings.nameRegex = "[A-Za-z0-9 ]{3,25}";
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			}
 
 			// Maximum shops permissions:
 			PlayerShopsLimit.updateMaxShopsPermissions(invalidPermissionOption -> {
-				Log.warning(INSTANCE.getLogPrefix() + "Ignoring invalid entry in 'max-shops-perm-options': " + invalidPermissionOption);
+				Log.warning(INSTANCE.getLogPrefix()
+						+ "Ignoring invalid entry in 'max-shops-perm-options': "
+						+ invalidPermissionOption);
 			});
 
 			// Enabled living shop types:
@@ -563,16 +626,23 @@ public class Settings extends Config {
 					foundInvalidEntityType = true;
 					if ("PIG_ZOMBIE".equals(entityTypeId)) {
 						// Migration note for MC 1.16 TODO Remove this again at some point?
-						Log.warning(INSTANCE.getLogPrefix() + "Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'. This mob no longer exist since MC 1.16. Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
+						Log.warning(INSTANCE.getLogPrefix()
+								+ "Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'."
+								+ " This mob no longer exist since MC 1.16."
+								+ " Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
 					} else {
-						Log.warning(INSTANCE.getLogPrefix() + "Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
+						Log.warning(INSTANCE.getLogPrefix()
+								+ "Invalid living entity type name in 'enabled-living-shops': "
+								+ entityTypeId);
 					}
 				} else {
 					enabledLivingShops.add(entityType);
 				}
 			}
 			if (foundInvalidEntityType) {
-				Log.warning(INSTANCE.getLogPrefix() + "All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
+				Log.warning(INSTANCE.getLogPrefix()
+						+ "All existing entity type names can be found here: "
+						+ "https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
 			}
 		}
 
@@ -590,7 +660,7 @@ public class Settings extends Config {
 		}
 
 		public final boolean debug;
-		public final List<String> debugOptions;
+		public final List<? extends @NonNull String> debugOptions;
 		public final Charset fileCharset;
 
 		private AsyncSettings() {
@@ -617,7 +687,7 @@ public class Settings extends Config {
 	///// PERSISTENCE
 
 	// Returns null on success, otherwise a severe issue prevented loading the config.
-	public static ConfigLoadException loadConfig() {
+	public static @Nullable ConfigLoadException loadConfig() {
 		Log.info("Loading config.");
 		Plugin plugin = SKShopkeepersPlugin.getInstance();
 
@@ -626,7 +696,8 @@ public class Settings extends Config {
 
 		// Load config:
 		plugin.reloadConfig();
-		// This is a wrapper around the Bukkit config. Config comments are preserved by the underlying Bukkit config.
+		// This is a wrapper around the Bukkit config. Config comments are preserved by the
+		// underlying Bukkit config.
 		ConfigData configData = ConfigData.of(plugin.getConfig());
 
 		// Load settings from config:
@@ -670,8 +741,8 @@ public class Settings extends Config {
 	}
 
 	/**
-	 * Applies the values of this config to the config of the {@link ShopkeepersPlugin} and {@link Plugin#saveConfig()
-	 * saves it}.
+	 * Applies the values of this config to the config of the {@link ShopkeepersPlugin} and
+	 * {@link Plugin#saveConfig() saves it}.
 	 */
 	public static void saveConfig() {
 		Log.info("Saving config.");
@@ -721,7 +792,8 @@ public class Settings extends Config {
 		}
 		if (namingOfPlayerShopsViaItem) {
 			if (nameItem.getType() == Material.AIR) {
-				Log.warning(this.getLogPrefix() + "'name-item' can not be AIR if naming-of-player-shops-via-item is enabled!");
+				Log.warning(this.getLogPrefix() + "'name-item' can not be AIR if "
+						+ "'naming-of-player-shops-via-item' is enabled!");
 				nameItem = nameItem.withType(Material.NAME_TAG);
 			}
 		}
@@ -748,13 +820,15 @@ public class Settings extends Config {
 			Log.warning(this.getLogPrefix() + "'trade-log-next-merge-timeout-ticks' cannot be negative.");
 			tradeLogNextMergeTimeoutTicks = 0;
 		}
-		// Note: If tradeLogNextMergeTimeoutTicks is greater than or equal to tradeLogMergeDurationTicks, it has no
-		// effect. However, we do not print a warning in this case to allow tradeLogMergeDurationTicks to be easily
-		// adjusted inside the config without having to keep tradeLogNextMergeTimeoutTicks consistent.
+		// Note: If tradeLogNextMergeTimeoutTicks is greater than or equal to
+		// tradeLogMergeDurationTicks, it has no effect. However, we do not print a warning in this
+		// case to allow tradeLogMergeDurationTicks to be easily adjusted inside the config without
+		// having to keep tradeLogNextMergeTimeoutTicks consistent.
 
 		// Temporary workaround for Mohist and Magma servers.
 		// See https://github.com/Shopkeepers/Shopkeepers/issues/738
-		// TODO This is supposed to be removed again once the underlying issue has been fixed by Mohist/Magma.
+		// TODO This is supposed to be removed again once the underlying issue has been fixed by
+		// Mohist/Magma.
 		if (!disableInventoryVerification) {
 			String serverName = Bukkit.getServer().getName();
 			boolean forceDisableInventoryVerification = false;
@@ -767,8 +841,9 @@ public class Settings extends Config {
 				serverDisplayName = "Magma";
 			}
 			if (forceDisableInventoryVerification) {
-				Log.warning(this.getLogPrefix() + "Forcefully enabled 'disable-inventory-verification'"
-						+ " to resolve a known incompatibility with " + serverDisplayName + " servers.");
+				Log.warning(this.getLogPrefix() + "Forcefully enabled " +
+						"'disable-inventory-verification' to resolve a known incompatibility with "
+						+ serverDisplayName + " servers.");
 				disableInventoryVerification = true;
 			}
 		}

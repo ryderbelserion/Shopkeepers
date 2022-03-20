@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.commands.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,14 +18,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.lib.util.ObjectMatcher;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -35,21 +38,20 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Command utility functions related to shopkeepers.
  */
-public class ShopkeeperArgumentUtils {
-
-	private ShopkeeperArgumentUtils() {
-	}
+public final class ShopkeeperArgumentUtils {
 
 	private static final int SHOPKEEPER_TARGET_RANGE = 10;
 
 	public static final class TargetShopkeepersResult {
 
-		private final List<? extends Shopkeeper> shopkeepers;
-		private final Text errorMessage;
+		private final List<? extends @NonNull Shopkeeper> shopkeepers;
+		private final @Nullable Text errorMessage;
 		// assert: !shopkeepers.isEmpty || errorMessage != null
 
-		private TargetShopkeepersResult(List<? extends Shopkeeper> shopkeepers) {
-			Validate.isTrue(shopkeepers != null && !shopkeepers.isEmpty());
+		private TargetShopkeepersResult(List<? extends @NonNull Shopkeeper> shopkeepers) {
+			Validate.notNull(shopkeepers, "shopkeepers is null");
+			Validate.isTrue(!shopkeepers.isEmpty(), "shopkeepers is empty");
+			Validate.noNullElements(shopkeepers, "shopkeepers contains null");
 			this.shopkeepers = shopkeepers;
 			this.errorMessage = null;
 		}
@@ -65,11 +67,11 @@ public class ShopkeeperArgumentUtils {
 			return (errorMessage == null);
 		}
 
-		public List<? extends Shopkeeper> getShopkeepers() {
+		public List<? extends @NonNull Shopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 
-		public Text getErrorMessage() {
+		public @Nullable Text getErrorMessage() {
 			return errorMessage;
 		}
 	}
@@ -78,7 +80,7 @@ public class ShopkeeperArgumentUtils {
 
 		public static final TargetShopkeeperFilter ANY = new TargetShopkeeperFilter() {
 			@Override
-			public boolean test(Shopkeeper shopkeeper) {
+			public boolean test(@Nullable Shopkeeper shopkeeper) {
 				return true;
 			}
 
@@ -95,7 +97,7 @@ public class ShopkeeperArgumentUtils {
 
 		public static final TargetShopkeeperFilter ADMIN = new TargetShopkeeperFilter() {
 			@Override
-			public boolean test(Shopkeeper shopkeeper) {
+			public boolean test(@Nullable Shopkeeper shopkeeper) {
 				return (shopkeeper instanceof AdminShopkeeper);
 			}
 
@@ -112,7 +114,7 @@ public class ShopkeeperArgumentUtils {
 
 		public static final TargetShopkeeperFilter PLAYER = new TargetShopkeeperFilter() {
 			@Override
-			public boolean test(Shopkeeper shopkeeper) {
+			public boolean test(@Nullable Shopkeeper shopkeeper) {
 				return (shopkeeper instanceof PlayerShopkeeper);
 			}
 
@@ -133,72 +135,118 @@ public class ShopkeeperArgumentUtils {
 	}
 
 	// If the filter is null, any shopkeeper type can be returned.
-	public static TargetShopkeepersResult findTargetedShopkeepers(Player player, TargetShopkeeperFilter shopkeeperFilter) {
-		if (shopkeeperFilter == null) shopkeeperFilter = TargetShopkeeperFilter.ANY;
+	public static TargetShopkeepersResult findTargetedShopkeepers(
+			Player player,
+			TargetShopkeeperFilter filter
+	) {
+		Validate.notNull(filter, "filter is null");
 		Location playerLoc = player.getEyeLocation();
-		World world = playerLoc.getWorld();
+		World world = Unsafe.assertNonNull(playerLoc.getWorld());
 		Vector viewDirection = playerLoc.getDirection();
 
 		// Ray trace to check for the closest block and entity collision:
 		// Not ignoring passable blocks, in case some type of shopkeeper object makes use of them.
-		RayTraceResult rayTraceResult = world.rayTrace(playerLoc, viewDirection, SHOPKEEPER_TARGET_RANGE, FluidCollisionMode.NEVER, false, 0.0D, (entity) -> {
-			return !entity.isDead() && !entity.equals(player); // TODO SPIGOT-5228: Filtering dead entities.
-		});
+		RayTraceResult rayTraceResult = world.rayTrace(
+				playerLoc,
+				viewDirection,
+				SHOPKEEPER_TARGET_RANGE,
+				FluidCollisionMode.NEVER,
+				false,
+				0.0D,
+				(entity) -> {
+					// TODO SPIGOT-5228: Filtering dead entities.
+					return !entity.isDead() && !entity.equals(player);
+				}
+		);
 
-		// Determine targeted shopkeeper, and return context dependent failure messages:
+		// Determine the targeted shopkeeper(s), or return a context dependent error messages:
 		if (rayTraceResult != null) {
-			Shopkeeper shopkeeper;
 			Block targetBlock = rayTraceResult.getHitBlock();
 			if (targetBlock != null) {
-				// Get shopkeeper by targeted block:
-				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByBlock(targetBlock);
-				if (shopkeeper == null) {
-					// Get player shopkeepers by targeted container:
-					if (ShopContainers.isSupportedContainer(targetBlock.getType())) {
-						List<PlayerShopkeeper> shopsUsingContainer = SKShopkeepersPlugin.getInstance().getProtectedContainers().getShopkeepersUsingContainer(targetBlock);
-						if (shopsUsingContainer.isEmpty()) {
-							return new TargetShopkeepersResult(Messages.unusedContainer);
-						} else {
-							// Filter shops:
-							List<Shopkeeper> acceptedShops = new ArrayList<>();
-							for (Shopkeeper shopUsingContainer : shopsUsingContainer) {
-								if (shopkeeperFilter.test(shopUsingContainer)) {
-									acceptedShops.add(shopUsingContainer);
-								}
-							}
-							if (acceptedShops.isEmpty()) {
-								// Use the first shopkeeper using the container for the error message:
-								return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopsUsingContainer.get(0)));
-							} else {
-								return new TargetShopkeepersResult(acceptedShops);
-							}
-						}
-					}
+				// Get the shopkeeper by the targeted block:
+				TargetShopkeepersResult result = getTargetedShopkeeperByBlock(targetBlock, filter);
+				if (result != null) {
+					return result;
+				}
+
+				// Get the player shopkeepers by the targeted container:
+				result = getTargetedShopkeepersByContainer(targetBlock, filter);
+				if (result != null) {
+					return result;
 				}
 			} else {
-				Entity targetEntity = rayTraceResult.getHitEntity();
-				assert targetEntity != null;
-				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(targetEntity);
-				if (shopkeeper == null) {
-					return new TargetShopkeepersResult(Messages.targetEntityIsNoShop);
-				}
-			}
-
-			// Check if found shopkeeper is accepted:
-			if (shopkeeper != null) {
-				if (shopkeeperFilter.test(shopkeeper)) {
-					return new TargetShopkeepersResult(Arrays.asList(shopkeeper)); // Accepted
-				} else {
-					return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopkeeper));
+				// Get the shopkeeper by the targeted entity:
+				Entity targetEntity = Unsafe.assertNonNull(rayTraceResult.getHitEntity());
+				TargetShopkeepersResult result = getTargetedShopkeeperByEntity(
+						targetEntity,
+						filter
+				);
+				if (result != null) {
+					return result;
 				}
 			}
 		}
 
 		// No targeted shopkeeper found:
-		return new TargetShopkeepersResult(shopkeeperFilter.getNoTargetErrorMsg());
+		return new TargetShopkeepersResult(filter.getNoTargetErrorMsg());
 	}
 
-	public static List<? extends Shopkeeper> getTargetedShopkeepers(Player player, TargetShopkeeperFilter shopkeeperFilter) {
+	private static @Nullable TargetShopkeepersResult getTargetedShopkeeperByBlock(
+			Block targetBlock,
+			TargetShopkeeperFilter filter
+	) {
+		Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByBlock(targetBlock);
+		if (shopkeeper == null) return null;
+		if (!filter.test(shopkeeper)) {
+			return new TargetShopkeepersResult(filter.getInvalidTargetErrorMsg(shopkeeper));
+		}
+		return new TargetShopkeepersResult(Collections.singletonList(shopkeeper));
+	}
+
+	private static @Nullable TargetShopkeepersResult getTargetedShopkeepersByContainer(
+			Block targetBlock,
+			TargetShopkeeperFilter filter
+	) {
+		if (!ShopContainers.isSupportedContainer(targetBlock.getType())) return null;
+
+		ProtectedContainers containerProtections = SKShopkeepersPlugin.getInstance().getProtectedContainers();
+		List<? extends @NonNull PlayerShopkeeper> shopsUsingContainer = containerProtections.getShopkeepersUsingContainer(targetBlock);
+		if (shopsUsingContainer.isEmpty()) {
+			return new TargetShopkeepersResult(Messages.unusedContainer);
+		}
+
+		// Filter shops:
+		List<@NonNull Shopkeeper> acceptedShops = new ArrayList<>();
+		for (Shopkeeper shopUsingContainer : shopsUsingContainer) {
+			if (filter.test(shopUsingContainer)) {
+				acceptedShops.add(shopUsingContainer);
+			}
+		}
+		if (acceptedShops.isEmpty()) {
+			// Use the first shopkeeper using the container for the error message:
+			return new TargetShopkeepersResult(filter.getInvalidTargetErrorMsg(shopsUsingContainer.get(0)));
+		}
+		return new TargetShopkeepersResult(acceptedShops);
+	}
+
+	private static @Nullable TargetShopkeepersResult getTargetedShopkeeperByEntity(
+			Entity targetEntity,
+			TargetShopkeeperFilter filter
+	) {
+		Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(targetEntity);
+		if (shopkeeper == null) {
+			return new TargetShopkeepersResult(Messages.targetEntityIsNoShop);
+		}
+		if (!filter.test(shopkeeper)) {
+			return new TargetShopkeepersResult(filter.getInvalidTargetErrorMsg(shopkeeper));
+		}
+		return new TargetShopkeepersResult(Collections.singletonList(shopkeeper));
+	}
+
+	public static List<? extends @NonNull Shopkeeper> getTargetedShopkeepers(
+			Player player,
+			TargetShopkeeperFilter shopkeeperFilter
+	) {
 		TargetShopkeepersResult result = findTargetedShopkeepers(player, shopkeeperFilter);
 		if (result.isSuccess()) {
 			assert !result.getShopkeepers().isEmpty();
@@ -209,7 +257,10 @@ public class ShopkeeperArgumentUtils {
 	}
 
 	// Returns an empty list if the command sender is not a player.
-	public static List<? extends Shopkeeper> getTargetedShopkeepers(CommandSender sender, TargetShopkeeperFilter shopkeeperFilter) {
+	public static List<? extends @NonNull Shopkeeper> getTargetedShopkeepers(
+			CommandSender sender,
+			TargetShopkeeperFilter shopkeeperFilter
+	) {
 		if (sender instanceof Player) {
 			return getTargetedShopkeepers((Player) sender, shopkeeperFilter);
 		} else {
@@ -219,99 +270,125 @@ public class ShopkeeperArgumentUtils {
 
 	public static class OwnedPlayerShopsResult {
 
-		private final UUID playerUUID; // Can be null
-		private final String playerName; // Can be null
-		// Stores the player uuids and names of all shop owners found that match the given target player name. If this
-		// contains more than one entry then the player name is ambiguous.
-		private final Map<UUID, String> matchingShopOwners; // Not null, can be empty
-		private final List<? extends PlayerShopkeeper> shops; // Not null, can be empty
+		private final @Nullable UUID playerUUID; // Can be null
+		private final @Nullable String playerName; // Can be null
+		// Stores the player uuids and names of all shop owners found that match the given target
+		// player name. If this contains more than one entry then the player name is ambiguous.
+		// Not null, can be empty:
+		private final Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners;
+		private final List<? extends @NonNull PlayerShopkeeper> shops; // Not null, can be empty
 
-		public OwnedPlayerShopsResult(UUID playerUUID, String playerName, Map<UUID, String> matchingShopOwners, List<? extends PlayerShopkeeper> shops) {
-			Validate.isTrue(playerUUID != null || playerName != null, "playerUUID and playerName are both null");
+		public OwnedPlayerShopsResult(
+				@Nullable UUID playerUUID,
+				@Nullable String playerName,
+				Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners,
+				List<? extends @NonNull PlayerShopkeeper> shops
+		) {
+			Validate.isTrue(playerUUID != null || playerName != null,
+					"playerUUID and playerName are both null");
 			Validate.notNull(matchingShopOwners, "matchingShopOwners is null");
+			Validate.notNull(shops, "shops is null");
 			this.playerUUID = playerUUID;
 			this.playerName = playerName;
 			this.matchingShopOwners = matchingShopOwners;
 			this.shops = shops;
 		}
 
-		public UUID getPlayerUUID() {
+		public @Nullable UUID getPlayerUUID() {
 			return playerUUID;
 		}
 
-		public String getPlayerName() {
+		public @Nullable String getPlayerName() {
 			return playerName;
 		}
 
-		public Map<UUID, String> getMatchingShopOwners() {
+		public Map<? extends @NonNull UUID, ? extends @NonNull String> getMatchingShopOwners() {
 			return matchingShopOwners;
 		}
 
-		public List<? extends PlayerShopkeeper> getShops() {
+		public List<? extends @NonNull PlayerShopkeeper> getShops() {
 			return shops;
 		}
 	}
 
 	// Searches for shops owned by the player specified by either uuid or name.
-	// If at least one matching shop is found, it is used to complete the available information about the target player
-	// (e.g. missing uuid or name). The found player name may also differ in case.
-	// If shops are searched via target player name, a map of matching shop owners is returned, which stores the player
-	// uuids and names of all shop owners found that match the given target player name. If this contains more than one
-	// entry then the target player name is ambiguous. The result contains the shops of all those matching players then.
-	public static OwnedPlayerShopsResult getOwnedPlayerShops(UUID targetPlayerUUID, String targetPlayerName) {
-		Validate.isTrue(targetPlayerUUID != null || targetPlayerName != null, "targetPlayerUUID and targetPlayerName are both null");
+	// If at least one matching shop is found, it is used to complete the available information
+	// about the target player (e.g. missing uuid or name). The found player name may also differ in
+	// case.
+	// If shops are searched via target player name, a map of matching shop owners is returned,
+	// which stores the player uuids and names of all shop owners found that match the given target
+	// player name. If this contains more than one entry then the target player name is ambiguous.
+	// The result contains the shops of all those matching players then.
+	public static OwnedPlayerShopsResult getOwnedPlayerShops(
+			@Nullable UUID targetPlayerUUID,
+			@Nullable String targetPlayerName
+	) {
+		Validate.isTrue(targetPlayerUUID != null || targetPlayerName != null,
+				"targetPlayerUUID and targetPlayerName are both null");
+
+		String actualTargetPlayerName = targetPlayerName;
 
 		// Keep track if there are multiple shop owners with matching name:
-		Map<UUID, String> matchingShopOwners = new LinkedHashMap<>();
+		Map<@NonNull UUID, @NonNull String> matchingShopOwners = new LinkedHashMap<>();
 
 		// Search for shops owned by the specified player:
-		List<PlayerShopkeeper> shops = new ArrayList<>();
+		List<@NonNull PlayerShopkeeper> shops = new ArrayList<>();
 		for (Shopkeeper shopkeeper : ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers()) {
-			if (shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-				UUID shopOwnerUUID = playerShop.getOwnerUUID(); // Not null
-				String shopOwnerName = playerShop.getOwnerName(); // Not null
-				if (targetPlayerUUID != null) {
-					// We search for shops with matching owner uuid:
-					if (targetPlayerUUID.equals(shopOwnerUUID)) {
-						shops.add(playerShop);
+			if (!(shopkeeper instanceof PlayerShopkeeper)) {
+				continue;
+			}
 
-						// The input target player name may be missing or differ in case.
-						// Keep track of the owner's actual name:
-						targetPlayerName = shopOwnerName;
-					}
-				} else {
-					assert targetPlayerName != null;
-					// Check for matching name:
-					if (shopOwnerName.equalsIgnoreCase(targetPlayerName)) {
-						// Note: If there exist multiple players which match the given name, the result will include the
-						// shops of all of them.
-						shops.add(playerShop);
+			PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+			UUID shopOwnerUUID = playerShop.getOwnerUUID(); // Not null
+			String shopOwnerName = playerShop.getOwnerName(); // Not null
+			if (targetPlayerUUID != null) {
+				// We search for shops with matching owner uuid:
+				if (targetPlayerUUID.equals(shopOwnerUUID)) {
+					shops.add(playerShop);
 
-						// The input target player name may differ in case.
-						// Keep track of the owner's actual name:
-						targetPlayerName = shopOwnerName;
+					// The input target player name may be missing or differ in case.
+					// Keep track of the owner's actual name:
+					actualTargetPlayerName = shopOwnerName;
+				}
+			} else {
+				assert targetPlayerName != null;
+				// Check for matching name:
+				if (shopOwnerName.equalsIgnoreCase(targetPlayerName)) {
+					// Note: If there exist multiple players which match the given name, the result
+					// will include the shops of all of them.
+					shops.add(playerShop);
 
-						// Keep track of players with matching name:
-						matchingShopOwners.putIfAbsent(shopOwnerUUID, shopOwnerName);
-					}
+					// The input target player name may differ in case.
+					// Keep track of the owner's actual name:
+					actualTargetPlayerName = shopOwnerName;
+
+					// Keep track of players with matching name:
+					matchingShopOwners.putIfAbsent(shopOwnerUUID, shopOwnerName);
 				}
 			}
 		}
-		return new OwnedPlayerShopsResult(targetPlayerUUID, targetPlayerName, matchingShopOwners, shops);
+		return new OwnedPlayerShopsResult(
+				targetPlayerUUID,
+				actualTargetPlayerName,
+				matchingShopOwners,
+				shops
+		);
 	}
 
-	public static class ShopkeeperNameMatchers {
+	public static final class ShopkeeperNameMatchers {
 
-		private ShopkeeperNameMatchers() {
-		}
-
-		public static final ObjectMatcher<Shopkeeper> DEFAULT = new ObjectMatcher<Shopkeeper>() {
+		public static final ObjectMatcher<@NonNull Shopkeeper> DEFAULT = new ObjectMatcher<@NonNull Shopkeeper>() {
 			@Override
-			public Stream<? extends Shopkeeper> match(String input) {
+			public Stream<? extends @NonNull Shopkeeper> match(String input) {
 				if (StringUtils.isEmpty(input)) return Stream.empty();
 				return ShopkeepersAPI.getShopkeeperRegistry().getShopkeepersByName(input);
 			}
 		};
+
+		private ShopkeeperNameMatchers() {
+		}
+	}
+
+	private ShopkeeperArgumentUtils() {
 	}
 }

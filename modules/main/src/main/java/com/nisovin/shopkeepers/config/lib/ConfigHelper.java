@@ -3,23 +3,23 @@ package com.nisovin.shopkeepers.config.lib;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class ConfigHelper {
+public final class ConfigHelper {
 
 	private static final Pattern CONFIG_KEY_PATTERN = Pattern.compile("([A-Z])");
 
-	private ConfigHelper() {
-	}
-
 	/**
-	 * Converts from lower camel case field names to lowercase config keys that separate words by hyphens (-).
+	 * Converts from lower camel case field names to lowercase config keys that separate words by
+	 * hyphens (-).
 	 * <p>
 	 * Some notes on the conversion:
 	 * <ul>
-	 * <li>Each uppercase (ASCII) character is interpreted as the beginning of a new word and a hyphen is inserted.
-	 * <li>The conversion does not deal with uppercase abbreviations. For example, 'someSQLField' is expected to be
-	 * called 'someSqlField'.
+	 * <li>Each uppercase (ASCII) character is interpreted as the beginning of a new word and a
+	 * hyphen is inserted.
+	 * <li>The conversion does not deal with uppercase abbreviations. For example, 'someSQLField' is
+	 * expected to be called 'someSqlField'.
 	 * <li>The field name is expected to start with a lowercase character.
-	 * <li>Digits are treated like any other lowercase characters and not separated into different words.
+	 * <li>Digits are treated like any other lowercase characters and not separated into different
+	 * words.
 	 * <li>All characters are converted to lowercase.
 	 * </ul>
 	 * <p>
@@ -39,5 +39,8 @@ public class ConfigHelper {
 	 */
 	public static String toConfigKey(String fieldName) {
 		return CONFIG_KEY_PATTERN.matcher(fieldName).replaceAll("-$1").toLowerCase(Locale.ROOT);
+	}
+
+	private ConfigHelper() {
 	}
 }

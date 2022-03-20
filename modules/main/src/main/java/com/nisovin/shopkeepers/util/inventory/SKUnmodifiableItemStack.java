@@ -8,6 +8,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -15,25 +16,28 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 /**
  * An unmodifiable view on an {@link ItemStack}.
  * <p>
- * This class extends {@link ItemStack} so that it can be substituted in code that expects an {@link ItemStack}, as long
- * as that code does not attempt to modify the item stack. All getters delegate to the wrapped item stack.
+ * This class extends {@link ItemStack} so that it can be substituted in code that expects an
+ * {@link ItemStack}, as long as that code does not attempt to modify the item stack. All getters
+ * delegate to the wrapped item stack.
  * <p>
- * The implementation of {@link #clone()} does not return a copy of this unmodifiable item stack, but instead returns a
- * modifiable copy of the underlying item stack.
+ * The implementation of {@link #clone()} does not return a copy of this unmodifiable item stack,
+ * but instead returns a modifiable copy of the underlying item stack.
  */
-@DelegateDeserialization(ItemStack.class) // Serialized and deserialized as a normal modifiable ItemStack
+@DelegateDeserialization(ItemStack.class) // De-/Serialized as a normal modifiable ItemStack
 public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableItemStack {
 
 	/**
 	 * Creates an {@link UnmodifiableItemStack} for the given {@link ItemStack}.
 	 * <p>
-	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given item stack itself.
+	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given
+	 * item stack itself.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be <code>null</code>
-	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
+	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is
+	 *         <code>null</code>
 	 */
-	public static UnmodifiableItemStack of(@ReadOnly ItemStack itemStack) {
+	public static @Nullable UnmodifiableItemStack of(@ReadOnly @Nullable ItemStack itemStack) {
 		if (itemStack == null) return null;
 		if (itemStack instanceof UnmodifiableItemStack) {
 			return (UnmodifiableItemStack) itemStack;
@@ -54,8 +58,8 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	/**
 	 * Gets the underlying {@link ItemStack}.
 	 * <p>
-	 * This method is only meant to be used for internal debugging or testing purposes! The caller is expected to not
-	 * modify or expose the returned item stack.
+	 * This method is only meant to be used for internal debugging or testing purposes! The caller
+	 * is expected to not modify or expose the returned item stack.
 	 * 
 	 * @return the underlying item stack
 	 * @deprecated For internal debugging and testing purposes only!
@@ -69,10 +73,10 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 		return new UnsupportedOperationException("This ItemStack cannot be modified!");
 	}
 
-	// Note: Any methods that the base class implements by delegating to other methods do not necessarily need to be
-	// overridden here. However, we delegate all read-only methods to the underlying item stack nevertheless, because
-	// the underlying item stack might provide an improved implementation specific to its concrete type of item stack
-	// (e.g. CraftItemStack).
+	// Note: Any methods that the base class implements by delegating to other methods do not
+	// necessarily need to be overridden here. However, we delegate all read-only methods to the
+	// underlying item stack nevertheless, because the underlying item stack might provide an
+	// improved implementation specific to its concrete type of item stack (e.g. CraftItemStack).
 
 	@Override
 	public ItemStack copy() {
@@ -81,7 +85,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 
 	@Override
 	public UnmodifiableItemStack shallowCopy() {
-		return UnmodifiableItemStack.of(delegate);
+		return UnmodifiableItemStack.ofNonNull(delegate);
 	}
 
 	@Override
@@ -110,12 +114,12 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	}
 
 	@Override
-	public MaterialData getData() {
+	public @Nullable MaterialData getData() {
 		return delegate.getData();
 	}
 
 	@Override
-	public void setData(MaterialData data) {
+	public void setData(@Nullable MaterialData data) {
 		throw unmodifiableException();
 	}
 
@@ -136,13 +140,14 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 
 	// The given item stack might also be another unmodifiable item stack.
 	@Override
-	public boolean isSimilar(@ReadOnly ItemStack itemStack) {
+	public boolean isSimilar(@ReadOnly @Nullable ItemStack itemStack) {
 		if (itemStack == this) return true;
 		if (itemStack instanceof UnmodifiableItemStack) {
-			// If this unmodifiable item stack's delegate is a CraftItemStack and the given item stack is an
-			// UnmodifiableItemStack, invoking CraftItemStack#isSimilar(itemStack) may return a wrong result.
-			// Instead, we therefore want to compare the underlying delegate item stacks with each other. Unlike when
-			// comparing CraftItemStacks with unmodifiable item stacks, the order of this comparison does not matter.
+			// If this unmodifiable item stack's delegate is a CraftItemStack and the given item
+			// stack is an UnmodifiableItemStack, invoking CraftItemStack#isSimilar(itemStack) may
+			// return a wrong result. Instead, we therefore want to compare the underlying delegate
+			// item stacks with each other. Unlike when comparing CraftItemStacks with unmodifiable
+			// item stacks, the order of this comparison does not matter.
 			// This is expected to not modify or expose the passed item stack:
 			return itemStack.isSimilar(delegate);
 		} else {
@@ -151,7 +156,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	}
 
 	@Override
-	public boolean isSimilar(UnmodifiableItemStack itemStack) {
+	public boolean isSimilar(@Nullable UnmodifiableItemStack itemStack) {
 		if (itemStack == null) return false;
 		if (itemStack == this) return true;
 		// Compare the underlying delegate item stacks:
@@ -160,12 +165,13 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 		return itemStack.isSimilar(delegate);
 	}
 
-	// TODO This method cannot be correctly implemented for CraftItemStack, because CraftItemStack always returns false
-	// when being compared to an unknown type of ItemStack (i.e. this method cannot fulfill the symmetry requirement of
-	// equals).
+	// TODO This method cannot be correctly implemented for CraftItemStack, because CraftItemStack
+	// always returns false when being compared to an unknown type of ItemStack (i.e. this method
+	// cannot fulfill the symmetry requirement of equals).
 	@Override
-	public boolean equals(@ReadOnly Object obj) {
+	public boolean equals(@ReadOnly @Nullable Object obj) {
 		if (this == obj) return true;
+		if (obj == null) return false;
 		if (obj instanceof UnmodifiableItemStack) {
 			UnmodifiableItemStack other = (UnmodifiableItemStack) obj;
 			// Compare the underlying delegate item stacks:
@@ -222,7 +228,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	}
 
 	@Override
-	public ItemMeta getItemMeta() {
+	public @Nullable ItemMeta getItemMeta() {
 		return delegate.getItemMeta();
 	}
 
@@ -232,7 +238,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	}
 
 	@Override
-	public boolean setItemMeta(@ReadOnly ItemMeta itemMeta) {
+	public boolean setItemMeta(@ReadOnly @Nullable ItemMeta itemMeta) {
 		throw unmodifiableException();
 	}
 

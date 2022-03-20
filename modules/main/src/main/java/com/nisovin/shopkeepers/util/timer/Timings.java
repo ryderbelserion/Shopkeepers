@@ -1,7 +1,8 @@
 package com.nisovin.shopkeepers.util.timer;
 
 /**
- * Monitors a specific task and provides information about its processing time and the number of times it was executed.
+ * Monitors a specific task and provides information about its processing time and the number of
+ * times it was executed.
  */
 public interface Timings {
 

@@ -45,7 +45,8 @@ class CommandNotify extends PlayerCommand {
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		Player sender = (Player) input.getSender();
-		assert context.has(ARGUMENT_TRADES); // This is the only kind of notification that can be toggled currently
+		// This is the only kind of notification that can be toggled currently:
+		assert context.has(ARGUMENT_TRADES);
 		if (context.has(ARGUMENT_TRADES)) {
 			NotificationUserPreferences userPreferences = SKShopkeepersPlugin.getInstance().getTradeNotifications().getUserPreferences();
 			boolean newState = !userPreferences.isNotifyOnTrades(sender);

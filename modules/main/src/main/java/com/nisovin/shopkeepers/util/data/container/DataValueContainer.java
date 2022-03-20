@@ -3,25 +3,31 @@ package com.nisovin.shopkeepers.util.data.container;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link DataContainer} implementation that dynamically accesses its data source via a given {@link DataValue}.
+ * A {@link DataContainer} implementation that dynamically accesses its data source via a given
+ * {@link DataValue}.
  * <p>
- * Write operations will dynamically create a new underlying data container if it is missing or if the underlying data
- * is not a valid data container. This expects that the given {@link DataValue} is modifiable, and may overwrite any
- * data that is currently stored for the given {@link DataValue}.
+ * Write operations will dynamically create a new underlying data container if it is missing or if
+ * the underlying data is not a valid data container. This expects that the given {@link DataValue}
+ * is modifiable, and may overwrite any data that is currently stored for the given
+ * {@link DataValue}.
  * <p>
- * Read operations do not attempt to create the underlying data container if it is missing or if the underlying data is
- * not a valid data container, and will instead behave as if this data container is empty. This also applies to
- * {@link Object#hashCode()} and {@link Object#equals(Object)}.
+ * Read operations do not attempt to create the underlying data container if it is missing or if the
+ * underlying data is not a valid data container, and will instead behave as if this data container
+ * is empty. This also applies to {@link Object#hashCode()} and {@link Object#equals(Object)}.
  * <p>
- * {@link #serialize()} returns the data that is currently stored by the given {@link DataValue}, even if this data does
- * not represent a valid data container.
+ * {@link #serialize()} returns the data that is currently stored by the given {@link DataValue},
+ * even if this data does not represent a valid data container.
  * <p>
- * Implementation note: The underlying data container instance is cached and only recreated if the underlying data
- * source has changed since the last access.
+ * Implementation note: The underlying data container instance is cached and only recreated if the
+ * underlying data source has changed since the last access.
  */
 public class DataValueContainer extends AbstractDataContainer {
 
@@ -29,26 +35,42 @@ public class DataValueContainer extends AbstractDataContainer {
 	 * Creates a new {@link DataValueContainer} for the given {@link DataValue}.
 	 * 
 	 * @param dataValue
-	 *            the data value that is used to access the underlying data container, or <code>null</code>
-	 * @return the {@link DataValueContainer}, or <code>null</code> if the given {@link DataValue} is <code>null</code>
+	 *            the data value that is used to access the underlying data container, or
+	 *            <code>null</code>
+	 * @return the {@link DataValueContainer}, or <code>null</code> if the given {@link DataValue}
+	 *         is <code>null</code>
 	 */
-	public static DataContainer of(DataValue dataValue) {
+	public static @Nullable DataContainer of(@Nullable DataValue dataValue) {
 		if (dataValue == null) return null;
 		return new DataValueContainer(dataValue);
+	}
+
+	/**
+	 * Creates a new {@link DataValueContainer} for the given {@link DataValue}.
+	 * 
+	 * @param dataValue
+	 *            the data value that is used to access the underlying data container,
+	 *            not<code>null</code>
+	 * @return the {@link DataValueContainer}, not <code>null</code>
+	 */
+	public static DataContainer ofNonNull(DataValue dataValue) {
+		Validate.notNull(dataValue, "dataValue is null");
+		return Unsafe.assertNonNull(of(dataValue));
 	}
 
 	/////
 
 	private final DataValue dataValue;
 
-	private Object dataSourceCache = null;
-	private DataContainer dataContainerCache = null;
+	private @Nullable Object dataSourceCache = null;
+	private @Nullable DataContainer dataContainerCache = null;
 
 	/**
 	 * Creates a new {@link DataValueContainer}.
 	 * 
 	 * @param dataValue
-	 *            the data value that is used to access the underlying data container, not <code>null</code>
+	 *            the data value that is used to access the underlying data container, not
+	 *            <code>null</code>
 	 */
 	protected DataValueContainer(DataValue dataValue) {
 		Validate.notNull(dataValue, "dataValue is null");
@@ -58,16 +80,17 @@ public class DataValueContainer extends AbstractDataContainer {
 	/**
 	 * Gets the underlying data container.
 	 * <p>
-	 * The underlying data container instance is cached and only recreated if the underlying data source has changed
-	 * since the last access.
+	 * The underlying data container instance is cached and only recreated if the underlying data
+	 * source has changed since the last access.
 	 * 
 	 * @param createIfMissing
-	 *            <code>true</code> to create a new underlying data container if it is missing or if the underlying data
-	 *            is not a valid data container. This will overwrite any currently stored data.
-	 * @return the underlying data container, or <code>null</code> if {@code createIfMissing} is <code>false</code> and
-	 *         the underlying data is empty or not a valid data container
+	 *            <code>true</code> to create a new underlying data container if it is missing or if
+	 *            the underlying data is not a valid data container. This will overwrite any
+	 *            currently stored data.
+	 * @return the underlying data container, or <code>null</code> if {@code createIfMissing} is
+	 *         <code>false</code> and the underlying data is empty or not a valid data container
 	 */
-	private DataContainer getDataContainer(boolean createIfMissing) {
+	private @Nullable DataContainer getDataContainer(boolean createIfMissing) {
 		Object dataSource = dataValue.get();
 		if (dataSource != dataSourceCache) {
 			// Update the cache:
@@ -87,26 +110,27 @@ public class DataValueContainer extends AbstractDataContainer {
 	/**
 	 * Gets the underlying data container.
 	 * <p>
-	 * The underlying data container instance is cached and only recreated if the underlying data source has changed
-	 * since the last access.
+	 * The underlying data container instance is cached and only recreated if the underlying data
+	 * source has changed since the last access.
 	 * 
-	 * @return the underlying data container, or <code>null</code> if the underlying data is empty or not a valid data
-	 *         container
+	 * @return the underlying data container, or <code>null</code> if the underlying data is empty
+	 *         or not a valid data container
 	 */
-	protected final DataContainer getDataContainer() {
+	protected final @Nullable DataContainer getDataContainer() {
 		return this.getDataContainer(false);
 	}
 
 	/**
 	 * Gets the underlying data container.
 	 * <p>
-	 * The underlying data container instance is cached and only recreated if the underlying data source has changed
-	 * since the last access.
+	 * The underlying data container instance is cached and only recreated if the underlying data
+	 * source has changed since the last access.
 	 * <p>
-	 * If the underlying data is empty or not a valid data container, this returns {@link DataContainer#EMPTY}.
+	 * If the underlying data is empty or not a valid data container, this returns
+	 * {@link DataContainer#EMPTY}.
 	 * 
-	 * @return the underlying data container, or {@link DataContainer#EMPTY} if the underlying data is empty or not a
-	 *         valid data container, not <code>null</code>
+	 * @return the underlying data container, or {@link DataContainer#EMPTY} if the underlying data
+	 *         is empty or not a valid data container, not <code>null</code>
 	 */
 	protected final DataContainer getDataContainerOrEmpty() {
 		DataContainer dataContainer = this.getDataContainer(false);
@@ -120,25 +144,27 @@ public class DataValueContainer extends AbstractDataContainer {
 	/**
 	 * Gets the underlying data container.
 	 * <p>
-	 * If the underlying data is empty or not a valid data container, this will create and insert a new data container,
-	 * and thereby overwrite any currently stored data for the {@link DataValue} of this {@link DataValueContainer}.
+	 * If the underlying data is empty or not a valid data container, this will create and insert a
+	 * new data container, and thereby overwrite any currently stored data for the {@link DataValue}
+	 * of this {@link DataValueContainer}.
 	 * <p>
-	 * The underlying data container instance is cached and only recreated if the underlying data source has changed
-	 * since the last access.
+	 * The underlying data container instance is cached and only recreated if the underlying data
+	 * source has changed since the last access.
 	 * 
 	 * @return the underlying data container, not <code>null</code>
 	 */
 	protected final DataContainer getOrCreateDataContainer() {
-		return this.getDataContainer(true);
+		DataContainer dataContainer = this.getDataContainer(true);
+		return Unsafe.assertNonNull(dataContainer);
 	}
 
 	@Override
-	public Object getOrDefault(String key, Object defaultValue) {
+	public @Nullable Object getOrDefault(String key, @Nullable Object defaultValue) {
 		return this.getDataContainerOrEmpty().getOrDefault(key, defaultValue);
 	}
 
 	@Override
-	public void set(String key, Object value) {
+	public void set(String key, @Nullable Object value) {
 		this.getOrCreateDataContainer().set(key, value);
 	}
 
@@ -164,22 +190,22 @@ public class DataValueContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<String> getKeys() {
+	public Set<? extends @NonNull String> getKeys() {
 		return this.getDataContainerOrEmpty().getKeys();
 	}
 
 	@Override
-	public Map<String, ?> getValues() {
+	public Map<? extends @NonNull String, @NonNull ?> getValues() {
 		return this.getDataContainerOrEmpty().getValues();
 	}
 
 	@Override
-	public Map<String, Object> getValuesCopy() {
+	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
 		return this.getDataContainerOrEmpty().getValuesCopy();
 	}
 
 	@Override
-	public Object serialize() {
+	public @Nullable Object serialize() {
 		// Retain the data that is currently stored, even if it is not a valid data container:
 		return dataValue.get();
 	}
@@ -200,7 +226,7 @@ public class DataValueContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (obj == this) return true;
 		return this.getDataContainerOrEmpty().equals(obj);
 	}

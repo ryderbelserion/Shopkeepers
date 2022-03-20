@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopcreation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,9 +26,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -51,17 +55,18 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 class CreateListener implements Listener {
 
-	// We sometimes receive two interact events (right click air and then left click air) at the same time when a player
-	// right-clicks air while being in survival mode and targeting a block that is slightly further away than the block
-	// interaction range allows.
-	// By only handling one interaction event within a small time span, we ignore the additional left click air event.
+	// We sometimes receive two interact events (right click air and then left click air) at the
+	// same time when a player right-clicks air while being in survival mode and targeting a block
+	// that is slightly further away than the block interaction range allows.
+	// By only handling one interaction event within a small time span, we ignore the additional
+	// left click air event.
 	private static final long INTERACTION_DELAY_MILLIS = 50L;
 
 	private final SKShopkeepersPlugin plugin;
 	private final ShopkeeperCreation shopkeeperCreation;
 
 	// By player UUID:
-	private final Map<UUID, MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
+	private final Map<@NonNull UUID, @NonNull MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
 
 	// Cached value whether the shop creation item selection message is enabled:
 	private boolean shopCreationItemSelectedMessageEnabled;
@@ -74,9 +79,10 @@ class CreateListener implements Listener {
 	void onEnable() {
 		shopCreationItemSelectedMessageEnabled = !Messages.creationItemSelected.isPlainTextEmpty();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		// Ensure that our interact event handler is always executed first, even after plugin reloads:
-		// In order to not change the order among the already registered event handlers of our own plugin, we move them
-		// all together to the front of the handler list.
+		// Ensure that our interact event handler is always executed first, even after plugin
+		// reloads:
+		// In order to not change the order among the already registered event handlers of our own
+		// plugin, we move them all together to the front of the handler list.
 		EventUtils.enforceExecuteFirst(PlayerInteractEvent.class, EventPriority.LOWEST, plugin);
 	}
 
@@ -112,21 +118,24 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		// To avoid message spam, we only print the shop creation item selection message if the player is still holding
-		// the item after a short delay. Any already active task is aborted.
+		// To avoid message spam, we only print the shop creation item selection message if the
+		// player is still holding the item after a short delay. Any already active task is aborted.
 		ShopCreationItemSelectionTask.start(plugin, player);
 	}
 
 	// See LivingEntityShopListener for a reasoning on why we handle this the event the way we do:
-	// We handle and cancel this event on LOWEST priority so that other plugins (e.g. protection plugins) can ignore it.
-	// This event handler might check container access by calling another dummy interaction event. Handling and
-	// canceling this event as early as possible is also required so that other event handlers (for example of
-	// protection plugins) can ignore the first event and don't handle the interaction twice.
-	// To resolve conflicts with other event handlers at LOWEST priority, we ignore the event if it is already
-	// cancelled. This includes, for example, the interaction handler for sign shops within this plugin, which takes
-	// precedence over this event handler.
-	// To further reduce conflicts with other event handlers at LOWEST priority, including after dynamic plugin reloads,
-	// we forcefully move our event handler(s) to the front of the handler list.
+	// We handle and cancel this event on LOWEST priority so that other plugins (e.g. protection
+	// plugins) can ignore it.
+	// This event handler might check container access by calling another dummy interaction event.
+	// Handling and canceling this event as early as possible is also required so that other event
+	// handlers (for example of protection plugins) can ignore the first event and don't handle the
+	// interaction twice.
+	// To resolve conflicts with other event handlers at LOWEST priority, we ignore the event if it
+	// is already cancelled. This includes, for example, the interaction handler for sign shops
+	// within this plugin, which takes precedence over this event handler.
+	// To further reduce conflicts with other event handlers at LOWEST priority, including after
+	// dynamic plugin reloads, we forcefully move our event handler(s) to the front of the handler
+	// list.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// Ignore our own fake interact event:
@@ -134,7 +143,9 @@ class CreateListener implements Listener {
 
 		// Ignore if the player isn't right-clicking, or left-clicking air:
 		Action action = event.getAction();
-		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) {
+		if (action != Action.RIGHT_CLICK_AIR
+				&& action != Action.RIGHT_CLICK_BLOCK
+				&& action != Action.LEFT_CLICK_AIR) {
 			return;
 		}
 
@@ -145,18 +156,21 @@ class CreateListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		Log.debug(() -> "Player " + player.getName() + " is interacting with the shop creation item: action=" + action
+		Log.debug(() -> "Player " + player.getName()
+				+ " is interacting with the shop creation item: action=" + action
 				+ ", hand=" + event.getHand());
 
 		// Capture event's cancellation state:
 		Result useItemInHand = event.useItemInHand();
 
 		// Prevent regular usage:
-		// If we actually act on the interaction later, we always cancel the event. However, if we don't cancel the
-		// event here, players are able to use the item like normal when holding it in their off hand.
-		// TODO Are there items which would require canceling the event for all left clicks or physical interaction as
-		// well?
-		if (Settings.preventShopCreationItemRegularUsage && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		// If we actually act on the interaction later, we always cancel the event. However, if we
+		// don't cancel the event here, players are able to use the item like normal when holding it
+		// in their off hand.
+		// TODO Are there items which would require canceling the event for all left clicks or
+		// physical interaction as well?
+		if (Settings.preventShopCreationItemRegularUsage
+				&& !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Log.debug("  Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
@@ -168,35 +182,41 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		// Ignore if already cancelled. This resolves conflicts with other event handlers that also run at LOWEST
-		// priority, such as for example Shopkeeper's sign shop listener.
+		// Ignore if already cancelled. This resolves conflicts with other event handlers that also
+		// run at LOWEST priority, such as for example Shopkeeper's sign shop listener.
 		if (useItemInHand == Result.DENY) {
 			Log.debug("  Ignoring already cancelled item interaction");
 			return;
 		}
 
-		// This is one of the interactions that we want to act on. We always cancel the event to prevent any vanilla or
-		// subsequent actions of other event handlers:
+		// This is one of the interactions that we want to act on. We always cancel the event to
+		// prevent any vanilla or subsequent actions of other event handlers:
 		event.setCancelled(true);
 
 		// Ignore the event if we already handled an interaction for the player recently:
-		// This filters out duplicate left click air interaction events that we sometimes receive alongside a right
-		// click air interaction event (TODO This assumes that we first receive the intended right click event, before
-		// we receive the additional left click event).
-		// Note: We do this after the above checks, so that we always cancel the interaction with the shop creation
-		// item, even if we don't actually handle the interaction then. This also avoids unrelated debug spam, since we
-		// only print debug output for interactions with the shop creation item.
+		// This filters out duplicate left click air interaction events that we sometimes receive
+		// alongside a right click air interaction event (TODO This assumes that we first receive
+		// the intended right click event, before we receive the additional left click event).
+		// Note: We do this after the above checks, so that we always cancel the interaction with
+		// the shop creation item, even if we don't actually handle the interaction then. This also
+		// avoids unrelated debug spam, since we only print debug output for interactions with the
+		// shop creation item.
 		UUID uniqueId = player.getUniqueId();
-		MutableLong lastHandledInteractionMillis = lastHandledPlayerInteractionsMillis.computeIfAbsent(uniqueId, (uuid) -> new MutableLong());
+		MutableLong lastHandledInteractionMillis = lastHandledPlayerInteractionsMillis.computeIfAbsent(
+				uniqueId,
+				uuid -> new MutableLong()
+		);
+		assert lastHandledInteractionMillis != null;
 		long nowMillis = System.currentTimeMillis();
 		long millisSinceLastInteraction = (nowMillis - lastHandledInteractionMillis.getValue());
 		if (millisSinceLastInteraction < INTERACTION_DELAY_MILLIS) {
-			Log.debug(() -> "Ignoring interaction of player " + player.getName() + ": Last handled interaction was "
-					+ millisSinceLastInteraction + " ms ago.");
+			Log.debug(() -> "Ignoring interaction of player " + player.getName()
+					+ ": Last handled interaction was " + millisSinceLastInteraction + " ms ago.");
 			return;
 		}
-		// We only update the last interaction timestamp when we actually handle the event. This prevents that delays
-		// between individual events accumulate and that we always handle the event after the intended delay is over.
+		// We only update the last interaction timestamp when we actually handle the event. This
+		// prevents that delays between individual events accumulate and that we always handle the
+		// event after the intended delay is over.
 		lastHandledInteractionMillis.setValue(nowMillis);
 
 		// Get shop type:
@@ -228,11 +248,12 @@ class CreateListener implements Listener {
 				plugin.getShopTypeRegistry().selectPrevious(player);
 			}
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
-			Block clickedBlock = event.getClickedBlock();
+			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
 
 			Block selectedContainer = shopkeeperCreation.getSelectedContainer(player);
 			// Validate old selected container:
-			if (selectedContainer != null && !ShopContainers.isSupportedContainer(selectedContainer.getType())) {
+			if (selectedContainer != null
+					&& !ShopContainers.isSupportedContainer(selectedContainer.getType())) {
 				shopkeeperCreation.selectContainer(player, null);
 				selectedContainer = null;
 			}
@@ -262,17 +283,29 @@ class CreateListener implements Listener {
 					TextUtils.sendMessage(player, Messages.mustSelectContainer);
 					return;
 				}
-				assert ShopContainers.isSupportedContainer(selectedContainer.getType()); // Checked above already
+				// Checked above already:
+				assert ShopContainers.isSupportedContainer(selectedContainer.getType());
 
 				// Only player shops can be selected currently. TODO Change that?
 				assert shopType instanceof PlayerShopType;
 
 				// Determine spawn location:
 				BlockFace clickedBlockFace = event.getBlockFace();
-				Location spawnLocation = shopkeeperCreation.determineSpawnLocation(player, clickedBlock, clickedBlockFace);
+				Location spawnLocation = shopkeeperCreation.determineSpawnLocation(
+						player,
+						clickedBlock,
+						clickedBlockFace
+				);
 
 				// Create player shopkeeper:
-				ShopCreationData creationData = PlayerShopCreationData.create(player, (PlayerShopType<?>) shopType, shopObjType, spawnLocation, clickedBlockFace, selectedContainer);
+				ShopCreationData creationData = PlayerShopCreationData.create(
+						player,
+						(PlayerShopType<?>) shopType,
+						shopObjType,
+						spawnLocation,
+						clickedBlockFace,
+						selectedContainer
+				);
 				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {
 					// Shopkeeper creation was successful:
@@ -280,7 +313,8 @@ class CreateListener implements Listener {
 					// Reset selected container:
 					shopkeeperCreation.selectContainer(player, null);
 
-					// Manually remove creation item from player's hand after this event is processed:
+					// Manually remove creation item from player's hand after this event is
+					// processed:
 					Bukkit.getScheduler().runTask(plugin, () -> {
 						ItemStack newItemInMainHand = ItemUtils.decreaseItemAmount(itemInHand, 1);
 						player.getInventory().setItemInMainHand(newItemInMainHand);
@@ -292,8 +326,10 @@ class CreateListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockDispense(BlockDispenseEvent event) {
-		if (Settings.preventShopCreationItemRegularUsage && Settings.shopCreationItem.matches(event.getItem())) {
-			Log.debug(() -> "Preventing dispensing of shop creation item at " + TextUtils.getLocationString(event.getBlock()));
+		if (Settings.preventShopCreationItemRegularUsage
+				&& Settings.shopCreationItem.matches(event.getItem())) {
+			Log.debug(() -> "Preventing dispensing of shop creation item at "
+					+ TextUtils.getLocationString(event.getBlock()));
 			event.setCancelled(true);
 			// TODO Drop item instead.
 			// TODO Only prevent it for items that have a special dispense behavior.
@@ -319,29 +355,33 @@ class CreateListener implements Listener {
 		if (!Settings.shopCreationItem.matches(itemInHand)) return;
 
 		// Prevent the entity interaction:
-		// TODO Only prevent the entity interaction if the item actually has a special entity interaction behavior.
-		// The interaction result may also depend on the interacted entity. However, there is no Bukkit API yet to
-		// check for this.
+		// TODO Only prevent the entity interaction if the item actually has a special entity
+		// interaction behavior.
+		// The interaction result may also depend on the interacted entity. However, there is no
+		// Bukkit API yet to check for this.
 		Log.debug(() -> {
 			if (event instanceof PlayerInteractAtEntityEvent) {
-				return "Preventing interaction at entity with shop creation item for player " + TextUtils.getPlayerString(player);
+				return "Preventing interaction at entity with shop creation item for player "
+						+ TextUtils.getPlayerString(player);
 			} else {
-				return "Preventing entity interaction with shop creation item for player " + TextUtils.getPlayerString(player);
+				return "Preventing entity interaction with shop creation item for player "
+						+ TextUtils.getPlayerString(player);
 			}
 		});
 		event.setCancelled(true);
 	}
 
 	// Rate limiting of debug messages related to the PrepareAnvilEvent:
-	private static final long ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS = 5000L; // 5 seconds
-	private UUID lastAnvilDebugMessagePlayer = null;
+	private static final long ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS = TimeUnit.SECONDS.toMillis(5L);
+	private @Nullable UUID lastAnvilDebugMessagePlayer = null;
 	private long lastAnvilDebugMessageMillis = 0L;
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPrepareAnvilEvent(PrepareAnvilEvent event) {
 		if (!Settings.preventShopCreationItemRegularUsage) return;
 		if (ItemUtils.isEmpty(event.getResult())) {
-			// The PrepareAnvilEvent is called multiple times. We only need to handle it when a result item is set.
+			// The PrepareAnvilEvent is called multiple times. We only need to handle it when a
+			// result item is set.
 			return;
 		}
 
@@ -349,9 +389,9 @@ class CreateListener implements Listener {
 		if (!Settings.shopCreationItem.matches(anvilInventory.getItem(0))
 				&& !Settings.shopCreationItem.matches(anvilInventory.getItem(1))) {
 			// No shop creation item involved.
-			// Note: We only prevent the renaming of the shop creation item, not its creation. I.e. we do not check the
-			// result item here. The shop creation item could intentionally be set up to be an item that can be created
-			// with an anvil.
+			// Note: We only prevent the renaming of the shop creation item, not its creation. I.e.
+			// we do not check the result item here. The shop creation item could intentionally be
+			// set up to be an item that can be created with an anvil.
 			return;
 		}
 
@@ -364,7 +404,8 @@ class CreateListener implements Listener {
 					|| (nowMillis - lastAnvilDebugMessageMillis) > ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS) {
 				lastAnvilDebugMessagePlayer = playerUniqueId;
 				lastAnvilDebugMessageMillis = nowMillis;
-				Log.debug(() -> "Preventing renaming of shop creation item by " + player.getName() + " (debug output is throttled)");
+				Log.debug(() -> "Preventing renaming of shop creation item by " + player.getName()
+						+ " (debug output is throttled)");
 			}
 		}
 		event.setResult(null);

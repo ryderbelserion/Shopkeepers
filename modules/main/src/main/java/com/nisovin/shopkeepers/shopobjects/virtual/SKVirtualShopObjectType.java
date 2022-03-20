@@ -5,6 +5,8 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
@@ -12,7 +14,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 
 // TODO Not yet used.
-public final class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirtualShopObject> implements VirtualShopObjectType<SKVirtualShopObject> {
+public final class SKVirtualShopObjectType
+		extends AbstractShopObjectType<@NonNull SKVirtualShopObject>
+		implements VirtualShopObjectType<@NonNull SKVirtualShopObject> {
 
 	private final VirtualShops virtualShops;
 
@@ -37,12 +41,19 @@ public final class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirt
 	}
 
 	@Override
-	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
+	public boolean validateSpawnLocation(
+			@Nullable Player creator,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
 		return true; // Does not use any spawn location
 	}
 
 	@Override
-	public SKVirtualShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public SKVirtualShopObject createObject(
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		return new SKVirtualShopObject(virtualShops, shopkeeper, creationData);
 	}
 }

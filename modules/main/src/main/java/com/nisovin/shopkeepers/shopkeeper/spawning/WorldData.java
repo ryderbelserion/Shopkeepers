@@ -1,12 +1,14 @@
 package com.nisovin.shopkeepers.shopkeeper.spawning;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.shopkeeper.spawning.WorldSaveDespawner.RespawnShopkeepersAfterWorldSaveTask;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 final class WorldData {
 
 	private final String worldName;
-	private RespawnShopkeepersAfterWorldSaveTask worldSaveRespawnTask = null;
+	private @Nullable RespawnShopkeepersAfterWorldSaveTask worldSaveRespawnTask = null;
 
 	WorldData(String worldName) {
 		Validate.notNull(worldName, "worldName is null");
@@ -21,14 +23,15 @@ final class WorldData {
 		return (worldSaveRespawnTask != null);
 	}
 
-	void setWorldSaveRespawnTask(RespawnShopkeepersAfterWorldSaveTask worldSaveRespawnTask) {
+	void setWorldSaveRespawnTask(
+			@Nullable RespawnShopkeepersAfterWorldSaveTask worldSaveRespawnTask
+	) {
 		this.worldSaveRespawnTask = worldSaveRespawnTask;
 	}
 
 	void cancelWorldSaveRespawnTask() {
 		if (worldSaveRespawnTask != null) {
 			worldSaveRespawnTask.cancel();
-			worldSaveRespawnTask = null;
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.ui;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -14,11 +15,15 @@ public final class SKUISession implements UISession {
 	private final UIHandler uiHandler;
 	private final Player player;
 	// Can be null for UIs that are not associated with some shopkeeper:
-	private final AbstractShopkeeper shopkeeper;
+	private final @Nullable AbstractShopkeeper shopkeeper;
 	private boolean uiActive = true;
 	private boolean valid = true;
 
-	public SKUISession(UIHandler uiHandler, Player player, AbstractShopkeeper shopkeeper) {
+	public SKUISession(
+			UIHandler uiHandler,
+			Player player,
+			@Nullable AbstractShopkeeper shopkeeper
+	) {
 		Validate.notNull(uiHandler, "uiHandler is null");
 		Validate.notNull(player, "player is null");
 		this.uiHandler = uiHandler;
@@ -41,7 +46,7 @@ public final class SKUISession implements UISession {
 	}
 
 	@Override
-	public final AbstractShopkeeper getShopkeeper() {
+	public final @Nullable AbstractShopkeeper getShopkeeper() {
 		return shopkeeper;
 	}
 
@@ -82,7 +87,7 @@ public final class SKUISession implements UISession {
 	}
 
 	@Override
-	public void closeDelayedAndRunTask(Runnable task) {
+	public void closeDelayedAndRunTask(@Nullable Runnable task) {
 		if (!this.isValid()) return;
 
 		this.deactivateUI();
@@ -107,7 +112,7 @@ public final class SKUISession implements UISession {
 	}
 
 	@Override
-	public void abortDelayedAndRunTask(Runnable task) {
+	public void abortDelayedAndRunTask(@Nullable Runnable task) {
 		if (!this.isValid()) return;
 
 		this.deactivateUI();

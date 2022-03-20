@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.commands.lib.argument;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.text.Text;
 
 /**
@@ -13,7 +15,11 @@ public class InvalidArgumentException extends ArgumentParseException {
 		this(argument, message, null);
 	}
 
-	public InvalidArgumentException(CommandArgument<?> argument, Text message, Throwable cause) {
+	public InvalidArgumentException(
+			CommandArgument<?> argument,
+			Text message,
+			@Nullable Throwable cause
+	) {
 		super(argument, message, cause);
 	}
 }

@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.api.shopobjects.entity;
 
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
@@ -15,5 +16,5 @@ public interface EntityShopObject extends ShopObject {
 	 * 
 	 * @return the entity, or <code>null</code> if the shop object is not spawned currently
 	 */
-	public Entity getEntity();
+	public @Nullable Entity getEntity();
 }

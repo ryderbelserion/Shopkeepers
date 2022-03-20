@@ -9,7 +9,10 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.config.Settings;
@@ -40,22 +43,22 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class VillagerShop extends BabyableShop<Villager> {
+public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	private static final String DATA_KEY_PROFESSION = "profession";
-	public static final Property<Profession> PROFESSION = new BasicProperty<Profession>()
+	public static final Property<@NonNull Profession> PROFESSION = new BasicProperty<@NonNull Profession>()
 			.dataKeyAccessor(DATA_KEY_PROFESSION, EnumSerializers.lenient(Profession.class))
 			.defaultValue(Profession.NONE)
 			.build();
 
-	public static final Property<Villager.Type> VILLAGER_TYPE = new BasicProperty<Villager.Type>()
+	public static final Property<Villager.@NonNull Type> VILLAGER_TYPE = new BasicProperty<Villager.@NonNull Type>()
 			.dataKeyAccessor("villagerType", EnumSerializers.lenient(Villager.Type.class))
 			.defaultValue(Villager.Type.PLAINS)
 			.build();
 
 	public static final int MIN_VILLAGER_LEVEL = 1;
 	public static final int MAX_VILLAGER_LEVEL = 5;
-	public static final Property<Integer> VILLAGER_LEVEL = new BasicProperty<Integer>()
+	public static final Property<@NonNull Integer> VILLAGER_LEVEL = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("villagerLevel", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.bounded(MIN_VILLAGER_LEVEL, MAX_VILLAGER_LEVEL))
 			.defaultValue(1)
@@ -63,16 +66,24 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	static {
 		// Register shopkeeper data migrations:
-		ShopkeeperDataMigrator.registerMigration(new Migration("villager-profession",
-				MigrationPhase.ofShopObjectClass(VillagerShop.class)) {
+		ShopkeeperDataMigrator.registerMigration(new Migration(
+				"villager-profession",
+				MigrationPhase.ofShopObjectClass(VillagerShop.class)
+		) {
 			@Override
-			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+			public boolean migrate(
+					ShopkeeperData shopkeeperData,
+					String logPrefix
+			) throws InvalidDataException {
 				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
 				boolean migrated = false;
-				// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
+
+				// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some
+				// point.
 				String professionName = shopObjectData.getString("prof");
 				if (professionName != null) {
-					Log.warning(logPrefix + "Migrated villager profession from key 'prof' to key 'profession'.");
+					Log.warning(logPrefix
+							+ "Migrated villager profession from key 'prof' to key 'profession'.");
 					shopObjectData.remove("prof");
 					shopObjectData.set(DATA_KEY_PROFESSION, professionName);
 					migrated = true;
@@ -99,22 +110,26 @@ public class VillagerShop extends BabyableShop<Villager> {
 		});
 	}
 
-	private final PropertyValue<Profession> professionProperty = new PropertyValue<>(PROFESSION)
-			.onValueChanged(this::applyProfession)
+	private final PropertyValue<@NonNull Profession> professionProperty = new PropertyValue<>(PROFESSION)
+			.onValueChanged(Unsafe.initialized(this)::applyProfession)
 			.build(properties);
-	private final PropertyValue<Villager.Type> villagerTypeProperty = new PropertyValue<>(VILLAGER_TYPE)
-			.onValueChanged(this::applyVillagerType)
+	private final PropertyValue<Villager.@NonNull Type> villagerTypeProperty = new PropertyValue<>(VILLAGER_TYPE)
+			.onValueChanged(Unsafe.initialized(this)::applyVillagerType)
 			.build(properties);
-	private final PropertyValue<Integer> villagerLevelProperty = new PropertyValue<>(VILLAGER_LEVEL)
-			.onValueChanged(this::applyVillagerLevel)
+	private final PropertyValue<@NonNull Integer> villagerLevelProperty = new PropertyValue<>(VILLAGER_LEVEL)
+			.onValueChanged(Unsafe.initialized(this)::applyVillagerLevel)
 			.build(properties);
 
 	private final VillagerSounds villagerSounds;
 
-	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public VillagerShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull VillagerShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
-		villagerSounds = new VillagerSounds(this);
+		villagerSounds = new VillagerSounds(Unsafe.initialized(this));
 	}
 
 	@Override
@@ -149,13 +164,16 @@ public class VillagerShop extends BabyableShop<Villager> {
 	@Override
 	protected void onSpawn() {
 		super.onSpawn();
-		// TODO I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would
-		// sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
-		// Related (but shouldn't apply here since we use NoAI mobs): https://hub.spigotmc.org/jira/browse/SPIGOT-4776
-		Villager entity = this.getEntity();
+		// TODO I wasn't able to reproduce this myself yet, but according to some reports villager
+		// shopkeepers would sometimes lose their profession. Setting their experience to something
+		// above 0 is an attempt to resolve this.
+		// Related (but shouldn't apply here since we use NoAI mobs):
+		// https://hub.spigotmc.org/jira/browse/SPIGOT-4776
+		Villager entity = Unsafe.assertNonNull(this.getEntity());
 		entity.setVillagerExperience(1);
 
-		// Disable the vanilla ambient sounds if we simulate the ambient and/or trading sounds ourselves:
+		// Disable the vanilla ambient sounds if we simulate the ambient and/or trading sounds
+		// ourselves:
 		if (Settings.simulateVillagerTradingSounds || Settings.simulateVillagerAmbientSounds) {
 			entity.setSilent(true);
 		}
@@ -176,8 +194,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getProfessionEditorButton());
 		editorButtons.add(this.getVillagerTypeEditorButton());
 		editorButtons.add(this.getVillagerLevelEditorButton());
@@ -195,7 +213,9 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void cycleProfession(boolean backwards) {
-		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards));
+		this.setProfession(
+				EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards)
+		);
 	}
 
 	private void applyProfession() {
@@ -256,19 +276,26 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonVillagerProfession,
+				Messages.buttonVillagerProfessionLore
+		);
 		return iconItem;
 	}
 
 	private Button getProfessionEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getProfessionEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleProfession(backwards);
 				return true;
@@ -287,7 +314,9 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void cycleVillagerType(boolean backwards) {
-		this.setVillagerType(EnumUtils.cycleEnumConstant(Villager.Type.class, this.getVillagerType(), backwards));
+		this.setVillagerType(
+				EnumUtils.cycleEnumConstant(Villager.Type.class, this.getVillagerType(), backwards)
+		);
 	}
 
 	private void applyVillagerType() {
@@ -322,19 +351,26 @@ public class VillagerShop extends BabyableShop<Villager> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonVillagerVariant,
+				Messages.buttonVillagerVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getVillagerTypeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getVillagerTypeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleVillagerType(backwards);
 				return true;
@@ -391,19 +427,26 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonVillagerLevel,
+				Messages.buttonVillagerLevelLore
+		);
 		return iconItem;
 	}
 
 	private Button getVillagerLevelEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getVillagerLevelEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleVillagerLevel(backwards);
 				return true;

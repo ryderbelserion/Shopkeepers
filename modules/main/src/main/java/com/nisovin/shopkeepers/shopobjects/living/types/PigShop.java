@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Pig;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -23,19 +26,23 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class PigShop extends BabyableShop<Pig> {
+public class PigShop extends BabyableShop<@NonNull Pig> {
 
-	public static final Property<Boolean> SADDLE = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> SADDLE = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("saddle", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Boolean> saddleProperty = new PropertyValue<>(SADDLE)
-			.onValueChanged(this::applySaddle)
+	private final PropertyValue<@NonNull Boolean> saddleProperty = new PropertyValue<>(SADDLE)
+			.onValueChanged(Unsafe.initialized(this)::applySaddle)
 			.build(properties);
 
-	public PigShop(	LivingShops livingShops, SKLivingShopObjectType<PigShop> livingObjectType,
-					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public PigShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull PigShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -58,8 +65,8 @@ public class PigShop extends BabyableShop<Pig> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSaddleEditorButton());
 		return editorButtons;
 	}
@@ -86,19 +93,26 @@ public class PigShop extends BabyableShop<Pig> {
 
 	private ItemStack getSaddleEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SADDLE);
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonPigSaddle, Messages.buttonPigSaddleLore);
+		ItemUtils.setDisplayNameAndLore(
+				iconItem,
+				Messages.buttonPigSaddle,
+				Messages.buttonPigSaddleLore
+		);
 		return iconItem;
 	}
 
 	private Button getSaddleEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getSaddleEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				cycleSaddle();
 				return true;
 			}

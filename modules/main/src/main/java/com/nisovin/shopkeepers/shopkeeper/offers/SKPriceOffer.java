@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
@@ -25,6 +28,7 @@ import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSeriali
 import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -36,8 +40,9 @@ public class SKPriceOffer implements PriceOffer {
 	/**
 	 * Creates a new {@link SKPriceOffer}.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
-	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
+	 * and therefore not copied before it is stored by the price offer. Otherwise, it is first
+	 * copied.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -45,13 +50,14 @@ public class SKPriceOffer implements PriceOffer {
 	 *            the price, has to be positive
 	 */
 	public SKPriceOffer(ItemStack item, int price) {
-		this(ItemUtils.unmodifiableCloneIfModifiable(item), price);
+		this(ItemUtils.nonNullUnmodifiableCloneIfModifiable(item), price);
 	}
 
 	/**
 	 * Creates a new {@link SKPriceOffer}.
 	 * <p>
-	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored
+	 * by the price offer.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -96,7 +102,7 @@ public class SKPriceOffer implements PriceOffer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (!(obj instanceof SKPriceOffer)) return false;
@@ -110,11 +116,11 @@ public class SKPriceOffer implements PriceOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	private static final Property<UnmodifiableItemStack> ITEM = new BasicProperty<UnmodifiableItemStack>()
+	private static final Property<@NonNull UnmodifiableItemStack> ITEM = new BasicProperty<@NonNull UnmodifiableItemStack>()
 			.dataKeyAccessor("item", ItemStackSerializers.UNMODIFIABLE)
 			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
 			.build();
-	private static final Property<Integer> PRICE = new BasicProperty<Integer>()
+	private static final Property<@NonNull Integer> PRICE = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("price", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.POSITIVE)
 			.build();
@@ -122,9 +128,9 @@ public class SKPriceOffer implements PriceOffer {
 	/**
 	 * A {@link DataSerializer} for values of type {@link PriceOffer}.
 	 */
-	public static final DataSerializer<PriceOffer> SERIALIZER = new DataSerializer<PriceOffer>() {
+	public static final DataSerializer<@NonNull PriceOffer> SERIALIZER = new DataSerializer<@NonNull PriceOffer>() {
 		@Override
-		public Object serialize(PriceOffer value) {
+		public @Nullable Object serialize(PriceOffer value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerData = DataContainer.create();
 			offerData.set(ITEM, value.getItem()); // Assumed immutable
@@ -136,7 +142,8 @@ public class SKPriceOffer implements PriceOffer {
 		public PriceOffer deserialize(Object data) throws InvalidDataException {
 			DataContainer offerData = DataContainerSerializers.DEFAULT.deserialize(data);
 			try {
-				// The item stack is assumed to be immutable and therefore does not need to be copied.
+				// The item stack is assumed to be immutable and therefore does not need to be
+				// copied.
 				UnmodifiableItemStack item = offerData.get(ITEM);
 				int price = offerData.get(PRICE);
 				return new SKPriceOffer(item, price);
@@ -151,9 +158,9 @@ public class SKPriceOffer implements PriceOffer {
 	 * <p>
 	 * All contained elements are expected to not be <code>null</code>.
 	 */
-	public static final DataSerializer<@ReadOnly List<? extends PriceOffer>> LIST_SERIALIZER = new DataSerializer<List<? extends PriceOffer>>() {
+	public static final DataSerializer<@NonNull List<? extends @NonNull PriceOffer>> LIST_SERIALIZER = new DataSerializer<@NonNull List<? extends @NonNull PriceOffer>>() {
 		@Override
-		public Object serialize(List<? extends PriceOffer> value) {
+		public @Nullable Object serialize(@ReadOnly List<? extends @NonNull PriceOffer> value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerListData = DataContainer.create();
 			int id = 1;
@@ -166,17 +173,20 @@ public class SKPriceOffer implements PriceOffer {
 		}
 
 		@Override
-		public List<? extends PriceOffer> deserialize(Object data) throws InvalidDataException {
+		public List<? extends @NonNull PriceOffer> deserialize(
+				Object data
+		) throws InvalidDataException {
 			DataContainer offerListData = DataContainerSerializers.DEFAULT.deserialize(data);
-			Set<String> keys = offerListData.getKeys();
-			List<PriceOffer> offers = new ArrayList<>(keys.size());
+			Set<? extends @NonNull String> keys = offerListData.getKeys();
+			List<@NonNull PriceOffer> offers = new ArrayList<>(keys.size());
 			for (String id : keys) {
-				Object offerData = offerListData.get(id);
+				Object offerData = Unsafe.assertNonNull(offerListData.get(id));
 				PriceOffer offer;
 				try {
 					offer = SERIALIZER.deserialize(offerData);
 				} catch (InvalidDataException e) {
-					throw new InvalidDataException("Invalid price offer " + id + ": " + e.getMessage(), e);
+					throw new InvalidDataException("Invalid price offer " + id + ": "
+							+ e.getMessage(), e);
 				}
 				offers.add(offer);
 			}
@@ -184,7 +194,10 @@ public class SKPriceOffer implements PriceOffer {
 		}
 	};
 
-	public static void saveOffers(DataValue dataValue, @ReadOnly List<? extends PriceOffer> offers) {
+	public static void saveOffers(
+			DataValue dataValue,
+			@ReadOnly @Nullable List<? extends @NonNull PriceOffer> offers
+	) {
 		Validate.notNull(dataValue, "dataValue is null");
 		if (offers == null) {
 			dataValue.clear();
@@ -195,23 +208,26 @@ public class SKPriceOffer implements PriceOffer {
 		dataValue.set(offerListData);
 	}
 
-	public static List<? extends PriceOffer> loadOffers(DataValue dataValue) throws InvalidDataException {
+	public static List<? extends @NonNull PriceOffer> loadOffers(
+			DataValue dataValue
+	) throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
-
-		if (!dataValue.isPresent()) {
+		Object offerListData = dataValue.get();
+		if (offerListData == null) {
 			// No data. -> Return an empty list of offers.
 			return Collections.emptyList();
 		}
-
-		Object offerListData = dataValue.get();
 		return LIST_SERIALIZER.deserialize(offerListData);
 	}
 
 	// Returns true if the data has changed due to migrations.
-	public static boolean migrateOffers(DataValue dataValue, String logPrefix) throws InvalidDataException {
+	public static boolean migrateOffers(
+			DataValue dataValue,
+			String logPrefix
+	) throws InvalidDataException {
 		Validate.notNull(logPrefix, "logPrefix is null");
-		List<? extends PriceOffer> offers = loadOffers(dataValue);
-		List<? extends PriceOffer> migratedOffers = migrateItems(offers);
+		List<? extends @NonNull PriceOffer> offers = loadOffers(dataValue);
+		List<? extends @NonNull PriceOffer> migratedOffers = migrateItems(offers);
 		if (offers == migratedOffers) {
 			// No offers were migrated.
 			return false;
@@ -219,46 +235,46 @@ public class SKPriceOffer implements PriceOffer {
 
 		// Write back the migrated offers:
 		saveOffers(dataValue, migratedOffers);
-		Log.debug(DebugOptions.itemMigrations, () -> logPrefix + "Migrated items of trade offers.");
+		Log.debug(DebugOptions.itemMigrations,
+				() -> logPrefix + "Migrated items of trade offers.");
 		return true;
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	private static List<? extends PriceOffer> migrateItems(@ReadOnly List<? extends PriceOffer> offers) throws InvalidDataException {
+	private static List<? extends @NonNull PriceOffer> migrateItems(
+			@ReadOnly List<? extends @NonNull PriceOffer> offers
+	) throws InvalidDataException {
 		Validate.notNull(offers, "offers is null");
-		assert !offers.contains(null);
-		List<PriceOffer> migratedOffers = null;
+		assert !CollectionUtils.containsNull(offers);
+		List<@NonNull PriceOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
 			PriceOffer offer = offers.get(i);
 			assert offer != null;
 
 			boolean itemsMigrated = false;
-			boolean migrationFailed = false;
 
-			UnmodifiableItemStack item = offer.getItem();
+			@NonNull UnmodifiableItemStack item = offer.getItem();
+			assert !ItemUtils.isEmpty(item);
 			UnmodifiableItemStack migratedItem = ItemMigration.migrateItemStack(item);
 			if (!ItemUtils.isSimilar(item, migratedItem)) {
-				if (ItemUtils.isEmpty(migratedItem) && !ItemUtils.isEmpty(item)) {
-					migrationFailed = true;
+				if (ItemUtils.isEmpty(migratedItem)) {
+					throw new InvalidDataException("Item migration failed for price offer "
+							+ (i + 1) + ": " + offer);
 				} else {
-					item = migratedItem;
+					item = Unsafe.assertNonNull(migratedItem);
 					itemsMigrated = true;
 				}
 			}
 
-			if (migrationFailed) {
-				throw new InvalidDataException("Item migration failed for price offer " + (i + 1) + ": " + offer);
-			}
-
 			if (itemsMigrated) {
-				// Lazily set up the list of migrated offers, and add the trades that were already processed but did not
-				// require migrations:
+				// Lazily set up the list of migrated offers, and add the trades that were already
+				// processed but did not require migrations:
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
 						PriceOffer oldOffer = offers.get(j);
-						if (oldOffer == null) continue; // Skip invalid entries
+						assert oldOffer != null;
 						migratedOffers.add(oldOffer);
 					}
 				}
@@ -267,7 +283,8 @@ public class SKPriceOffer implements PriceOffer {
 				assert !ItemUtils.isEmpty(item);
 				migratedOffers.add(new SKPriceOffer(item, offer.getPrice()));
 			} else if (migratedOffers != null) {
-				// Add the previous offer, which did not require any migrations, to the list of already migrated offers:
+				// Add the previous offer, which did not require any migrations, to the list of
+				// already migrated offers:
 				migratedOffers.add(offer);
 			}
 		}

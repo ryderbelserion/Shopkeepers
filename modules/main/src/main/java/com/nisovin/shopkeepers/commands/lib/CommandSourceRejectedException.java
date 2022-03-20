@@ -3,7 +3,8 @@ package com.nisovin.shopkeepers.commands.lib;
 import com.nisovin.shopkeepers.text.Text;
 
 /**
- * This exception is thrown when a command cannot be executed because the command source is not accepted.
+ * This exception is thrown when a command cannot be executed because the command source is not
+ * accepted.
  */
 public class CommandSourceRejectedException extends CommandException {
 

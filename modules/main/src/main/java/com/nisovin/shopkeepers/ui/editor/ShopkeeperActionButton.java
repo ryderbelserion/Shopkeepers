@@ -5,7 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * An {@link ActionButton} for simple one-click shopkeeper editing actions.
@@ -28,8 +30,11 @@ public abstract class ShopkeeperActionButton extends ActionButton {
 	}
 
 	protected Shopkeeper getShopkeeper() {
-		assert this.getEditorHandler() instanceof EditorHandler;
-		return ((EditorHandler) this.getEditorHandler()).getShopkeeper();
+		AbstractEditorHandler editorHandler = this.getEditorHandler();
+		Validate.State.notNull(editorHandler,
+				"This button has not yet been added to any editor handler!");
+		assert editorHandler instanceof EditorHandler;
+		return Unsafe.<EditorHandler>castNonNull(editorHandler).getShopkeeper();
 	}
 
 	@Override

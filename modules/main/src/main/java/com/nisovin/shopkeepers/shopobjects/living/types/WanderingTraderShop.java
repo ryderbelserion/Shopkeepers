@@ -3,7 +3,10 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.List;
 
 import org.bukkit.entity.WanderingTrader;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -18,14 +21,18 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 
-public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
+public class WanderingTraderShop extends BabyableShop<@NonNull WanderingTrader> {
 
 	private final WanderingTraderSounds wanderingTraderSounds;
 
-	public WanderingTraderShop(	LivingShops livingShops, SKLivingShopObjectType<WanderingTraderShop> livingObjectType,
-								AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public WanderingTraderShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull WanderingTraderShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
-		wanderingTraderSounds = new WanderingTraderSounds(this);
+		wanderingTraderSounds = new WanderingTraderSounds(Unsafe.initialized(this));
 	}
 
 	@Override
@@ -54,10 +61,12 @@ public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
 	@Override
 	protected void onSpawn() {
 		super.onSpawn();
-		WanderingTrader entity = this.getEntity();
+		WanderingTrader entity = Unsafe.assertNonNull(this.getEntity());
 
-		// Disable the vanilla ambient sounds if we simulate the ambient and/or trading sounds ourselves:
-		if (Settings.simulateWanderingTraderTradingSounds || Settings.simulateWanderingTraderAmbientSounds) {
+		// Disable the vanilla ambient sounds if we simulate the ambient and/or trading sounds
+		// ourselves:
+		if (Settings.simulateWanderingTraderTradingSounds
+				|| Settings.simulateWanderingTraderAmbientSounds) {
 			entity.setSilent(true);
 		}
 
@@ -76,8 +85,8 @@ public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		return editorButtons;
 	}
 }

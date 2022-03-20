@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
@@ -15,30 +18,29 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
 public abstract class AbstractText implements Text {
 
 	// Reused among all Text instances:
-	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+	private static final Map<@NonNull String, @NonNull Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
 	private static final MessageArguments TEMP_ARGUMENTS = MessageArguments.ofMap(TEMP_ARGUMENTS_MAP);
 
 	// TODO Remove parent reference?
 	// Would allow less mutable state, which simplifies reuse of Text instances.
-	private Text parent = null;
+	private @Nullable Text parent = null;
 
-	private Text child = null;
-	private Text next = null;
+	private @Nullable Text child = null;
+	private @Nullable Text next = null;
 
-	// TODO Cache plain text? Requires childs to inform parents on changes to their translation or placeholder
-	// arguments. -> Might not even be worth it in the presence of dynamic arguments.
+	// TODO Cache plain text? Requires childs to inform parents on changes to their translation or
+	// placeholder arguments. -> Might not even be worth it in the presence of dynamic arguments.
 
 	protected AbstractText() {
 	}
 
 	// PARENT
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Text> T getParent() {
-		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g. to TextBuilder in a
-		// fluently built Text).
-		return (T) parent;
+	public <T extends @NonNull Text> @Nullable T getParent() {
+		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g.
+		// to TextBuilder in a fluently built Text).
+		return Unsafe.cast(parent);
 	}
 
 	/**
@@ -49,26 +51,27 @@ public abstract class AbstractText implements Text {
 	 * @param parent
 	 *            the parent Text, can be <code>null</code>
 	 */
-	private void setParent(Text parent) {
+	private void setParent(@Nullable Text parent) {
 		this.parent = parent;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Text> T getRoot() {
+	public <T extends @NonNull Text> @NonNull T getRoot() {
 		Text text = this;
-		while (text.getParent() != null) {
-			text = text.getParent();
+		Text parent;
+		while ((parent = text.getParent()) != null) {
+			text = parent;
 		}
-		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g. to TextBuilder in a
-		// fluently built Text).
+		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g.
+		// to TextBuilder in a fluently built Text).
 		return (T) text;
 	}
 
 	// CHILD
 
 	@Override
-	public Text getChild() {
+	public @Nullable Text getChild() {
 		return child;
 	}
 
@@ -80,7 +83,7 @@ public abstract class AbstractText implements Text {
 	 * @param child
 	 *            the child Text, or <code>null</code> to unset it
 	 */
-	protected void setChild(Text child) {
+	protected void setChild(@Nullable Text child) {
 		if (child != null) {
 			Validate.isTrue(child != this, "child cannot be this Text itself");
 			Validate.isTrue(child.getParent() == null, "child already has a parent");
@@ -95,7 +98,7 @@ public abstract class AbstractText implements Text {
 	// NEXT
 
 	@Override
-	public Text getNext() {
+	public @Nullable Text getNext() {
 		return next;
 	}
 
@@ -107,7 +110,7 @@ public abstract class AbstractText implements Text {
 	 * @param next
 	 *            the next Text, or <code>null</code> to unset it
 	 */
-	protected void setNext(Text next) {
+	protected void setNext(@Nullable Text next) {
 		if (next != null) {
 			Validate.isTrue(next != this, "next cannot be this Text itself");
 			Validate.isTrue(next.getParent() == null, "next already has a parent");
@@ -140,12 +143,14 @@ public abstract class AbstractText implements Text {
 	}
 
 	@Override
-	public final Text setPlaceholderArguments(Map<String, ?> arguments) {
+	public final Text setPlaceholderArguments(
+			Map<? extends @NonNull String, @NonNull ?> arguments
+	) {
 		return this.setPlaceholderArguments(MessageArguments.ofMap(arguments));
 	}
 
 	@Override
-	public final Text setPlaceholderArguments(Object... argumentPairs) {
+	public final Text setPlaceholderArguments(@NonNull Object... argumentPairs) {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
 			StringUtils.addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
@@ -237,6 +242,7 @@ public abstract class AbstractText implements Text {
 
 	@Override
 	public String toUnformattedText() {
-		return ChatColor.stripColor(this.toPlainText());
+		String unformatted = ChatColor.stripColor(this.toPlainText());
+		return Unsafe.assertNonNull(unformatted);
 	}
 }

@@ -6,27 +6,33 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+
 /**
- * Base class that handles method invocations for mocks that are implemented as proxies.
+ * Base class that handled as proxies.
  *
  * @param <T>
  *            the proxied type
  */
-abstract class ProxyHandler<T> implements InvocationHandler {
+abstract class ProxyHandler<@NonNull T> implements InvocationHandler {
 
 	@FunctionalInterface
-	public interface MethodHandler<T> {
-		Object handle(T proxy, Object[] args);
+	public interface MethodHandler<@NonNull T> {
+		@Nullable
+		Object handle(@NonNull T proxy, @Nullable Object @Nullable [] args);
 	}
 
-	private final Map<Method, MethodHandler<T>> methodHandlers = new HashMap<>();
-	private final Class<T> proxiedInterface;
+	private final Map<@NonNull Method, @NonNull MethodHandler<@NonNull T>> methodHandlers = new HashMap<>();
+	private final Class<@NonNull T> proxiedInterface;
 
-	public ProxyHandler(Class<T> proxiedInterface) {
+	public ProxyHandler(Class<@NonNull T> proxiedInterface) {
 		assert proxiedInterface != null && proxiedInterface.isInterface();
 		this.proxiedInterface = proxiedInterface;
 		try {
-			this.setupMethodHandlers();
+			Unsafe.initialized(this).setupMethodHandlers();
 		} catch (Exception e) {
 			throw new Error(e);
 		}
@@ -35,21 +41,28 @@ abstract class ProxyHandler<T> implements InvocationHandler {
 	protected void setupMethodHandlers() throws Exception {
 	}
 
-	protected final void addHandler(Method method, MethodHandler<T> handler) {
+	protected final void addHandler(Method method, MethodHandler<@NonNull T> handler) {
 		methodHandlers.put(method, handler);
 	}
 
-	@SuppressWarnings("unchecked")
-	public final T newProxy() {
-		return (T) Proxy.newProxyInstance(proxiedInterface.getClassLoader(), new Class<?>[] { proxiedInterface }, this);
+	public final @NonNull T newProxy() {
+		return Unsafe.cast(Proxy.newProxyInstance(
+				proxiedInterface.getClassLoader(),
+				new Class<?>[] { proxiedInterface },
+				this
+		));
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("override.return")
 	@Override
-	public final Object invoke(Object proxy, Method method, Object[] args) {
-		MethodHandler<T> handler = methodHandlers.get(method);
+	public final @Nullable Object invoke(
+			Object proxy,
+			Method method,
+			@Nullable Object @Nullable [] args
+	) {
+		MethodHandler<@NonNull T> handler = methodHandlers.get(Unsafe.assertNonNull(method));
 		if (handler != null) {
-			return handler.handle((T) proxy, args);
+			return handler.handle(Unsafe.castNonNull(proxy), args);
 		}
 		throw new UnsupportedOperationException(String.valueOf(method));
 	}

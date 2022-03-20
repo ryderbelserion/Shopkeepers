@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents a player that the Shopkeepers plugin knows about.
@@ -40,8 +41,8 @@ public interface User {
 	/**
 	 * Gets the player's display name.
 	 * <p>
-	 * If the player is currently offline, the display name may not be available. In this case, this returns the
-	 * player's {@link #getLastKnownName() last known name} as fallback.
+	 * If the player is currently offline, the display name may not be available. In this case, this
+	 * returns the player's {@link #getLastKnownName() last known name} as fallback.
 	 * 
 	 * @return the display name or last known name, not <code>null</code> or empty
 	 */
@@ -59,13 +60,13 @@ public interface User {
 	 * 
 	 * @return the player, or <code>null</code> if the player is not online
 	 */
-	public Player getPlayer();
+	public @Nullable Player getPlayer();
 
 	/**
 	 * Gets the {@link OfflinePlayer}.
 	 * 
-	 * @return the offline player, never <code>null</code> (even if the player does not exist or has never played on the
-	 *         server before)
+	 * @return the offline player, never <code>null</code> (even if the player does not exist or has
+	 *         never played on the server before)
 	 */
 	public OfflinePlayer getOfflinePlayer();
 }

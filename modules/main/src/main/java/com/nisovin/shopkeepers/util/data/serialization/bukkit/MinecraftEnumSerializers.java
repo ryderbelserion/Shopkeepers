@@ -1,6 +1,8 @@
 package com.nisovin.shopkeepers.util.data.serialization.bukkit;
 
 import org.bukkit.Material;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
@@ -9,15 +11,16 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers.EnumSerializer;
 
 /**
- * Default {@link DataSerializer}s for Bukkit {@link Enum} values that are based on Minecaft namespaced ids, such as
- * {@link Material}.
+ * Default {@link DataSerializer}s for Bukkit {@link Enum} values that are based on Minecaft
+ * namespaced ids, such as {@link Material}.
  * <p>
- * These serializers behaves similar to the normal {@link EnumSerializers}, but may take into account any formatting
- * differences of these Bukkit enums.
+ * These serializers behaves similar to the normal {@link EnumSerializers}, but may take into
+ * account any formatting differences of these Bukkit enums.
  */
 public final class MinecraftEnumSerializers {
 
-	private static class LenientMinecraftEnumSerializer<E extends Enum<E>> extends EnumSerializer<E> {
+	private static class LenientMinecraftEnumSerializer<E extends @NonNull Enum<E>>
+			extends EnumSerializer<@NonNull E> {
 
 		/**
 		 * Creates a new {@link LenientMinecraftEnumSerializer}.
@@ -25,14 +28,14 @@ public final class MinecraftEnumSerializers {
 		 * @param enumType
 		 *            the enum class, not <code>null</code>
 		 */
-		public LenientMinecraftEnumSerializer(Class<E> enumType) {
+		public LenientMinecraftEnumSerializer(Class<@NonNull E> enumType) {
 			super(enumType);
 		}
 
 		@Override
-		public E deserialize(Object data) throws InvalidDataException {
+		public @NonNull E deserialize(Object data) throws InvalidDataException {
 			String valueName = this.deserializeEnumValueName(data);
-			E value = MinecraftEnumUtils.parseEnum(enumType, valueName);
+			@Nullable E value = MinecraftEnumUtils.parseEnum(enumType, valueName);
 			if (value == null) {
 				throw this.unknownEnumValueError(valueName);
 			} else {
@@ -52,17 +55,20 @@ public final class MinecraftEnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends Enum<E>> DataSerializer<E> strict(Class<E> enumType) {
+	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> strict(
+			Class<@NonNull E> enumType
+	) {
 		return EnumSerializers.strict(enumType);
 	}
 
 	/**
 	 * Gets a {@link DataSerializer} for values of the specified enum.
 	 * <p>
-	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} first tries to
-	 * find an enum value whose name perfectly matches the given serialized enum value name, and otherwise tries to find
-	 * a matching enum value by {@link MinecraftEnumUtils#normalizeEnumName(String) formatting} the given serialized
-	 * enum value name so that it matches the usual formatting of Bukkit enums.
+	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
+	 * {@link DataSerializer} first tries to find an enum value whose name perfectly matches the
+	 * given serialized enum value name, and otherwise tries to find a matching enum value by
+	 * {@link MinecraftEnumUtils#normalizeEnumName(String) formatting} the given serialized enum
+	 * value name so that it matches the usual formatting of Bukkit enums.
 	 * 
 	 * @param <E>
 	 *            the enum type
@@ -70,8 +76,10 @@ public final class MinecraftEnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends Enum<E>> DataSerializer<E> lenient(Class<E> enumType) {
-		return new LenientMinecraftEnumSerializer<E>(enumType);
+	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> lenient(
+			Class<@NonNull E> enumType
+	) {
+		return new LenientMinecraftEnumSerializer<@NonNull E>(enumType);
 	}
 
 	/**
@@ -83,13 +91,17 @@ public final class MinecraftEnumSerializers {
 		 * Gets a {@link DataSerializer} for {@link Material} values.
 		 * <p>
 		 * This {@link DataSerializer} behaves similar to the lenient data serializers returned by
-		 * {@link #lenient(Class)}. Besides the common enum name formatting, this data serializer performs no
-		 * conversions of the material name during deserialization, but assumes an up-to-date material name.
+		 * {@link #lenient(Class)}. Besides the common enum name formatting, this data serializer
+		 * performs no conversions of the material name during deserialization, but assumes an
+		 * up-to-date material name.
 		 * <p>
-		 * If no matching {@link Material} is found during deserialization, this data serializer throws an
-		 * {@link UnknownMaterialException} instead of a normal {@link InvalidDataException}.
+		 * If no matching {@link Material} is found during deserialization, this data serializer
+		 * throws an {@link UnknownMaterialException} instead of a normal
+		 * {@link InvalidDataException}.
 		 */
-		public static DataSerializer<Material> LENIENT = new LenientMinecraftEnumSerializer<Material>(Material.class) {
+		public static DataSerializer<@NonNull Material> LENIENT = new LenientMinecraftEnumSerializer<@NonNull Material>(
+				Material.class
+		) {
 			@Override
 			protected InvalidDataException unknownEnumValueError(String valueName) {
 				assert valueName != null;

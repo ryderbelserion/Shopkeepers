@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.data.property.validation.java;
 
-import com.nisovin.shopkeepers.util.data.property.Property;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.util.data.property.validation.PropertyValidator;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -10,9 +11,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class IntegerValidators {
 
 	/**
-	 * A {@link PropertyValidator} that ensures that the validated integer is within specific bounds.
+	 * A {@link PropertyValidator} that ensures that the validated integer is within specific
+	 * bounds.
 	 */
-	private static class BoundedIntegerValidator implements PropertyValidator<Integer> {
+	private static class BoundedIntegerValidator implements PropertyValidator<@NonNull Integer> {
 
 		private final int minValue;
 		private final int maxValue;
@@ -37,7 +39,7 @@ public final class IntegerValidators {
 		}
 
 		@Override
-		public void validate(Property<? extends Integer> property, Integer value) {
+		public void validate(Integer value) {
 			Validate.notNull(value, "value is null");
 			Validate.isTrue(this.isInBounds(value), () -> this.getOutOfBoundsMessage(value));
 		}
@@ -50,14 +52,18 @@ public final class IntegerValidators {
 		 * @return the error message, not <code>null</code> or empty
 		 */
 		protected String getOutOfBoundsMessage(int value) {
-			return "Value is out of bounds: min=" + minValue + ", max=" + maxValue + ", value" + value + ".";
+			return "Value is out of bounds: min=" + minValue + ", max=" + maxValue
+					+ ", value" + value + ".";
 		}
 	}
 
 	/**
 	 * A {@link PropertyValidator} that ensures that the validated integer is positive.
 	 */
-	public static final PropertyValidator<Integer> POSITIVE = new BoundedIntegerValidator(1, Integer.MAX_VALUE) {
+	public static final PropertyValidator<@NonNull Integer> POSITIVE = new BoundedIntegerValidator(
+			1,
+			Integer.MAX_VALUE
+	) {
 		@Override
 		protected String getOutOfBoundsMessage(int value) {
 			return "Value has to be positive, but is " + value + ".";
@@ -67,7 +73,10 @@ public final class IntegerValidators {
 	/**
 	 * A {@link PropertyValidator} that ensures that the validated integer is not negative.
 	 */
-	public static final PropertyValidator<Integer> NON_NEGATIVE = new BoundedIntegerValidator(0, Integer.MAX_VALUE) {
+	public static final PropertyValidator<@NonNull Integer> NON_NEGATIVE = new BoundedIntegerValidator(
+			0,
+			Integer.MAX_VALUE
+	) {
 		@Override
 		protected String getOutOfBoundsMessage(int value) {
 			return "Value cannot be negative, but is " + value + ".";
@@ -75,7 +84,8 @@ public final class IntegerValidators {
 	};
 
 	/**
-	 * Get a {@link PropertyValidator} that ensures that the validated integer is within the specified bounds.
+	 * Get a {@link PropertyValidator} that ensures that the validated integer is within the
+	 * specified bounds.
 	 * 
 	 * @param minValue
 	 *            the minimum value
@@ -83,7 +93,7 @@ public final class IntegerValidators {
 	 *            the maximum value
 	 * @return the property validator
 	 */
-	public static PropertyValidator<Integer> bounded(int minValue, int maxValue) {
+	public static PropertyValidator<@NonNull Integer> bounded(int minValue, int maxValue) {
 		return new BoundedIntegerValidator(minValue, maxValue);
 	}
 

@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.api.shopkeeper.player.sell;
 import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -24,7 +26,7 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<? extends PriceOffer> getOffers();
+	public List<? extends @NonNull PriceOffer> getOffers();
 
 	/**
 	 * Gets the offer for the given type of item.
@@ -33,7 +35,7 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	 *            the item being sold, not <code>null</code>
 	 * @return the offer, or <code>null</code> if there is none for the given item
 	 */
-	public PriceOffer getOffer(ItemStack tradedItem);
+	public @Nullable PriceOffer getOffer(ItemStack tradedItem);
 
 	/**
 	 * Gets the offer for the given type of item.
@@ -42,7 +44,7 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	 *            the item being sold, not <code>null</code>
 	 * @return the offer, or <code>null</code> if there is none for the given item
 	 */
-	public PriceOffer getOffer(UnmodifiableItemStack tradedItem);
+	public @Nullable PriceOffer getOffer(UnmodifiableItemStack tradedItem);
 
 	/**
 	 * Removes the offer for the given type of item.
@@ -72,20 +74,21 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	/**
 	 * Sets the shopkeeper's offers.
 	 * <p>
-	 * This replaces the shopkeeper's previous offers. Duplicate offers for the same item will replace each other.
+	 * This replaces the shopkeeper's previous offers. Duplicate offers for the same item will
+	 * replace each other.
 	 * 
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<? extends PriceOffer> offers);
+	public void setOffers(List<? extends @NonNull PriceOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
 	 * <p>
 	 * This will replace any previous offer for the same item.
 	 * <p>
-	 * The offer gets added to the end of the current offers. If you want to insert, replace or reorder offers, use
-	 * {@link #setOffers(List)} instead.
+	 * The offer gets added to the end of the current offers. If you want to insert, replace or
+	 * reorder offers, use {@link #setOffers(List)} instead.
 	 * 
 	 * @param offer
 	 *            the offer to add
@@ -95,14 +98,14 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	/**
 	 * Adds the given offers to the shopkeeper.
 	 * <p>
-	 * For every offer, this will replace any previous offer for the same item. Duplicate offers for the same item will
-	 * replace each other.
+	 * For every offer, this will replace any previous offer for the same item. Duplicate offers for
+	 * the same item will replace each other.
 	 * <p>
-	 * The offers get added to the end of the current offers. If you want to insert, replace or reorder offers, use
-	 * {@link #setOffers(List)} instead.
+	 * The offers get added to the end of the current offers. If you want to insert, replace or
+	 * reorder offers, use {@link #setOffers(List)} instead.
 	 * 
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<? extends PriceOffer> offers);
+	public void addOffers(List<? extends @NonNull PriceOffer> offers);
 }

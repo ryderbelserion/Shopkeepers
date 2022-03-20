@@ -21,14 +21,18 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
@@ -52,12 +56,14 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 public final class VillagerEditorHandler extends AbstractEditorHandler {
 
-	// We compare the recipes from the editor with the original recipes and keep the original recipes with their
-	// original internal data if the items have not changed.
-	// TODO Somehow support changing/persisting: max-uses, uses, exp reward, villager xp reward, price multiplier?
-	// TODO The trades may change during the editor session, in which case the comparison between new and old recipes no
-	// longer works (trades may get reverted to the editor state).
-	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<MerchantRecipe> {
+	// We compare the recipes from the editor with the original recipes and keep the original
+	// recipes with their original internal data if the items have not changed.
+	// TODO Somehow support changing/persisting: max-uses, uses, exp reward, villager xp reward,
+	// price multiplier?
+	// TODO The trades may change during the editor session, in which case the comparison between
+	// new and old recipes no longer works (trades may get reverted to the editor state).
+	private static class TradingRecipesAdapter
+			extends DefaultTradingRecipesAdapter<@NonNull MerchantRecipe> {
 
 		private final AbstractVillager villager;
 
@@ -67,42 +73,46 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		}
 
 		@Override
-		public List<TradingRecipeDraft> getTradingRecipes() {
+		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
 			assert villager.isValid();
-			List<MerchantRecipe> merchantRecipes = villager.getRecipes();
-			List<TradingRecipeDraft> recipes = MerchantUtils.createTradingRecipeDrafts(merchantRecipes);
+			@NonNull List<@NonNull MerchantRecipe> merchantRecipes = Unsafe.cast(villager.getRecipes());
+			List<@NonNull TradingRecipeDraft> recipes = MerchantUtils.createTradingRecipeDrafts(
+					merchantRecipes
+			);
 			return recipes;
 		}
 
 		@Override
-		protected List<? extends MerchantRecipe> getOffers() {
+		protected List<? extends @NonNull MerchantRecipe> getOffers() {
 			assert villager.isValid();
-			return villager.getRecipes();
+			return Unsafe.cast(villager.getRecipes());
 		}
 
 		@Override
-		protected void setOffers(List<MerchantRecipe> newOffers) {
+		protected void setOffers(List<? extends @NonNull MerchantRecipe> newOffers) {
 			assert villager.isValid();
 
 			// Stop any current trading with the villager:
 			HumanEntity trader = villager.getTrader();
 			if (trader != null) {
 				trader.closeInventory();
-				// TODO Send a message to the player explaining that the villager's trades have changed?
+				// TODO Send a message to the player explaining that the villager's trades have
+				// changed?
 			}
 
 			// Apply the new trading recipes:
-			villager.setRecipes(newOffers);
+			villager.setRecipes(Unsafe.cast(newOffers));
 		}
 
 		@Override
-		protected MerchantRecipe createOffer(TradingRecipeDraft recipe) {
+		protected @Nullable MerchantRecipe createOffer(TradingRecipeDraft recipe) {
 			return MerchantUtils.createMerchantRecipe(recipe);
 		}
 
 		@Override
 		protected boolean areOffersEqual(MerchantRecipe oldOffer, MerchantRecipe newOffer) {
-			// Keep the old recipe (including all of its other internal data) if the items are still the same:
+			// Keep the old recipe (including all of its other internal data) if the items are still
+			// the same:
 			return MerchantUtils.MERCHANT_RECIPES_EQUAL_ITEMS.equals(oldOffer, newOffer);
 		}
 	}
@@ -115,7 +125,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		}
 
 		@Override
-		public List<String> getConfirmationLore() {
+		public @Nullable List<? extends @NonNull String> getConfirmationLore() {
 			return Messages.confirmationUiDeleteVillagerConfirmLore;
 		}
 	};
@@ -128,7 +138,9 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		Validate.notNull(villager, "villager is null");
 		this.villager = villager;
 		String villagerName = villager.getName(); // Not null
-		this.title = StringUtils.replaceArguments(Messages.villagerEditorTitle, "villagerName", villagerName);
+		this.title = StringUtils.replaceArguments(Messages.villagerEditorTitle,
+				"villagerName", villagerName
+		);
 	}
 
 	public AbstractVillager getVillager() {
@@ -139,7 +151,11 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		return this.checkVillagerExistence(editorSession, false, true);
 	}
 
-	private boolean checkVillagerExistence(EditorSession editorSession, boolean silent, boolean closeEditor) {
+	private boolean checkVillagerExistence(
+			EditorSession editorSession,
+			boolean silent,
+			boolean closeEditor
+	) {
 		if (!villager.isValid()) {
 			if (!silent) {
 				TextUtils.sendMessage(editorSession.getPlayer(), Messages.villagerNoLongerExists);
@@ -161,24 +177,53 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	public boolean canOpen(Player player, boolean silent) {
 		Validate.notNull(player, "player is null");
 		// Check permission:
-		if (villager instanceof WanderingTrader) {
-			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_WANDERING_TRADERS_PERMISSION)) {
-				if (!silent) {
-					this.debugNotOpeningUI(player, "Player is missing the edit-wandering-traders permission.");
-					TextUtils.sendMessage(player, Messages.missingEditWanderingTradersPerm);
-				}
-				return false;
-			}
-		} else { // Regular villager
-			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_VILLAGERS_PERMISSION)) {
-				if (!silent) {
-					this.debugNotOpeningUI(player, "Player is missing the edit-villagers permission.");
-					TextUtils.sendMessage(player, Messages.missingEditVillagersPerm);
-				}
-				return false;
-			}
+		if (!this.checkEditPermission(player, silent)) {
+			return false;
 		}
 		return true;
+	}
+
+	private boolean checkEditPermission(Player player, boolean silent) {
+		if (villager instanceof WanderingTrader) {
+			return this.checkEditWanderingTraderPermission(player, silent);
+		} else { // Regular villager
+			return this.checkEditVillagerPermission(player, silent);
+		}
+	}
+
+	private boolean checkEditWanderingTraderPermission(Player player, boolean silent) {
+		return this.checkEditPermission(
+				player,
+				silent,
+				ShopkeepersPlugin.EDIT_WANDERING_TRADERS_PERMISSION,
+				Messages.missingEditWanderingTradersPerm
+		);
+	}
+
+	private boolean checkEditVillagerPermission(Player player, boolean silent) {
+		return this.checkEditPermission(
+				player,
+				silent,
+				ShopkeepersPlugin.EDIT_VILLAGERS_PERMISSION,
+				Messages.missingEditVillagersPerm
+		);
+	}
+
+	private boolean checkEditPermission(
+			Player player,
+			boolean silent,
+			String permission,
+			Text missingPermissionMessage
+	) {
+		if (PermissionUtils.hasPermission(player, permission)) {
+			return true;
+		}
+
+		if (!silent) {
+			this.debugNotOpeningUI(player, "Player is missing the required edit permission.");
+			TextUtils.sendMessage(player, missingPermissionMessage);
+		}
+		return false;
 	}
 
 	@Override
@@ -188,7 +233,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, @Nullable InventoryCloseEvent closeEvent) {
 		super.onInventoryClose(uiSession, closeEvent);
 	}
 
@@ -198,8 +243,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected void setupButtons() {
 		super.setupButtons();
 		this.addButtonOrIgnore(this.createDeleteButton());
-		// Note: Players can also use nametags to rename the villager like normal. However, this option allows to set up
-		// colored names more conveniently.
+		// Note: Players can also use nametags to rename the villager like normal. However, this
+		// option allows to set up colored names more conveniently.
 		this.addButtonOrIgnore(this.createNamingButton());
 		// Note: Wandering traders have an inventory as well, but it is usually always empty.
 		this.addButtonOrIgnore(this.createContainerButton());
@@ -213,19 +258,22 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		this.addButtonOrIgnore(this.getAIButton());
 		this.addButtonOrIgnore(this.getInvulnerabilityButton());
 		// TODO Equipment?
-		// TODO Option to generate random vanilla trades? Maybe when changing the profession and/or level and there are
-		// no trades currently?
+		// TODO Option to generate random vanilla trades? Maybe when changing the profession and/or
+		// level and there are no trades currently?
 	}
 
 	protected Button createDeleteButton() {
 		return new ActionButton(true) {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return DerivedSettings.deleteVillagerButtonItem.createItemStack();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
 				editorSession.getUISession().closeDelayedAndRunTask(() -> {
 					requestConfirmationDeleteVillager(editorSession);
@@ -250,20 +298,24 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			if (!checkVillagerExistence(editorSession)) return;
 
 			// Try to open the editor again:
-			// Note: This may currently not remember the previous editor state (such as the selected trades page).
-			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(VillagerEditorHandler.this, player);
+			// Note: This may currently not remember the previous editor state (such as the selected
+			// trades page).
+			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(this, player);
 		});
 	}
 
 	protected Button createNamingButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return DerivedSettings.nameVillagerButtonItem.createItemStack();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				editorSession.getUISession().closeDelayedAndRunTask(() -> {
 					Player player = editorSession.getPlayer();
 					if (!player.isValid()) return;
@@ -287,26 +339,26 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		Player player = editorSession.getPlayer();
 
 		// Prepare the new name:
-		newName = newName.trim();
+		String preparedName = newName.trim();
 
-		if (newName.isEmpty() || newName.equals("-")) {
+		if (preparedName.isEmpty() || preparedName.equals("-")) {
 			// Remove name:
-			newName = "";
+			preparedName = "";
 		} else {
 			// Validate name:
-			if (!this.isValidName(newName)) {
+			if (!this.isValidName(preparedName)) {
 				TextUtils.sendMessage(player, Messages.villagerNameInvalid);
 				return;
 			}
 		}
 
 		// Apply new name:
-		if (newName.isEmpty()) {
+		if (preparedName.isEmpty()) {
 			villager.setCustomName(null);
 		} else {
 			// Further preparation:
-			newName = TextUtils.colorize(newName);
-			villager.setCustomName(newName);
+			preparedName = TextUtils.colorize(preparedName);
+			villager.setCustomName(preparedName);
 		}
 
 		// Inform player:
@@ -316,32 +368,45 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	private static final int MAX_NAME_LENGTH = 128;
 
 	private boolean isValidName(String name) {
-		return (name != null && name.length() <= MAX_NAME_LENGTH);
+		assert name != null;
+		return name.length() <= MAX_NAME_LENGTH;
 	}
 
 	protected Button createContainerButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return DerivedSettings.villagerInventoryButtonItem.createItemStack();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				editorSession.getUISession().closeDelayedAndRunTask(() -> {
 					Player player = editorSession.getPlayer();
 					if (!player.isValid()) return;
 					if (!checkVillagerExistence(editorSession)) return;
 
-					// We cannot open the villagers inventory directly. Instead we create custom inventory with its
-					// contents. However, any changes in the inventory are not reflected in the villager.
-					// TODO Apply inventory changes? The inventory may change during the editor session..
+					// We cannot open the villagers inventory directly. Instead, we create custom
+					// inventory with its contents. However, any changes in the inventory are not
+					// reflected in the villager.
+					// TODO Apply inventory changes? The inventory may change during the editor
+					// session ...
 					Inventory villagerInventory = villager.getInventory();
 					int inventorySize = (int) Math.ceil(villagerInventory.getSize() / 9.0D) * 9;
 
 					String villagerName = villager.getName(); // Not null
-					String inventoryTitle = StringUtils.replaceArguments(Messages.villagerInventoryTitle, "villagerName", villagerName);
-					Inventory customInventory = Bukkit.createInventory(null, inventorySize, inventoryTitle);
+					String inventoryTitle = StringUtils.replaceArguments(
+							Messages.villagerInventoryTitle,
+							"villagerName", villagerName
+					);
+					Inventory customInventory = Bukkit.createInventory(
+							null,
+							inventorySize,
+							inventoryTitle
+					);
 
 					// Copy storage contents:
 					customInventory.setStorageContents(villagerInventory.getStorageContents());
@@ -355,14 +420,21 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected Button getBabyEditorButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem = new ItemStack(Material.EGG);
-				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonBaby, Messages.buttonBabyLore);
+				ItemUtils.setDisplayNameAndLore(
+						iconItem,
+						Messages.buttonBaby,
+						Messages.buttonBabyLore
+				);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
 				if (villager.isAdult()) {
 					villager.setBaby();
@@ -377,7 +449,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		};
 	}
 
-	protected Button getProfessionEditorButton() {
+	protected @Nullable Button getProfessionEditorButton() {
 		if (!(villager instanceof Villager)) return null;
 		Villager regularVillager = (Villager) villager;
 		return new ActionButton() {
@@ -385,7 +457,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private Profession profession = regularVillager.getProfession();
 
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				switch (profession) {
 				case ARMORER:
@@ -437,24 +509,31 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					break;
 				}
 				assert iconItem != null;
-				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
+				ItemUtils.setDisplayNameAndLore(iconItem,
+						Messages.buttonVillagerProfession,
+						Messages.buttonVillagerProfessionLore
+				);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
-
 				boolean backwards = clickEvent.isRightClick();
-				// Changing the profession will change the trades. Closing the editor view will replace the new trades
-				// with the old ones from the editor. But we try to preserve the old trades with their original data:
-				List<MerchantRecipe> prevRecipes = villager.getRecipes();
+				// Changing the profession will change the trades. Closing the editor view will
+				// replace the new trades with the old ones from the editor. But we try to preserve
+				// the old trades with their original data:
+				List<MerchantRecipe> previousRecipes = villager.getRecipes();
 				profession = EnumUtils.cycleEnumConstant(Profession.class, profession, backwards);
 				regularVillager.setProfession(profession);
-				villager.setRecipes(prevRecipes); // Restore previous trades with their original data
+				// Restore previous trades with their original data:
+				villager.setRecipes(previousRecipes);
 
-				// We set the villager experience to at least 1, so that the villager does no longer automatically
-				// change its profession:
+				// We set the villager experience to at least 1, so that the villager does no longer
+				// automatically change its profession:
 				if (regularVillager.getVillagerExperience() == 0) {
 					regularVillager.setVillagerExperience(1);
 					Player player = editorSession.getPlayer();
@@ -465,7 +544,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		};
 	}
 
-	protected Button getVillagerTypeEditorButton() {
+	protected @Nullable Button getVillagerTypeEditorButton() {
 		if (!(villager instanceof Villager)) return null;
 		Villager regularVillager = (Villager) villager;
 		return new ActionButton() {
@@ -473,7 +552,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private Villager.Type villagerType = regularVillager.getVillagerType();
 
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 				switch (villagerType) {
 				default:
@@ -499,23 +578,32 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 					break;
 				}
-				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
+				ItemUtils.setDisplayNameAndLore(iconItem,
+						Messages.buttonVillagerVariant,
+						Messages.buttonVillagerVariantLore
+				);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
-
 				boolean backwards = clickEvent.isRightClick();
-				villagerType = EnumUtils.cycleEnumConstant(Villager.Type.class, villagerType, backwards);
+				villagerType = EnumUtils.cycleEnumConstant(
+						Villager.Type.class,
+						villagerType,
+						backwards
+				);
 				regularVillager.setVillagerType(villagerType);
 				return true;
 			}
 		};
 	}
 
-	protected Button getVillagerLevelEditorButton() {
+	protected @Nullable Button getVillagerLevelEditorButton() {
 		if (!(villager instanceof Villager)) return null;
 		Villager regularVillager = (Villager) villager;
 		return new ActionButton() {
@@ -523,7 +611,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private int villagerLevel = regularVillager.getVillagerLevel();
 
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				switch (regularVillager.getVillagerLevel()) {
 				default:
@@ -544,15 +632,21 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					break;
 				}
 				assert iconItem != null;
-				// TODO Change the default message back to mention the villager level, instead of just the badge color?
-				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
+				// TODO Change the default message back to mention the villager level, instead of
+				// just the badge color?
+				ItemUtils.setDisplayNameAndLore(iconItem,
+						Messages.buttonVillagerLevel,
+						Messages.buttonVillagerLevelLore
+				);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
-
 				boolean backwards = clickEvent.isRightClick();
 				if (backwards) {
 					villagerLevel -= 1;
@@ -572,7 +666,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private boolean hasAI = villager.hasAI();
 
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				if (hasAI) {
 					iconItem = new ItemStack(Material.JACK_O_LANTERN);
@@ -580,14 +674,19 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					iconItem = new ItemStack(Material.CARVED_PUMPKIN);
 				}
 				assert iconItem != null;
-				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonMobAi, Messages.buttonMobAiLore);
+				ItemUtils.setDisplayNameAndLore(iconItem,
+						Messages.buttonMobAi,
+						Messages.buttonMobAiLore
+				);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
-
 				hasAI = !hasAI;
 				villager.setAI(hasAI);
 				return true;
@@ -601,25 +700,30 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private boolean invulnerable = villager.isInvulnerable();
 
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				if (invulnerable) {
 					iconItem = new ItemStack(Material.POTION);
-					PotionMeta potionMeta = (PotionMeta) iconItem.getItemMeta();
+					PotionMeta potionMeta = Unsafe.castNonNull(iconItem.getItemMeta());
 					potionMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
 					iconItem.setItemMeta(potionMeta);
 				} else {
 					iconItem = new ItemStack(Material.GLASS_BOTTLE);
 				}
 				assert iconItem != null;
-				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonInvulnerability, Messages.buttonInvulnerabilityLore);
+				ItemUtils.setDisplayNameAndLore(iconItem,
+						Messages.buttonInvulnerability,
+						Messages.buttonInvulnerabilityLore
+				);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				if (!checkVillagerExistence(editorSession)) return false;
-
 				invulnerable = !invulnerable;
 				villager.setInvulnerable(invulnerable);
 				return true;
@@ -632,34 +736,46 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	@Override
 	protected ItemStack createTradeSetupIcon() {
 		String villagerName = villager.getName(); // Not null
-		String itemName = StringUtils.replaceArguments(Messages.villagerEditorDescriptionHeader, "villagerName", villagerName);
-		List<String> itemLore = Messages.villagerEditorDescription;
-		return ItemUtils.setDisplayNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
+		String itemName = StringUtils.replaceArguments(Messages.villagerEditorDescriptionHeader,
+				"villagerName", villagerName
+		);
+		List<? extends @NonNull String> itemLore = Messages.villagerEditorDescription;
+		return ItemUtils.setDisplayNameAndLore(
+				Settings.tradeSetupItem.createItemStack(),
+				itemName,
+				itemLore
+		);
 	}
 
 	@Override
 	protected void saveRecipes(EditorSession editorSession) {
 		Player player = editorSession.getPlayer();
-		// The villager might have been unloaded in the meantime. Our changes won't have any effect then:
+		// The villager might have been unloaded in the meantime. Our changes won't have any effect
+		// then:
 		if (!this.checkVillagerExistence(editorSession)) {
-			Log.debug("The villager edited by " + player.getName() + " no longer exists or has been unloaded.");
+			Log.debug("The villager edited by " + player.getName()
+					+ " no longer exists or has been unloaded.");
 			return;
 		}
 
-		int changedTrades = tradingRecipesAdapter.updateTradingRecipes(player, editorSession.getRecipes());
+		int changedTrades = tradingRecipesAdapter.updateTradingRecipes(
+				player,
+				editorSession.getRecipes()
+		);
 		if (changedTrades == 0) {
 			// No changes:
 			TextUtils.sendMessage(player, Messages.noVillagerTradesChanged);
 			return;
 		} else {
-			TextUtils.sendMessage(player, Messages.villagerTradesChanged, "changedTrades", changedTrades);
+			TextUtils.sendMessage(player, Messages.villagerTradesChanged,
+					"changedTrades", changedTrades
+			);
 		}
 
 		if (villager instanceof Villager) {
 			Villager regularVillager = (Villager) villager;
-
-			// We set the villager experience to at least 1, so that the villager no longer automatically changes its
-			// profession (and thereby its trades):
+			// We set the villager experience to at least 1, so that the villager no longer
+			// automatically changes its profession (and thereby its trades):
 			if (regularVillager.getVillagerExperience() == 0) {
 				regularVillager.setVillagerExperience(1);
 				TextUtils.sendMessage(player, Messages.setVillagerXp, "xp", 1);

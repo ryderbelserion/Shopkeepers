@@ -46,13 +46,12 @@ class CommandTransfer extends Command {
 		CommandSender sender = input.getSender();
 
 		PlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null;
 		Player newOwner = context.get(ARGUMENT_NEW_OWNER);
-		assert newOwner != null;
 
 		// Check that the shop is owned by the executing player:
-		Player player = (sender instanceof Player) ? (Player) sender : null;
-		if ((player == null || !shopkeeper.isOwner(player)) && !PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
+		if ((senderPlayer == null || !shopkeeper.isOwner(senderPlayer))
+				&& !PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(sender, Messages.notOwner);
 			return;
 		}
@@ -61,7 +60,9 @@ class CommandTransfer extends Command {
 		shopkeeper.setOwner(newOwner);
 
 		// Success:
-		TextUtils.sendMessage(player, Messages.ownerSet, "owner", TextUtils.getPlayerText(newOwner));
+		TextUtils.sendMessage(sender, Messages.ownerSet,
+				"owner", TextUtils.getPlayerText(newOwner)
+		);
 
 		// Save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();

@@ -19,7 +19,10 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
@@ -36,7 +39,8 @@ import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * Base class for editor UIs which support editing multiple pages of trades and offer additional editor buttons.
+ * Base class for editor UIs which support editing multiple pages of trades and offer additional
+ * editor buttons.
  * <p>
  * For example used by {@link EditorHandler} and {@link VillagerEditorHandler}.
  */
@@ -61,8 +65,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected static final int TRADES_SETUP_ICON = TRADES_PAGE_ICON - 1;
 
 	protected static final int BUTTONS_START = TRADES_PAGE_BAR_END + (COLUMNS_PER_ROW - TRADES_COLUMNS) + 1;
-	// TODO If there are more buttons than we can fit into two rows, move the excess buttons into a separate (paged)
-	// inventory view and add an editor button that opens it.
+	// TODO If there are more buttons than we can fit into two rows, move the excess buttons into a
+	// separate (paged) inventory view and add an editor button that opens it.
 	protected static final int BUTTON_MAX_ROWS = 2;
 
 	// slot = column + offset:
@@ -70,18 +74,21 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected static final int ITEM_1_OFFSET = TRADES_ROW_3_START;
 	protected static final int ITEM_2_OFFSET = TRADES_ROW_2_START;
 
-	private final Button[] tradesPageBarButtons = new Button[TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START + 1];
+	private final @Nullable Button[] tradesPageBarButtons = new @Nullable Button[TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START + 1];
 	private final List<Button> buttons = new ArrayList<>();
 	private int buttonRows = 1;
-	private final Button[] bakedButtons = new Button[BUTTON_MAX_ROWS * COLUMNS_PER_ROW];
+	private final @Nullable Button[] bakedButtons = new @Nullable Button[BUTTON_MAX_ROWS * COLUMNS_PER_ROW];
 	private boolean dirtyButtons = false;
 	private boolean setup = false; // lazy setup
 
 	protected final TradingRecipesAdapter tradingRecipesAdapter;
 
-	private final Map<UUID, EditorSession> editorSessions = new HashMap<>();
+	private final Map<@NonNull UUID, @NonNull EditorSession> editorSessions = new HashMap<>();
 
-	protected AbstractEditorHandler(AbstractUIType uiType, TradingRecipesAdapter tradingRecipesAdapter) {
+	protected AbstractEditorHandler(
+			AbstractUIType uiType,
+			TradingRecipesAdapter tradingRecipesAdapter
+	) {
 		super(uiType);
 		Validate.notNull(tradingRecipesAdapter, "tradingRecipesAdapter is null");
 		this.tradingRecipesAdapter = tradingRecipesAdapter;
@@ -159,7 +166,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	protected boolean isPlayerInventory(InventoryView view, SlotType slotType, int rawSlot) {
-		return rawSlot >= view.getTopInventory().getSize() && (slotType == SlotType.CONTAINER || slotType == SlotType.QUICKBAR);
+		return rawSlot >= view.getTopInventory().getSize()
+				&& (slotType == SlotType.CONTAINER || slotType == SlotType.QUICKBAR);
 	}
 
 	// TRADES AREA
@@ -170,11 +178,13 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	/**
-	 * Gets the {@link TradingRecipeDraft} that is used for trade columns that don't contain any trade yet.
+	 * Gets the {@link TradingRecipeDraft} that is used for trade columns that don't contain any
+	 * trade yet.
 	 * <p>
 	 * This is expected to always return the same placeholder items.
 	 * <p>
-	 * The placeholder items are expected to not match any items that players are able to set up trades with.
+	 * The placeholder items are expected to not match any items that players are able to set up
+	 * trades with.
 	 * 
 	 * @return the {@link TradingRecipeDraft} to use for empty trade columns, not <code>null</code>
 	 */
@@ -187,16 +197,17 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	 * <p>
 	 * This is expected to always return the same placeholder items.
 	 * <p>
-	 * The placeholder items are expected to not match any items that players are able to set up trades with.
+	 * The placeholder items are expected to not match any items that players are able to set up
+	 * trades with.
 	 * 
-	 * @return a {@link TradingRecipeDraft} with the items to use for empty slots of partially set up trades, not
-	 *         <code>null</code>
+	 * @return a {@link TradingRecipeDraft} with the items to use for empty slots of partially set
+	 *         up trades, not <code>null</code>
 	 */
 	protected TradingRecipeDraft getEmptyTradeSlotItems() {
 		return TradingRecipeDraft.EMPTY;
 	}
 
-	private boolean isEmptyResultItem(@ReadOnly ItemStack slotItem) {
+	private boolean isEmptyResultItem(@ReadOnly @Nullable ItemStack slotItem) {
 		ItemStack item = ItemUtils.getNullIfEmpty(slotItem);
 		if (item == null) return true;
 		if (ItemUtils.equals(this.getEmptyTrade().getResultItem(), item)) return true;
@@ -204,7 +215,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return false;
 	}
 
-	private boolean isEmptyItem1(@ReadOnly ItemStack slotItem) {
+	private boolean isEmptyItem1(@ReadOnly @Nullable ItemStack slotItem) {
 		ItemStack item = ItemUtils.getNullIfEmpty(slotItem);
 		if (item == null) return true;
 		if (ItemUtils.equals(this.getEmptyTrade().getItem1(), item)) return true;
@@ -212,7 +223,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return false;
 	}
 
-	private boolean isEmptyItem2(@ReadOnly ItemStack slotItem) {
+	private boolean isEmptyItem2(@ReadOnly @Nullable ItemStack slotItem) {
 		ItemStack item = ItemUtils.getNullIfEmpty(slotItem);
 		if (item == null) return true;
 		if (ItemUtils.equals(this.getEmptyTrade().getItem2(), item)) return true;
@@ -221,7 +232,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	// Returns null if the slot is empty or if the item matches an empty slot placeholder item.
-	protected final ItemStack getTradeResultItem(Inventory inventory, int column) {
+	protected final @Nullable ItemStack getTradeResultItem(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
 		ItemStack item = inventory.getItem(this.getResultItemSlot(column));
@@ -230,7 +241,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	// Returns null if the slot is empty or if the item matches an empty slot placeholder item.
-	protected final ItemStack getTradeItem1(Inventory inventory, int column) {
+	protected final @Nullable ItemStack getTradeItem1(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
 		ItemStack item = inventory.getItem(this.getItem1Slot(column));
@@ -239,7 +250,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	// Returns null if the slot is empty or if the item matches an empty slot placeholder item.
-	protected final ItemStack getTradeItem2(Inventory inventory, int column) {
+	protected final @Nullable ItemStack getTradeItem2(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
 		ItemStack item = inventory.getItem(this.getItem2Slot(column));
@@ -261,18 +272,30 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 
 		// Insert placeholders for empty slots:
-		UnmodifiableItemStack resultItem = ItemUtils.getFallbackIfNull(recipe.getResultItem(), emptySlotItems.getResultItem());
-		UnmodifiableItemStack item1 = ItemUtils.getFallbackIfNull(recipe.getItem1(), emptySlotItems.getItem1());
-		UnmodifiableItemStack item2 = ItemUtils.getFallbackIfNull(recipe.getItem2(), emptySlotItems.getItem2());
+		UnmodifiableItemStack resultItem = ItemUtils.getFallbackIfNull(
+				recipe.getResultItem(),
+				emptySlotItems.getResultItem()
+		);
+		UnmodifiableItemStack item1 = ItemUtils.getFallbackIfNull(
+				recipe.getItem1(),
+				emptySlotItems.getItem1()
+		);
+		UnmodifiableItemStack item2 = ItemUtils.getFallbackIfNull(
+				recipe.getItem2(),
+				emptySlotItems.getItem2()
+		);
 
-		// The inventory implementations create NMS copies of the items, so we do not need to copy them ourselves here:
+		// The inventory implementations create NMS copies of the items, so we do not need to copy
+		// them ourselves here:
 		inventory.setItem(this.getResultItemSlot(column), ItemUtils.asItemStackOrNull(resultItem));
 		inventory.setItem(this.getItem1Slot(column), ItemUtils.asItemStackOrNull(item1));
 		inventory.setItem(this.getItem2Slot(column), ItemUtils.asItemStackOrNull(item2));
 	}
 
-	// TODO Avoid creating new TradingRecipeDraft objects here and instead update the drafts of the session?
-	// This replaces items matching the empty slot placeholders with null items in the returned TradingRecipeDraft.
+	// TODO Avoid creating new TradingRecipeDraft objects here and instead update the drafts of the
+	// session?
+	// This replaces items matching the empty slot placeholders with null items in the returned
+	// TradingRecipeDraft.
 	protected TradingRecipeDraft getTradingRecipe(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
@@ -301,17 +324,17 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	// EDITOR BUTTONS
 
-	private Button[] getTradesPageBarButtons() {
+	private @Nullable Button[] getTradesPageBarButtons() {
 		this.setupTradesPageBarButtons();
 		return tradesPageBarButtons;
 	}
 
-	private Button getTradesPageBarButton(int rawSlot) {
+	private @Nullable Button getTradesPageBarButton(int rawSlot) {
 		if (!this.isTradesPageBar(rawSlot)) return null;
 		return this._getTradesPageBarButton(rawSlot);
 	}
 
-	private Button _getTradesPageBarButton(int rawSlot) {
+	private @Nullable Button _getTradesPageBarButton(int rawSlot) {
 		assert this.isTradesPageBar(rawSlot);
 		return tradesPageBarButtons[rawSlot - TRADES_PAGE_BAR_START];
 	}
@@ -337,7 +360,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createPrevPageButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				int page = editorSession.getCurrentPage();
 				if (page <= 1) return null;
 				return createPrevPageIcon(page);
@@ -351,7 +374,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				// Ignore double clicks:
 				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
 
@@ -375,7 +401,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createNextPageButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				int page = editorSession.getCurrentPage();
 				if (page >= getMaxTradesPages()) return null;
 				return createNextPageIcon(page);
@@ -389,7 +415,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				// Ignore double clicks:
 				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
 
@@ -413,7 +442,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createCurrentPageButton() {
 		return new Button() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				int page = editorSession.getCurrentPage();
 				return createCurrentPageIcon(page);
 			}
@@ -428,7 +457,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createTradeSetupButton() {
 		return new Button() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return createTradeSetupIcon();
 			}
 
@@ -525,18 +554,17 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return buttonRows;
 	}
 
-	private Button[] getBakedButtons() {
+	private @Nullable Button[] getBakedButtons() {
 		this.bakeButtons();
 		return bakedButtons;
 	}
 
-	private Button getButton(int rawSlot) {
+	private @Nullable Button getButton(int rawSlot) {
 		if (!this.isButtonArea(rawSlot)) return null;
-		this.bakeButtons();
-		return bakedButtons[rawSlot - BUTTONS_START];
+		return this._getButton(rawSlot);
 	}
 
-	private Button _getButton(int rawSlot) {
+	private @Nullable Button _getButton(int rawSlot) {
 		assert this.isButtonArea(rawSlot);
 		this.bakeButtons();
 		return bakedButtons[rawSlot - BUTTONS_START];
@@ -544,19 +572,27 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	public void addButton(Button button) {
 		Validate.notNull(button, "button is null");
-		Validate.isTrue(button.isApplicable(this), "button is not applicable to this editor handler");
+		Validate.isTrue(button.isApplicable(this),
+				"button is not applicable to this editor handler");
 		button.setEditorHandler(this); // Validates that the button isn't used elsewhere yet
 		buttons.add(button);
 		dirtyButtons = true;
 	}
 
-	protected void addButtonOrIgnore(Button button) {
+	protected final void addButtons(Iterable<? extends @NonNull Button> buttons) {
+		Validate.notNull(buttons, "buttons is null");
+		for (Button button : buttons) {
+			this.addButton(button);
+		}
+	}
+
+	protected void addButtonOrIgnore(@Nullable Button button) {
 		if (button == null) return; // Ignore
 		this.addButton(button);
 	}
 
-	protected void addButtonsOrIgnore(Iterable<Button> buttons) {
-		if (buttons == null) return;
+	protected final void addButtonsOrIgnore(Iterable<? extends @Nullable Button> buttons) {
+		Validate.notNull(buttons, "buttons is null");
 		for (Button button : buttons) {
 			this.addButtonOrIgnore(button);
 		}
@@ -581,12 +617,16 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	 *            the editor inventory, not <code>null</code>
 	 * @return the editor session, not <code>null</code>
 	 */
-	protected EditorSession createEditorSession(UISession uiSession, List<TradingRecipeDraft> recipes, Inventory inventory) {
+	protected EditorSession createEditorSession(
+			UISession uiSession,
+			List<@NonNull TradingRecipeDraft> recipes,
+			Inventory inventory
+	) {
 		return new EditorSession(uiSession, recipes, inventory);
 	}
 
-	protected EditorSession getEditorSession(Player player) {
-		if (player == null) return null;
+	protected @Nullable EditorSession getEditorSession(Player player) {
+		Validate.notNull(player, "player is null");
 		return editorSessions.get(player.getUniqueId());
 	}
 
@@ -599,10 +639,14 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		this.setup();
 
 		// Setup session:
-		List<TradingRecipeDraft> recipes = tradingRecipesAdapter.getTradingRecipes();
+		List<@NonNull TradingRecipeDraft> recipes = tradingRecipesAdapter.getTradingRecipes();
 
 		// Create inventory:
-		Inventory inventory = Bukkit.createInventory(player, this.getInventorySize(), this.getEditorTitle());
+		Inventory inventory = Bukkit.createInventory(
+				player,
+				this.getInventorySize(),
+				this.getEditorTitle()
+		);
 		EditorSession editorSession = this.createEditorSession(uiSession, recipes, inventory);
 		editorSessions.put(player.getUniqueId(), editorSession);
 
@@ -629,7 +673,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		Inventory inventory = editorSession.getInventory();
 		int page = editorSession.getCurrentPage();
 		assert page >= 1;
-		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
+		List<@NonNull TradingRecipeDraft> recipes = editorSession.getRecipes();
 		int recipeStartIndex = (page - 1) * TRADES_COLUMNS;
 		for (int column = 0; column < TRADES_COLUMNS; column++) {
 			int recipeIndex = recipeStartIndex + column;
@@ -653,7 +697,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 
 		// Insert buttons:
-		Button[] buttons = this.getTradesPageBarButtons();
+		@Nullable Button[] buttons = this.getTradesPageBarButtons();
 		for (int i = 0; i < buttons.length; ++i) {
 			Button button = buttons[i];
 			if (button == null) continue;
@@ -663,8 +707,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 	}
 
-	// Note: This cannot deal with new button rows being required due to newly added buttons (which would require
-	// creating and freshly open a new inventory, resulting in flicker).
+	// Note: This cannot deal with new button rows being required due to newly added buttons (which
+	// would require creating and freshly open a new inventory, resulting in flicker).
 	protected void updateButtons(EditorSession editorSession) {
 		this.setupButtons(editorSession);
 	}
@@ -680,7 +724,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected void setupButtons(EditorSession editorSession) {
 		Inventory inventory = editorSession.getInventory();
 		final int inventorySize = inventory.getSize();
-		Button[] buttons = this.getBakedButtons();
+		@Nullable Button[] buttons = this.getBakedButtons();
 		for (int buttonIndex = 0; buttonIndex < buttons.length; ++buttonIndex) {
 			int slot = BUTTONS_START + buttonIndex;
 			if (slot >= inventorySize) {
@@ -693,8 +737,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			if (button != null) {
 				icon = button.getIcon(editorSession);
 			}
-			// Null will clear the slot (which is required if this is called to refresh the buttons in an already set up
-			// inventory):
+			// Null will clear the slot (which is required if this is called to refresh the buttons
+			// in an already set up inventory):
 			inventory.setItem(slot, icon);
 		}
 	}
@@ -711,14 +755,16 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
 		Validate.notNull(player, "player is null");
-		// Permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler.
+		// Permission for the type of shopkeeper is checked in the AdminShopkeeper specific
+		// EditorHandler.
 		// Owner is checked in the PlayerShopkeeper specific EditorHandler.
 		return true;
 	}
 
 	@Override
 	protected boolean isWindow(InventoryView view) {
-		return view != null && view.getTitle().equals(this.getEditorTitle());
+		Validate.notNull(view, "view is null");
+		return view.getTitle().equals(this.getEditorTitle());
 	}
 
 	@Override
@@ -726,13 +772,16 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		assert uiSession != null && event != null;
 		// Dragging is allowed by default only inside the player inventory and the trades area:
 		if (event.isCancelled()) return; // Already cancelled
+
 		InventoryView view = event.getView();
-		Set<Integer> slots = event.getRawSlots();
-		for (Integer slot : slots) {
-			if (!this.isTradesArea(slot) && !this.isPlayerInventory(view, view.getSlotType(slot), slot)) {
-				event.setCancelled(true);
-				break;
-			}
+		Set<@NonNull Integer> slots = Unsafe.castNonNull(event.getRawSlots());
+		for (Integer rawSlotInteger : slots) {
+			int rawSlot = rawSlotInteger;
+			if (this.isTradesArea(rawSlot)) continue;
+			if (this.isPlayerInventory(view, view.getSlotType(rawSlot), rawSlot)) continue;
+
+			event.setCancelled(true);
+			break;
 		}
 	}
 
@@ -744,8 +793,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			return;
 		}
 
-		EditorSession editorSession = this.getEditorSession(uiSession.getPlayer());
-		assert editorSession != null;
+		EditorSession editorSession = Unsafe.assertNonNull(
+				this.getEditorSession(uiSession.getPlayer())
+		);
 
 		int rawSlot = event.getRawSlot();
 		if (this.isTradesArea(rawSlot)) {
@@ -767,7 +817,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		assert this.isTradesArea(event.getRawSlot());
 	}
 
-	protected void handleTradesPageBarClick(EditorSession editorSession, InventoryClickEvent event) {
+	protected void handleTradesPageBarClick(
+			EditorSession editorSession,
+			InventoryClickEvent event
+	) {
 		assert this.isTradesPageBar(event.getRawSlot());
 		event.setCancelled(true);
 		int rawSlot = event.getRawSlot();
@@ -787,11 +840,19 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 	}
 
-	protected void handlePlayerInventoryClick(EditorSession editorSession, InventoryClickEvent event) {
+	protected void handlePlayerInventoryClick(
+			EditorSession editorSession,
+			InventoryClickEvent event
+	) {
 		assert this.isPlayerInventory(event.getView(), event.getSlotType(), event.getRawSlot());
 	}
 
-	protected int getNewAmountAfterEditorClick(InventoryClickEvent event, int currentAmount, int minAmount, int maxAmount) {
+	protected int getNewAmountAfterEditorClick(
+			InventoryClickEvent event,
+			int currentAmount,
+			int minAmount,
+			int maxAmount
+	) {
 		// Validate bounds:
 		if (minAmount > maxAmount) return currentAmount; // No valid value possible
 		if (minAmount == maxAmount) return minAmount; // Only one valid value possible
@@ -828,13 +889,15 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, @Nullable InventoryCloseEvent closeEvent) {
 		// Cleanup session:
 		Player player = uiSession.getPlayer();
 		EditorSession editorSession = editorSessions.remove(player.getUniqueId());
+		editorSession = Validate.State.notNull(editorSession, "editorSession is null");
 
 		if (closeEvent != null) {
-			// Only save if caused by an inventory close event (i.e. if the session has not been 'aborted'):
+			// Only save if caused by an inventory close event (i.e. if the session has not been
+			// 'aborted'):
 			this.saveEditor(editorSession);
 		}
 	}
@@ -850,7 +913,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		Inventory inventory = editorSession.getInventory();
 		int page = editorSession.getCurrentPage();
 		assert page >= 1;
-		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
+		List<@NonNull TradingRecipeDraft> recipes = editorSession.getRecipes();
 
 		int recipesPerPage = COLUMNS_PER_ROW;
 		int startIndex = (page - 1) * recipesPerPage;

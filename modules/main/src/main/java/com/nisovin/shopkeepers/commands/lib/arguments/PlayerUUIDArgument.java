@@ -4,10 +4,13 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -24,18 +27,22 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT;
 
-	// Note: Not providing a default argument filter that only accepts uuids of online players, because this can be
-	// achieved more efficiently by using PlayerByUUIDArgument instead.
+	// Note: Not providing a default argument filter that only accepts uuids of online players,
+	// because this can be achieved more efficiently by using PlayerByUUIDArgument instead.
 
 	public PlayerUUIDArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public PlayerUUIDArgument(String name, ArgumentFilter<UUID> filter) {
+	public PlayerUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public PlayerUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimumCompletionInput) {
+	public PlayerUUIDArgument(
+			String name,
+			ArgumentFilter<? super @NonNull UUID> filter,
+			int minimumCompletionInput
+	) {
 		super(name, filter, minimumCompletionInput);
 	}
 
@@ -64,16 +71,22 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	 *            only suggestions for players accepted by this predicate get included
 	 * @return the player uuid completion suggestions
 	 */
-	public static Iterable<UUID> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
-																	int minimumCompletionInput, String uuidPrefix,
-																	Predicate<Player> playerFilter) {
+	public static Iterable<? extends @NonNull UUID> getDefaultCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String uuidPrefix,
+			Predicate<? super @NonNull Player> playerFilter
+	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (uuidPrefix.length() < minimumCompletionInput) {
 			return Collections.emptyList();
 		}
 
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
-		return Bukkit.getOnlinePlayers().stream()
+		// TODO Cast: Workaround for a limitation of CheckerFramework
+		Stream<@NonNull Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
+		return onlinePlayers
 				.filter(playerFilter)
 				.map(Player::getUniqueId)
 				.filter(uuid -> {
@@ -83,7 +96,17 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, PredicateUtils.alwaysTrue());
+	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			String idPrefix
+	) {
+		return getDefaultCompletionSuggestions(
+				input,
+				context,
+				minimumCompletionInput,
+				idPrefix,
+				PredicateUtils.alwaysTrue()
+		);
 	}
 }

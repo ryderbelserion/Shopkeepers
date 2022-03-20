@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.playershops.inactivity;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
@@ -34,14 +35,16 @@ public class PlayerInactivity {
 	}
 
 	/**
-	 * This task periodically triggers the detection and removal of shops that are owned by inactive players.
+	 * This task periodically triggers the detection and removal of shops that are owned by inactive
+	 * players.
 	 * <p>
 	 * The task is also run shortly after being started.
 	 * <p>
-	 * Since we measure player inactivity in granularity of days, and since the checking for inactive players is
-	 * relatively performance-intensive, we run this task very infrequently. It is also not required that this task runs
-	 * exactly in the specified interval, which is unlikely, because server lag can noticeably influence the exact
-	 * interval duration. The primary purpose of this task is to account for servers that keep running for very long
+	 * Since we measure player inactivity in granularity of days, and since the checking for
+	 * inactive players is relatively performance-intensive, we run this task very infrequently. It
+	 * is also not required that this task runs exactly in the specified interval, which is
+	 * unlikely, because server lag can noticeably influence the exact interval duration. The
+	 * primary purpose of this task is to account for servers that keep running for very long
 	 * durations.
 	 */
 	private final class DeleteInactivePlayerShopsTask implements Runnable {
@@ -50,7 +53,7 @@ public class PlayerInactivity {
 		private static final long INTERVAL_TICKS = 20 * 60 * 60 * 4;
 
 		private final Plugin plugin;
-		private BukkitTask task = null;
+		private @Nullable BukkitTask task = null;
 
 		public DeleteInactivePlayerShopsTask(Plugin plugin) {
 			Validate.notNull(plugin, "plugin is null");

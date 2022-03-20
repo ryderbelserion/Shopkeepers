@@ -4,8 +4,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 /**
- * A test event that is called to check if a player can damage the given entity (ex. when the player tries to hire a
- * villager).
+ * A test event that is called to check if a player can damage the given entity (e.g. when the
+ * player tries to hire a villager).
  */
 public class TestEntityDamageByEntityEvent extends EntityDamageByEntityEvent {
 

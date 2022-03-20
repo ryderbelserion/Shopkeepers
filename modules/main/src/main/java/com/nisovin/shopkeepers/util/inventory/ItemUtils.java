@@ -13,12 +13,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -35,14 +39,14 @@ public final class ItemUtils {
 	/**
 	 * Parses the {@link Material} from the given input String.
 	 * <p>
-	 * This is similar to {@link Material#matchMaterial(String)}, but may have small performance benefits, or be more
-	 * lenient in the inputs it accepts.
+	 * This is similar to {@link Material#matchMaterial(String)}, but may have small performance
+	 * benefits, or be more lenient in the inputs it accepts.
 	 * 
 	 * @param input
 	 *            the input String
 	 * @return the parsed {@link Material}, or <code>null</code> if the material cannot be parsed
 	 */
-	public static Material parseMaterial(String input) {
+	public static @Nullable Material parseMaterial(@Nullable String input) {
 		return MinecraftEnumUtils.parseEnum(Material.class, input);
 	}
 
@@ -53,7 +57,7 @@ public final class ItemUtils {
 	 *            the material
 	 * @return <code>true</code> if the material is a container
 	 */
-	public static boolean isContainer(Material material) {
+	public static boolean isContainer(@Nullable Material material) {
 		// TODO This list of container materials needs to be updated with each MC update.
 		if (material == null) return false;
 		if (isChest(material)) return true; // Includes trapped chest
@@ -74,11 +78,11 @@ public final class ItemUtils {
 		}
 	}
 
-	public static boolean isChest(Material material) {
+	public static boolean isChest(@Nullable Material material) {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
 	}
 
-	public static boolean isShulkerBox(Material material) {
+	public static boolean isShulkerBox(@Nullable Material material) {
 		if (material == null) return false;
 		switch (material) {
 		case SHULKER_BOX:
@@ -104,12 +108,13 @@ public final class ItemUtils {
 		}
 	}
 
-	public static boolean isSign(Material material) {
+	public static boolean isSign(@Nullable Material material) {
 		if (material == null) return false;
-		return material.data == org.bukkit.block.data.type.Sign.class || material.data == org.bukkit.block.data.type.WallSign.class;
+		return material.data == org.bukkit.block.data.type.Sign.class
+				|| material.data == org.bukkit.block.data.type.WallSign.class;
 	}
 
-	public static boolean isRail(Material material) {
+	public static boolean isRail(@Nullable Material material) {
 		if (material == null) return false;
 		switch (material) {
 		case RAIL:
@@ -123,27 +128,29 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Formats the name of the given {@link Material} to a more user-friendly representation. See also
-	 * {@link EnumUtils#formatEnumName(String)}.
+	 * Formats the name of the given {@link Material} to a more user-friendly representation. See
+	 * also {@link EnumUtils#formatEnumName(String)}.
 	 * 
 	 * @param material
-	 *            the material
+	 *            the material, not <code>null</code>
 	 * @return the formatted material name
 	 */
 	public static String formatMaterialName(Material material) {
-		return EnumUtils.formatEnumName(material != null ? material.name() : "");
+		Validate.notNull(material, "material is null");
+		return EnumUtils.formatEnumName(material.name());
 	}
 
 	/**
-	 * Formats the {@link Material} name of the given {@link ItemStack} to a more user-friendly representation. See also
-	 * {@link #formatMaterialName(Material)}.
+	 * Formats the {@link Material} name of the given {@link ItemStack} to a more user-friendly
+	 * representation. See also {@link #formatMaterialName(Material)}.
 	 * 
 	 * @param itemStack
-	 *            the item stack
+	 *            the item stack, not <code>null</code>
 	 * @return the formatted material name
 	 */
 	public static String formatMaterialName(@ReadOnly ItemStack itemStack) {
-		return formatMaterialName(itemStack != null ? itemStack.getType() : null);
+		Validate.notNull(itemStack, "itemStack is null");
+		return formatMaterialName(itemStack.getType());
 	}
 
 	// ItemStack utilities:
@@ -151,69 +158,96 @@ public final class ItemUtils {
 	/**
 	 * Checks if the given {@link ItemStack} is empty.
 	 * <p>
-	 * The item stack is considered 'empty' if it is <code>null</code>, it is of type {@link Material#AIR}, or its
-	 * amount is less than or equal to zero.
+	 * The item stack is considered 'empty' if it is <code>null</code>, it is of type
+	 * {@link Material#AIR}, or its amount is less than or equal to zero.
 	 * 
 	 * @param itemStack
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is empty
 	 */
-	public static boolean isEmpty(@ReadOnly ItemStack itemStack) {
-		return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
+	public static boolean isEmpty(@ReadOnly @Nullable ItemStack itemStack) {
+		return itemStack == null
+				|| itemStack.getType() == Material.AIR
+				|| itemStack.getAmount() <= 0;
 	}
 
-	public static boolean isEmpty(UnmodifiableItemStack itemStack) {
+	public static boolean isEmpty(@Nullable UnmodifiableItemStack itemStack) {
 		return isEmpty(asItemStackOrNull(itemStack));
 	}
 
-	public static ItemStack getNullIfEmpty(@ReadOnly ItemStack itemStack) {
+	public static @Nullable ItemStack getNullIfEmpty(@ReadOnly @Nullable ItemStack itemStack) {
 		return isEmpty(itemStack) ? null : itemStack;
 	}
 
-	public static UnmodifiableItemStack getNullIfEmpty(UnmodifiableItemStack itemStack) {
+	public static @Nullable UnmodifiableItemStack getNullIfEmpty(
+			@Nullable UnmodifiableItemStack itemStack
+	) {
 		return isEmpty(itemStack) ? null : itemStack;
 	}
 
-	public static ItemStack getOrEmpty(@ReadOnly ItemStack itemStack) {
-		if (!isEmpty(itemStack)) return itemStack;
-		if (itemStack != null && itemStack.getType() == Material.AIR) return itemStack;
+	public static ItemStack getOrEmpty(@ReadOnly @Nullable ItemStack itemStack) {
+		if (!isEmpty(itemStack)) {
+			return Unsafe.assertNonNull(itemStack);
+		}
+		if (itemStack != null && itemStack.getType() == Material.AIR) {
+			return itemStack;
+		}
 		return new ItemStack(Material.AIR);
 	}
 
-	public static UnmodifiableItemStack getFallbackIfNull(UnmodifiableItemStack item, UnmodifiableItemStack fallback) {
+	public static @Nullable UnmodifiableItemStack getFallbackIfNull(
+			@Nullable UnmodifiableItemStack item,
+			@Nullable UnmodifiableItemStack fallback
+	) {
 		if (item == null) return fallback;
 		return item;
 	}
 
-	public static ItemStack cloneOrNullIfEmpty(@ReadOnly ItemStack itemStack) {
-		return isEmpty(itemStack) ? null : itemStack.clone();
+	public static @Nullable ItemStack cloneOrNullIfEmpty(@ReadOnly @Nullable ItemStack itemStack) {
+		if (isEmpty(itemStack)) return null;
+		return Unsafe.assertNonNull(itemStack).clone();
 	}
 
-	public static ItemStack copyOrNullIfEmpty(UnmodifiableItemStack itemStack) {
-		return isEmpty(itemStack) ? null : itemStack.copy();
+	public static @Nullable ItemStack copyOrNullIfEmpty(@Nullable UnmodifiableItemStack itemStack) {
+		if (isEmpty(itemStack)) return null;
+		return Unsafe.assertNonNull(itemStack).copy();
 	}
 
-	public static ItemStack copyOrNull(UnmodifiableItemStack itemStack) {
+	public static @Nullable ItemStack copyOrNull(@Nullable UnmodifiableItemStack itemStack) {
 		return (itemStack != null) ? itemStack.copy() : null;
 	}
 
-	public static UnmodifiableItemStack shallowCopy(UnmodifiableItemStack itemStack) {
+	public static @Nullable UnmodifiableItemStack shallowCopy(
+			@Nullable UnmodifiableItemStack itemStack
+	) {
 		return (itemStack != null) ? itemStack.shallowCopy() : null;
 	}
 
-	public static UnmodifiableItemStack unmodifiableCloneIfModifiable(@ReadOnly ItemStack itemStack) {
+	public static @Nullable UnmodifiableItemStack unmodifiableCloneIfModifiable(
+			@ReadOnly @Nullable ItemStack itemStack
+	) {
 		if (itemStack == null) return null;
 		if (itemStack instanceof UnmodifiableItemStack) return (UnmodifiableItemStack) itemStack;
 		return UnmodifiableItemStack.of(itemStack.clone());
 	}
 
-	public static UnmodifiableItemStack unmodifiableOrNullIfEmpty(@ReadOnly ItemStack itemStack) {
+	public static UnmodifiableItemStack nonNullUnmodifiableCloneIfModifiable(
+			@ReadOnly ItemStack itemStack
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		UnmodifiableItemStack unmodifiableItemStack = unmodifiableCloneIfModifiable(itemStack);
+		return Unsafe.assertNonNull(unmodifiableItemStack);
+	}
+
+	public static @Nullable UnmodifiableItemStack unmodifiableOrNullIfEmpty(
+			@ReadOnly @Nullable ItemStack itemStack
+	) {
 		return UnmodifiableItemStack.of(getNullIfEmpty(itemStack));
 	}
 
 	/**
-	 * Returns an {@link ItemStack} view of the given unmodifiable item stack, or <code>null</code> if the given item
-	 * stack is <code>null</code>.
+	 * Returns an {@link ItemStack} view of the given unmodifiable item stack, or <code>null</code>
+	 * if the given item stack is <code>null</code>.
 	 * 
 	 * @param itemStack
 	 *            the unmodifiable item stack
@@ -221,50 +255,58 @@ public final class ItemUtils {
 	 * @deprecated See {@link UnmodifiableItemStack#asItemStack()}
 	 */
 	@Deprecated
-	public static ItemStack asItemStackOrNull(UnmodifiableItemStack itemStack) {
+	public static @Nullable ItemStack asItemStackOrNull(@Nullable UnmodifiableItemStack itemStack) {
 		return (itemStack != null) ? itemStack.asItemStack() : null;
 	}
 
 	/**
-	 * Creates a {@link ItemStack#clone() copy} of the given {@link ItemStack} with a stack size of {@code 1}.
+	 * Creates a {@link ItemStack#clone() copy} of the given {@link ItemStack} with a stack size of
+	 * {@code 1}.
 	 * 
 	 * @param itemStack
-	 *            the item stack to copy
-	 * @return the copy, or <code>null</code> if the given item stack is <code>null</code>
+	 *            the item stack to copy, not <code>null</code>
+	 * @return the copy
 	 */
 	public static ItemStack copySingleItem(@ReadOnly ItemStack itemStack) {
 		return copyWithAmount(itemStack, 1);
 	}
 
 	/**
-	 * Creates a {@link ItemStack#clone() copy} of the given {@link ItemStack} with the specified stack size.
+	 * Creates a {@link ItemStack#clone() copy} of the given {@link ItemStack} with the specified
+	 * stack size.
 	 * 
 	 * @param itemStack
-	 *            the item stack to copy
+	 *            the item stack to copy, not <code>null</code>
 	 * @param amount
 	 *            the stack size of the copy
-	 * @return the copy, or <code>null</code> if the given item stack is <code>null</code>
+	 * @return the copy
 	 */
 	public static ItemStack copyWithAmount(@ReadOnly ItemStack itemStack, int amount) {
-		if (itemStack == null) return null;
+		Validate.notNull(itemStack, "itemStack is null");
 		ItemStack copy = itemStack.clone();
 		copy.setAmount(amount);
 		return copy;
 	}
 
 	public static ItemStack copyWithAmount(UnmodifiableItemStack itemStack, int amount) {
-		return copyWithAmount(asItemStackOrNull(itemStack), amount);
+		Validate.notNull(itemStack, "itemStack is null");
+		return copyWithAmount(itemStack.asItemStack(), amount);
 	}
 
-	// Returns the same item stack if its amount already matches the target amount and the item stack is already
-	// unmodifiable.
-	public static UnmodifiableItemStack unmodifiableCopyWithAmount(@ReadOnly ItemStack itemStack, int amount) {
-		if (itemStack == null) return null;
+	// Returns the same item stack if its amount already matches the target amount and the item
+	// stack is already unmodifiable.
+	public static UnmodifiableItemStack unmodifiableCopyWithAmount(
+			@ReadOnly ItemStack itemStack,
+			int amount
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		UnmodifiableItemStack result;
 		if (itemStack.getAmount() != amount) {
-			return UnmodifiableItemStack.of(copyWithAmount(itemStack, amount));
+			result = UnmodifiableItemStack.ofNonNull(copyWithAmount(itemStack, amount));
 		} else {
-			return unmodifiableCloneIfModifiable(itemStack);
+			result = nonNullUnmodifiableCloneIfModifiable(itemStack);
 		}
+		return result;
 	}
 
 	public static int trimItemAmount(@ReadOnly ItemStack itemStack, int amount) {
@@ -279,8 +321,9 @@ public final class ItemUtils {
 	/**
 	 * Increases the amount of the given {@link ItemStack}.
 	 * <p>
-	 * This makes sure that the item stack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
-	 * empty item stacks are represented by <code>null</code>.
+	 * This makes sure that the item stack's amount ends up to be at most
+	 * {@link ItemStack#getMaxStackSize()}, and that empty item stacks are represented by
+	 * <code>null</code>.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be empty
@@ -288,9 +331,17 @@ public final class ItemUtils {
 	 *            the amount to increase, can be negative to decrease
 	 * @return the resulting item stack, or <code>null</code> if the item stack ends up being empty
 	 */
-	public static ItemStack increaseItemAmount(@ReadWrite ItemStack itemStack, int amountToIncrease) {
+	public static @Nullable ItemStack increaseItemAmount(
+			@ReadWrite @Nullable ItemStack itemStack,
+			int amountToIncrease
+	) {
 		if (isEmpty(itemStack)) return null;
-		int newAmount = Math.min(itemStack.getAmount() + amountToIncrease, itemStack.getMaxStackSize());
+		assert itemStack != null;
+		Unsafe.assertNonNull(itemStack);
+		int newAmount = Math.min(
+				itemStack.getAmount() + amountToIncrease,
+				itemStack.getMaxStackSize()
+		);
 		if (newAmount <= 0) return null;
 		itemStack.setAmount(newAmount);
 		return itemStack;
@@ -299,8 +350,9 @@ public final class ItemUtils {
 	/**
 	 * Decreases the amount of the given {@link ItemStack}.
 	 * <p>
-	 * This makes sure that the item stack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
-	 * empty item stacks are represented by <code>null</code>.
+	 * This makes sure that the item stack's amount ends up to be at most
+	 * {@link ItemStack#getMaxStackSize()}, and that empty item stacks are represented by
+	 * <code>null</code>.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be empty
@@ -308,36 +360,45 @@ public final class ItemUtils {
 	 *            the amount to decrease, can be negative to increase
 	 * @return the resulting item, or <code>null</code> if the item ends up being empty
 	 */
-	public static ItemStack decreaseItemAmount(@ReadWrite ItemStack itemStack, int amountToDecrease) {
+	public static @Nullable ItemStack decreaseItemAmount(
+			@ReadWrite @Nullable ItemStack itemStack,
+			int amountToDecrease
+	) {
 		return increaseItemAmount(itemStack, -amountToDecrease);
 	}
 
 	/**
-	 * Gets the amount of the given {@link ItemStack}, and returns <code>0</code> if the item stack is
-	 * {@link #isEmpty(ItemStack) empty}.
+	 * Gets the amount of the given {@link ItemStack}, and returns <code>0</code> if the item stack
+	 * is {@link #isEmpty(ItemStack) empty}.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be empty
 	 * @return the item stack's amount, or <code>0</code> if the item stack is empty
 	 */
-	public static int getItemStackAmount(@ReadOnly ItemStack itemStack) {
-		return isEmpty(itemStack) ? 0 : itemStack.getAmount();
+	public static int getItemStackAmount(@ReadOnly @Nullable ItemStack itemStack) {
+		if (isEmpty(itemStack)) return 0;
+		return Unsafe.assertNonNull(itemStack).getAmount();
 	}
 
 	/**
-	 * Gets the amount of the given {@link UnmodifiableItemStack}, and returns <code>0</code> if the item stack is
-	 * {@link #isEmpty(UnmodifiableItemStack) empty}.
+	 * Gets the amount of the given {@link UnmodifiableItemStack}, and returns <code>0</code> if the
+	 * item stack is {@link #isEmpty(UnmodifiableItemStack) empty}.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be empty
 	 * @return the item stack's amount, or <code>0</code> if the item stack is empty
 	 */
-	public static int getItemStackAmount(UnmodifiableItemStack itemStack) {
+	public static int getItemStackAmount(@Nullable UnmodifiableItemStack itemStack) {
 		return getItemStackAmount(asItemStackOrNull(itemStack));
 	}
 
 	// The display name and lore are expected to use Minecraft's color codes.
-	public static ItemStack createItemStack(Material type, int amount, String displayName, @ReadOnly List<String> lore) {
+	public static ItemStack createItemStack(
+			Material type,
+			int amount,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends @NonNull String> lore
+	) {
 		assert type != null; // Checked by the ItemStack constructor
 		assert type.isItem();
 		// TODO Return null in case of type AIR?
@@ -346,32 +407,45 @@ public final class ItemUtils {
 	}
 
 	// The display name and lore are expected to use Minecraft's color codes.
-	public static ItemStack createItemStack(ItemData itemData, int amount, String displayName, @ReadOnly List<String> lore) {
+	public static ItemStack createItemStack(
+			ItemData itemData,
+			int amount,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends @NonNull String> lore
+	) {
 		Validate.notNull(itemData, "itemData is null");
 		return setDisplayNameAndLore(itemData.createItemStack(amount), displayName, lore);
 	}
 
 	// The display name and lore are expected to use Minecraft's color codes.
-	// Null arguments keep the previous display name or lore (instead of clearing them). TODO Change this?
-	public static ItemStack setDisplayNameAndLore(@ReadWrite ItemStack item, String displayName, @ReadOnly List<String> lore) {
-		if (item == null) return null;
-		ItemMeta meta = item.getItemMeta();
+	// Null arguments keep the previous display name or lore (instead of clearing them).
+	// TODO Change this?
+	public static ItemStack setDisplayNameAndLore(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends @NonNull String> lore
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		ItemMeta meta = itemStack.getItemMeta();
 		if (meta != null) {
 			if (displayName != null) {
 				meta.setDisplayName(displayName);
 			}
 			if (lore != null) {
-				meta.setLore(lore);
+				meta.setLore(Unsafe.cast(lore));
 			}
-			item.setItemMeta(meta);
+			itemStack.setItemMeta(meta);
 		}
-		return item;
+		return itemStack;
 	}
 
 	// Null to remove display name.
 	// The display name is expected to use Minecraft's color codes.
-	public static ItemStack setDisplayName(@ReadWrite ItemStack itemStack, String displayName) {
-		if (itemStack == null) return null;
+	public static ItemStack setDisplayName(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String displayName
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta == null) return itemStack;
 		if (displayName == null && !itemMeta.hasDisplayName()) {
@@ -382,8 +456,12 @@ public final class ItemUtils {
 		return itemStack;
 	}
 
-	public static ItemStack setLeatherColor(@ReadWrite ItemStack leatherArmorItem, Color color) {
-		if (leatherArmorItem == null) return null;
+	// A color of null resets the color to its default.
+	public static ItemStack setLeatherColor(
+			@ReadWrite ItemStack leatherArmorItem,
+			@Nullable Color color
+	) {
+		Validate.notNull(leatherArmorItem, "leatherArmorItem is null");
 		ItemMeta meta = leatherArmorItem.getItemMeta();
 		if (meta instanceof LeatherArmorMeta) {
 			LeatherArmorMeta leatherMeta = (LeatherArmorMeta) meta;
@@ -391,6 +469,17 @@ public final class ItemUtils {
 			leatherArmorItem.setItemMeta(leatherMeta);
 		}
 		return leatherArmorItem;
+	}
+
+	public static String getDisplayNameOrEmpty(@ReadOnly @Nullable ItemStack itemStack) {
+		if (itemStack == null) return "";
+		return getDisplayNameOrEmpty(itemStack.getItemMeta());
+	}
+
+	public static String getDisplayNameOrEmpty(@ReadOnly @Nullable ItemMeta itemMeta) {
+		if (itemMeta == null) return "";
+		if (!itemMeta.hasDisplayName()) return "";
+		return itemMeta.getDisplayName(); // Not null
 	}
 
 	// TODO This can be removed once Bukkit provides a non-deprecated mapping itself.
@@ -470,7 +559,7 @@ public final class ItemUtils {
 		}
 	}
 
-	public static boolean isDamageable(@ReadOnly ItemStack itemStack) {
+	public static boolean isDamageable(@ReadOnly @Nullable ItemStack itemStack) {
 		if (itemStack == null) return false;
 		return isDamageable(itemStack.getType());
 	}
@@ -479,9 +568,11 @@ public final class ItemUtils {
 		return (type.getMaxDurability() > 0);
 	}
 
-	public static int getDurability(@ReadOnly ItemStack itemStack) {
+	public static int getDurability(@ReadOnly @Nullable ItemStack itemStack) {
 		// Checking if the item is damageable is cheap in comparison to retrieving the ItemMeta:
 		if (!isDamageable(itemStack)) return 0; // Also returns 0 if itemStack is null
+		assert itemStack != null;
+		Unsafe.assertNonNull(itemStack);
 
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta instanceof Damageable) { // Also checks for null ItemMeta
@@ -490,7 +581,7 @@ public final class ItemUtils {
 		return 0;
 	}
 
-	public static ItemStack ensureBukkitItemStack(ItemStack itemStack) {
+	public static @Nullable ItemStack ensureBukkitItemStack(@Nullable ItemStack itemStack) {
 		if (itemStack == null) return null;
 		if (itemStack.getClass() == ItemStack.class) return itemStack;
 		// Similar to CraftItemStack#asBukkitCopy:
@@ -503,25 +594,26 @@ public final class ItemUtils {
 		return bukkitItemStack;
 	}
 
-	public static String getSimpleItemInfo(UnmodifiableItemStack item) {
+	public static String getSimpleItemInfo(@Nullable UnmodifiableItemStack item) {
 		if (item == null) return "empty";
 		StringBuilder sb = new StringBuilder();
 		sb.append(item.getAmount()).append('x').append(item.getType());
 		return sb.toString();
 	}
 
-	public static String getSimpleRecipeInfo(TradingRecipe recipe) {
+	public static String getSimpleRecipeInfo(@Nullable TradingRecipe recipe) {
 		if (recipe == null) return "none";
 		StringBuilder sb = new StringBuilder();
 		sb.append("[item1=").append(getSimpleItemInfo(recipe.getItem1()))
 				.append(", item2=").append(getSimpleItemInfo(recipe.getItem2()))
-				.append(", result=").append(getSimpleItemInfo(recipe.getResultItem())).append("]");
+				.append(", result=").append(getSimpleItemInfo(recipe.getResultItem()))
+				.append("]");
 		return sb.toString();
 	}
 
 	/**
-	 * Same as {@link UnmodifiableItemStack#equals(ItemStack)}, but takes into account that the given item stacks might
-	 * both be <code>null</code>.
+	 * Same as {@link UnmodifiableItemStack#equals(ItemStack)}, but takes into account that the
+	 * given item stacks might both be <code>null</code>.
 	 * 
 	 * @param unmodifiableItemStack
 	 *            an unmodifiable item stack
@@ -529,14 +621,17 @@ public final class ItemUtils {
 	 *            an item stack to compare with
 	 * @return <code>true</code> if the item stacks are equal, or both <code>null</code>
 	 */
-	public static boolean equals(UnmodifiableItemStack unmodifiableItemStack, @ReadOnly ItemStack itemStack) {
+	public static boolean equals(
+			@Nullable UnmodifiableItemStack unmodifiableItemStack,
+			@ReadOnly @Nullable ItemStack itemStack
+	) {
 		if (unmodifiableItemStack == null) return (itemStack == null);
 		return unmodifiableItemStack.equals(itemStack);
 	}
 
 	/**
-	 * Same as {@link ItemStack#isSimilar(ItemStack)}, but takes into account that the given item stacks might both be
-	 * <code>null</code>.
+	 * Same as {@link ItemStack#isSimilar(ItemStack)}, but takes into account that the given item
+	 * stacks might both be <code>null</code>.
 	 * 
 	 * @param item1
 	 *            an item stack
@@ -544,14 +639,17 @@ public final class ItemUtils {
 	 *            another item stack
 	 * @return <code>true</code> if the item stacks are similar, or both <code>null</code>
 	 */
-	public static boolean isSimilar(@ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {
+	public static boolean isSimilar(
+			@ReadOnly @Nullable ItemStack item1,
+			@ReadOnly @Nullable ItemStack item2
+	) {
 		if (item1 == null) return (item2 == null);
 		return item1.isSimilar(item2);
 	}
 
 	/**
-	 * Same as {@link UnmodifiableItemStack#isSimilar(UnmodifiableItemStack)}, but takes into account that the given
-	 * item stacks might both be <code>null</code>.
+	 * Same as {@link UnmodifiableItemStack#isSimilar(UnmodifiableItemStack)}, but takes into
+	 * account that the given item stacks might both be <code>null</code>.
 	 * 
 	 * @param item1
 	 *            an item stack
@@ -559,13 +657,16 @@ public final class ItemUtils {
 	 *            another item stack
 	 * @return <code>true</code> if the item stacks are similar, or both <code>null</code>
 	 */
-	public static boolean isSimilar(UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+	public static boolean isSimilar(
+			@Nullable UnmodifiableItemStack item1,
+			@Nullable UnmodifiableItemStack item2
+	) {
 		return isSimilar(asItemStackOrNull(item1), asItemStackOrNull(item2));
 	}
 
 	/**
-	 * Same as {@link UnmodifiableItemStack#isSimilar(ItemStack)}, but takes into account that the given item stacks
-	 * might both be <code>null</code>.
+	 * Same as {@link UnmodifiableItemStack#isSimilar(ItemStack)}, but takes into account that the
+	 * given item stacks might both be <code>null</code>.
 	 * 
 	 * @param item1
 	 *            an item stack
@@ -573,7 +674,10 @@ public final class ItemUtils {
 	 *            another item stack
 	 * @return <code>true</code> if the item stacks are similar, or both <code>null</code>
 	 */
-	public static boolean isSimilar(UnmodifiableItemStack item1, @ReadOnly ItemStack item2) {
+	public static boolean isSimilar(
+			@Nullable UnmodifiableItemStack item1,
+			@ReadOnly @Nullable ItemStack item2
+	) {
 		return isSimilar(asItemStackOrNull(item1), item2);
 	}
 
@@ -590,7 +694,12 @@ public final class ItemUtils {
 	 *            the item lore, or <code>null</code> or empty to ignore it
 	 * @return <code>true</code> if the item has similar attributes
 	 */
-	public static boolean isSimilar(@ReadOnly ItemStack item, Material type, String displayName, @ReadOnly List<String> lore) {
+	public static boolean isSimilar(
+			@ReadOnly @Nullable ItemStack item,
+			Material type,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends @NonNull String> lore
+	) {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
 
@@ -603,6 +712,8 @@ public final class ItemUtils {
 
 		// Compare display name:
 		if (checkDisplayName) {
+			assert displayName != null;
+			Unsafe.assertNonNull(displayName);
 			if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
 				return false;
 			}
@@ -610,6 +721,8 @@ public final class ItemUtils {
 
 		// Compare lore:
 		if (checkLore) {
+			assert lore != null;
+			Unsafe.assertNonNull(lore);
 			if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
 				return false;
 			}
@@ -620,21 +733,35 @@ public final class ItemUtils {
 
 	// ITEM DATA MATCHING
 
-	public static boolean matchesData(@ReadOnly ItemStack item, @ReadOnly ItemStack data) {
+	public static boolean matchesData(
+			@ReadOnly @Nullable ItemStack item,
+			@ReadOnly @Nullable ItemStack data
+	) {
 		return matchesData(item, data, false); // Not matching partial lists
 	}
 
-	public static boolean matchesData(UnmodifiableItemStack item, UnmodifiableItemStack data) {
+	public static boolean matchesData(
+			@Nullable UnmodifiableItemStack item,
+			@Nullable UnmodifiableItemStack data
+	) {
 		return matchesData(item, data, false); // Not matching partial lists
 	}
 
 	// Same type and contains data.
-	public static boolean matchesData(UnmodifiableItemStack item, UnmodifiableItemStack data, boolean matchPartialLists) {
+	public static boolean matchesData(
+			@Nullable UnmodifiableItemStack item,
+			@Nullable UnmodifiableItemStack data,
+			boolean matchPartialLists
+	) {
 		return matchesData(asItemStackOrNull(item), asItemStackOrNull(data), matchPartialLists);
 	}
 
 	// Same type and contains data.
-	public static boolean matchesData(@ReadOnly ItemStack item, @ReadOnly ItemStack data, boolean matchPartialLists) {
+	public static boolean matchesData(
+			@ReadOnly @Nullable ItemStack item,
+			@ReadOnly @Nullable ItemStack data,
+			boolean matchPartialLists
+	) {
 		if (item == data) return true;
 		if (data == null) return true;
 		if (item == null) return false;
@@ -645,49 +772,85 @@ public final class ItemUtils {
 		return matchesData(item.getItemMeta(), data.getItemMeta(), matchPartialLists);
 	}
 
-	public static boolean matchesData(@ReadOnly ItemStack item, Material dataType, @ReadOnly Map<String, @ReadOnly Object> data, boolean matchPartialLists) {
+	public static boolean matchesData(
+			@ReadOnly @Nullable ItemStack item,
+			Material dataType,
+			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			boolean matchPartialLists
+	) {
 		if (item == null) return false;
 		if (item.getType() != dataType) return false; // Also returns false if dataType is null
 		if (data == null || data.isEmpty()) return true;
 		return matchesData(item.getItemMeta(), data, matchPartialLists);
 	}
 
-	public static boolean matchesData(UnmodifiableItemStack item, Material dataType, @ReadOnly Map<String, @ReadOnly Object> data, boolean matchPartialLists) {
+	public static boolean matchesData(
+			@Nullable UnmodifiableItemStack item,
+			Material dataType,
+			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			boolean matchPartialLists
+	) {
 		return matchesData(asItemStackOrNull(item), dataType, data, matchPartialLists);
 	}
 
-	public static boolean matchesData(@ReadOnly ItemMeta itemMetaData, @ReadOnly ItemMeta dataMetaData) {
+	public static boolean matchesData(
+			@ReadOnly ItemMeta itemMetaData,
+			@ReadOnly ItemMeta dataMetaData
+	) {
 		return matchesData(itemMetaData, dataMetaData, false); // Not matching partial lists
 	}
 
 	// Checks if the metadata contains the other given metadata.
-	// Similar to Minecraft's NBT data matching (trading does not match partial lists, but data specified in commands
-	// does), but there are a few differences: Minecraft requires explicitly specified empty lists to perfectly match in
-	// all cases, and some data is treated as list in Minecraft but as map in Bukkit (e.g. enchantments). But the
-	// behavior is the same if not matching partial lists.
-	public static boolean matchesData(ItemMeta itemMetaData, ItemMeta dataMetaData, boolean matchPartialLists) {
+	// Similar to Minecraft's NBT data matching (trading does not match partial lists, but data
+	// specified in commands does), but there are a few differences: Minecraft requires explicitly
+	// specified empty lists to perfectly match in all cases, and some data is treated as list in
+	// Minecraft but as map in Bukkit (e.g. enchantments). But the behavior is the same if not
+	// matching partial lists.
+	public static boolean matchesData(
+			@Nullable ItemMeta itemMetaData,
+			@Nullable ItemMeta dataMetaData,
+			boolean matchPartialLists
+	) {
 		if (itemMetaData == dataMetaData) return true;
 		if (dataMetaData == null) return true;
 		if (itemMetaData == null) return false;
 
 		// TODO Maybe there is a better way of doing this in the future..
-		Map<String, Object> itemMetaDataMap = itemMetaData.serialize();
-		Map<String, Object> dataMetaDataMap = dataMetaData.serialize();
+		Map<? extends @NonNull String, @NonNull ?> itemMetaDataMap = Unsafe.cast(
+				itemMetaData.serialize()
+		);
+		Map<? extends @NonNull String, @NonNull ?> dataMetaDataMap = Unsafe.cast(
+				dataMetaData.serialize()
+		);
 		return matchesData(itemMetaDataMap, dataMetaDataMap, matchPartialLists);
 	}
 
-	public static boolean matchesData(@ReadOnly ItemMeta itemMetaData, @ReadOnly Map<String, @ReadOnly Object> data, boolean matchPartialLists) {
+	public static boolean matchesData(
+			@ReadOnly @Nullable ItemMeta itemMetaData,
+			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			boolean matchPartialLists
+	) {
 		if (data == null || data.isEmpty()) return true;
 		if (itemMetaData == null) return false;
-		Map<String, Object> itemMetaDataMap = itemMetaData.serialize();
+		Map<? extends @NonNull String, @NonNull ?> itemMetaDataMap = Unsafe.cast(
+				itemMetaData.serialize()
+		);
 		return matchesData(itemMetaDataMap, data, matchPartialLists);
 	}
 
-	public static boolean matchesData(@ReadOnly Map<String, @ReadOnly Object> itemData, @ReadOnly Map<String, @ReadOnly Object> data, boolean matchPartialLists) {
+	public static boolean matchesData(
+			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> itemData,
+			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			boolean matchPartialLists
+	) {
 		return _matchesData(itemData, data, matchPartialLists);
 	}
 
-	private static boolean _matchesData(@ReadOnly Object target, @ReadOnly Object data, boolean matchPartialLists) {
+	private static boolean _matchesData(
+			@ReadOnly @Nullable Object target,
+			@ReadOnly @Nullable Object data,
+			boolean matchPartialLists
+	) {
 		if (target == data) return true;
 		if (data == null) return true;
 		if (target == null) return false;
@@ -695,9 +858,9 @@ public final class ItemUtils {
 		// Check if map contains given data:
 		if (data instanceof Map) {
 			if (!(target instanceof Map)) return false;
-			Map<?, ?> targetMap = (Map<?, ?>) target;
-			Map<?, ?> dataMap = (Map<?, ?>) data;
-			for (Entry<?, ?> entry : dataMap.entrySet()) {
+			Map<@NonNull ?, @NonNull ?> targetMap = Unsafe.castNonNull(target);
+			Map<@NonNull ?, @NonNull ?> dataMap = Unsafe.castNonNull(data);
+			for (Entry<@NonNull ?, ?> entry : dataMap.entrySet()) {
 				Object targetValue = targetMap.get(entry.getKey());
 				if (!_matchesData(targetValue, entry.getValue(), matchPartialLists)) {
 					return false;
@@ -740,51 +903,57 @@ public final class ItemUtils {
 
 	// PREDICATES
 
-	private static final Predicate<@ReadOnly ItemStack> EMPTY_ITEMS = ItemUtils::isEmpty;
-	private static final Predicate<@ReadOnly ItemStack> NON_EMPTY_ITEMS = (itemStack) -> !isEmpty(itemStack);
+	private static final Predicate<@ReadOnly @Nullable ItemStack> EMPTY_ITEMS = ItemUtils::isEmpty;
+	private static final Predicate<@ReadOnly @Nullable ItemStack> NON_EMPTY_ITEMS = (itemStack) -> {
+		return !isEmpty(itemStack);
+	};
 
 	/**
-	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) empty} {@link ItemStack ItemStacks}.
+	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) empty} {@link ItemStack
+	 * ItemStacks}.
 	 * 
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> emptyItems() {
+	public static Predicate<@ReadOnly @Nullable ItemStack> emptyItems() {
 		return EMPTY_ITEMS;
 	}
 
 	/**
-	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) non-empty} {@link ItemStack ItemStacks}.
+	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) non-empty} {@link ItemStack
+	 * ItemStacks}.
 	 * 
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> nonEmptyItems() {
+	public static Predicate<@ReadOnly @Nullable ItemStack> nonEmptyItems() {
 		return NON_EMPTY_ITEMS;
 	}
 
 	/**
-	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that {@link ItemData#matches(ItemStack) match}
-	 * the given {@link ItemData}.
+	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that
+	 * {@link ItemData#matches(ItemStack) match} the given {@link ItemData}.
 	 * 
 	 * @param itemData
 	 *            the ItemData, not <code>null</code>
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> matchingItems(ItemData itemData) {
+	public static Predicate<@ReadOnly @Nullable ItemStack> matchingItems(ItemData itemData) {
 		Validate.notNull(itemData, "itemData is null");
 		return (itemStack) -> itemData.matches(itemStack);
 	}
 
 	/**
-	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) non-empty} {@link ItemStack ItemStacks} that
-	 * {@link ItemData#matches(ItemStack) match} any of the given {@link ItemData}.
+	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) non-empty} {@link ItemStack
+	 * ItemStacks} that {@link ItemData#matches(ItemStack) match} any of the given {@link ItemData}.
 	 * 
 	 * @param itemDataList
 	 *            the list of ItemData, not <code>null</code> and does not contain <code>null</code>
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> matchingItems(@ReadOnly List<ItemData> itemDataList) {
+	public static Predicate<@ReadOnly @Nullable ItemStack> matchingItems(
+			@ReadOnly List<? extends @NonNull ItemData> itemDataList
+	) {
 		Validate.notNull(itemDataList, "itemDataList is null");
-		assert !itemDataList.contains(null);
+		assert !CollectionUtils.containsNull(itemDataList);
 		return (itemStack) -> {
 			if (isEmpty(itemStack)) return false;
 			for (ItemData itemData : itemDataList) {
@@ -798,42 +967,47 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are {@link ItemStack#isSimilar(ItemStack)
-	 * similar} to the given {@link ItemStack}.
+	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are
+	 * {@link ItemStack#isSimilar(ItemStack) similar} to the given {@link ItemStack}.
 	 * 
 	 * @param itemStack
 	 *            the item stack, not <code>null</code>
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> similarItems(@ReadOnly ItemStack itemStack) {
+	public static Predicate<@ReadOnly @Nullable ItemStack> similarItems(
+			@ReadOnly ItemStack itemStack
+	) {
 		Validate.notNull(itemStack, "itemStack is null");
 		return (otherItemStack) -> itemStack.isSimilar(otherItemStack);
 	}
 
 	/**
 	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are
-	 * {@link UnmodifiableItemStack#isSimilar(ItemStack) similar} to the given {@link UnmodifiableItemStack}.
+	 * {@link UnmodifiableItemStack#isSimilar(ItemStack) similar} to the given
+	 * {@link UnmodifiableItemStack}.
 	 * 
 	 * @param itemStack
 	 *            the item stack, not <code>null</code>
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> similarItems(UnmodifiableItemStack itemStack) {
+	public static Predicate<@ReadOnly @Nullable ItemStack> similarItems(
+			UnmodifiableItemStack itemStack
+	) {
 		Validate.notNull(itemStack, "itemStack is null");
 		return (otherItemStack) -> itemStack.isSimilar(otherItemStack);
 	}
 
 	/**
-	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are of the specified {@link Material
-	 * type}.
+	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are of the specified
+	 * {@link Material type}.
 	 * 
 	 * @param itemType
 	 *            the item type, not <code>null</code>
 	 * @return the Predicate
 	 */
-	public static Predicate<@ReadOnly ItemStack> itemsOfType(Material itemType) {
+	public static Predicate<@ReadOnly @Nullable ItemStack> itemsOfType(Material itemType) {
 		Validate.notNull(itemType, "itemType is null");
-		return (itemStack) -> itemStack.getType() == itemType;
+		return (itemStack) -> itemStack != null && itemStack.getType() == itemType;
 	}
 
 	private ItemUtils() {

@@ -13,16 +13,16 @@ public class MutableChunkCoords extends ChunkCoords {
 	/**
 	 * The (invalid) dummy world name that is used to indicate that the world name is unset.
 	 * <p>
-	 * {@link ChunkCoords} always expects a non-empty name, but this class additionally provides a state with an unset
-	 * world name.
+	 * {@link ChunkCoords} always expects a non-empty name, but this class additionally provides a
+	 * state with an unset world name.
 	 */
 	public static final String UNSET_WORLD_NAME = "<UNSET>";
 
 	/**
 	 * Creates a new {@link MutableChunkCoords}.
 	 * <p>
-	 * The {@link #getWorldName() world name} is initialized to the {@link #UNSET_WORLD_NAME}, and the chunk coordinates
-	 * are all {@code zero}.
+	 * The {@link #getWorldName() world name} is initialized to the {@link #UNSET_WORLD_NAME}, and
+	 * the chunk coordinates are all {@code zero}.
 	 */
 	public MutableChunkCoords() {
 		super(UNSET_WORLD_NAME, 0, 0);

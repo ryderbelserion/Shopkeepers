@@ -8,6 +8,8 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
@@ -18,12 +20,15 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * A permission node associated with a maximum player shops limit.
  * <p>
- * {@link MaxShopsPermission} is {@link Comparable} and ordered based on its {@link #getMaxShops() maximum player shops
- * limit}.
+ * {@link MaxShopsPermission} is {@link Comparable} and ordered based on its {@link #getMaxShops()
+ * maximum player shops limit}.
  */
-public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
+public class MaxShopsPermission implements Comparable<@NonNull MaxShopsPermission> {
 
-	public static final MaxShopsPermission UNLIMITED = new MaxShopsPermission(Integer.MAX_VALUE, ShopkeepersPlugin.MAXSHOPS_UNLIMITED_PERMISSION);
+	public static final MaxShopsPermission UNLIMITED = new MaxShopsPermission(
+			Integer.MAX_VALUE,
+			ShopkeepersPlugin.MAXSHOPS_UNLIMITED_PERMISSION
+	);
 	private static final String PERMISSION_PREFIX = "shopkeeper.maxshops.";
 
 	/**
@@ -33,18 +38,20 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	 * 
 	 * @param maxShopsPermissionOption
 	 *            the input String
-	 * @return the parsed {@link MaxShopsPermission}
+	 * @return the parsed {@link MaxShopsPermission}, not <code>null</code>
 	 * @throws IllegalArgumentException
 	 *             if the {@link MaxShopsPermission} cannot be parsed
 	 */
 	public static MaxShopsPermission parse(String maxShopsPermissionOption) {
 		Integer maxShops = ConversionUtils.parseInt(maxShopsPermissionOption);
 		if (maxShops == null || maxShops <= 0) {
-			throw new IllegalArgumentException("Invalid max shops permission option: " + maxShopsPermissionOption);
+			throw new IllegalArgumentException("Invalid max shops permission option: "
+					+ maxShopsPermissionOption);
 		}
-		// Using the String representation of the parsed integer instead of the original String ensures that the result
-		// is always the expected integer representation and not affected by any lenient parsing rules (such as for
-		// example the optionally allowed '+' sign character for positive integers):
+		// Using the String representation of the parsed integer instead of the original String
+		// ensures that the result is always the expected integer representation and not affected by
+		// any lenient parsing rules (such as for example the optionally allowed '+' sign character
+		// for positive integers):
 		String permission = PERMISSION_PREFIX + maxShops;
 		return new MaxShopsPermission(maxShops, permission);
 	}
@@ -52,19 +59,24 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	/**
 	 * Parses a list of {@link MaxShopsPermission} from the given input String.
 	 * <p>
-	 * The input String is expected to be the String representation of the maximum shops limits separated by commas.
+	 * The input String is expected to be the String representation of the maximum shops limits
+	 * separated by commas.
 	 * 
 	 * @param maxShopsPermissionOptionsList
 	 *            the input String, not <code>null</code>
 	 * @param invalidPermissionOptionCallback
-	 *            this callback is invoked for invalid maximum shops permission options, not <code>null</code>
+	 *            this callback is invoked for invalid maximum shops permission options, not
+	 *            <code>null</code>
 	 * @return the parsed list of {@link MaxShopsPermission}
 	 */
-	public static List<MaxShopsPermission> parseList(String maxShopsPermissionOptionsList, Consumer<String> invalidPermissionOptionCallback) {
+	public static List<@NonNull MaxShopsPermission> parseList(
+			String maxShopsPermissionOptionsList,
+			Consumer<? super @NonNull String> invalidPermissionOptionCallback
+	) {
 		Validate.notNull(maxShopsPermissionOptionsList, "maxShopsPermissionOptionsList is null");
 		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback is null");
-		String[] permissionOptions = StringUtils.removeWhitespace(maxShopsPermissionOptionsList).split(",");
-		List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>(permissionOptions.length);
+		@NonNull String[] permissionOptions = StringUtils.removeWhitespace(maxShopsPermissionOptionsList).split(",");
+		List<@NonNull MaxShopsPermission> maxShopsPermissions = new ArrayList<>(permissionOptions.length);
 		for (String permissionOption : permissionOptions) {
 			MaxShopsPermission maxShopsPermission;
 			try {
@@ -103,15 +115,16 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	/**
 	 * Gets the maximum player shops limit associated with this permission.
 	 * 
-	 * @return the maximum player shops limit, a positive number, can be {@link Integer#MAX_VALUE} if there is no limit
+	 * @return the maximum player shops limit, a positive number, can be {@link Integer#MAX_VALUE}
+	 *         if there is no limit
 	 */
 	public int getMaxShops() {
 		return maxShops;
 	}
 
 	/**
-	 * Checks if the {@link #getMaxShops() maximum shops limit} of this {@link MaxShopsPermission} is unlimited (i.e. is
-	 * {@link Integer#MAX_VALUE}).
+	 * Checks if the {@link #getMaxShops() maximum shops limit} of this {@link MaxShopsPermission}
+	 * is unlimited (i.e. is {@link Integer#MAX_VALUE}).
 	 * 
 	 * @return <code>true</code> if the maximum shops limit is unlimited
 	 */
@@ -129,8 +142,8 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	}
 
 	/**
-	 * {@link PluginManager#addPermission(Permission) Registers} the permission node of this maximum shops permission,
-	 * if it is not already registered.
+	 * {@link PluginManager#addPermission(Permission) Registers} the permission node of this maximum
+	 * shops permission, if it is not already registered.
 	 */
 	public void registerPermission() {
 		PermissionUtils.registerPermission(permission, node -> createPermission());
@@ -184,7 +197,7 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof MaxShopsPermission)) return false;
 		MaxShopsPermission other = (MaxShopsPermission) obj;

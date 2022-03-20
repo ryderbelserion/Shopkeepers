@@ -3,6 +3,9 @@ package com.nisovin.shopkeepers.shopkeeper.migration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -12,16 +15,17 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Shopkeeper data migration phases.
  * <p>
- * These migration phases determine the order in which shopkeeper data {@link Migration migrations} are executed. They
- * also allow migrations to be applied only to the data of specific types of {@link #ofShopkeeperClass(Class)
- * shopkeepers} or {@link #ofShopObjectClass(Class) shop objects}.
+ * These migration phases determine the order in which shopkeeper data {@link Migration migrations}
+ * are executed. They also allow migrations to be applied only to the data of specific types of
+ * {@link #ofShopkeeperClass(Class) shopkeepers} or {@link #ofShopObjectClass(Class) shop objects}.
  * <p>
- * Each shopkeeper data {@link Migration migration} specifies a {@link Migration#getTargetPhase() target migration
- * phase} at which it wants to execute. This can be one of the fixed migration phases that each shopkeeper data
- * migration goes through, or it can be one of the migration phases that only applies to specific types of shopkeepers
- * or shop objects. If its target migration phase is {@link #isApplicable(MigrationPhase) applicable} in the current
- * migration phase of some shopkeeper data, the migration is {@link Migration#migrate(ShopkeeperData, String) executed}.
- * All migrations that are applicable in the same migration phase are executed in the order of their
+ * Each shopkeeper data {@link Migration migration} specifies a {@link Migration#getTargetPhase()
+ * target migration phase} at which it wants to execute. This can be one of the fixed migration
+ * phases that each shopkeeper data migration goes through, or it can be one of the migration phases
+ * that only applies to specific types of shopkeepers or shop objects. If its target migration phase
+ * is {@link #isApplicable(MigrationPhase) applicable} in the current migration phase of some
+ * shopkeeper data, the migration is {@link Migration#migrate(ShopkeeperData, String) executed}. All
+ * migrations that are applicable in the same migration phase are executed in the order of their
  * {@link ShopkeeperDataMigrator#registerMigration(Migration) registration}.
  */
 public class MigrationPhase {
@@ -37,8 +41,8 @@ public class MigrationPhase {
 	public static final MigrationPhase DEFAULT = new MigrationPhase("default");
 
 	/**
-	 * Migrations for the returned phase are executed after {@link #DEFAULT} for shopkeepers of the specified type or
-	 * any sub-type.
+	 * Migrations for the returned phase are executed after {@link #DEFAULT} for shopkeepers of the
+	 * specified type or any sub-type.
 	 * 
 	 * @param shopkeeperClass
 	 *            the shopkeeper class, not <code>null</code>
@@ -49,14 +53,22 @@ public class MigrationPhase {
 	}
 
 	/**
-	 * A {@link MigrationPhase} that is only executed for shopkeepers of a specific type or any sub-type.
+	 * A {@link MigrationPhase} that is only executed for shopkeepers of a specific type or any
+	 * sub-type.
 	 */
 	public static final class ShopkeeperClassMigrationPhase extends MigrationPhase {
 
-		private static final Map<Class<? extends Shopkeeper>, ShopkeeperClassMigrationPhase> CACHE = new HashMap<>();
+		private static final Map<@NonNull Class<? extends Shopkeeper>, @NonNull ShopkeeperClassMigrationPhase> CACHE = new HashMap<>();
 
-		private static ShopkeeperClassMigrationPhase of(Class<? extends Shopkeeper> shopkeeperClass) {
-			return CACHE.computeIfAbsent(shopkeeperClass, ShopkeeperClassMigrationPhase::new);
+		private static ShopkeeperClassMigrationPhase of(
+				Class<? extends Shopkeeper> shopkeeperClass
+		) {
+			ShopkeeperClassMigrationPhase migrationPhase = CACHE.computeIfAbsent(
+					shopkeeperClass,
+					ShopkeeperClassMigrationPhase::new
+			);
+			assert migrationPhase != null;
+			return migrationPhase;
 		}
 
 		private static String getName(Class<? extends Shopkeeper> shopkeeperClass) {
@@ -97,7 +109,7 @@ public class MigrationPhase {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals(@Nullable Object obj) {
 			if (this == obj) return true;
 			if (!(obj instanceof ShopkeeperClassMigrationPhase)) return false;
 			ShopkeeperClassMigrationPhase other = (ShopkeeperClassMigrationPhase) obj;
@@ -106,8 +118,8 @@ public class MigrationPhase {
 	}
 
 	/**
-	 * Migrations for the returned phase are executed after {@link #ofShopkeeperClass(Class)} for shop object's of the
-	 * specified type or any sub-type.
+	 * Migrations for the returned phase are executed after {@link #ofShopkeeperClass(Class)} for
+	 * shop object's of the specified type or any sub-type.
 	 * 
 	 * @param shopObjectClass
 	 *            the shop object class, not <code>null</code>
@@ -118,14 +130,20 @@ public class MigrationPhase {
 	}
 
 	/**
-	 * A {@link MigrationPhase} that is only executed for shop object's of a specific type or any sub-type.
+	 * A {@link MigrationPhase} that is only executed for shop object's of a specific type or any
+	 * sub-type.
 	 */
 	public static final class ShopObjectClassMigrationPhase extends MigrationPhase {
 
-		private static final Map<Class<? extends ShopObject>, ShopObjectClassMigrationPhase> CACHE = new HashMap<>();
+		private static final Map<@NonNull Class<? extends ShopObject>, @NonNull ShopObjectClassMigrationPhase> CACHE = new HashMap<>();
 
 		private static ShopObjectClassMigrationPhase of(Class<? extends ShopObject> shopObjectClass) {
-			return CACHE.computeIfAbsent(shopObjectClass, ShopObjectClassMigrationPhase::new);
+			ShopObjectClassMigrationPhase migrationPhase = CACHE.computeIfAbsent(
+					shopObjectClass,
+					ShopObjectClassMigrationPhase::new
+			);
+			assert migrationPhase != null;
+			return migrationPhase;
 		}
 
 		private static String getName(Class<? extends ShopObject> shopObjectClass) {
@@ -166,7 +184,7 @@ public class MigrationPhase {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals(@Nullable Object obj) {
 			if (this == obj) return true;
 			if (!(obj instanceof ShopObjectClassMigrationPhase)) return false;
 			ShopObjectClassMigrationPhase other = (ShopObjectClassMigrationPhase) obj;
@@ -196,11 +214,13 @@ public class MigrationPhase {
 	}
 
 	/**
-	 * Checks whether this {@link MigrationPhase} is meant to execute in the given current migration phase.
+	 * Checks whether this {@link MigrationPhase} is meant to execute in the given current migration
+	 * phase.
 	 * 
 	 * @param migrationPhase
 	 *            the current migration phase, not <code>null</code>
-	 * @return <code>true</code> if this migration phase is meant to execute in the given current migration phase
+	 * @return <code>true</code> if this migration phase is meant to execute in the given current
+	 *         migration phase
 	 */
 	public boolean isApplicable(MigrationPhase migrationPhase) {
 		return this.equals(migrationPhase);

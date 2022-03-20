@@ -19,10 +19,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -54,26 +57,32 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final SKShopkeepersPlugin plugin;
 
 	// All shopkeepers:
-	private final Map<UUID, AbstractShopkeeper> shopkeepersByUUID = new LinkedHashMap<>();
-	private final Collection<AbstractShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersByUUID.values());
-	private final Map<Integer, AbstractShopkeeper> shopkeepersById = new HashMap<>();
+	private final Map<@NonNull UUID, @NonNull AbstractShopkeeper> shopkeepersByUUID = new LinkedHashMap<>();
+	private final Collection<? extends @NonNull AbstractShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersByUUID.values());
+	private final Map<@NonNull Integer, @NonNull AbstractShopkeeper> shopkeepersById = new HashMap<>();
 
 	// TODO Shopkeepers by name TreeMap to speedup name lookups and prefix matching?
 	// TODO TreeMaps for shopkeeper owners by name and uuid to speedup prefix matching?
 
 	// Virtual shopkeepers:
 	// Set: Allows for fast removal.
-	private final Set<AbstractShopkeeper> virtualShopkeepers = new LinkedHashSet<>();
-	private final Collection<AbstractShopkeeper> virtualShopkeepersView = Collections.unmodifiableCollection(virtualShopkeepers);
+	private final Set<@NonNull AbstractShopkeeper> virtualShopkeepers = new LinkedHashSet<>();
+	private final Collection<? extends @NonNull AbstractShopkeeper> virtualShopkeepersView = Collections.unmodifiableCollection(virtualShopkeepers);
 
 	private final ShopkeeperChunkMap chunkMap;
 	private final ChangeListener chunkMapChangeListener = new ChangeListener() {
 		@Override
-		public void onShopkeeperAdded(AbstractShopkeeper shopkeeper, ChunkShopkeepers chunkShopkeepers) {
+		public void onShopkeeperAdded(
+				AbstractShopkeeper shopkeeper,
+				ChunkShopkeepers chunkShopkeepers
+		) {
 		}
 
 		@Override
-		public void onShopkeeperRemoved(AbstractShopkeeper shopkeeper, ChunkShopkeepers chunkShopkeepers) {
+		public void onShopkeeperRemoved(
+				AbstractShopkeeper shopkeeper,
+				ChunkShopkeepers chunkShopkeepers
+		) {
 		}
 
 		@Override
@@ -82,19 +91,22 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		@Override
 		public void onWorldRemoved(WorldShopkeepers worldShopkeepers) {
+			Unsafe.assertNonNull(shopkeeperSpawner);
 			shopkeeperSpawner.onShopkeeperWorldRemoved(worldShopkeepers.getWorldName());
 		}
 
 		@Override
 		public void onChunkAdded(ChunkShopkeepers chunkShopkeepers) {
-			// Also immediately set up the chunk activator's chunk data, but do not yet trigger shopkeeper activation
-			// (ticking, spawning, etc.). This ensures that all queries involving active chunks provide a consistent
-			// view.
+			// Also immediately set up the chunk activator's chunk data, but do not yet trigger
+			// shopkeeper activation (ticking, spawning, etc.). This ensures that all queries
+			// involving active chunks provide a consistent view.
+			Unsafe.assertNonNull(chunkActivator);
 			chunkActivator.onShopkeeperChunkAdded(chunkShopkeepers.getChunkCoords());
 		}
 
 		@Override
 		public void onChunkRemoved(ChunkShopkeepers chunkShopkeepers) {
+			Unsafe.assertNonNull(chunkActivator);
 			chunkActivator.onShopkeeperChunkRemoved(chunkShopkeepers.getChunkCoords());
 		}
 	};
@@ -102,13 +114,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// Player shopkeepers:
 	private int playerShopCount = 0;
 	// Note: Already unmodifiable.
-	private final Set<AbstractPlayerShopkeeper> allPlayerShopkeepersView = new AbstractSet<AbstractPlayerShopkeeper>() {
+	private final Set<? extends @NonNull AbstractPlayerShopkeeper> allPlayerShopkeepersView = new AbstractSet<@NonNull AbstractPlayerShopkeeper>() {
 		@Override
 		public Iterator<AbstractPlayerShopkeeper> iterator() {
 			if (this.isEmpty()) {
 				return Collections.emptyIterator();
 			}
-			return getAllShopkeepers().stream()
+			return Unsafe.initialized(SKShopkeeperRegistry.this).getAllShopkeepers().stream()
 					.filter(shopkeeper -> shopkeeper instanceof PlayerShopkeeper)
 					.map(shopkeeper -> (AbstractPlayerShopkeeper) shopkeeper)
 					.iterator();
@@ -130,8 +142,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		this.plugin = plugin;
 		this.chunkMap = new ShopkeeperChunkMap(chunkMapChangeListener);
 		this.shopkeeperTicker = new ShopkeeperTicker(plugin);
-		this.shopkeeperSpawner = new ShopkeeperSpawner(plugin, this);
-		this.chunkActivator = new ShopkeeperChunkActivator(plugin, this, shopkeeperTicker, shopkeeperSpawner);
+		this.shopkeeperSpawner = new ShopkeeperSpawner(plugin, Unsafe.initialized(this));
+		this.chunkActivator = new ShopkeeperChunkActivator(
+				plugin,
+				Unsafe.initialized(this),
+				shopkeeperTicker,
+				shopkeeperSpawner
+		);
 		this.activeChunkQueries = new ActiveChunkQueries(chunkMap, chunkActivator);
 	}
 
@@ -157,7 +174,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	private void ensureEmpty() {
-		if (!shopkeepersByUUID.isEmpty() || !shopkeepersById.isEmpty() || !virtualShopkeepers.isEmpty() || playerShopCount != 0) {
+		if (!shopkeepersByUUID.isEmpty() || !shopkeepersById.isEmpty()
+				|| !virtualShopkeepers.isEmpty() || playerShopCount != 0) {
 			Log.warning("Some shopkeepers were not properly unregistered!");
 			shopkeepersByUUID.clear();
 			shopkeepersById.clear();
@@ -182,7 +200,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	@Override
-	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
+	public AbstractShopkeeper createShopkeeper(
+			ShopCreationData creationData
+	) throws ShopkeeperCreateException {
 		Validate.notNull(creationData, "creationData is null");
 		ShopType<?> shopType = creationData.getShopType();
 		assert shopType != null;
@@ -211,7 +231,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	/**
-	 * Recreates a shopkeeper by loading its previously saved data from the given {@link ShopkeeperData}.
+	 * Recreates a shopkeeper by loading its previously saved data from the given
+	 * {@link ShopkeeperData}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data
@@ -219,11 +240,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * @throws InvalidDataException
 	 *             if the shopkeeper data could not be loaded
 	 */
-	// Internal method: This is only supposed to be called by the built-in storage currently. If the data comes from any
-	// other source, the storage would need to be made aware of the shopkeeper (e.g. by marking the shopkeeper as
-	// dirty). Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no
-	// longer work as expected.
-	public AbstractShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws InvalidDataException {
+	// Internal method: This is only supposed to be called by the built-in storage currently. If the
+	// data comes from any other source, the storage would need to be made aware of the shopkeeper
+	// (e.g. by marking the shopkeeper as dirty). Otherwise, certain operations (such as checking if
+	// a certain shopkeeper id is already in use) would no longer work as expected.
+	public AbstractShopkeeper loadShopkeeper(
+			ShopkeeperData shopkeeperData
+	) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
 		AbstractShopType<?> shopType = shopkeeperData.get(AbstractShopkeeper.SHOP_TYPE);
@@ -250,7 +273,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		Validate.isTrue(this.getShopkeeperById(shopkeeper.getId()) == null,
 				() -> "There already exists a shopkeeper with the same id: " + shopkeeper.getId());
 		Validate.isTrue(this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) == null,
-				() -> "There already exists a shopkeeper with the same unique id: " + shopkeeper.getUniqueId());
+				() -> "There already exists a shopkeeper with the same unique id: "
+						+ shopkeeper.getUniqueId());
 	}
 
 	// ADD / REMOVE SHOPKEEPER
@@ -282,10 +306,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			playerShopCount++;
 		}
 
-		// Log a warning if either the shop type or the shop object type is disabled. The shopkeeper is still added (so
-		// containers are still protected), but it might not get spawned, and there is no guarantee that the shop still
-		// works as expected. Admins are advised to either delete the shopkeeper, or change its object type to something
-		// else.
+		// Log a warning if either the shop type or the shop object type is disabled. The shopkeeper
+		// is still added (so containers are still protected), but it might not get spawned, and
+		// there is no guarantee that the shop still works as expected. Admins are advised to either
+		// delete the shopkeeper, or change its object type to something else.
 		AbstractShopType<?> shopType = shopkeeper.getType();
 		if (!shopType.isEnabled()) {
 			Log.warning(shopkeeper.getLogPrefix() + "Shop type '" + shopType.getIdentifier()
@@ -298,8 +322,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Inform shopkeeper:
-		// If the shop object handles spawning itself, and the shop object is already spawned, this might register the
-		// already spawned shop object.
+		// If the shop object handles spawning itself, and the shop object is already spawned, this
+		// might register the already spawned shop object.
 		shopkeeper.informAdded(cause);
 
 		// Call event:
@@ -313,22 +337,26 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		chunkActivator.checkShopkeeperActivation(shopkeeper);
 	}
 
-	private void removeShopkeeper(AbstractShopkeeper shopkeeper, ShopkeeperRemoveEvent.Cause cause) {
+	private void removeShopkeeper(
+			AbstractShopkeeper shopkeeper,
+			ShopkeeperRemoveEvent.Cause cause
+	) {
 		assert shopkeeper != null && shopkeeper.isValid() && cause != null;
 
 		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperRemoveEvent(shopkeeper, cause));
 
 		// Delayed closing of all active UI sessions:
-		// TODO UI handlers might want/need to handle the UI closing immediately here (e.g. to save UI state and apply
-		// shopkeeper changes).
+		// TODO UI handlers might want/need to handle the UI closing immediately here (e.g. to save
+		// UI state and apply shopkeeper changes).
 		shopkeeper.abortUISessionsDelayed();
 
 		// If necessary, deactivate the shopkeeper (stop ticking, despawn, etc.):
 		chunkActivator.deactivateShopkeeper(shopkeeper);
 
 		// Inform shopkeeper:
-		// If the shop object handles spawning itself, this is expected to unregister any currently spawned shop object.
+		// If the shop object handles spawning itself, this is expected to unregister any currently
+		// spawned shop object.
 		shopkeeper.informRemoval(cause);
 
 		// Verify that the shop object is no longer registered:
@@ -367,7 +395,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		Validate.isTrue(shopkeeper.isValid(), "shopkeeper is not valid");
 		Validate.isTrue(!shopkeeper.isVirtual(), "shopkeeper is virtual");
 
-		ChunkCoords oldChunk = shopkeeper.getLastChunkCoords();
+		ChunkCoords oldChunk = Unsafe.assertNonNull(shopkeeper.getLastChunkCoords());
 
 		// Update the shopkeeper's location inside the chunk map:
 		if (!chunkMap.moveShopkeeper(shopkeeper)) {
@@ -385,11 +413,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void unloadAllShopkeepers() {
-		// Note: One optimization idea is to clear the shopkeeper spawn queue here immediately, instead of removing
-		// shopkeepers one by one during shopkeeper removals. However, we don't expect this to actually provide much
-		// benefit, as the spawn queue is usually not very full anyway: The spawn queue is intentionally not used in
-		// situations in which it could fill up a lot (reloads, world save respawns, etc.) in order to not create a
-		// backlog that would result in players waiting very long for shopkeepers to respawn. The same applies when
+		// Note: One optimization idea is to clear the shopkeeper spawn queue here immediately,
+		// instead of removing shopkeepers one by one during shopkeeper removals. However, we don't
+		// expect this to actually provide much benefit, as the spawn queue is usually not very full
+		// anyway: The spawn queue is intentionally not used in situations in which it could fill up
+		// a lot (reloads, world save respawns, etc.) in order to not create a backlog that would
+		// result in players waiting very long for shopkeepers to respawn. The same applies when
 		// deleting all shopkeepers.
 		new ArrayList<>(this.getAllShopkeepers()).forEach(this::unloadShopkeeper);
 	}
@@ -407,39 +436,41 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	///// QUERYING
 
 	@Override
-	public Collection<? extends AbstractShopkeeper> getAllShopkeepers() {
+	public Collection<? extends @NonNull AbstractShopkeeper> getAllShopkeepers() {
 		return allShopkeepersView;
 	}
 
 	@Override
-	public Collection<? extends AbstractShopkeeper> getVirtualShopkeepers() {
+	public Collection<? extends @NonNull AbstractShopkeeper> getVirtualShopkeepers() {
 		return virtualShopkeepersView;
 	}
 
 	@Override
-	public AbstractShopkeeper getShopkeeperByUniqueId(UUID shopkeeperUniqueId) {
+	public @Nullable AbstractShopkeeper getShopkeeperByUniqueId(UUID shopkeeperUniqueId) {
 		return shopkeepersByUUID.get(shopkeeperUniqueId);
 	}
 
 	@Override
-	public AbstractShopkeeper getShopkeeperById(int shopkeeperId) {
+	public @Nullable AbstractShopkeeper getShopkeeperById(int shopkeeperId) {
 		return shopkeepersById.get(shopkeeperId);
 	}
 
 	// PLAYER SHOPS
 
 	@Override
-	public Collection<? extends AbstractPlayerShopkeeper> getAllPlayerShopkeepers() {
+	public Collection<? extends @NonNull AbstractPlayerShopkeeper> getAllPlayerShopkeepers() {
 		return allPlayerShopkeepersView;
 	}
 
 	@Override
-	public Collection<? extends AbstractPlayerShopkeeper> getPlayerShopkeepersByOwner(UUID ownerUUID) {
+	public Collection<? extends @NonNull AbstractPlayerShopkeeper> getPlayerShopkeepersByOwner(
+			UUID ownerUUID
+	) {
 		Validate.notNull(ownerUUID, "ownerUUID is null");
 		// TODO Improve? Maybe keep an index of player shops? Or even index by owner?
 		// Note: Already unmodifiable.
-		return new AbstractSet<AbstractPlayerShopkeeper>() {
-			private Stream<AbstractPlayerShopkeeper> createStream() {
+		return new AbstractSet<@NonNull AbstractPlayerShopkeeper>() {
+			private Stream<? extends @NonNull AbstractPlayerShopkeeper> createStream() {
 				return allPlayerShopkeepersView.stream()
 						.filter(shopkeeper -> shopkeeper.getOwnerUUID().equals(ownerUUID));
 			}
@@ -450,7 +481,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 					// There are no player shops at all:
 					return Collections.emptyIterator();
 				}
-				return this.createStream().iterator();
+				return Unsafe.cast(this.createStream().iterator());
 			}
 
 			@Override
@@ -467,7 +498,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// BY NAME
 
 	@Override
-	public Stream<? extends AbstractShopkeeper> getShopkeepersByName(String shopName) {
+	public Stream<? extends @NonNull AbstractShopkeeper> getShopkeepersByName(String shopName) {
 		String normalizedShopName = StringUtils.normalize(TextUtils.stripColor(shopName));
 		if (StringUtils.isEmpty(normalizedShopName)) return Stream.empty();
 
@@ -478,12 +509,15 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 			shopkeeperName = TextUtils.stripColor(shopkeeperName);
 			shopkeeperName = StringUtils.normalize(shopkeeperName);
-			return (shopkeeperName.equals(normalizedShopName)); // Include shopkeeper if name matches
+			// Include shopkeeper if name matches:
+			return (shopkeeperName.equals(normalizedShopName));
 		});
 	}
 
 	@Override
-	public Stream<? extends AbstractShopkeeper> getShopkeepersByNamePrefix(String shopNamePrefix) {
+	public Stream<? extends @NonNull AbstractShopkeeper> getShopkeepersByNamePrefix(
+			String shopNamePrefix
+	) {
 		String normalizedShopNamePrefix = StringUtils.normalize(TextUtils.stripColor(shopNamePrefix));
 		if (StringUtils.isEmpty(normalizedShopNamePrefix)) return Stream.empty();
 
@@ -494,35 +528,40 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 			shopkeeperName = TextUtils.stripColor(shopkeeperName);
 			shopkeeperName = StringUtils.normalize(shopkeeperName);
-			return (shopkeeperName.startsWith(normalizedShopNamePrefix)); // Include shopkeeper if name matches
+			// Include shopkeeper if name matches:
+			return shopkeeperName.startsWith(normalizedShopNamePrefix);
 		});
 	}
 
 	// BY WORLD
 
 	@Override
-	public Collection<String> getWorldsWithShopkeepers() {
+	public Collection<? extends @NonNull String> getWorldsWithShopkeepers() {
 		return chunkMap.getWorldsWithShopkeepers();
 	}
 
 	@Override
-	public Collection<? extends AbstractShopkeeper> getShopkeepersInWorld(String worldName) {
+	public Collection<? extends @NonNull AbstractShopkeeper> getShopkeepersInWorld(String worldName) {
 		WorldShopkeepers worldShopkeepers = chunkMap.getWorldShopkeepers(worldName);
 		if (worldShopkeepers == null) return Collections.emptySet();
 		return worldShopkeepers.getShopkeepers();
 	}
 
 	@Override
-	public Map<ChunkCoords, ? extends Collection<? extends AbstractShopkeeper>> getShopkeepersByChunks(String worldName) {
+	public Map<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull AbstractShopkeeper>> getShopkeepersByChunks(
+			String worldName
+	) {
 		WorldShopkeepers worldShopkeepers = chunkMap.getWorldShopkeepers(worldName);
-		if (worldShopkeepers == null) return Collections.emptyMap();
+		if (worldShopkeepers == null) {
+			return Collections.emptyMap();
+		}
 		return worldShopkeepers.getShopkeepersByChunk();
 	}
 
 	// ACTIVE CHUNKS
 
 	@Override
-	public Collection<ChunkCoords> getActiveChunks(String worldName) {
+	public Collection<? extends @NonNull ChunkCoords> getActiveChunks(String worldName) {
 		return activeChunkQueries.getActiveChunks(worldName);
 	}
 
@@ -531,28 +570,33 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return chunkActivator.isChunkActive(chunkCoords);
 	}
 
-	// Note: This are the shopkeepers in active chunks. The shopkeepers might not necessarily be spawned yet.
+	// Note: This are the shopkeepers in active chunks. The shopkeepers might not necessarily be
+	// spawned yet.
 	@Override
-	public Collection<? extends AbstractShopkeeper> getActiveShopkeepers() {
+	public Collection<? extends @NonNull AbstractShopkeeper> getActiveShopkeepers() {
 		return activeChunkQueries.getShopkeepersInActiveChunks();
 	}
 
 	@Override
-	public Collection<? extends AbstractShopkeeper> getActiveShopkeepers(String worldName) {
+	public Collection<? extends @NonNull AbstractShopkeeper> getActiveShopkeepers(String worldName) {
 		return activeChunkQueries.getShopkeepersInActiveChunks(worldName);
 	}
 
 	// BY CHUNK
 
 	@Override
-	public Collection<? extends AbstractShopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
+	public Collection<? extends @NonNull AbstractShopkeeper> getShopkeepersInChunk(
+			ChunkCoords chunkCoords
+	) {
 		Validate.notNull(chunkCoords, "chunkCoords is null");
 		ChunkShopkeepers chunkShopkeepers = chunkMap.getChunkShopkeepers(chunkCoords);
 		if (chunkShopkeepers == null) return Collections.emptySet();
 		return chunkShopkeepers.getShopkeepers();
 	}
 
-	public Collection<? extends AbstractShopkeeper> getShopkeepersInChunkSnapshot(ChunkCoords chunkCoords) {
+	public Collection<? extends @NonNull AbstractShopkeeper> getShopkeepersInChunkSnapshot(
+			ChunkCoords chunkCoords
+	) {
 		Validate.notNull(chunkCoords, "chunkCoords is null");
 		ChunkShopkeepers chunkShopkeepers = chunkMap.getChunkShopkeepers(chunkCoords);
 		if (chunkShopkeepers == null) return Collections.emptySet();
@@ -562,14 +606,16 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// BY LOCATION
 
 	@Override
-	public Collection<? extends AbstractShopkeeper> getShopkeepersAtLocation(Location location) {
+	public Collection<? extends @NonNull AbstractShopkeeper> getShopkeepersAtLocation(
+			Location location
+	) {
 		World world = LocationUtils.getWorld(location);
 		String worldName = world.getName();
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
 
-		List<AbstractShopkeeper> shopkeepers = new ArrayList<>();
+		List<@NonNull AbstractShopkeeper> shopkeepers = new ArrayList<>();
 		ChunkCoords chunkCoords = ChunkCoords.fromBlock(worldName, x, z);
 		this.getShopkeepersInChunk(chunkCoords).forEach(shopkeeper -> {
 			assert worldName.equals(shopkeeper.getWorldName());
@@ -587,8 +633,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	@Override
-	public AbstractShopkeeper getShopkeeperByEntity(Entity entity) {
-		if (entity == null) return null;
+	public @Nullable AbstractShopkeeper getShopkeeperByEntity(Entity entity) {
+		Validate.notNull(entity, "entity is null");
 		Object objectId = EntityShopObjectIds.getObjectId(entity);
 		return shopObjectRegistry.getShopkeeperByObjectId(objectId);
 	}
@@ -599,8 +645,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	@Override
-	public AbstractShopkeeper getShopkeeperByBlock(Block block) {
-		if (block == null) return null;
+	public @Nullable AbstractShopkeeper getShopkeeperByBlock(Block block) {
+		Validate.notNull(block, "block is null");
 		Object objectId = BlockShopObjectIds.getObjectId(block);
 		return shopObjectRegistry.getShopkeeperByObjectId(objectId);
 	}

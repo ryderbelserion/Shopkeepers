@@ -9,11 +9,13 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -62,14 +64,14 @@ class CommandList extends Command {
 				new FirstOfArgument(ARGUMENT_PLAYER, Arrays.asList(
 						// TODO Provide completions for known shop owners?
 						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // Accepts any uuid
-						// Only accepts names of online players initially, but falls back to any given name or the
-						// sender's name (using a fallback to give the following page argument a chance to parse the
-						// input first)
+						// Only accepts names of online players initially, but falls back to any
+						// given name or the sender's name (using a fallback to give the following
+						// page argument a chance to parse the input first)
 						// TODO Add alias 'own'?
 						new SenderPlayerNameFallback(new AnyStringFallback(
 								new TransformedArgument<>(
 										new PlayerByNameArgument(ARGUMENT_PLAYER_NAME),
-										Player::getName
+										(player) -> Unsafe.assertNonNull(player.getName())
 								)
 						))
 				), false) // Don't join formats
@@ -89,13 +91,13 @@ class CommandList extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		int page = context.get(ARGUMENT_PAGE);
-		boolean listAllShops = context.has(ARGUMENT_ALL); // can be null
-		boolean listAdminShops = context.has(ARGUMENT_ADMIN); // can be null
-		UUID targetPlayerUUID = context.get(ARGUMENT_PLAYER_UUID); // can be null
-		String targetPlayerName = context.get(ARGUMENT_PLAYER_NAME); // can be null
-		assert listAllShops ^ listAdminShops ^ (targetPlayerUUID != null ^ targetPlayerName != null); // xor
+		boolean listAllShops = context.has(ARGUMENT_ALL);
+		boolean listAdminShops = context.has(ARGUMENT_ADMIN);
+		UUID targetPlayerUUID = context.getOrNull(ARGUMENT_PLAYER_UUID); // Can be null
+		String targetPlayerName = context.getOrNull(ARGUMENT_PLAYER_NAME); // Can be null
+		assert listAllShops ^ listAdminShops ^ (targetPlayerUUID != null ^ targetPlayerName != null);
 
-		List<? extends Shopkeeper> shops;
+		List<? extends @NonNull Shopkeeper> shops;
 		if (listAllShops) {
 			// Permission check:
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
@@ -107,9 +109,9 @@ class CommandList extends Command {
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
 
 			// Searching admin shops:
-			List<Shopkeeper> adminShops = new ArrayList<>();
+			List<@NonNull Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
-				if (!(shopkeeper instanceof PlayerShopkeeper)) {
+				if (shopkeeper instanceof AdminShopkeeper) {
 					adminShops.add(shopkeeper);
 				}
 			}
@@ -118,16 +120,20 @@ class CommandList extends Command {
 			// Check if the target matches the sender player:
 			boolean targetOwnShops = false;
 			Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
-			if (senderPlayer != null && (senderPlayer.getUniqueId().equals(targetPlayerUUID) || senderPlayer.getName().equalsIgnoreCase(targetPlayerName))) {
+			String senderName = Unsafe.assertNonNull(sender.getName());
+			if (senderPlayer != null
+					&& (senderPlayer.getUniqueId().equals(targetPlayerUUID)
+							|| senderName.equalsIgnoreCase(targetPlayerName))) {
 				targetOwnShops = true;
-				// Cet missing / exact player information:
+				// Get missing / exact player information:
 				targetPlayerUUID = senderPlayer.getUniqueId();
 				targetPlayerName = senderPlayer.getName();
 			} else if (targetPlayerName != null) {
 				// Check if the target matches an online player:
-				// If the name matches an online player, list that player's shops (regardless of if the name is
-				// ambiguous / if there are shops of other players with matching name):
-				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName); // Note: Case insensitive.
+				// If the name matches an online player, list that player's shops (regardless of if
+				// the name is ambiguous / if there are shops of other players with matching name):
+				// Note: Case insensitive.
+				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName);
 				if (onlinePlayer != null) {
 					// Get missing / exact player information:
 					targetPlayerUUID = onlinePlayer.getUniqueId();
@@ -145,14 +151,26 @@ class CommandList extends Command {
 			}
 
 			// Search for shops owned by the target player:
-			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperArgumentUtils.getOwnedPlayerShops(targetPlayerUUID, targetPlayerName);
+			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperArgumentUtils.getOwnedPlayerShops(
+					targetPlayerUUID,
+					targetPlayerName
+			);
 			assert ownedPlayerShopsResult != null;
 
-			// If the input name is ambiguous, we print an error and require the player to be specified by uuid:
-			Map<UUID, String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
+			// If the input name is ambiguous, we print an error and require the player to be
+			// specified by uuid:
+			Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
-			if (PlayerArgumentUtils.handleAmbiguousPlayerName(sender, targetPlayerName, matchingShopOwners.entrySet())) {
-				return;
+			if (matchingShopOwners.size() > 1) {
+				assert targetPlayerName != null;
+				boolean ambiguous = PlayerArgumentUtils.handleAmbiguousPlayerName(
+						sender,
+						Unsafe.assertNonNull(targetPlayerName),
+						matchingShopOwners.entrySet()
+				);
+				if (ambiguous) {
+					return;
+				}
 			}
 
 			// Get missing / exact player information:
@@ -206,8 +224,10 @@ class CommandList extends Command {
 					// deprecated, use {shopId} instead; TODO Remove at some point
 					"shopSessionId", shopkeeper.getId(),
 					"shopId", shopkeeper.getId(),
-					// TODO Find a better solution for this special case, since this is specific to the used format.
-					// Maybe by supporting conditional prefixes/suffixes for placeholders inside the format Strings?
+					// TODO Find a better solution for this special case, since this is specific to
+					// the used format.
+					// Maybe by supporting conditional prefixes/suffixes for placeholders inside the
+					// format Strings?
 					"shopName", (shopName.isEmpty() ? "" : (shopName + " ")),
 					"location", shopkeeper.getPositionString(),
 					"shopType", shopkeeper.getType().getIdentifier(),

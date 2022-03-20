@@ -7,8 +7,10 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
@@ -27,18 +29,23 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT;
 
-	// Note: Not providing default argument filters that only accept existing shops, admin shops, or player shops,
-	// because this can be achieved more efficiently by using ShopkeeperByUUIDArgument instead.
+	// Note: Not providing default argument filters that only accept existing shops, admin shops, or
+	// player shops, because this can be achieved more efficiently by using ShopkeeperByUUIDArgument
+	// instead.
 
 	public ShopkeeperUUIDArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperUUIDArgument(String name, ArgumentFilter<UUID> filter) {
+	public ShopkeeperUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimumCompletionInput) {
+	public ShopkeeperUUIDArgument(
+			String name,
+			ArgumentFilter<? super @NonNull UUID> filter,
+			int minimumCompletionInput
+	) {
 		super(name, filter, minimumCompletionInput);
 	}
 
@@ -49,8 +56,8 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	/**
 	 * Gets the default uuid completion suggestions.
 	 * <p>
-	 * This always suggests the uuid of the targeted shopkeeper(s), regardless of the {@code minimumCompletionInput}
-	 * argument.
+	 * This always suggests the uuid of the targeted shopkeeper(s), regardless of the
+	 * {@code minimumCompletionInput} argument.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
@@ -61,23 +68,37 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param filter
-	 *            only suggestions for shopkeepers accepted by this predicate are included, not <code>null</code>
+	 *            only suggestions for shopkeepers accepted by this predicate are included, not
+	 *            <code>null</code>
 	 * @return the shopkeeper uuid completion suggestions
 	 */
-	public static Iterable<UUID> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
-																	int minimumCompletionInput, String uuidPrefix,
-																	Predicate<Shopkeeper> filter) {
+	public static Iterable<? extends @NonNull UUID> getDefaultCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String uuidPrefix,
+			Predicate<? super @NonNull Shopkeeper> filter
+	) {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		// Suggestion for the unique id(s) of the targeted shopkeeper(s):
 		CommandSender sender = input.getSender();
-		List<? extends Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(sender, TargetShopkeeperFilter.ANY);
-		Stream<? extends Shopkeeper> shopkeepersStream = targetedShopkeepers.stream();
+		List<? extends @NonNull Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(
+				sender,
+				TargetShopkeeperFilter.ANY
+		);
 
 		// Only provide other suggestions if there is a minimum length input:
+		Stream<@NonNull Shopkeeper> shopkeepersStream;
 		if (uuidPrefix.length() >= minimumCompletionInput) {
 			// TODO Improve by using a TreeMap for the prefix matching?
-			shopkeepersStream = Stream.concat(shopkeepersStream, ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
-					.filter(shopkeeper -> !targetedShopkeepers.contains(shopkeeper)));
+			shopkeepersStream = Stream.concat(
+					targetedShopkeepers.stream(),
+					ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
+							.filter(shopkeeper -> !targetedShopkeepers.contains(shopkeeper))
+			);
+		} else {
+			// TODO CheckerFramework complains when using a wildcard Stream here.
+			shopkeepersStream = Unsafe.castNonNull(targetedShopkeepers.stream());
 		}
 
 		return shopkeepersStream
@@ -90,7 +111,17 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, PredicateUtils.alwaysTrue());
+	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			String idPrefix
+	) {
+		return getDefaultCompletionSuggestions(
+				input,
+				context,
+				minimumCompletionInput,
+				idPrefix,
+				PredicateUtils.alwaysTrue()
+		);
 	}
 }

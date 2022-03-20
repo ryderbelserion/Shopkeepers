@@ -6,7 +6,10 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.Animals;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -27,21 +30,26 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual Axolotl type once we only support Bukkit 1.17 upwards
 // TODO Editor option to play dead?
-public class AxolotlShop extends BabyableShop<Animals> {
+public class AxolotlShop extends BabyableShop<@NonNull Animals> {
 
 	// TODO Use correct enum type once we only support Bukkit 1.17 upwards
-	public static final Property<String> VARIANT = new BasicProperty<String>()
+	public static final Property<@NonNull String> VARIANT = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("axolotlVariant", StringSerializers.STRICT)
-			.validator(StringValidators.NON_EMPTY) // TODO Validate that the value is a valid axolotl type
+			// TODO Validate that the value is a valid axolotl type
+			.validator(StringValidators.NON_EMPTY)
 			.defaultValue("LUCY")
 			.build();
 
-	private final PropertyValue<String> variantProperty = new PropertyValue<>(VARIANT)
-			.onValueChanged(this::applyVariant)
+	private final PropertyValue<@NonNull String> variantProperty = new PropertyValue<>(VARIANT)
+			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
-	public AxolotlShop(	LivingShops livingShops, SKLivingShopObjectType<AxolotlShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public AxolotlShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull AxolotlShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -64,8 +72,8 @@ public class AxolotlShop extends BabyableShop<Animals> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
@@ -82,13 +90,14 @@ public class AxolotlShop extends BabyableShop<Animals> {
 
 	public void cycleVariant(boolean backwards) {
 		this.setVariant(NMSManager.getProvider().cycleAxolotlVariant(this.getVariant(), backwards));
-		// this.setVariant(EnumUtils.cycleEnumConstant(Axolotl.Variant.class, this.getVariant(), backwards));
+		// this.setVariant(EnumUtils.cycleEnumConstant(Axolotl.Variant.class, this.getVariant(),
+		// backwards));
 	}
 
 	private void applyVariant() {
 		Animals entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setAxolotlVariant(this.getEntity(), this.getVariant());
+		NMSManager.getProvider().setAxolotlVariant(entity, this.getVariant());
 		// entity.setVariant(this.getVariant());
 	}
 
@@ -112,19 +121,25 @@ public class AxolotlShop extends BabyableShop<Animals> {
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.BLUE));
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonAxolotlVariant, Messages.buttonAxolotlVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonAxolotlVariant,
+				Messages.buttonAxolotlVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getVariantEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getVariantEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleVariant(backwards);
 				return true;

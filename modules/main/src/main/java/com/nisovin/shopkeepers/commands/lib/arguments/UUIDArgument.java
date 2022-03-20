@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -16,7 +18,7 @@ import com.nisovin.shopkeepers.util.java.ConversionUtils;
  * <p>
  * Provides no completions.
  */
-public class UUIDArgument extends CommandArgument<UUID> {
+public class UUIDArgument extends CommandArgument<@NonNull UUID> {
 
 	public UUIDArgument(String name) {
 		super(name);
@@ -25,7 +27,11 @@ public class UUIDArgument extends CommandArgument<UUID> {
 	// TODO 'invalid uuid' message
 
 	@Override
-	public UUID parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public UUID parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		String uuidArg = argsReader.nextIfPresent();
 		if (uuidArg == null) {
 			throw this.missingArgumentError();
@@ -40,7 +46,11 @@ public class UUIDArgument extends CommandArgument<UUID> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
 		return Collections.emptyList();
 	}
 }

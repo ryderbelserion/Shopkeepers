@@ -4,8 +4,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -43,7 +45,6 @@ class CommandGive extends Command {
 		CommandSender sender = input.getSender();
 
 		Player targetPlayer = context.get(ARGUMENT_PLAYER);
-		assert targetPlayer != null;
 		boolean targetSelf = (sender.equals(targetPlayer));
 
 		int amount = context.get(ARGUMENT_AMOUNT);
@@ -53,7 +54,7 @@ class CommandGive extends Command {
 		item.setAmount(amount);
 
 		PlayerInventory inventory = targetPlayer.getInventory();
-		ItemStack[] contents = inventory.getStorageContents();
+		@Nullable ItemStack[] contents = Unsafe.castNonNull(inventory.getStorageContents());
 		int remaining = InventoryUtils.addItems(contents, item);
 		InventoryUtils.setStorageContents(inventory, contents);
 		if (remaining > 0) {

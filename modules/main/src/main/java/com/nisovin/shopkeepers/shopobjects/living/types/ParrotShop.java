@@ -6,7 +6,10 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.Parrot;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -24,19 +27,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class ParrotShop extends SittableShop<Parrot> {
+public class ParrotShop extends SittableShop<@NonNull Parrot> {
 
-	public static final Property<Parrot.Variant> VARIANT = new BasicProperty<Parrot.Variant>()
+	public static final Property<Parrot.@NonNull Variant> VARIANT = new BasicProperty<Parrot.@NonNull Variant>()
 			.dataKeyAccessor("parrotVariant", EnumSerializers.lenient(Parrot.Variant.class))
 			.defaultValue(Parrot.Variant.RED)
 			.build();
 
-	private final PropertyValue<Parrot.Variant> variantProperty = new PropertyValue<>(VARIANT)
-			.onValueChanged(this::applyVariant)
+	private final PropertyValue<Parrot.@NonNull Variant> variantProperty = new PropertyValue<>(VARIANT)
+			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
-	public ParrotShop(	LivingShops livingShops, SKLivingShopObjectType<ParrotShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public ParrotShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull ParrotShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -59,8 +66,8 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
@@ -76,7 +83,9 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	public void cycleVariant(boolean backwards) {
-		this.setVariant(EnumUtils.cycleEnumConstant(Parrot.Variant.class, this.getVariant(), backwards));
+		this.setVariant(
+				EnumUtils.cycleEnumConstant(Parrot.Variant.class, this.getVariant(), backwards)
+		);
 	}
 
 	private void applyVariant() {
@@ -105,19 +114,25 @@ public class ParrotShop extends SittableShop<Parrot> {
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.RED));
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonParrotVariant, Messages.buttonParrotVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonParrotVariant,
+				Messages.buttonParrotVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getVariantEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getVariantEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleVariant(backwards);
 				return true;

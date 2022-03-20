@@ -4,6 +4,11 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -20,40 +25,74 @@ import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * Determines the index of a shopkeeper {@link Shopkeeper#getSnapshots() snapshot} by a given name input.
+ * Determines the index of a shopkeeper {@link Shopkeeper#getSnapshots() snapshot} by a given name
+ * input.
  * <p>
- * The shopkeeper whose snapshots are considered is derived from the {@link CommandContext} using a given command
- * argument.
+ * The shopkeeper whose snapshots are considered is derived from the {@link CommandContext} using a
+ * given command argument.
  */
-public class ShopkeeperSnapshotIndexByNameArgument extends ObjectByIdArgument<String, Integer> {
+public class ShopkeeperSnapshotIndexByNameArgument
+		extends ObjectByIdArgument<@NonNull String, @NonNull Integer> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 0;
 
-	private final CommandArgument<? extends Shopkeeper> shopkeeperArgument;
+	private final CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument;
 
-	public ShopkeeperSnapshotIndexByNameArgument(String name, CommandArgument<? extends Shopkeeper> shopkeeperArgument) {
+	public ShopkeeperSnapshotIndexByNameArgument(
+			String name,
+			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument
+	) {
 		this(name, shopkeeperArgument, false, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperSnapshotIndexByNameArgument(	String name, CommandArgument<? extends Shopkeeper> shopkeeperArgument,
-													boolean joinRemainingArgs, int minimumCompletionInput) {
-		super(name, ArgumentFilter.acceptAny(), new IdArgumentArgs(minimumCompletionInput, joinRemainingArgs));
+	public ShopkeeperSnapshotIndexByNameArgument(
+			String name,
+			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			boolean joinRemainingArgs,
+			int minimumCompletionInput
+	) {
+		super(
+				name,
+				ArgumentFilter.acceptAny(),
+				new IdArgumentArgs(minimumCompletionInput, joinRemainingArgs)
+		);
 		Validate.notNull(shopkeeperArgument, "shopkeeperArgument is null");
 		this.shopkeeperArgument = shopkeeperArgument;
 	}
 
 	@Override
-	protected ObjectIdArgument<String> createIdArgument(String name, IdArgumentArgs args) {
-		return new ObjectNameArgument(name, args.joinRemainingArgs, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
+	protected ObjectIdArgument<@NonNull String> createIdArgument(
+			@UnknownInitialization ShopkeeperSnapshotIndexByNameArgument this,
+			String name,
+			IdArgumentArgs args
+	) {
+		return new ObjectNameArgument(
+				name,
+				args.joinRemainingArgs,
+				ArgumentFilter.acceptAny(),
+				args.minimumCompletionInput
+		) {
 			@Override
-			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return ShopkeeperSnapshotIndexByNameArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
+			protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+					CommandInput input,
+					CommandContextView context,
+					String idPrefix
+			) {
+				return ShopkeeperSnapshotIndexByNameArgument.this.getCompletionSuggestions(
+						input,
+						context,
+						minimumCompletionInput,
+						idPrefix
+				);
 			}
 		};
 	}
 
-	private Shopkeeper getShopkeeperScope(CommandInput input, CommandContextView context) {
-		Object shopkeeper = context.get(shopkeeperArgument.getName());
+	private @Nullable Shopkeeper getShopkeeperScope(
+			CommandInput input,
+			CommandContextView context
+	) {
+		Object shopkeeper = context.getOrNull(shopkeeperArgument.getName());
 		if (shopkeeper instanceof Shopkeeper) return (Shopkeeper) shopkeeper;
 		return null;
 	}
@@ -64,7 +103,11 @@ public class ShopkeeperSnapshotIndexByNameArgument extends ObjectByIdArgument<St
 	}
 
 	@Override
-	protected Integer getObject(CommandInput input, CommandContextView context, String id) throws ArgumentParseException {
+	protected @Nullable Integer getObject(
+			CommandInput input,
+			CommandContextView context,
+			String id
+	) throws ArgumentParseException {
 		assert id != null;
 		if (id.isEmpty()) return null;
 		Shopkeeper shopkeeper = this.getShopkeeperScope(input, context);
@@ -74,8 +117,12 @@ public class ShopkeeperSnapshotIndexByNameArgument extends ObjectByIdArgument<St
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context,
-														int minimumCompletionInput, String idPrefix) {
+	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+			CommandInput input,
+			CommandContextView context,
+			int minimumCompletionInput,
+			String idPrefix
+	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (idPrefix.length() < minimumCompletionInput) {
 			return Collections.emptyList();
@@ -85,14 +132,17 @@ public class ShopkeeperSnapshotIndexByNameArgument extends ObjectByIdArgument<St
 		if (shopkeeper == null) return Collections.emptyList();
 
 		String normalizedNamePrefix = StringUtils.normalize(idPrefix);
-		return shopkeeper.getSnapshots().stream().map(snapshot -> {
-			String normalizedWithCase = StringUtils.normalizeKeepCase(snapshot.getName());
-			String normalized = normalizedWithCase.toLowerCase(Locale.ROOT);
-			if (normalized.startsWith(normalizedNamePrefix)) {
-				return normalizedWithCase;
-			} else {
-				return null;
-			}
-		}).filter(Objects::nonNull)::iterator;
+		Iterable<@NonNull String> suggestions = shopkeeper.getSnapshots().stream()
+				.<@Nullable String>map(snapshot -> {
+					String normalizedWithCase = StringUtils.normalizeKeepCase(snapshot.getName());
+					String normalized = normalizedWithCase.toLowerCase(Locale.ROOT);
+					if (normalized.startsWith(normalizedNamePrefix)) {
+						return normalizedWithCase;
+					} else {
+						return null;
+					}
+				}).filter(Objects::nonNull)
+				.<@NonNull String>map(Unsafe::assertNonNull)::iterator;
+		return suggestions;
 	}
 }

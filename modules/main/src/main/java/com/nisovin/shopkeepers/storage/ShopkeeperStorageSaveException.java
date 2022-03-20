@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.storage;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 
 /**
@@ -15,7 +17,7 @@ public class ShopkeeperStorageSaveException extends Exception {
 	 * @param message
 	 *            the detail message
 	 */
-	public ShopkeeperStorageSaveException(String message) {
+	public ShopkeeperStorageSaveException(@Nullable String message) {
 		super(message);
 	}
 
@@ -27,7 +29,7 @@ public class ShopkeeperStorageSaveException extends Exception {
 	 * @param cause
 	 *            the cause
 	 */
-	public ShopkeeperStorageSaveException(String message, Throwable cause) {
+	public ShopkeeperStorageSaveException(@Nullable String message, @Nullable Throwable cause) {
 		super(message, cause);
 	}
 }

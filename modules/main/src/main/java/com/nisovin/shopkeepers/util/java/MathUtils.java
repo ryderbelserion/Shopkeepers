@@ -8,13 +8,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class MathUtils {
 
 	/**
-	 * The default maximum difference between two floating point numbers that are still considered equal in a fuzzy
-	 * comparison.
+	 * The default maximum difference between two floating point numbers that are still considered
+	 * equal in a fuzzy comparison.
 	 */
 	public static final double EPSILON = 0.00001D;
 
 	/**
-	 * Checks if the given values are roughly equal, using {@link #EPSILON} as the maximum tolerance.
+	 * Checks if the given values are roughly equal, using {@link #EPSILON} as the maximum
+	 * tolerance.
 	 * 
 	 * @param a
 	 *            the first value
@@ -33,8 +34,8 @@ public final class MathUtils {
 	 * Notes on the comparison of special values:
 	 * <ul>
 	 * <li>All {@link Double#NaN} values are considered equal.
-	 * <li>{@link Double#POSITIVE_INFINITY} and {@link Double#NEGATIVE_INFINITY} are each considered equal to
-	 * themselves.
+	 * <li>{@link Double#POSITIVE_INFINITY} and {@link Double#NEGATIVE_INFINITY} are each considered
+	 * equal to themselves.
 	 * <li>Positive and negative zero are considered equal.
 	 * </ul>
 	 * 
@@ -52,7 +53,8 @@ public final class MathUtils {
 	}
 
 	/**
-	 * Gets a random integer value between the given minimum value (inclusive) and maximum value (exclusive).
+	 * Gets a random integer value between the given minimum value (inclusive) and maximum value
+	 * (exclusive).
 	 * 
 	 * @param min
 	 *            the minimum value (inclusive)
@@ -67,7 +69,8 @@ public final class MathUtils {
 	}
 
 	/**
-	 * Gets a random float value between the given minimum value (inclusive) and maximum value (exclusive).
+	 * Gets a random float value between the given minimum value (inclusive) and maximum value
+	 * (exclusive).
 	 * 
 	 * @param min
 	 *            the minimum value (inclusive)
@@ -87,8 +90,8 @@ public final class MathUtils {
 	}
 
 	/**
-	 * Gets the sum of the given integers, clamped to {@link Integer#MAX_VALUE} and {@link Integer#MIN_VALUE} if an
-	 * overflow would occur.
+	 * Gets the sum of the given integers, clamped to {@link Integer#MAX_VALUE} and
+	 * {@link Integer#MIN_VALUE} if an overflow would occur.
 	 * 
 	 * @param x
 	 *            the first value
@@ -130,9 +133,9 @@ public final class MathUtils {
 	/**
 	 * Calculates the average of the given values.
 	 * <p>
-	 * The average is calculated by forming the sum of all values and then dividing by the number of values. If the sum
-	 * of the given values does not fit into a single <code>long</code>, it can overflow and produce an incorrect
-	 * result.
+	 * The average is calculated by forming the sum of all values and then dividing by the number of
+	 * values. If the sum of the given values does not fit into a single <code>long</code>, it can
+	 * overflow and produce an incorrect result.
 	 * <p>
 	 * If no values are given, {@code 0} is returned.
 	 * 
@@ -151,9 +154,9 @@ public final class MathUtils {
 	/**
 	 * Calculates the average of the given values, ignoring values that match the specified one.
 	 * <p>
-	 * The average is calculated by forming the sum of all values and then dividing by the number of values. If the sum
-	 * of the given values does not fit into a single <code>long</code>, it can overflow and produce an incorrect
-	 * result.
+	 * The average is calculated by forming the sum of all values and then dividing by the number of
+	 * values. If the sum of the given values does not fit into a single <code>long</code>, it can
+	 * overflow and produce an incorrect result.
 	 * <p>
 	 * If no values are given, {@code 0} is returned.
 	 * 

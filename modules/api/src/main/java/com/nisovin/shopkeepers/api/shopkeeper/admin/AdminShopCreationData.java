@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.api.shopkeeper.admin;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -15,7 +16,8 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 public class AdminShopCreationData extends ShopCreationData {
 
 	private static AdminShopType<?> toAdminShopType(ShopType<?> shopType) {
-		Preconditions.checkArgument(shopType instanceof AdminShopType, "shopType has to be an AdminShopType");
+		Preconditions.checkArgument(shopType instanceof AdminShopType,
+				"shopType has to be an AdminShopType");
 		return (AdminShopType<?>) shopType;
 	}
 
@@ -33,12 +35,24 @@ public class AdminShopCreationData extends ShopCreationData {
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
 	 * @return the {@link AdminShopCreationData}
-	 * @deprecated Use {@link #create(Player, AdminShopType, ShopObjectType, Location, BlockFace)} instead
+	 * @deprecated Use {@link #create(Player, AdminShopType, ShopObjectType, Location, BlockFace)}
+	 *             instead
 	 */
 	@Deprecated
-	public static AdminShopCreationData create(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
-												Location spawnLocation, BlockFace targetedBlockFace) {
-		return create(creator, toAdminShopType(shopType), shopObjectType, spawnLocation, targetedBlockFace);
+	public static AdminShopCreationData create(
+			@Nullable Player creator,
+			ShopType<?> shopType,
+			ShopObjectType<?> shopObjectType,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
+		return create(
+				creator,
+				toAdminShopType(shopType),
+				shopObjectType,
+				spawnLocation,
+				targetedBlockFace
+		);
 	}
 
 	/**
@@ -56,9 +70,20 @@ public class AdminShopCreationData extends ShopCreationData {
 	 *            the targeted block face, can be <code>null</code>
 	 * @return the {@link AdminShopCreationData}
 	 */
-	public static AdminShopCreationData create(	Player creator, AdminShopType<?> shopType, ShopObjectType<?> shopObjectType,
-												Location spawnLocation, BlockFace targetedBlockFace) {
-		return new AdminShopCreationData(creator, shopType, shopObjectType, spawnLocation, targetedBlockFace);
+	public static AdminShopCreationData create(
+			@Nullable Player creator,
+			AdminShopType<?> shopType,
+			ShopObjectType<?> shopObjectType,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
+		return new AdminShopCreationData(
+				creator,
+				shopType,
+				shopObjectType,
+				spawnLocation,
+				targetedBlockFace
+		);
 	}
 
 	/**
@@ -74,13 +99,25 @@ public class AdminShopCreationData extends ShopCreationData {
 	 *            the spawn location, can be <code>null</code> for virtual shops
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
-	 * @deprecated Use {@link #AdminShopCreationData(Player, AdminShopType, ShopObjectType, Location, BlockFace)}
+	 * @deprecated Use
+	 *             {@link #AdminShopCreationData(Player, AdminShopType, ShopObjectType, Location, BlockFace)}
 	 *             instead
 	 */
 	@Deprecated
-	protected AdminShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
-									Location spawnLocation, BlockFace targetedBlockFace) {
-		this(creator, toAdminShopType(shopType), shopObjectType, spawnLocation, targetedBlockFace);
+	protected AdminShopCreationData(
+			@Nullable Player creator,
+			ShopType<?> shopType,
+			ShopObjectType<?> shopObjectType,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
+		this(
+				creator,
+				toAdminShopType(shopType),
+				shopObjectType,
+				spawnLocation,
+				targetedBlockFace
+		);
 	}
 
 	/**
@@ -97,8 +134,19 @@ public class AdminShopCreationData extends ShopCreationData {
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
 	 */
-	protected AdminShopCreationData(Player creator, AdminShopType<?> shopType, ShopObjectType<?> shopObjectType,
-									Location spawnLocation, BlockFace targetedBlockFace) {
-		super(creator, shopType, shopObjectType, spawnLocation, targetedBlockFace);
+	protected AdminShopCreationData(
+			@Nullable Player creator,
+			AdminShopType<?> shopType,
+			ShopObjectType<?> shopObjectType,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace targetedBlockFace
+	) {
+		super(
+				creator,
+				shopType,
+				shopObjectType,
+				spawnLocation,
+				targetedBlockFace
+		);
 	}
 }

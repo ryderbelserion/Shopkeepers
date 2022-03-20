@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -17,10 +20,11 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class ShopObjectRegistry {
 
 	// Spawned shopkeepers by their shop object ids:
-	// These shopkeepers are not necessarily ticked yet: Shopkeepers start ticking once their chunk has been activated.
-	// Since some types of shop objects may handle their spawning themselves, shop objects might already be spawned
-	// before their chunk is activated.
-	private final Map<Object, AbstractShopkeeper> shopkeepersByObjectId = new HashMap<>();
+	// These shopkeepers are not necessarily ticked yet: Shopkeepers start ticking once their chunk
+	// has been activated.
+	// Since some types of shop objects may handle their spawning themselves, shop objects might
+	// already be spawned before their chunk is activated.
+	private final Map<@NonNull Object, @NonNull AbstractShopkeeper> shopkeepersByObjectId = new HashMap<>();
 
 	ShopObjectRegistry() {
 	}
@@ -46,21 +50,22 @@ public class ShopObjectRegistry {
 		return (objectId != null);
 	}
 
-	public AbstractShopkeeper getShopkeeperByObjectId(Object objectId) {
+	public @Nullable AbstractShopkeeper getShopkeeperByObjectId(Object objectId) {
 		return shopkeepersByObjectId.get(objectId);
 	}
 
 	/**
 	 * Handles the registration and unregistration of spawned shop objects.
 	 * <p>
-	 * If the shop object was previously already spawned but its object id has changed, this unregisters the previous
-	 * object id and registers the new object id.
+	 * If the shop object was previously already spawned but its object id has changed, this
+	 * unregisters the previous object id and registers the new object id.
 	 * <p>
-	 * This needs to be called by shop objects whenever their object id might have changed, such as when they spawned or
-	 * despawned.
+	 * This needs to be called by shop objects whenever their object id might have changed, such as
+	 * when they spawned or despawned.
 	 * 
 	 * @param shopkeeper
-	 *            the shopkeeper, not <code>null</code> and not {@link Shopkeeper#isVirtual() virtual}
+	 *            the shopkeeper, not <code>null</code> and not {@link Shopkeeper#isVirtual()
+	 *            virtual}
 	 */
 	public void updateShopObjectRegistration(AbstractShopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
@@ -70,7 +75,8 @@ public class ShopObjectRegistry {
 		Object lastObjectId = shopObject.getLastId();
 		Object currentObjectId = shopObject.getId();
 		if (Objects.equals(lastObjectId, currentObjectId)) {
-			// The current object id equals the last object id, so there is no need to update the registration.
+			// The current object id equals the last object id, so there is no need to update the
+			// registration.
 			return;
 		}
 
@@ -93,8 +99,8 @@ public class ShopObjectRegistry {
 			return;
 		}
 
-		// Keep track of the shopkeeper's shop object id, if there isn't already another shopkeeper using the same
-		// object id:
+		// Keep track of the shopkeeper's shop object id, if there isn't already another shopkeeper
+		// using the same object id:
 		Object finalObjectId = objectId;
 		Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
 				+ "Registering object with id '" + finalObjectId + "'.");

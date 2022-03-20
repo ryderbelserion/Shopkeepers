@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.shopobjects.citizens;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObjectType;
 
@@ -9,5 +11,6 @@ import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObjectType;
  * @param <T>
  *            the type of the shop objects that this represents
  */
-public interface CitizensShopObjectType<T extends CitizensShopObject> extends EntityShopObjectType<T> {
+public interface CitizensShopObjectType<T extends @NonNull CitizensShopObject>
+		extends EntityShopObjectType<T> {
 }

@@ -1,11 +1,13 @@
 package com.nisovin.shopkeepers.util.data.serialization.bukkit;
 
 import org.bukkit.Material;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 
 /**
- * An {@link InvalidDataException} that indicates that some data represents an unknown {@link Material}.
+ * An {@link InvalidDataException} that indicates that some data represents an unknown
+ * {@link Material}.
  */
 public class UnknownMaterialException extends InvalidDataException {
 
@@ -17,7 +19,7 @@ public class UnknownMaterialException extends InvalidDataException {
 	 * @param message
 	 *            the detail message
 	 */
-	public UnknownMaterialException(String message) {
+	public UnknownMaterialException(@Nullable String message) {
 		super(message);
 	}
 
@@ -29,7 +31,7 @@ public class UnknownMaterialException extends InvalidDataException {
 	 * @param cause
 	 *            the cause
 	 */
-	public UnknownMaterialException(String message, Throwable cause) {
+	public UnknownMaterialException(@Nullable String message, @Nullable Throwable cause) {
 		super(message, cause);
 	}
 }

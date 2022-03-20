@@ -3,8 +3,10 @@ package com.nisovin.shopkeepers.shopkeeper.player;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -18,8 +20,8 @@ import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 public abstract class PlayerShopTradingHandler extends TradingHandler {
 
 	// State related to the currently handled trade:
-	protected Inventory containerInventory = null;
-	protected ItemStack[] newContainerContents = null;
+	protected @Nullable Inventory containerInventory = null;
+	protected @Nullable ItemStack @Nullable [] newContainerContents = null;
 
 	protected PlayerShopTradingHandler(AbstractPlayerShopkeeper shopkeeper) {
 		super(SKDefaultUITypes.TRADING(), shopkeeper);
@@ -36,12 +38,15 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 		// Stop opening if trading shall be prevented while the owner is offline:
-		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (Settings.preventTradingWhileOwnerIsOnline
+				&& !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null) {
 				if (!silent) {
 					this.debugNotOpeningUI(player, "Shop owner is online.");
-					TextUtils.sendMessage(player, Messages.cannotTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+					TextUtils.sendMessage(player, Messages.cannotTradeWhileOwnerOnline,
+							"owner", Unsafe.assertNonNull(ownerPlayer.getName())
+					);
 				}
 				return false;
 			}
@@ -59,7 +64,10 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
 				&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWithOwnShop);
-			this.debugPreventedTrade(tradingPlayer, "Trading with the own shop is not allowed.");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"Trading with the own shop is not allowed."
+			);
 			return false;
 		}
 
@@ -68,8 +76,13 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)
 					&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
-				this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
+				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWhileOwnerOnline,
+						"owner", Unsafe.assertNonNull(ownerPlayer.getName())
+				);
+				this.debugPreventedTrade(
+						tradingPlayer,
+						"Trading is not allowed while the shop owner is online."
+				);
 				return false;
 			}
 		}
@@ -77,14 +90,19 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		// Check for the shop's container:
 		Inventory containerInventory = shopkeeper.getContainerInventory();
 		if (containerInventory == null) {
-			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
-			this.debugPreventedTrade(tradingPlayer, "The shop's container is missing.");
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWithShopMissingContainer,
+					"owner", shopkeeper.getOwnerName()
+			);
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container is missing."
+			);
 			return false;
 		}
 
 		// Setup common state information for handling this trade:
 		this.containerInventory = containerInventory;
-		this.newContainerContents = containerInventory.getContents();
+		this.newContainerContents = Unsafe.cast(containerInventory.getContents());
 
 		return true;
 	}
@@ -95,7 +113,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 
 		// Apply container content changes:
 		if (containerInventory != null && newContainerContents != null) {
-			containerInventory.setContents(newContainerContents);
+			containerInventory.setContents(Unsafe.castNonNull(newContainerContents));
 		}
 
 		// Reset trade related state information:

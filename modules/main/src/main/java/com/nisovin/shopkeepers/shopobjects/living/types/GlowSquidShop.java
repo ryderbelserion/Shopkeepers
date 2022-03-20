@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Squid;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -27,19 +30,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
-public class GlowSquidShop extends SKLivingShopObject<Squid> {
+public class GlowSquidShop extends SKLivingShopObject<@NonNull Squid> {
 
-	public static final Property<Boolean> DARK = new BasicProperty<Boolean>()
+	public static final Property<@NonNull Boolean> DARK = new BasicProperty<@NonNull Boolean>()
 			.dataKeyAccessor("darkGlowSquid", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Boolean> darkGlowSquidProperty = new PropertyValue<>(DARK)
-			.onValueChanged(this::applyDark)
+	private final PropertyValue<@NonNull Boolean> darkGlowSquidProperty = new PropertyValue<>(DARK)
+			.onValueChanged(Unsafe.initialized(this)::applyDark)
 			.build(properties);
 
-	public GlowSquidShop(	LivingShops livingShops, SKLivingShopObjectType<GlowSquidShop> livingObjectType,
-							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public GlowSquidShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull GlowSquidShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -62,8 +69,8 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getDarkEditorButton());
 		return editorButtons;
 	}
@@ -85,7 +92,7 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	private void applyDark() {
 		Squid entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setGlowSquidDark(this.getEntity(), this.isDark());
+		NMSManager.getProvider().setGlowSquidDark(entity, this.isDark());
 	}
 
 	private ItemStack getDarkEditorItem() {
@@ -93,21 +100,28 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 		if (this.isDark()) {
 			iconItem = new ItemStack(Material.INK_SAC);
 		} else {
-			iconItem = new ItemStack(MC_1_17.GLOW_INK_SAC);
+			Material iconType = Unsafe.assertNonNull(MC_1_17.GLOW_INK_SAC.orElse(Material.INK_SAC));
+			iconItem = new ItemStack(iconType);
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonGlowSquidDark, Messages.buttonGlowSquidDarkLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonGlowSquidDark,
+				Messages.buttonGlowSquidDarkLore
+		);
 		return iconItem;
 	}
 
 	private Button getDarkEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getDarkEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleDark(backwards);
 				return true;

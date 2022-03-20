@@ -7,7 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -25,19 +28,23 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class RabbitShop extends BabyableShop<Rabbit> {
+public class RabbitShop extends BabyableShop<@NonNull Rabbit> {
 
-	public static final Property<Rabbit.Type> RABBIT_TYPE = new BasicProperty<Rabbit.Type>()
+	public static final Property<Rabbit.@NonNull Type> RABBIT_TYPE = new BasicProperty<Rabbit.@NonNull Type>()
 			.dataKeyAccessor("rabbitType", EnumSerializers.lenient(Rabbit.Type.class))
 			.defaultValue(Rabbit.Type.BROWN)
 			.build();
 
-	private final PropertyValue<Rabbit.Type> rabbitTypeProperty = new PropertyValue<>(RABBIT_TYPE)
-			.onValueChanged(this::applyRabbitType)
+	private final PropertyValue<Rabbit.@NonNull Type> rabbitTypeProperty = new PropertyValue<>(RABBIT_TYPE)
+			.onValueChanged(Unsafe.initialized(this)::applyRabbitType)
 			.build(properties);
 
-	public RabbitShop(	LivingShops livingShops, SKLivingShopObjectType<RabbitShop> livingObjectType,
-						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public RabbitShop(
+			LivingShops livingShops,
+			SKLivingShopObjectType<@NonNull RabbitShop> livingObjectType,
+			AbstractShopkeeper shopkeeper,
+			@Nullable ShopCreationData creationData
+	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
@@ -60,8 +67,8 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	@Override
-	public List<Button> createEditorButtons() {
-		List<Button> editorButtons = super.createEditorButtons();
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getRabbitTypeEditorButton());
 		return editorButtons;
 	}
@@ -77,7 +84,9 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	public void cycleRabbitType(boolean backwards) {
-		this.setRabbitType(EnumUtils.cycleEnumConstant(Rabbit.Type.class, this.getRabbitType(), backwards));
+		this.setRabbitType(
+				EnumUtils.cycleEnumConstant(Rabbit.Type.class, this.getRabbitType(), backwards)
+		);
 	}
 
 	private void applyRabbitType() {
@@ -86,13 +95,14 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 		Rabbit.Type rabbitType = this.getRabbitType();
 		if (rabbitType == Rabbit.Type.THE_KILLER_BUNNY) {
 			// Special handling if the rabbit type is the killer rabbit:
-			// If the entity's custom name is not empty, Minecraft applies the 'The Killer Rabbit' name. We therefore
-			// temporarily set the custom name to something non-empty:
+			// If the entity's custom name is not empty, Minecraft applies the 'The Killer Rabbit'
+			// name. We therefore temporarily set the custom name to something non-empty:
 			String customName = entity.getCustomName(); // can be null
 			entity.setCustomName(" "); // Non-empty
 			entity.setRabbitType(rabbitType);
 			entity.setCustomName(customName); // Reset previous name
-			// CraftBukkit and Minecraft reset the rabbit's pathfinder goals, so we clear them again:
+			// CraftBukkit and Minecraft reset the rabbit's pathfinder goals, so we clear them
+			// again:
 			this.overwriteAI();
 			// Minecraft also sets the rabbit's armor attribute, but this doesn't affect us.
 		} else {
@@ -129,19 +139,25 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
-		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonRabbitVariant, Messages.buttonRabbitVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonRabbitVariant,
+				Messages.buttonRabbitVariantLore
+		);
 		return iconItem;
 	}
 
 	private Button getRabbitTypeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorSession editorSession) {
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				return getRabbitTypeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleRabbitType(backwards);
 				return true;

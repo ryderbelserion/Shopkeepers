@@ -4,14 +4,17 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MapUtils {
 
 	// Maximum capacity of a HashMap (largest power of two fitting into an int):
 	private static final int MAX_CAPACITY = (1 << 30);
 
-	// Capacity for a HashMap/Set with the specified expected size and a load factor of >= 0.75 that prevents the
-	// Map/Set from resizing.
+	// Capacity for a HashMap/Set with the specified expected size and a load factor of >= 0.75 that
+	// prevents the Map/Set from resizing.
 	public static int getIdealHashMapCapacity(int expectedSize) {
 		Validate.isTrue(expectedSize >= 0, "expectedSize cannot be negative");
 		if (expectedSize < 3) {
@@ -46,7 +49,12 @@ public final class MapUtils {
 		return map;
 	}
 
-	public static <K, V> Map<K, V> createMap(K key1, V value1, K key2, V value2, K key3, V value3, K key4, V value4) {
+	public static <K, V> Map<K, V> createMap(
+			K key1, V value1,
+			K key2, V value2,
+			K key3, V value3,
+			K key4, V value4
+	) {
 		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(4));
 		map.put(key1, value1);
 		map.put(key2, value2);
@@ -55,7 +63,13 @@ public final class MapUtils {
 		return map;
 	}
 
-	public static <K, V> Map<K, V> createMap(K key1, V value1, K key2, V value2, K key3, V value3, K key4, V value4, K key5, V value5) {
+	public static <K, V> Map<K, V> createMap(
+			K key1, V value1,
+			K key2, V value2,
+			K key3, V value3,
+			K key4, V value4,
+			K key5, V value5
+	) {
 		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(5));
 		map.put(key1, value1);
 		map.put(key2, value2);
@@ -77,24 +91,27 @@ public final class MapUtils {
 		return map;
 	}
 
-	public static <K, V> Map.Entry<K, V> entry(K key, V value) {
+	public static <K, V> Entry<K, V> entry(K key, V value) {
 		return new AbstractMap.SimpleImmutableEntry<>(key, value);
 	}
 
 	/**
-	 * Creates a new Map that copies the entries of the given Map, but converts all keys {@link Object#toString() to
-	 * Strings}.
+	 * Creates a new Map that copies the entries of the given Map, but converts all keys
+	 * {@link Object#toString() to Strings}.
 	 * <p>
-	 * If the given Map contains a <code>null</code> key, the resulting Map will contain a <code>null</code> key as
-	 * well.
+	 * If the given Map contains a <code>null</code> key, the resulting Map will contain a
+	 * <code>null</code> key as well.
 	 * 
 	 * @param map
 	 *            the map of arbitrary key and value type
-	 * @return a new String to Object map, or <code>null</code> if the given Map is <code>null</code>
+	 * @return a new String to Object map, or <code>null</code> if the given Map is
+	 *         <code>null</code>
 	 */
-	public static Map<String, Object> toStringMap(Map<?, ?> map) {
-		if (map == null) return null;
-		Map<String, Object> stringMap = new LinkedHashMap<>(getIdealHashMapCapacity(map.size()));
+	public static Map<@Nullable String, @Nullable Object> toStringMap(Map<?, ?> map) {
+		Validate.notNull(map, "map is null");
+		Map<@Nullable String, @Nullable Object> stringMap = new LinkedHashMap<>(
+				getIdealHashMapCapacity(map.size())
+		);
 		map.forEach((key, value) -> {
 			String stringKey = StringUtils.toStringOrNull(key);
 			stringMap.put(stringKey, value);
@@ -103,8 +120,8 @@ public final class MapUtils {
 	}
 
 	/**
-	 * Returns the given Map if it is not <code>null</code>, and otherwise returns an {@link Collections#emptyMap()
-	 * empty Map}.
+	 * Returns the given Map if it is not <code>null</code>, and otherwise returns an
+	 * {@link Collections#emptyMap() empty Map}.
 	 * 
 	 * @param <K>
 	 *            the key type
@@ -114,7 +131,7 @@ public final class MapUtils {
 	 *            the map
 	 * @return the given map, or an empty map, not <code>null</code>
 	 */
-	public static <K, V> Map<K, V> getOrEmpty(Map<K, V> map) {
+	public static <K, V> Map<K, V> getOrEmpty(@Nullable Map<K, V> map) {
 		return (map != null) ? map : Collections.emptyMap();
 	}
 

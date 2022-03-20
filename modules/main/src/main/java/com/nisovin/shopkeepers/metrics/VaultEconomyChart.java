@@ -3,7 +3,9 @@ package com.nisovin.shopkeepers.metrics;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 import net.milkbowl.vault.economy.Economy;
@@ -26,13 +28,16 @@ public class VaultEconomyChart extends Metrics.SimplePie {
 			String economyName = null;
 			if (economyClass != null) {
 				// Get the economy name, if an economy is present:
-				RegisteredServiceProvider<Economy> registration = Bukkit.getServicesManager().getRegistration(Economy.class);
-				Economy economy = (registration != null ? registration.getProvider() : null);
+				RegisteredServiceProvider<@NonNull Economy> registration = Bukkit.getServicesManager().getRegistration(Economy.class);
+				Economy economy = (registration != null) ? registration.getProvider() : null;
 				if (economy != null) {
 					economyName = economy.getName();
 				}
 			}
-			return (StringUtils.isEmpty(economyName) ? "None" : economyName);
+			if (StringUtils.isEmpty(economyName)) {
+				return "None";
+			}
+			return Unsafe.assertNonNull(economyName);
 		});
 	}
 }

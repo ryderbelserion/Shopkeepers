@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.text;
 import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
@@ -10,7 +12,8 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
 /**
  * The base class for builders that allow the fluent construction of {@link Text Texts}.
  * <p>
- * Once {@link #build()} has been called, this Text and all its child and subsequent Texts can no longer be modified.
+ * Once {@link #build()} has been called, this Text and all its child and subsequent Texts can no
+ * longer be modified.
  * <p>
  * Use one of the factory methods in {@link Text} to create an instance.
  */
@@ -66,13 +69,13 @@ public abstract class TextBuilder extends AbstractText {
 		return root;
 	}
 
-	protected static void buildIfRequired(Object text) {
+	protected static void buildIfRequired(@Nullable Object text) {
 		if (text instanceof TextBuilder) { // Also checks for null
 			((TextBuilder) text).build(); // No effect if already built
 		}
 	}
 
-	protected static boolean isUnbuiltText(Object text) {
+	protected static boolean isUnbuiltText(@Nullable Object text) {
 		return (text instanceof TextBuilder) && !((TextBuilder) text).isBuilt();
 	}
 
@@ -89,18 +92,20 @@ public abstract class TextBuilder extends AbstractText {
 	/**
 	 * Sets the child Text.
 	 * <p>
-	 * The child Text may be an unbuilt {@link TextBuilder} as well. It gets built once this Text gets built.
+	 * The child Text may be an unbuilt {@link TextBuilder} as well. It gets built once this Text
+	 * gets built.
 	 * 
 	 * @param <T>
 	 *            the type of the child text
 	 * @param child
-	 *            the child text, or <code>null</code> to unset it
+	 *            the child text, not <code>null</code>
 	 * @return the child Text
 	 */
-	public <T extends Text> T child(T child) {
+	public <T extends @NonNull Text> T child(T child) {
 		this.validateModification();
 		this.setChild(child);
-		// Returning the child Text here allows for convenient chaining when fluently building a Text.
+		// Returning the child Text here allows for convenient chaining when fluently building a
+		// Text.
 		return child;
 	}
 
@@ -109,45 +114,50 @@ public abstract class TextBuilder extends AbstractText {
 	/**
 	 * Sets the next {@link Text}.
 	 * <p>
-	 * The next Text may be an unbuilt {@link TextBuilder} as well. It gets built once this Text gets built.
+	 * The next Text may be an unbuilt {@link TextBuilder} as well. It gets built once this Text
+	 * gets built.
 	 * 
 	 * @param <T>
 	 *            the type of the next text
 	 * @param next
-	 *            the next text, or <code>null</code> to unset it
+	 *            the next text, not <code>null</code>
 	 * @return the next Text
 	 */
-	public <T extends Text> T next(T next) {
+	public <T extends @NonNull Text> T next(T next) {
 		this.validateModification();
 		this.setNext(next);
-		// Returning the next Text here allows for convenient chaining when fluently building a Text.
+		// Returning the next Text here allows for convenient chaining when fluently building a
+		// Text.
 		return next;
 	}
 
 	/**
 	 * Sets the {@link #child(Text) child} and {@link #next(Text) next} Text.
 	 * <p>
-	 * This a convenience shortcut when fluently constructing a Text which uses both a child and next Text.
+	 * This a convenience shortcut when fluently constructing a Text which uses both a child and
+	 * next Text.
 	 * 
 	 * @param child
-	 *            the child Text
+	 *            the child Text, or <code>null</code> to unset it
 	 * @param next
-	 *            the next Text
-	 * @return this
+	 *            the next Text, or <code>null</code> to unset it
+	 * @return this Text
 	 */
-	public TextBuilder childAndNext(Text child, Text next) {
-		this.child(child);
-		this.next(next);
+	public TextBuilder childAndNext(@Nullable Text child, @Nullable Text next) {
+		this.validateModification();
+		this.setChild(child);
+		this.setNext(next);
 		return this;
 	}
 
 	// FLUENT CHILD BUILDER
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given text and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the given text and sets it as {@link #child(Text)
+	 * child} Text.
 	 * 
 	 * @param text
-	 *            the text
+	 *            the text, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childText(String text) {
@@ -155,11 +165,11 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} which uses the String representation of the given object as its
-	 * text and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} which uses the String representation of the given object as
+	 * its text and sets it as {@link #child(Text) child} Text.
 	 * <p>
-	 * If the given object is a {@link Supplier}, it gets invoked to obtain the actual object. If the object is
-	 * <code>null</code>, the String "null" is used.
+	 * If the given object is a {@link Supplier}, it gets invoked to obtain the actual object. If
+	 * the object is <code>null</code>, the String {@code "null"} is used.
 	 * 
 	 * @param object
 	 *            the object to convert to a Text
@@ -167,14 +177,15 @@ public abstract class TextBuilder extends AbstractText {
 	 * @throws IllegalArgumentException
 	 *             if the given object is already a Text
 	 */
-	// TODO A common issue is to accidentally pass another Text here, which is not supported at runtime. Somehow change
-	// this to already detect and prevent this during compile time.
-	public TextBuilder childText(Object object) {
+	// TODO A common issue is to accidentally pass another Text here, which is not supported at
+	// runtime. Somehow change this to already detect and prevent this during compile time.
+	public TextBuilder childText(@Nullable Object object) {
 		return this.child(Text.text(object));
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the newline symbol as text and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the newline symbol as text and sets it as
+	 * {@link #child(Text) child} Text.
 	 * 
 	 * @return the new {@link TextBuilder}
 	 */
@@ -183,13 +194,14 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given formatting and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the given formatting and sets it as
+	 * {@link #child(Text) child} Text.
 	 * <p>
-	 * The formatting may be a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat() format}, or
-	 * {@link ChatColor#RESET}.
+	 * The formatting may be a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat()
+	 * format}, or {@link ChatColor#RESET}.
 	 * 
 	 * @param formatting
-	 *            the formatting
+	 *            the formatting, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childFormatting(ChatColor formatting) {
@@ -197,12 +209,14 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given color and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the given color and sets it as {@link #child(Text)
+	 * child} Text.
 	 * <p>
-	 * This is simply an alias for {@link #formatting(ChatColor)} and actually accepts any type of formatting.
+	 * This is simply an alias for {@link #formatting(ChatColor)} and actually accepts any type of
+	 * formatting.
 	 * 
 	 * @param color
-	 *            the color
+	 *            the color, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childColor(ChatColor color) {
@@ -210,7 +224,8 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with a formatting reset and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with a formatting reset and sets it as {@link #child(Text)
+	 * child} Text.
 	 * <p>
 	 * This is a shortcut for {@link #formatting(ChatColor)} with {@link ChatColor#RESET}.
 	 * 
@@ -221,10 +236,11 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new translatable {@link TextBuilder} and sets it as {@link #child(Text) child} Text.
+	 * Creates a new translatable {@link TextBuilder} and sets it as {@link #child(Text) child}
+	 * Text.
 	 * 
 	 * @param translationKey
-	 *            the translation key
+	 *            the translation key, not <code>null</code> or empty
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childTranslatable(String translationKey) {
@@ -235,7 +251,7 @@ public abstract class TextBuilder extends AbstractText {
 	 * Creates a new placeholder {@link TextBuilder} and sets it as {@link #child(Text) child} Text.
 	 * 
 	 * @param placeholderKey
-	 *            the placeholder key
+	 *            the placeholder key, not <code>null</code> or empty
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childPlaceholder(String placeholderKey) {
@@ -243,12 +259,13 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the specified hover event and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the specified hover event and sets it as
+	 * {@link #child(Text) child} Text.
 	 * 
 	 * @param action
-	 *            the hover event action
+	 *            the hover event action, not <code>null</code>
 	 * @param value
-	 *            the hover event value
+	 *            the hover event value, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childHoverEvent(HoverEventText.Action action, Text value) {
@@ -256,12 +273,13 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the specified hover text and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the specified hover text and sets it as
+	 * {@link #child(Text) child} Text.
 	 * <p>
 	 * This is a shortcut for the corresponding {@link #hoverEvent(HoverEventText.Action, Text)}.
 	 * 
 	 * @param hoverText
-	 *            the hover text
+	 *            the hover text, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childHoverEvent(Text hoverText) {
@@ -269,12 +287,13 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the specified click event and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the specified click event and sets it as
+	 * {@link #child(Text) child} Text.
 	 * 
 	 * @param action
-	 *            the click event action
+	 *            the click event action, not <code>null</code>
 	 * @param value
-	 *            the click event value
+	 *            the click event value, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childClickEvent(ClickEventText.Action action, String value) {
@@ -282,10 +301,11 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given insertion text and sets it as {@link #child(Text) child} Text.
+	 * Creates a new {@link TextBuilder} with the given insertion text and sets it as
+	 * {@link #child(Text) child} Text.
 	 * 
 	 * @param insertion
-	 *            the insertion text
+	 *            the insertion text, not <code>null</code> or empty
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder childInsertion(String insertion) {
@@ -295,10 +315,11 @@ public abstract class TextBuilder extends AbstractText {
 	// FLUENT NEXT BUILDER
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given text and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the given text and sets it as {@link #next(Text) next}
+	 * Text.
 	 * 
 	 * @param text
-	 *            the text
+	 *            the text, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder text(String text) {
@@ -306,11 +327,11 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} which uses the String representation of the given object as its
-	 * text and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} which uses the String representation of the given object as
+	 * its text and sets it as {@link #next(Text) next} Text.
 	 * <p>
-	 * If the given object is a {@link Supplier}, it gets invoked to obtain the actual object. If the object is
-	 * <code>null</code>, the String "null" is used.
+	 * If the given object is a {@link Supplier}, it gets invoked to obtain the actual object. If
+	 * the object is <code>null</code>, the String {@code "null"} is used.
 	 * 
 	 * @param object
 	 *            the object to convert to a Text
@@ -318,12 +339,13 @@ public abstract class TextBuilder extends AbstractText {
 	 * @throws IllegalArgumentException
 	 *             if the given object is already a Text
 	 */
-	public TextBuilder text(Object object) {
+	public TextBuilder text(@Nullable Object object) {
 		return this.next(Text.text(object));
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the newline symbol as text and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the newline symbol as text and sets it as
+	 * {@link #next(Text) next} Text.
 	 * 
 	 * @return the new {@link TextBuilder}
 	 */
@@ -332,13 +354,14 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given formatting and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the given formatting and sets it as {@link #next(Text)
+	 * next} Text.
 	 * <p>
-	 * The formatting may be a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat() format}, or
-	 * {@link ChatColor#RESET}.
+	 * The formatting may be a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat()
+	 * format}, or {@link ChatColor#RESET}.
 	 * 
 	 * @param formatting
-	 *            the formatting
+	 *            the formatting, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder formatting(ChatColor formatting) {
@@ -346,12 +369,14 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given color and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the given color and sets it as {@link #next(Text)
+	 * next} Text.
 	 * <p>
-	 * This is simply an alias for {@link #formatting(ChatColor)} and actually accepts any type of formatting.
+	 * This is simply an alias for {@link #formatting(ChatColor)} and actually accepts any type of
+	 * formatting.
 	 * 
 	 * @param color
-	 *            the color
+	 *            the color, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder color(ChatColor color) {
@@ -359,7 +384,8 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with a formatting reset and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with a formatting reset and sets it as {@link #next(Text)
+	 * next} Text.
 	 * <p>
 	 * This is a shortcut for {@link #formatting(ChatColor)} with {@link ChatColor#RESET}.
 	 * 
@@ -373,7 +399,7 @@ public abstract class TextBuilder extends AbstractText {
 	 * Creates a new translatable {@link TextBuilder} and sets it as {@link #next(Text) next} Text.
 	 * 
 	 * @param translationKey
-	 *            the translation key
+	 *            the translation key, not <code>null</code> or empty
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder translatable(String translationKey) {
@@ -384,7 +410,7 @@ public abstract class TextBuilder extends AbstractText {
 	 * Creates a new placeholder {@link TextBuilder} and sets it as {@link #next(Text) next} Text.
 	 * 
 	 * @param placeholderKey
-	 *            the placeholder key
+	 *            the placeholder key, not <code>null</code> or empty
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder placeholder(String placeholderKey) {
@@ -392,12 +418,13 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the specified hover event and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the specified hover event and sets it as
+	 * {@link #next(Text) next} Text.
 	 * 
 	 * @param action
-	 *            the hover event action
+	 *            the hover event action, not <code>null</code>
 	 * @param value
-	 *            the hover event value
+	 *            the hover event value, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder hoverEvent(HoverEventText.Action action, Text value) {
@@ -405,12 +432,13 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the specified hover text and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the specified hover text and sets it as
+	 * {@link #next(Text) next} Text.
 	 * <p>
 	 * This is a shortcut for the corresponding {@link #hoverEvent(HoverEventText.Action, Text)}.
 	 * 
 	 * @param hoverText
-	 *            the hover text
+	 *            the hover text, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder hoverEvent(Text hoverText) {
@@ -418,12 +446,13 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the specified click event and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the specified click event and sets it as
+	 * {@link #next(Text) next} Text.
 	 * 
 	 * @param action
-	 *            the click event action
+	 *            the click event action, not <code>null</code>
 	 * @param value
-	 *            the click event value
+	 *            the click event value, not <code>null</code>
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder clickEvent(ClickEventText.Action action, String value) {
@@ -431,10 +460,11 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given insertion text and sets it as {@link #next(Text) next} Text.
+	 * Creates a new {@link TextBuilder} with the given insertion text and sets it as
+	 * {@link #next(Text) next} Text.
 	 * 
 	 * @param insertion
-	 *            the insertion text
+	 *            the insertion text, not <code>null</code> or empty
 	 * @return the new {@link TextBuilder}
 	 */
 	public TextBuilder insertion(String insertion) {
@@ -454,8 +484,9 @@ public abstract class TextBuilder extends AbstractText {
 	 * @param sourceText
 	 *            the source Text
 	 * @param copyChilds
-	 *            <code>true</code> to also (deeply) copy the child and subsequent Texts, <code>false</code> to omit
-	 *            them and keep any currently set child and subsequent Texts
+	 *            <code>true</code> to also (deeply) copy the child and subsequent Texts,
+	 *            <code>false</code> to omit them and keep any currently set child and subsequent
+	 *            Texts
 	 * @return this
 	 */
 	public TextBuilder copy(Text sourceText, boolean copyChilds) {

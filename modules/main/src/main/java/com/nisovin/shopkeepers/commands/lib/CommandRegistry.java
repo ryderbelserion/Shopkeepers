@@ -10,21 +10,29 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class CommandRegistry {
 
 	private final Command parent;
 
-	// Gets only initialized when used, sorted by insertion order:
-	private Set<Command> commands = null;
+	// Sorted by insertion order:
+	private final Set<@NonNull Command> commands = new LinkedHashSet<>();
+	private final Set<@NonNull Command> commandsView = Collections.unmodifiableSet(commands);
 	// Normalized aliases:
-	// Implementation detail (used by Command): All aliases for the same command are stored in succession.
-	private Map<String, Command> commandsByAlias = null;
+	// Implementation detail (used by Command): All aliases for the same command are stored in
+	// succession.
+	private final Map<@NonNull String, @NonNull Command> commandsByAlias = new LinkedHashMap<>();
+	private final Map<@NonNull String, @NonNull Command> commandsByAliasView = Collections.unmodifiableMap(commandsByAlias);
 
-	public CommandRegistry(Command parent) {
+	public CommandRegistry(@UnknownInitialization Command parent) {
 		Validate.notNull(parent, "parent is null");
-		this.parent = parent;
+		this.parent = Unsafe.initialized(parent);
 	}
 
 	public Command getParent() {
@@ -34,18 +42,12 @@ public class CommandRegistry {
 	public void register(Command command) {
 		Validate.notNull(command, "command is null");
 		Validate.isTrue(command.getParent() == null, "command has already been registered somewhere");
-
-		// Lazy initialization:
-		if (commands == null) {
-			commands = new LinkedHashSet<>();
-			commandsByAlias = new LinkedHashMap<>();
-		}
-
 		Validate.isTrue(!commands.contains(command), "command is already registered");
 
 		// Register command by name:
 		String name = CommandUtils.normalize(command.getName());
-		Validate.isTrue(!commandsByAlias.containsKey(name), "Another command with this name is already registered: " + name);
+		Validate.isTrue(!commandsByAlias.containsKey(name),
+				"Another command with this name is already registered: " + name);
 		commandsByAlias.put(name, command);
 
 		// Register command aliases:
@@ -63,7 +65,7 @@ public class CommandRegistry {
 	}
 
 	public boolean isRegistered(Command command) {
-		return commands != null && commands.contains(command);
+		return commands.contains(command);
 	}
 
 	public void unregister(Command command) {
@@ -95,11 +97,8 @@ public class CommandRegistry {
 	 * 
 	 * @return an unmodifiable view on all registered commands
 	 */
-	public Collection<Command> getCommands() {
-		if (commands == null) {
-			return Collections.emptySet();
-		}
-		return Collections.unmodifiableSet(commands);
+	public Collection<? extends @NonNull Command> getCommands() {
+		return commandsView;
 	}
 
 	/**
@@ -109,26 +108,21 @@ public class CommandRegistry {
 	 *            the alias
 	 * @return the command, or <code>null</code>
 	 */
-	public Command getCommand(String alias) {
+	public @Nullable Command getCommand(String alias) {
 		Validate.notNull(alias, "alias is null");
-		if (commandsByAlias == null) {
-			return null;
-		}
 		return commandsByAlias.get(CommandUtils.normalize(alias));
 	}
 
 	/**
 	 * Gets all registered command aliases.
 	 * <p>
-	 * The aliases are {@link CommandUtils#normalize(String) normalized}, ordered by insertion and grouped by command.
+	 * The aliases are {@link CommandUtils#normalize(String) normalized}, ordered by insertion and
+	 * grouped by command.
 	 * 
 	 * @return an unmodifiable view on all registered command aliases
 	 */
-	public Set<String> getAliases() {
-		if (commandsByAlias == null) {
-			return Collections.emptySet();
-		}
-		return Collections.unmodifiableSet(commandsByAlias.keySet());
+	public Set<? extends @NonNull String> getAliases() {
+		return commandsByAliasView.keySet();
 	}
 
 	/**
@@ -136,11 +130,8 @@ public class CommandRegistry {
 	 * 
 	 * @return an unmodifiable view on all registered aliases and the commands they are mapped to
 	 */
-	public Map<String, Command> getAliasesMap() {
-		if (commandsByAlias == null) {
-			return Collections.emptyMap();
-		}
-		return Collections.unmodifiableMap(commandsByAlias);
+	public Map<? extends @NonNull String, ? extends @NonNull Command> getAliasesMap() {
+		return commandsByAliasView;
 	}
 
 	/**
@@ -148,14 +139,15 @@ public class CommandRegistry {
 	 * 
 	 * @param command
 	 *            the command
-	 * @return an unmodifiable view on all registered aliases that are mapped to the specified command
+	 * @return an unmodifiable view on all registered aliases that are mapped to the specified
+	 *         command
 	 */
-	public List<String> getAliases(Command command) {
-		if (commandsByAlias == null) {
+	public List<? extends @NonNull String> getAliases(Command command) {
+		if (commandsByAlias.isEmpty()) {
 			return Collections.emptyList();
 		}
-		List<String> aliases = new ArrayList<>();
-		for (Entry<String, Command> entry : commandsByAlias.entrySet()) {
+		List<@NonNull String> aliases = new ArrayList<>();
+		for (Entry<? extends @NonNull String, ? extends @NonNull Command> entry : commandsByAlias.entrySet()) {
 			if (entry.getValue() == command) {
 				aliases.add(entry.getKey());
 			}

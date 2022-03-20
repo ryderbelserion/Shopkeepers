@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.api.shopkeeper;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
@@ -16,7 +18,7 @@ public interface DefaultShopTypes {
 	 * 
 	 * @return all default shop types
 	 */
-	public List<? extends ShopType<?>> getAll();
+	public List<? extends @NonNull ShopType<?>> getAll();
 
 	/**
 	 * Gets the default regular {@link AdminShopType}.

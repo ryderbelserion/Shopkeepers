@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.debug;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.Settings;
 
 /**
@@ -11,7 +13,7 @@ public final class Debug {
 		return isDebugging(null);
 	}
 
-	public static boolean isDebugging(String option) {
+	public static boolean isDebugging(@Nullable String option) {
 		// Thread-safe:
 		Settings.AsyncSettings settings = Settings.async();
 		return settings.debug && (option == null || settings.debugOptions.contains(option));

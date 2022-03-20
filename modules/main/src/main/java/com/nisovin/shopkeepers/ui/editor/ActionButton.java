@@ -40,7 +40,10 @@ public abstract class ActionButton extends Button {
 	}
 
 	// Returns true on success:
-	protected abstract boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent);
+	protected abstract boolean runAction(
+			EditorSession editorSession,
+			InventoryClickEvent clickEvent
+	);
 
 	protected void onActionSuccess(EditorSession editorSession, InventoryClickEvent clickEvent) {
 		// Nothing by default.

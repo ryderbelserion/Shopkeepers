@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.util.java;
 
 /**
- * A counter that resets to a specified lower bound (inclusive) whenever its value reaches a specified upper bound
- * (exclusive).
+ * A counter that resets to a specified lower bound (inclusive) whenever its value reaches a
+ * specified upper bound (exclusive).
  * <p>
  * Not thread-safe.
  */
@@ -68,7 +68,8 @@ public class CyclicCounter {
 	 * Sets the current value.
 	 * 
 	 * @param value
-	 *            the new value, has to be within the lower bound (inclusive) and the upper bound (exclusive)
+	 *            the new value, has to be within the lower bound (inclusive) and the upper bound
+	 *            (exclusive)
 	 */
 	public void setValue(int value) {
 		Validate.isTrue(value >= lowerBound && value < upperBound, "value is out of bounds");
@@ -85,8 +86,8 @@ public class CyclicCounter {
 	/**
 	 * Gets the current value and then increments it by one.
 	 * <p>
-	 * If the new value reaches the {@link #getUpperBound() upper bound} of this counter, the value is reset to the
-	 * {@link #getLowerBound() lower bound}.
+	 * If the new value reaches the {@link #getUpperBound() upper bound} of this counter, the value
+	 * is reset to the {@link #getLowerBound() lower bound}.
 	 * 
 	 * @return the current value prior to the increment
 	 */
@@ -105,8 +106,8 @@ public class CyclicCounter {
 	/**
 	 * Increments the current value by one and then returns the new value.
 	 * <p>
-	 * If the new value reaches the {@link #getUpperBound() upper bound} of this counter, the value is reset to the
-	 * {@link #getLowerBound() lower bound}.
+	 * If the new value reaches the {@link #getUpperBound() upper bound} of this counter, the value
+	 * is reset to the {@link #getLowerBound() lower bound}.
 	 * 
 	 * @return the new value after the increment
 	 */

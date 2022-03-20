@@ -4,26 +4,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectableType> extends AbstractTypeRegistry<T> implements SelectableTypeRegistry<T> {
+public abstract class AbstractSelectableTypeRegistry<T extends @NonNull AbstractSelectableType>
+		extends AbstractTypeRegistry<T> implements SelectableTypeRegistry<T> {
 
 	private static class Link<T> {
-		private T prev = null;
-		private T next = null;
+		private @Nullable T prev = null;
+		private @Nullable T next = null;
 	}
 
-	private final Map<String, Link<T>> links = new HashMap<>();
-	private T first = null;
-	private T last = null;
+	private final Map<@NonNull String, @NonNull Link<T>> links = new HashMap<>();
+	private @Nullable T first = null;
+	private @Nullable T last = null;
 
 	protected AbstractSelectableTypeRegistry() {
 	}
 
 	@Override
-	public void register(T type) {
+	public void register(@NonNull T type) {
 		super.register(type);
 		if (first == null) {
 			first = type;
@@ -31,112 +35,121 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 		Link<T> link = new Link<>();
 		links.put(type.getIdentifier(), link);
 		if (last != null) {
-			Link<T> lastLink = links.get(last.getIdentifier());
+			Link<T> lastLink = Unsafe.assertNonNull(links.get(last.getIdentifier()));
 			lastLink.next = type;
 			link.prev = last;
 		}
 		last = type;
 	}
 
-	protected T getFirst() {
+	protected @Nullable T getFirst() {
 		return first;
 	}
 
-	protected T getLast() {
+	protected @Nullable T getLast() {
 		return last;
 	}
 
-	protected T getNext(T current) {
+	protected @Nullable T getNext(@Nullable T current) {
 		Link<T> link = (current != null) ? links.get(current.getIdentifier()) : null;
 		if (link == null) return first;
 		return (link.next == null) ? first : link.next;
 	}
 
-	protected T getPrevious(T current) {
+	protected @Nullable T getPrevious(@Nullable T current) {
 		Link<T> link = (current != null) ? links.get(current.getIdentifier()) : null;
 		if (link == null) return first;
 		return (link.prev == null) ? last : link.prev;
 	}
 
-	protected boolean canBeSelected(Player player, T type) {
+	protected boolean canBeSelected(Player player, @NonNull T type) {
 		assert player != null && type != null;
 		return type.isEnabled() && type.hasPermission(player);
 	}
 
-	protected T getNext(Player player, T current) {
+	protected @Nullable T getNext(Player player, @Nullable T current) {
 		assert player != null;
-		T next = current;
+		@Nullable T next = current;
 
 		int count = this.getRegisteredTypes().size();
 		while (count > 0) {
-			// Automatically selects the first type, if next is null or if next is the last type:
-			next = this.getNext(next);
+			// Automatically selects the first type if next is null or if next is the last type:
+			next = Unsafe.assertNonNull(this.getNext(next));
 			if (this.canBeSelected(player, next)) {
 				break;
 			}
 			count--;
 		}
 
-		// Use the currently selected type (can be null) after it went through all types and didn't find one the player
-		// can use:
+		// Use the currently selected type (can be null) after we went through all types and didn't
+		// find one the player can use:
 		if (count == 0) {
 			// Check if the currently selected type can still be used by this player:
-			if (current != null && !this.canBeSelected(player, current)) current = null;
-			next = current;
+			if (current != null && !this.canBeSelected(player, current)) {
+				next = null;
+			} else {
+				next = current;
+			}
 		}
 		return next;
 	}
 
-	protected T getPrevious(Player player, T current) {
+	protected @Nullable T getPrevious(Player player, @Nullable T current) {
 		assert player != null;
-		T prev = current;
+		@Nullable T previous = current;
 
 		int count = this.getRegisteredTypes().size();
 		while (count > 0) {
-			// Automatically selects the first type if prev is null, or the last type if prev is the first type:
-			prev = this.getPrevious(prev);
-			if (this.canBeSelected(player, prev)) {
+			// Automatically selects the first type if prev is null, or the last type if prev is the
+			// first type:
+			previous = Unsafe.assertNonNull(this.getPrevious(previous));
+			if (this.canBeSelected(player, previous)) {
 				break;
 			}
 			count--;
 		}
 
-		// Use the currently selected type (can be null) after it went through all types and didn't find one the player
-		// can use:
+		// Use the currently selected type (can be null) after we went through all types and didn't
+		// find one the player can use:
 		if (count == 0) {
 			// Check if the currently selected type can still be used by this player:
-			if (current != null && !this.canBeSelected(player, current)) current = null;
-			prev = current;
+			if (current != null && !this.canBeSelected(player, current)) {
+				previous = null;
+			} else {
+				previous = current;
+			}
 		}
-		return prev;
+		return previous;
 	}
 
 	// SELECTION MANAGEMENT
 
 	// Player name -> selected type
-	protected final Map<String, T> selections = new HashMap<>();
+	protected final Map<@NonNull String, @NonNull T> selections = new HashMap<>();
 
 	@Override
-	public T getDefaultSelection(Player player) {
+	public @Nullable T getDefaultSelection(Player player) {
 		return this.getNext(player, null);
 	}
 
 	@Override
-	public T getSelection(Player player) {
+	public @Nullable T getSelection(Player player) {
 		Validate.notNull(player, "player is null");
-		String playerName = player.getName();
-		T current = selections.get(playerName);
+		String playerName = Unsafe.assertNonNull(player.getName());
+		@Nullable T current = selections.get(playerName);
 		// If none is currently selected, let's search for the first type this player can use:
-		if (current == null || !this.canBeSelected(player, current)) current = this.getNext(player, current);
-		return current; // Returns null if the player can use no type at all
+		if (current == null || !this.canBeSelected(player, current)) {
+			current = this.getNext(player, current);
+		}
+		return current; // Returns null if the player can not use any type
 	}
 
 	@Override
-	public T selectNext(Player player) {
+	public @Nullable T selectNext(Player player) {
 		Validate.notNull(player, "player is null");
-		String playerName = player.getName();
-		T current = selections.get(playerName);
-		T next = this.getNext(player, current);
+		String playerName = Unsafe.assertNonNull(player.getName());
+		@Nullable T current = selections.get(playerName);
+		@Nullable T next = this.getNext(player, current);
 		if (next != null) {
 			selections.put(playerName, next);
 			this.onSelect(next, player);
@@ -148,11 +161,11 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 	}
 
 	@Override
-	public T selectPrevious(Player player) {
+	public @Nullable T selectPrevious(Player player) {
 		Validate.notNull(player, "player is null");
-		String playerName = player.getName();
-		T current = selections.get(playerName);
-		T prev = this.getPrevious(player, current);
+		String playerName = Unsafe.assertNonNull(player.getName());
+		@Nullable T current = selections.get(playerName);
+		@Nullable T prev = this.getPrevious(player, current);
 		if (prev != null) {
 			selections.put(playerName, prev);
 			this.onSelect(prev, player);
@@ -163,7 +176,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 		return prev;
 	}
 
-	protected void onSelect(T type, Player selectedBy) {
+	protected void onSelect(@NonNull T type, Player selectedBy) {
 		// Inform type:
 		type.onSelect(selectedBy);
 	}
@@ -171,7 +184,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 	@Override
 	public void clearSelection(Player player) {
 		Validate.notNull(player, "player is null");
-		String playerName = player.getName();
+		String playerName = Unsafe.assertNonNull(player.getName());
 		selections.remove(playerName);
 	}
 

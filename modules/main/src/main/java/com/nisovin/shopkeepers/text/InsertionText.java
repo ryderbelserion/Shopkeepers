@@ -5,8 +5,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * When shift-clicked by the player, the insertion text gets inserted into his chat input.
  * <p>
- * Unlike {@link net.md_5.bungee.api.chat.ClickEvent.Action#SUGGEST_COMMAND} this does not replace the already existing
- * chat input.
+ * Unlike {@link net.md_5.bungee.api.chat.ClickEvent.Action#SUGGEST_COMMAND} this does not replace
+ * the already existing chat input.
  */
 public class InsertionText extends TextBuilder {
 

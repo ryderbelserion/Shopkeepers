@@ -25,7 +25,12 @@ public class ShopkeeperOpenUIEvent extends PlayerOpenUIEvent {
 	 * @param silentRequest
 	 *            <code>true</code> if this is a silent UI request
 	 */
-	public ShopkeeperOpenUIEvent(Shopkeeper shopkeeper, UIType uiType, Player player, boolean silentRequest) {
+	public ShopkeeperOpenUIEvent(
+			Shopkeeper shopkeeper,
+			UIType uiType,
+			Player player,
+			boolean silentRequest
+	) {
 		super(uiType, player, silentRequest);
 		Preconditions.checkNotNull(shopkeeper, "shopkeeper is null");
 		this.shopkeeper = shopkeeper;

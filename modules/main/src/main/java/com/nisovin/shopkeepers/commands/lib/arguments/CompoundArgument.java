@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -15,8 +18,8 @@ import com.nisovin.shopkeepers.commands.lib.context.SimpleCommandContext;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * An abstract {@link CommandArgument} which consists of multiple other command arguments which it parses its value
- * from.
+ * An abstract {@link CommandArgument} which consists of multiple other command arguments which it
+ * parses its value from.
  * 
  * @param <T>
  *            the type of the parsed argument
@@ -25,31 +28,42 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 
 	public static final String FORMAT_DELIMITER = " ";
 
-	private final List<CommandArgument<?>> arguments;
+	private final List<? extends @NonNull CommandArgument<?>> arguments;
 	private final boolean useReducedFormat;
-	private final String reducedFormat;
+	// Null if the default (parent) reduced format shall be used:
+	private final @Nullable String reducedFormat;
 
-	public CompoundArgument(String name, List<CommandArgument<?>> arguments) {
+	public CompoundArgument(String name, List<? extends @NonNull CommandArgument<?>> arguments) {
 		this(name, arguments, true);
 	}
 
-	public CompoundArgument(String name, List<CommandArgument<?>> arguments, boolean joinFormats) {
+	public CompoundArgument(
+			String name,
+			List<? extends @NonNull CommandArgument<?>> arguments,
+			boolean joinFormats
+	) {
 		this(name, arguments, joinFormats, true);
 	}
 
-	public CompoundArgument(String name, List<CommandArgument<?>> arguments, boolean joinFormats, boolean useReducedFormat) {
+	public CompoundArgument(
+			String name,
+			List<? extends @NonNull CommandArgument<?>> arguments,
+			boolean joinFormats,
+			boolean useReducedFormat
+	) {
 		super(name);
 
 		// Arguments:
 		Validate.notNull(arguments, "arguments is null");
 		Validate.isTrue(!arguments.isEmpty(), "arguments is empty");
-		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
+		List<@NonNull CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
 			Validate.notNull(argument, "arguments contains null");
-			// TODO This also excludes optional arguments.. allow fallbacks and handle them somehow? Maybe evaluate
-			// fallbacks immediately?
-			Validate.isTrue(!(argument instanceof FallbackArgument), "arguments contains a FallbackArgument");
+			// TODO This also excludes optional arguments.. allow fallbacks and handle them somehow?
+			// Maybe evaluate fallbacks immediately?
+			Validate.isTrue(!(argument instanceof FallbackArgument),
+					"arguments contains a FallbackArgument");
 			argument.setParent(this);
 			argumentsList.add(argument);
 		}
@@ -75,11 +89,11 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 			}
 		} else {
 			// Using the default format:
-			this.reducedFormat = super.getReducedFormat();
+			this.reducedFormat = null;
 		}
 	}
 
-	public List<CommandArgument<?>> getArguments() {
+	public List<? extends @NonNull CommandArgument<?>> getArguments() {
 		return arguments;
 	}
 
@@ -101,7 +115,11 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public String getReducedFormat() {
-		return reducedFormat;
+		if (reducedFormat != null) {
+			return reducedFormat;
+		} else {
+			return super.getReducedFormat();
+		}
 	}
 
 	// This is not throwing this compound-argument's 'missing argument' exception by default,
@@ -111,7 +129,11 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 	// compound-argument's exception instead.
 
 	@Override
-	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public T parseValue(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) throws ArgumentParseException {
 		// Parse requirements:
 		CommandContext localContext = context.copy();
 		for (CommandArgument<?> argument : arguments) {
@@ -122,11 +144,19 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		return this.parseCompoundValue(input, localContext.getView(), argsReader);
 	}
 
-	protected abstract T parseCompoundValue(CommandInput input, CommandContextView localContext, ArgumentsReader args) throws ArgumentParseException;
+	protected abstract T parseCompoundValue(
+			CommandInput input,
+			CommandContextView localContext,
+			ArgumentsReader args
+	) throws ArgumentParseException;
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		List<String> suggestions = new ArrayList<>();
+	public List<? extends @NonNull String> complete(
+			CommandInput input,
+			CommandContextView context,
+			ArgumentsReader argsReader
+	) {
+		List<@NonNull String> suggestions = new ArrayList<>();
 		CommandContext localContext = new SimpleCommandContext();
 		CommandContextView localContextView = localContext.getView();
 		// Similar to Command#handleTabCompletion
@@ -152,8 +182,8 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 					// Include suggestions (if it has any), but continue:
 					suggestions.addAll(argument.complete(input, localContextView, argsReader));
 
-					// Reset state (just in case), and then let the following arguments also try to complete the same
-					// arg(s):
+					// Reset state (just in case), and then let the following arguments also try to
+					// complete the same arg(s):
 					argsReader.setState(argsReaderState);
 					continue;
 				}
@@ -170,9 +200,10 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 					// -> Include suggestions in that case.
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, localContextView, argsReader));
-					// Parsing might also have failed because of an invalid argument inside the sequence of arguments.
-					// -> Skip later arguments (current argument will not provide suggestions in that case, because it
-					// isn't using up the last argument).
+					// Parsing might also have failed because of an invalid argument inside the
+					// sequence of arguments.
+					// -> Skip later arguments (current argument will not provide suggestions in
+					// that case, because it isn't using up the last argument).
 					break;
 				}
 			}

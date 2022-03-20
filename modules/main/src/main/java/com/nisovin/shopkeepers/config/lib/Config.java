@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.lib.annotation.Colored;
 import com.nisovin.shopkeepers.config.lib.annotation.Uncolored;
 import com.nisovin.shopkeepers.config.lib.annotation.WithDefaultValueType;
@@ -37,11 +41,11 @@ public abstract class Config {
 
 	// Custom default value types specified by annotations:
 	// This is lazily setup if required during settings setup.
-	private ValueTypeRegistry customDefaultValueTypes = null;
+	private @Nullable ValueTypeRegistry customDefaultValueTypes = null;
 
 	// Lazily setup cache of all settings:
-	private Map<String, FieldSetting<?>> settings = null;
-	private Collection<? extends FieldSetting<?>> settingsView = null;
+	private @Nullable Map<@NonNull String, @NonNull FieldSetting<?>> settings = null;
+	private @Nullable Collection<? extends @NonNull FieldSetting<?>> settingsView = null;
 
 	protected Config() {
 	}
@@ -58,12 +62,14 @@ public abstract class Config {
 	// SETTINGS SETUP
 
 	private void setupSettings() {
+		Map<@NonNull String, @NonNull FieldSetting<?>> settings = this.settings;
 		if (settings != null) {
 			return; // Already setup
 		}
 		assert settingsView == null;
 
-		this.settings = new LinkedHashMap<>();
+		settings = new LinkedHashMap<>();
+		this.settings = settings;
 		this.settingsView = Collections.unmodifiableCollection(settings.values());
 		for (Field field : CollectionUtils.toIterable(this.streamSettingFields())) {
 			String configKey = this.getConfigKey(field);
@@ -77,14 +83,14 @@ public abstract class Config {
 		customDefaultValueTypes = null;
 	}
 
-	private Stream<Field> streamSettingFields() {
+	private Stream<@NonNull Field> streamSettingFields() {
 		Class<?> configClass = this.getClass();
-		Stream<Field> settings = this.streamSettingFields(configClass);
+		Stream<@NonNull Field> settings = this.streamSettingFields(configClass);
 
-		// Append setting fields of parent config classes (allows for composition of config classes):
+		// Append setting fields of parent config classes (allows for composition of config
+		// classes):
 		// We stop once we reach this class in the type hierarchy:
-		Class<?> parentClass = configClass.getSuperclass();
-		assert parentClass != null;
+		Class<?> parentClass = Unsafe.assertNonNull(configClass.getSuperclass());
 		while (parentClass != Config.class) {
 			settings = Stream.concat(settings, this.streamSettingFields(parentClass));
 			parentClass = configClass.getSuperclass();
@@ -93,8 +99,8 @@ public abstract class Config {
 		return settings;
 	}
 
-	private final Stream<Field> streamSettingFields(Class<?> configClass) {
-		List<Field> fields = Arrays.asList(configClass.getDeclaredFields());
+	private final Stream<@NonNull Field> streamSettingFields(Class<?> configClass) {
+		List<@NonNull Field> fields = Arrays.asList(configClass.getDeclaredFields());
 		return fields.stream().filter(field -> {
 			// Filter fields:
 			if (field.isSynthetic()) return false;
@@ -107,7 +113,8 @@ public abstract class Config {
 	/**
 	 * This can be used to exclude fields from the settings.
 	 * <p>
-	 * By default, all public fields are included. Fields can also be declared in parent config classes.
+	 * By default, all public fields are included. Fields can also be declared in parent config
+	 * classes.
 	 * <p>
 	 * Synthetic and final fields are always excluded.
 	 * 
@@ -150,31 +157,35 @@ public abstract class Config {
 
 		// ValueType could not be determined:
 		String configKey = this.getConfigKey(field);
-		throw new IllegalStateException("Setting '" + configKey + "' is of unsupported type: " + fieldType.getTypeName());
+		throw new IllegalStateException("Setting '" + configKey + "' is of unsupported type: "
+				+ fieldType.getTypeName());
 	}
 
 	@SuppressWarnings("unchecked")
-	protected final <T> ValueType<T> getValueTypeByAnnotation(Field field) {
+	protected final <T> @Nullable ValueType<T> getValueTypeByAnnotation(Field field) {
 		WithValueType valueTypeAnnotation = field.getAnnotation(WithValueType.class);
 		if (valueTypeAnnotation != null) {
-			Class<? extends ValueType<?>> valueTypeClass = valueTypeAnnotation.value();
+			Class<? extends @NonNull ValueType<?>> valueTypeClass = valueTypeAnnotation.value();
 			assert valueTypeClass != null;
 			return (ValueType<T>) instantiateValueType(valueTypeClass);
 		}
 		return null;
 	}
 
-	private static ValueType<?> instantiateValueType(Class<? extends ValueType<?>> valueTypeClass) {
+	private static ValueType<?> instantiateValueType(
+			Class<? extends @NonNull ValueType<?>> valueTypeClass
+	) {
 		assert valueTypeClass != null;
 		try {
 			return valueTypeClass.newInstance();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not instantiate ValueType: " + valueTypeClass.getName(), e);
+			throw new IllegalArgumentException("Could not instantiate ValueType: "
+					+ valueTypeClass.getName(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	protected final <T> ValueType<T> getValueTypeByColoredAnnotation(Field field) {
+	protected final <T> @Nullable ValueType<T> getValueTypeByColoredAnnotation(Field field) {
 		Colored coloredAnnotation = field.getAnnotation(Colored.class);
 		if (coloredAnnotation != null) {
 			Type fieldType = field.getGenericType();
@@ -183,14 +194,17 @@ public abstract class Config {
 			} else if (ColoredStringListValue.TYPE_PATTERN.matches(fieldType)) {
 				return (ValueType<T>) ColoredStringListValue.INSTANCE;
 			} else {
-				throw new IllegalArgumentException("The Colored annotation is not supported for settings of type " + fieldType.getTypeName());
+				throw new IllegalArgumentException(
+						"The Colored annotation is not supported for settings of type "
+								+ fieldType.getTypeName()
+				);
 			}
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected final <T> ValueType<T> getValueTypeByUncoloredAnnotation(Field field) {
+	protected final <T> @Nullable ValueType<T> getValueTypeByUncoloredAnnotation(Field field) {
 		Uncolored uncoloredAnnotation = field.getAnnotation(Uncolored.class);
 		if (uncoloredAnnotation != null) {
 			Type fieldType = field.getGenericType();
@@ -199,17 +213,19 @@ public abstract class Config {
 			} else if (ColoredStringListValue.TYPE_PATTERN.matches(fieldType)) {
 				return (ValueType<T>) StringListValue.INSTANCE;
 			} else {
-				throw new IllegalArgumentException("The Uncolored annotation is not supported for settings of type " + fieldType.getTypeName());
+				throw new IllegalArgumentException(
+						"The Uncolored annotation is not supported for settings of type "
+								+ fieldType.getTypeName()
+				);
 			}
 		}
 		return null;
 	}
 
-	protected final <T> ValueType<T> getValueTypeByCustomDefaults(Field field) {
+	protected final <T> @Nullable ValueType<T> getValueTypeByCustomDefaults(Field field) {
 		this.setupCustomDefaultValueTypes(); // Lazy setup
-		assert customDefaultValueTypes != null;
 		Type fieldType = field.getGenericType();
-		return customDefaultValueTypes.getValueType(fieldType);
+		return Unsafe.assertNonNull(customDefaultValueTypes).getValueType(fieldType);
 	}
 
 	private void setupCustomDefaultValueTypes() {
@@ -221,8 +237,7 @@ public abstract class Config {
 		this.setupCustomDefaultValueTypes(configClass);
 
 		// Also take into account custom default value types specified in parent classes:
-		Class<?> parentClass = configClass.getSuperclass();
-		assert parentClass != null;
+		Class<?> parentClass = Unsafe.assertNonNull(configClass.getSuperclass());
 		while (parentClass != Config.class) {
 			this.setupCustomDefaultValueTypes(parentClass);
 			parentClass = configClass.getSuperclass();
@@ -231,7 +246,7 @@ public abstract class Config {
 	}
 
 	private void setupCustomDefaultValueTypes(Class<?> configClass) {
-		assert customDefaultValueTypes != null;
+		ValueTypeRegistry customDefaultValueTypes = Unsafe.assertNonNull(this.customDefaultValueTypes);
 		// WithDefaultValueType annotations:
 		WithDefaultValueType[] defaultValueTypeAnnotations = configClass.getAnnotationsByType(WithDefaultValueType.class);
 		assert defaultValueTypeAnnotations != null;
@@ -261,12 +276,15 @@ public abstract class Config {
 		}
 	}
 
-	private static ValueTypeProvider instantiateValueTypeProvider(Class<? extends ValueTypeProvider> valueTypeProviderClass) {
+	private static ValueTypeProvider instantiateValueTypeProvider(
+			Class<? extends @NonNull ValueTypeProvider> valueTypeProviderClass
+	) {
 		assert valueTypeProviderClass != null;
 		try {
 			return valueTypeProviderClass.newInstance();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Could not instantiate ValueTypeProvider: " + valueTypeProviderClass.getName(), e);
+			throw new IllegalArgumentException("Could not instantiate ValueTypeProvider: "
+					+ valueTypeProviderClass.getName(), e);
 		}
 	}
 
@@ -277,15 +295,15 @@ public abstract class Config {
 	 * 
 	 * @return an unmodifiable view on the settings
 	 */
-	public final Collection<? extends Setting<?>> getSettings() {
+	public final Collection<? extends @NonNull Setting<?>> getSettings() {
 		this.setupSettings();
-		return settingsView;
+		return Unsafe.assertNonNull(settingsView);
 	}
 
 	// Returns null if there is no setting for this config key:
-	protected final Setting<?> getSetting(String configKey) {
+	protected final @Nullable Setting<?> getSetting(String configKey) {
 		this.setupSettings();
-		return settings.get(configKey);
+		return Unsafe.assertNonNull(settings).get(configKey);
 	}
 
 	// SAVING
@@ -308,19 +326,22 @@ public abstract class Config {
 	// LOADING
 
 	public void load(ConfigData configData) throws ConfigLoadException {
-		Validate.notNull(configData, "dataContainer is null");
+		Validate.notNull(configData, "configData is null");
 		for (Setting<?> setting : this.getSettings()) {
 			this.loadSetting(configData, setting);
 		}
 		this.validateSettings();
 	}
 
-	protected <T> void loadSetting(ConfigData configData, Setting<T> setting) throws ConfigLoadException {
+	protected <T> void loadSetting(
+			ConfigData configData,
+			Setting<T> setting
+	) throws ConfigLoadException {
 		assert setting.getConfig() == this;
 		String configKey = setting.getConfigKey();
 		ValueType<T> valueType = setting.getValueType();
 		try {
-			T value;
+			@Nullable T value;
 
 			// Handle missing value:
 			if (!configData.contains(configKey)) {
@@ -342,7 +363,11 @@ public abstract class Config {
 		}
 	}
 
-	protected <T> void onValueMissing(ConfigData configData, Setting<T> setting, T defaultValue) throws ConfigLoadException {
+	protected <T> void onValueMissing(
+			ConfigData configData,
+			Setting<T> setting,
+			@Nullable T defaultValue
+	) throws ConfigLoadException {
 		String configKey = setting.getConfigKey();
 		if (defaultValue == null) {
 			Log.warning(this.msgMissingValue(configKey));
@@ -359,7 +384,11 @@ public abstract class Config {
 		return this.getLogPrefix() + "Using default value for missing config entry: " + configKey;
 	}
 
-	protected <T> void onValueLoadException(ConfigData configData, Setting<T> setting, ValueLoadException e) throws ConfigLoadException {
+	protected <T> void onValueLoadException(
+			ConfigData configData,
+			Setting<T> setting,
+			ValueLoadException e
+	) throws ConfigLoadException {
 		String configKey = setting.getConfigKey();
 		Log.warning(this.msgValueLoadException(configKey, e));
 		for (String extraMessage : e.getExtraMessages()) {
@@ -368,7 +397,8 @@ public abstract class Config {
 	}
 
 	protected String msgValueLoadException(String configKey, ValueLoadException e) {
-		return this.getLogPrefix() + "Could not load setting '" + configKey + "': " + e.getMessage();
+		return this.getLogPrefix() + "Could not load setting '" + configKey + "': "
+				+ e.getMessage();
 	}
 
 	/**
@@ -387,7 +417,7 @@ public abstract class Config {
 
 	// Returns null if there is no default value.
 	@SuppressWarnings("unchecked")
-	protected <T> T getDefaultValue(ConfigData configData, Setting<T> setting) {
+	protected <T> @Nullable T getDefaultValue(ConfigData configData, Setting<T> setting) {
 		assert setting.getConfig() == this;
 		DataContainer defaults = configData.getDefaults();
 		if (defaults == null) {
@@ -400,7 +430,8 @@ public abstract class Config {
 
 		// Load default value:
 		try {
-			// Note: This can return null if the config data does not provide a default value for this setting.
+			// Note: This can return null if the config data does not provide a default value for
+			// this setting.
 			return (T) valueType.load(defaults, configKey);
 		} catch (ValueLoadException e) {
 			Log.warning(this.msgDefaultValueLoadException(configKey, e));
@@ -409,7 +440,8 @@ public abstract class Config {
 	}
 
 	protected String msgDefaultValueLoadException(String configKey, ValueLoadException e) {
-		return this.getLogPrefix() + "Could not load default value for setting '" + configKey + "': " + e.getMessage();
+		return this.getLogPrefix() + "Could not load default value for setting '" + configKey
+				+ "': " + e.getMessage();
 	}
 
 	/**
@@ -446,7 +478,7 @@ public abstract class Config {
 		Log.warning(this.msgInsertingDefault(configKey));
 
 		// Get default value:
-		T defaultValue = this.getDefaultValue(configData, setting);
+		@Nullable T defaultValue = this.getDefaultValue(configData, setting);
 		if (defaultValue == null) {
 			Log.warning(this.msgMissingDefault(configKey));
 			return false;
@@ -459,7 +491,8 @@ public abstract class Config {
 	}
 
 	protected String msgInsertingDefault(String configKey) {
-		return this.getLogPrefix() + "Inserting default value for missing config entry: " + configKey;
+		return this.getLogPrefix() + "Inserting default value for missing config entry: "
+				+ configKey;
 	}
 
 	protected String msgMissingDefault(String configKey) {
@@ -473,7 +506,8 @@ public abstract class Config {
 	 * 
 	 * @param text
 	 *            the text with {@code &}-based color codes
-	 * @return the text with Minecraft's color codes, or <code>null</code> if the given text is <code>null</code>
+	 * @return the text with Minecraft's color codes, or <code>null</code> if the given text is
+	 *         <code>null</code>
 	 */
 	protected static String c(String text) {
 		return TextUtils.colorize(text);
@@ -481,14 +515,12 @@ public abstract class Config {
 
 	/**
 	 * Translates {@code &}-based color codes to Minecraft's {@code §}-based color codes.
-	 * <p>
-	 * This creates a new list. Any contained <code>null</code> texts will remain <code>null</code>.
 	 * 
-	 * @param texts
-	 *            the texts with {@code &}-based color codes
-	 * @return the texts with Minecraft's color codes, or <code>null</code> if the given list is <code>null</code>
+	 * @param list
+	 *            the texts with {@code &}-based color codes, not <code>null</code>
+	 * @return a new list containing the corresponding texts with Minecraft's color codes
 	 */
-	protected static List<String> c(List<String> texts) {
+	protected static List<@NonNull String> c(List<? extends @NonNull String> texts) {
 		return TextUtils.colorize(texts);
 	}
 }

@@ -2,21 +2,24 @@ package com.nisovin.shopkeepers.util.text;
 
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 
-class CommonMessageArguments {
+final class CommonMessageArguments {
 
 	static class MapMessageArguments implements MessageArguments {
 
-		private final Map<String, ?> arguments;
+		private final Map<? extends @NonNull String, @NonNull ?> arguments;
 
-		public MapMessageArguments(Map<String, ?> arguments) {
+		public MapMessageArguments(Map<? extends @NonNull String, @NonNull ?> arguments) {
 			Validate.notNull(arguments, "arguments is null");
 			this.arguments = arguments;
 		}
 
 		@Override
-		public Object get(String key) {
+		public @Nullable Object get(String key) {
 			return arguments.get(key);
 		}
 	}
@@ -34,7 +37,7 @@ class CommonMessageArguments {
 		}
 
 		@Override
-		public Object get(String key) {
+		public @Nullable Object get(String key) {
 			Object argument = first.get(key);
 			return (argument != null) ? argument : second.get(key);
 		}
@@ -53,7 +56,7 @@ class CommonMessageArguments {
 		}
 
 		@Override
-		public Object get(String key) {
+		public @Nullable Object get(String key) {
 			if (!key.startsWith(keyPrefix)) return null;
 			String suffixKey = key.substring(keyPrefix.length());
 			return arguments.get(suffixKey);

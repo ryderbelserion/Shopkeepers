@@ -1,18 +1,17 @@
 package com.nisovin.shopkeepers.util;
 
 import org.bukkit.NamespacedKey;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
 
 public class NamespacedKeyUtilsTests {
 
 	@Test
 	public void testParsing() {
-		// Null case:
-		testParsing(null, null);
-
 		// No namespace specified (implicitly uses the Minecraft namespace):
 		testParsing("", null); // Empty
 		testParsing("bla", NamespacedKey.minecraft("bla"));
@@ -52,7 +51,8 @@ public class NamespacedKeyUtilsTests {
 		testParsing("custom:", null);
 		testParsing("custom:bla", NamespacedKeyUtils.create("custom", "bla"));
 		testParsing("custom:bla_blubb", NamespacedKeyUtils.create("custom", "bla_blubb"));
-		testParsing("custom:bla-blubb", NamespacedKeyUtils.create("custom", "bla-blubb")); // Dash might be valid
+		// Dash might be valid:
+		testParsing("custom:bla-blubb", NamespacedKeyUtils.create("custom", "bla-blubb"));
 		testParsing("custom:bla blubb", NamespacedKeyUtils.create("custom", "bla_blubb"));
 		testParsing("custom:bla.blubb", NamespacedKeyUtils.create("custom", "bla.blubb"));
 		testParsing("custom:bla/blubb", NamespacedKeyUtils.create("custom", "bla/blubb"));
@@ -60,8 +60,11 @@ public class NamespacedKeyUtilsTests {
 		testParsing("custom:bla_BluBB", NamespacedKeyUtils.create("custom", "bla_blubb"));
 	}
 
-	private void testParsing(String input, NamespacedKey expected) {
+	private void testParsing(String input, @Nullable NamespacedKey expected) {
 		NamespacedKey parsed = NamespacedKeyUtils.parse(input);
-		Assert.assertEquals(expected, parsed);
+		Assert.assertEquals(
+				Unsafe.nullableAsNonNull(expected),
+				Unsafe.nullableAsNonNull(parsed)
+		);
 	}
 }

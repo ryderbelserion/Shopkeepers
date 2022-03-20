@@ -2,7 +2,9 @@ package com.nisovin.shopkeepers.shopkeeper.player.buy;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -11,6 +13,7 @@ import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.ui.trading.Trade;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -40,7 +43,10 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (offer == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"Could not find the offer corresponding to the trading recipe!"
+			);
 			return false;
 		}
 
@@ -49,21 +55,30 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (expectedBoughtItemAmount > boughtItem.getAmount()) {
 			// Unexpected, because the recipe was created based on this offer.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-			this.debugPreventedTrade(tradingPlayer, "The offer does not match the trading recipe!");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The offer does not match the trading recipe!"
+			);
 			return false;
 		}
 
-		assert containerInventory != null && newContainerContents != null;
+		@Nullable ItemStack[] newContainerContents = Unsafe.assertNonNull(this.newContainerContents);
 
 		// Remove currency items from container contents:
 		int remaining = this.removeCurrency(newContainerContents, offer.getPrice());
 		if (remaining > 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientCurrency);
-			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain enough currency.");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container does not contain enough currency."
+			);
 			return false;
 		} else if (remaining < 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
-			this.debugPreventedTrade(tradingPlayer, "The shop's container does not have enough space to split large currency items.");
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container does not have enough space to split large currency items."
+			);
 			return false;
 		}
 
@@ -75,7 +90,10 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			ItemStack receivedItem = ItemUtils.copyWithAmount(trade.getOfferedItem1(), amountAfterTaxes);
 			if (InventoryUtils.addItems(newContainerContents, receivedItem) != 0) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
-				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
+				this.debugPreventedTrade(
+						tradingPlayer,
+						"The shop's container cannot hold the traded items."
+				);
 				return false;
 			}
 		}
@@ -84,8 +102,9 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 	// TODO Simplify this? Maybe by separating into different, general utility functions.
 	// TODO Support iterating in reverse order, for nicer looking container contents?
-	// Returns the amount of currency that couldn't be removed, 0 on full success, negative if too much was removed.
-	protected int removeCurrency(ItemStack[] contents, int amount) {
+	// Returns the amount of currency that couldn't be removed, 0 on full success, negative if too
+	// much was removed.
+	protected int removeCurrency(@ReadOnly @Nullable ItemStack[] contents, int amount) {
 		Validate.notNull(contents, "contents is null");
 		Validate.isTrue(amount >= 0, "amount cannot be negative");
 		if (amount == 0) return 0;
@@ -98,6 +117,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
 				if (!baseCurrency.getItemData().matches(itemStack)) continue;
+				itemStack = Unsafe.assertNonNull(itemStack);
 
 				// Second pass, or the ItemStack is a partial one:
 				int itemAmount = itemStack.getAmount();
@@ -130,8 +150,8 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		Currency highCurrency = Currencies.getHigh();
 		int remainingHigh = (int) Math.ceil((double) remaining / highCurrency.getValue());
-		// We rounded the high currency up, so if this is negative now, it represents the remaining change which
-		// needs to be added back:
+		// We rounded the high currency up, so if this is negative now, it represents the remaining
+		// change which needs to be added back:
 		remaining -= (remainingHigh * highCurrency.getValue());
 		assert remaining <= 0;
 
@@ -141,6 +161,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
 				if (!highCurrency.getItemData().matches(itemStack)) continue;
+				itemStack = Unsafe.assertNonNull(itemStack);
 
 				// Second pass, or the ItemStack is a partial one:
 				int itemAmount = itemStack.getAmount();
@@ -172,7 +193,8 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		assert remaining < 0; // We have some change left
 		remaining = -remaining; // The change is now represented as positive value
 
-		// Add the remaining change into empty slots (all partial slots have already been cleared above):
+		// Add the remaining change into empty slots (all partial slots have already been cleared
+		// above):
 		// TODO This could probably be replaced with Utils.addItems
 		int maxStackSize = baseCurrency.getMaxStackSize();
 		for (int slot = 0; slot < contents.length; slot++) {

@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
@@ -25,7 +29,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKBookOffer implements BookOffer {
 
-	private final String bookTitle; // not null or empty
+	private final String bookTitle; // Not null or empty
 	private final int price; // > 0
 
 	public SKBookOffer(String bookTitle, int price) {
@@ -66,7 +70,7 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (!(obj instanceof SKBookOffer)) return false;
@@ -80,11 +84,11 @@ public class SKBookOffer implements BookOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	private static final Property<String> BOOK_TITLE = new BasicProperty<String>()
+	private static final Property<@NonNull String> BOOK_TITLE = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("book", StringSerializers.SCALAR)
 			.validator(StringValidators.NON_EMPTY)
 			.build();
-	private static final Property<Integer> PRICE = new BasicProperty<Integer>()
+	private static final Property<@NonNull Integer> PRICE = new BasicProperty<@NonNull Integer>()
 			.dataKeyAccessor("price", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.POSITIVE)
 			.build();
@@ -92,9 +96,9 @@ public class SKBookOffer implements BookOffer {
 	/**
 	 * A {@link DataSerializer} for values of type {@link BookOffer}.
 	 */
-	public static final DataSerializer<BookOffer> SERIALIZER = new DataSerializer<BookOffer>() {
+	public static final DataSerializer<@NonNull BookOffer> SERIALIZER = new DataSerializer<@NonNull BookOffer>() {
 		@Override
-		public Object serialize(BookOffer value) {
+		public @Nullable Object serialize(BookOffer value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerData = DataContainer.create();
 			offerData.set(BOOK_TITLE, value.getBookTitle());
@@ -120,9 +124,9 @@ public class SKBookOffer implements BookOffer {
 	 * <p>
 	 * All contained elements are expected to not be <code>null</code>.
 	 */
-	public static final DataSerializer<@ReadOnly List<? extends BookOffer>> LIST_SERIALIZER = new DataSerializer<List<? extends BookOffer>>() {
+	public static final DataSerializer<@NonNull List<? extends @NonNull BookOffer>> LIST_SERIALIZER = new DataSerializer<@NonNull List<? extends @NonNull BookOffer>>() {
 		@Override
-		public Object serialize(List<? extends BookOffer> value) {
+		public @Nullable Object serialize(@ReadOnly List<? extends @NonNull BookOffer> value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerListData = DataContainer.create();
 			int id = 1;
@@ -135,17 +139,20 @@ public class SKBookOffer implements BookOffer {
 		}
 
 		@Override
-		public List<? extends BookOffer> deserialize(Object data) throws InvalidDataException {
+		public List<? extends @NonNull BookOffer> deserialize(
+				Object data
+		) throws InvalidDataException {
 			DataContainer offerListData = DataContainerSerializers.DEFAULT.deserialize(data);
-			Set<String> keys = offerListData.getKeys();
-			List<BookOffer> offers = new ArrayList<>(keys.size());
+			Set<? extends @NonNull String> keys = offerListData.getKeys();
+			List<@NonNull BookOffer> offers = new ArrayList<>(keys.size());
 			for (String id : keys) {
-				Object offerData = offerListData.get(id);
+				Object offerData = Unsafe.assertNonNull(offerListData.get(id));
 				BookOffer offer;
 				try {
 					offer = SERIALIZER.deserialize(offerData);
 				} catch (InvalidDataException e) {
-					throw new InvalidDataException("Invalid book offer " + id + ": " + e.getMessage(), e);
+					throw new InvalidDataException("Invalid book offer " + id + ": "
+							+ e.getMessage(), e);
 				}
 				offers.add(offer);
 			}
@@ -153,7 +160,10 @@ public class SKBookOffer implements BookOffer {
 		}
 	};
 
-	public static void saveOffers(DataValue dataValue, List<? extends BookOffer> offers) {
+	public static void saveOffers(
+			DataValue dataValue,
+			@ReadOnly @Nullable List<? extends @NonNull BookOffer> offers
+	) {
 		Validate.notNull(dataValue, "dataValue is null");
 		if (offers == null) {
 			dataValue.clear();
@@ -164,30 +174,33 @@ public class SKBookOffer implements BookOffer {
 		dataValue.set(offerListData);
 	}
 
-	public static List<? extends BookOffer> loadOffers(DataValue dataValue) throws InvalidDataException {
+	public static List<? extends @NonNull BookOffer> loadOffers(
+			DataValue dataValue
+	) throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
-
-		if (!dataValue.isPresent()) {
+		Object offerListData = dataValue.get();
+		if (offerListData == null) {
 			// No data. -> Return an empty list of offers.
 			return Collections.emptyList();
 		}
-
-		Object offerListData = dataValue.get();
 		return LIST_SERIALIZER.deserialize(offerListData);
 	}
 
 	// Returns true if the data has changed due to migrations.
-	public static boolean migrateOffers(DataValue dataValue, String logPrefix) throws InvalidDataException {
+	public static boolean migrateOffers(
+			DataValue dataValue,
+			String logPrefix
+	) throws InvalidDataException {
 		Validate.notNull(logPrefix, "logPrefix is null");
 		// TODO Remove this migration again at some point (added in late MC 1.14.4).
-		List<? extends BookOffer> legacyOffers = loadLegacyOffers(dataValue);
+		List<? extends @NonNull BookOffer> legacyOffers = loadLegacyOffers(dataValue);
 		if (legacyOffers.isEmpty()) {
 			// Nothing to migrate.
 			return false;
 		}
 
-		// Assertion: We do not expect there to be a mix of legacy and non-legacy offers. We can therefore skip loading
-		// any non-legacy offers.
+		// Assertion: We do not expect there to be a mix of legacy and non-legacy offers. We can
+		// therefore skip loading any non-legacy offers.
 		// Write back the migrated offers:
 		saveOffers(dataValue, legacyOffers);
 		Log.info(logPrefix + "Migrated old book offers.");
@@ -195,20 +208,25 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	// Legacy format: bookTitle -> price mapping
-	private static List<? extends BookOffer> loadLegacyOffers(DataValue dataValue) throws InvalidDataException {
+	private static List<? extends @NonNull BookOffer> loadLegacyOffers(
+			DataValue dataValue
+	) throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
 		DataContainer offerListData = dataValue.getContainer();
 		if (offerListData == null) {
 			return Collections.emptyList();
 		}
 
-		List<BookOffer> offers = new ArrayList<>();
+		List<@NonNull BookOffer> offers = new ArrayList<>();
 		for (String bookTitle : offerListData.getKeys()) {
 			if (offerListData.isContainer(bookTitle)) {
-				// Found a container instead of an integer. -> We assume that the offers have already been migrated to
-				// the new data format, and therefore abort the loading of legacy book offers.
+				// Found a container instead of an integer. -> We assume that the offers have
+				// already been migrated to the new data format, and therefore abort the loading of
+				// legacy book offers.
 				if (!offers.isEmpty()) {
-					throw new InvalidDataException("Found a mix of legacy and non-legacy book offers!");
+					throw new InvalidDataException(
+							"Found a mix of legacy and non-legacy book offers!"
+					);
 				}
 				return Collections.emptyList(); // Abort
 			}

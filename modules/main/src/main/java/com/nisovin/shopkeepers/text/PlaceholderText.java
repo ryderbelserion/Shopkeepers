@@ -2,11 +2,15 @@ package com.nisovin.shopkeepers.text;
 
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
- * A {@link Text} that uses a dynamically set {@link #getPlaceholderArgument() placeholder argument} as its child.
+ * A {@link Text} that uses a dynamically set {@link #getPlaceholderArgument() placeholder argument}
+ * as its child.
  * <p>
  * If no placeholder argument is set this Text acts like a plain Text that consists of its
  * {@link #getFormattedPlaceholderKey() formatted placeholder key}.
@@ -20,7 +24,7 @@ public class PlaceholderText extends TextBuilder {
 
 	private final String placeholderKey; // Not null or empty
 	private final String formattedPlaceholderKey; // Not null or empty
-	private Text placeholderArgument = null; // Can be null, not unbuilt
+	private @Nullable Text placeholderArgument = null; // Can be null, not unbuilt
 
 	// Not intended for public use, use Text.placeholder(String) instead.
 	PlaceholderText(String placeholderKey) {
@@ -32,7 +36,9 @@ public class PlaceholderText extends TextBuilder {
 	// PLACEHOLDER
 
 	private UnsupportedOperationException unsupportedPlaceholderOperation() {
-		return new UnsupportedOperationException("This operation is not supported for placeholder Texts!");
+		return new UnsupportedOperationException(
+				"This operation is not supported for placeholder Texts!"
+		);
 	}
 
 	/**
@@ -56,12 +62,13 @@ public class PlaceholderText extends TextBuilder {
 	/**
 	 * Gets the argument {@link Text} that is currently assigned to this {@link PlaceholderText}.
 	 * <p>
-	 * This Text adopts all properties of the argument Text. If no placeholder argument is set this Text acts like a
-	 * plain Text that consists of its {@link #getFormattedPlaceholderKey() formatted placeholder key}.
+	 * This Text adopts all properties of the argument Text. If no placeholder argument is set this
+	 * Text acts like a plain Text that consists of its {@link #getFormattedPlaceholderKey()
+	 * formatted placeholder key}.
 	 * 
 	 * @return the argument Text, or <code>null</code> if no argument is set
 	 */
-	public Text getPlaceholderArgument() {
+	public @Nullable Text getPlaceholderArgument() {
 		return placeholderArgument;
 	}
 
@@ -77,30 +84,33 @@ public class PlaceholderText extends TextBuilder {
 	/**
 	 * Sets the argument {@link Text} that is currently assigned to this {@link PlaceholderText}.
 	 * <p>
-	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its {@link Object#toString()
-	 * String representation}. If the argument is a {@link Supplier} it will be invoked to obtain the actual argument.
+	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its
+	 * {@link Object#toString() String representation}. If the argument is a {@link Supplier} it
+	 * will be invoked to obtain the actual argument.
 	 * <p>
-	 * If the argument is a {@link Text} that has not yet been {@link TextBuilder#isBuilt() built}, this method may
-	 * build it.
+	 * If the argument is a {@link Text} that has not yet been {@link TextBuilder#isBuilt() built},
+	 * this method may build it.
 	 * 
 	 * @param placeholderArgument
 	 *            the argument Text, or <code>null</code> to unset the argument
 	 * @see #getPlaceholderArgument()
 	 */
-	public void setPlaceholderArgument(Object placeholderArgument) {
+	public void setPlaceholderArgument(@Nullable Object placeholderArgument) {
 		Text placeholderArgumentText = null;
 		if (placeholderArgument != null) {
-			Validate.isTrue(placeholderArgument != this, "placeholderArgument cannot be this Text itself");
+			Validate.isTrue(placeholderArgument != this,
+					"placeholderArgument cannot be this Text itself");
 			placeholderArgumentText = Text.of(placeholderArgument);
-			Validate.isTrue(placeholderArgumentText.getParent() == null, "placeholderArgument is a non-root Text");
+			Validate.isTrue(placeholderArgumentText.getParent() == null,
+					"placeholderArgument is a non-root Text");
 
 			// Build unbuilt argument:
 			buildIfRequired(placeholderArgumentText);
 
 			// TODO Set parent?
-			// Not setting the parent allows reusing the same placeholder argument Text instances more easily.
-			// Setting the parent would currently block the Text from being used as placeholder argument in more than
-			// one Text at once.
+			// Not setting the parent allows reusing the same placeholder argument Text instances
+			// more easily. Setting the parent would currently block the Text from being used as
+			// placeholder argument in more than one Text at once.
 		}
 		this.placeholderArgument = placeholderArgumentText; // Can be null
 	}
@@ -109,7 +119,8 @@ public class PlaceholderText extends TextBuilder {
 
 	@Override
 	public Text setPlaceholderArguments(MessageArguments arguments) {
-		// Temporarily clear placeholder argument (if any) to not delegate to it via child delegation:
+		// Temporarily clear placeholder argument (if any) to not delegate to it via child
+		// delegation:
 		Text prevArgument = this.getPlaceholderArgument();
 		this.setPlaceholderArgument(null);
 
@@ -144,12 +155,12 @@ public class PlaceholderText extends TextBuilder {
 	// CHILD
 
 	@Override
-	public Text getChild() {
+	public @Nullable Text getChild() {
 		return placeholderArgument; // Can be null
 	}
 
 	@Override
-	public <T extends Text> T child(T child) {
+	public <T extends @NonNull Text> T child(T child) {
 		throw unsupportedPlaceholderOperation();
 	}
 
@@ -158,7 +169,8 @@ public class PlaceholderText extends TextBuilder {
 	@Override
 	protected void appendPlainText(StringBuilder builder, boolean formatText) {
 		if (formatText || !this.hasPlaceholderArgument()) {
-			// Temporarily clear placeholder argument (if any) to not append it via child delegation:
+			// Temporarily clear placeholder argument (if any) to not append it via child
+			// delegation:
 			Text prevArgument = this.getPlaceholderArgument();
 			this.setPlaceholderArgument(null);
 
@@ -188,7 +200,8 @@ public class PlaceholderText extends TextBuilder {
 	}
 
 	/**
-	 * This will not copy the placeholder key. Any currently set placeholder argument gets (deeply) copied.
+	 * This will not copy the placeholder key. Any currently set placeholder argument gets (deeply)
+	 * copied.
 	 */
 	@Override
 	public PlaceholderText copy(Text sourceText, boolean copyChilds) {
@@ -206,7 +219,9 @@ public class PlaceholderText extends TextBuilder {
 		if (sourceText instanceof PlaceholderText) {
 			PlaceholderText placeholderSourceText = (PlaceholderText) sourceText;
 			Text placeholderArgument = placeholderSourceText.getPlaceholderArgument();
-			this.setPlaceholderArgument(placeholderArgument != null ? placeholderArgument.copy() : null);
+			this.setPlaceholderArgument(
+					placeholderArgument != null ? placeholderArgument.copy() : null
+			);
 		}
 	}
 

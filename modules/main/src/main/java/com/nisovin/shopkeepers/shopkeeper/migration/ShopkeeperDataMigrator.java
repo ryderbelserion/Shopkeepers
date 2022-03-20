@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.shopkeeper.migration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -18,13 +20,13 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 public final class ShopkeeperDataMigrator {
 
-	private static final List<Migration> migrations = new ArrayList<>();
+	private static final List<@NonNull Migration> migrations = new ArrayList<>();
 
 	/**
 	 * Registers the given {@link Migration}.
 	 * <p>
-	 * Each migration is expected to be registered only once, and then never unregistered again. The name of the
-	 * migration needs to be unique among all registered migrations.
+	 * Each migration is expected to be registered only once, and then never unregistered again. The
+	 * name of the migration needs to be unique among all registered migrations.
 	 * 
 	 * @param migration
 	 *            the migration, not <code>null</code>
@@ -57,10 +59,11 @@ public final class ShopkeeperDataMigrator {
 	/**
 	 * Applies migrations to the given shopkeeper data.
 	 * <p>
-	 * This operation does not check if the given data is complete or if all of it is valid: Some missing or invalid
-	 * data may be silently ignored, whereas invalid data that is relevant to the migration may cause the migration to
-	 * fail with an {@link InvalidDataException}. However, missing data should never result in the migration to fail,
-	 * but rather cause the affected migrations to be silently skipped.
+	 * This operation does not check if the given data is complete or if all of it is valid: Some
+	 * missing or invalid data may be silently ignored, whereas invalid data that is relevant to the
+	 * migration may cause the migration to fail with an {@link InvalidDataException}. However,
+	 * missing data should never result in the migration to fail, but rather cause the affected
+	 * migrations to be silently skipped.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -70,7 +73,10 @@ public final class ShopkeeperDataMigrator {
 	 * @throws InvalidDataException
 	 *             if the data is invalid and cannot be migrated
 	 */
-	public static boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+	public static boolean migrate(
+			ShopkeeperData shopkeeperData,
+			String logPrefix
+	) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		Validate.notNull(logPrefix, "logPrefix is null");
 		boolean migrated = false;
@@ -107,7 +113,11 @@ public final class ShopkeeperDataMigrator {
 		return migrated;
 	}
 
-	private static boolean migrate(MigrationPhase currentPhase, ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+	private static boolean migrate(
+			MigrationPhase currentPhase,
+			ShopkeeperData shopkeeperData,
+			String logPrefix
+	) throws InvalidDataException {
 		boolean migrated = false;
 		for (Migration migration : migrations) {
 			if (migration.getTargetPhase().isApplicable(currentPhase)) {
