@@ -67,11 +67,18 @@ To support the latest mappings version:
 	* Check the MerchantRecipe constructions in MerchantUtils.
 
 * If there are major differences, consider dropping support for older Minecraft versions.
-	* Remove corresponding modules.
+	* Remove the corresponding modules:
+		* Folders.
+		* Entries in root 'settings.gradle'.
+		* Entries in 'modules/dist/build.gradle'.
+		* CompatVersion entries in NMSManager class.
+		* Entries in 'scripts/installSpigotDependencies.sh' script.
 	* Update the minimal Bukkit/Spigot/CraftBukkit dependency versions inside the 'gradle/libs.versions.toml' file.
-	* Check for legacy data migrations which could be removed now.
-	* Check if there are new Bukkit features which can replace portions of the existing NMS specific code.
-	* Use the EntityType enum to get the name of default enabled mobs inside the Settings.
+	* Update the code base:
+		* Check for legacy data migrations that could be removed now.
+		* Check if there are new Bukkit features that can replace portions of the existing NMS specific code.
+		* Use the EntityType enum to get the name of default enabled mobs inside the Settings.
+		* Check for TODO notes that mention Bukkit version dependencies.
 
 ## On every update
 

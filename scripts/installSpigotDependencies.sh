@@ -20,10 +20,6 @@ buildSpigotIfMissing() {
 # The following versions require JDK 8 to build:
 source installJDK.sh 8
 
-buildSpigotIfMissing 1.14.4
-buildSpigotIfMissing 1.15.2
-buildSpigotIfMissing 1.16.1
-buildSpigotIfMissing 1.16.3
 buildSpigotIfMissing 1.16.5
 
 # The following versions require JDK 16 to build:

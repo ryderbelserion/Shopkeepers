@@ -1,4 +1,0 @@
-apply from: rootProject.file('modules/shared/nmsModule.gradle')
-
-craftbukkitVersion = '1.15.2-R0.1-SNAPSHOT'
-remapServerCode = false

@@ -32,7 +32,7 @@ public final class NMSManager {
 	// remapping.
 	static {
 		// Registered in the order from latest to oldest.
-		// Different CB evision:
+		// Different CB revision:
 		register(new CompatVersion("1_18_R2", "1.18.1", "20b026e774dbf715e40a0b2afe114792"));
 		register(new CompatVersion("1_18_R1", "1.18", "9e9fe6961a80f3e586c25601590b51ec"));
 		// Different CB revision:
@@ -40,12 +40,6 @@ public final class NMSManager {
 		register(new CompatVersion("1_17_R1", "1.17", "acd6e6c27e5a0a9440afba70a96c27c9"));
 		register(new CompatVersion("1_16_R3", "1.16.5", "d4b392244df170796f8779ef0fc1f2e9"));
 		register(new CompatVersion("1_16_R3", "1.16.5", "54e89c47309b53737f894f1bf1b0edbe"));
-		register(new CompatVersion("1_16_R3", "1.16.4", "da85101b34b252659e3ddf10c0c57cc9"));
-		register(new CompatVersion("1_16_R2", "1.16.3", "09f04031f41cb54f1077c6ac348cc220"));
-		register(new CompatVersion("1_16_R2", "1.16.2", "c2d5d7871edcc4fb0f81d18959c647af"));
-		register(new CompatVersion("1_16_R1", "1.16.1", "25afc67716a170ea965092c1067ff439"));
-		register(new CompatVersion("1_15_R1", "1.15.2", "5684afcc1835d966e1b6eb0ed3f72edb"));
-		register(new CompatVersion("1_14_R1", "1.14.4", "11ae498d9cf909730659b6357e7c2afa"));
 	}
 
 	public static @Nullable CompatVersion getCompatVersion(String compatVersion) {
