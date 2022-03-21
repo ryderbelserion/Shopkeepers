@@ -548,6 +548,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			// If the shopkeeper cannot be loaded, it is skipped and the loading continues with the
 			// remaining shopkeepers:
+			// Note: When a player shopkeeper cannot be loaded, its associated containers might no
+			// longer be protected. So this is potentially a severe issue that admins should
+			// immediately look into. However, we do not abort the enabling of the plugin if
+			// individual shopkeepers cannot be loaded, because this would disable the protection of
+			// all player shop containers on the server (which is even worse).
 			this.loadShopkeeper(key, forceSaveAllShopkeepers);
 		}
 		return true;
