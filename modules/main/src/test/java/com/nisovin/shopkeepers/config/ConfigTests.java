@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.config;
 
-import static com.nisovin.shopkeepers.testutil.matchers.IsDataFuzzyEqual.dataFuzzyEqualTo;
+import static com.nisovin.shopkeepers.testutil.matchers.IsDataFuzzyEqual.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +12,9 @@ import java.util.Set;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -20,9 +22,21 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.java.ClassUtils;
 
 public class ConfigTests extends AbstractBukkitTest {
+
+	@BeforeClass
+	public static void setup() {
+		// Our default config uses the plain text format:
+		ItemData.serializerPrefersPlainTextFormat(true);
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		ItemData.resetSerializerPrefersPlainTextFormat();
+	}
 
 	private DataContainer loadConfigFromResource(String resourcePath) {
 		InputStream configResource = ClassUtils.getResource(this.getClass(), resourcePath);

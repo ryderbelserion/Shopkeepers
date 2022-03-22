@@ -5,7 +5,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
@@ -16,6 +18,17 @@ import com.nisovin.shopkeepers.util.yaml.YamlUtils;
 // Note: We test the ItemStack deserialization through ItemData. Since ItemData is defined by its
 // stored ItemStack, this is sufficient to also test the deserialization of the ItemData itself.
 public class ItemDataTest extends AbstractItemStackSerializationTest {
+
+	@BeforeClass
+	public static void setup() {
+		// Our test cases use the plain text format:
+		ItemData.serializerPrefersPlainTextFormat(true);
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		ItemData.resetSerializerPrefersPlainTextFormat();
+	}
 
 	private static String yamlNewline() {
 		return YamlUtils.yamlNewline();

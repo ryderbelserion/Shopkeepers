@@ -99,6 +99,7 @@ Date format: (YYYY-MM-DD)
   * Fixed a nullness related issue in DataMatcher#Result: The left and right objects can each be null, but they cannot both be null.
   * DataAccessor has been split into two separate interfaces: DataSaver and DataLoader. This allows the use of different type parameter bounds for each interface.
   * There are some cases in which DataSerializer#serialize can return null, so we need to account for that. The internal documentation on that has been updated.
+* The ItemData serializer can now be configured to serialize the display name, lore, and loc name in the plain text format with color codes instead of Json. This is primarily used in test cases in which we need to compare the serializer output with item text data in the plain format.
 * Various other internal refactors and documentation changes.
 * Various code formatting changes.
 
