@@ -74,7 +74,9 @@ To support the latest mappings version:
 		* CompatVersion entries in NMSManager class.
 		* Entries in 'scripts/installSpigotDependencies.sh' script.
 	* Update the minimal Bukkit/Spigot/CraftBukkit dependency versions inside the 'gradle/libs.versions.toml' file.
-	* Update the code base:
+	* Update the 'api-version' inside the 'plugin.yml' file.
+	* Update the Minecraft version specific test code inside the 'main' module. The test cases and the default config might need to be updated (e.g. if there have been changes to Bukkit's item serialization).
+	* Update the code base (optional):
 		* Check for legacy data migrations that could be removed now.
 		* Check if there are new Bukkit features that can replace portions of the existing NMS specific code.
 		* Use the EntityType enum to get the name of default enabled mobs inside the Settings.

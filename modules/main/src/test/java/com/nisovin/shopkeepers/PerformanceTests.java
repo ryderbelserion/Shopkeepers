@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -22,8 +22,8 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MutableLong;
 import com.nisovin.shopkeepers.util.java.TimeUtils;
 
-import net.minecraft.server.v1_14_R1.GameProfileSerializer;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.GameProfileSerializer;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
 public class PerformanceTests extends AbstractBukkitTest {
 
@@ -296,7 +296,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				testCount,
 				() -> {
 					try {
-						net.minecraft.server.v1_14_R1.ItemStack nmsItem = Unsafe.cast(
+						net.minecraft.server.v1_16_R3.ItemStack nmsItem = Unsafe.cast(
 								craftItemStackHandleField.get(fullCraftItemStack)
 						);
 						if (nmsItem != null) {
@@ -314,7 +314,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							fullCraftItemStack
 					);
 					if (nmsItem != null) {
@@ -329,7 +329,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							fullItemStack
 					);
 					if (nmsItem != null) {
@@ -345,7 +345,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				testCount,
 				() -> {
 					try {
-						net.minecraft.server.v1_14_R1.ItemStack nmsItem = Unsafe.cast(
+						net.minecraft.server.v1_16_R3.ItemStack nmsItem = Unsafe.cast(
 								craftItemStackHandleField.get(basicCraftItemStack)
 						);
 						if (nmsItem != null) {
@@ -363,7 +363,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							basicCraftItemStack
 					);
 					if (nmsItem != null) {
@@ -378,7 +378,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							basicItemStack
 					);
 					if (nmsItem != null) {

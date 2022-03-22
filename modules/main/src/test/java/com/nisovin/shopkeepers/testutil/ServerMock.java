@@ -5,10 +5,10 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemFactory;
-import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_14_R1.util.Versioning;
+import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemFactory;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_16_R3.util.Versioning;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
