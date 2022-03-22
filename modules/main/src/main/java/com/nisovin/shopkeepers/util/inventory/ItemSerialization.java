@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util.inventory;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -26,6 +27,17 @@ public final class ItemSerialization {
 			return Unsafe.cast(itemMeta.serialize()); // Assert: Not null or empty
 		} else {
 			return null;
+		}
+	}
+
+	public static Map<? extends @NonNull String, @NonNull ?> serializeItemMetaOrEmpty(
+			@ReadOnly @Nullable ItemMeta itemMeta
+	) {
+		Map<? extends @NonNull String, @NonNull ?> serializedItemMeta = serializeItemMeta(itemMeta);
+		if (serializedItemMeta != null) {
+			return serializedItemMeta;
+		} else {
+			return Collections.<@NonNull String, @NonNull Object>emptyMap();
 		}
 	}
 

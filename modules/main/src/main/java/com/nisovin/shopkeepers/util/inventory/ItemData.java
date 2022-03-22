@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.util.inventory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -250,8 +249,9 @@ public final class ItemData {
 			@ReadOnly @Nullable List<? extends @NonNull String> lore
 	) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
-		this(UnmodifiableItemStack.ofNonNull(ItemUtils.createItemStack(
-				otherItemData, 1, displayName, lore)));
+		this(UnmodifiableItemStack.ofNonNull(
+				ItemUtils.createItemStack(otherItemData, 1, displayName, lore)
+		));
 	}
 
 	/**
@@ -299,11 +299,8 @@ public final class ItemData {
 		// Lazily cache the serialized data:
 		if (serializedMetaData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();
-			serializedMetaData = ItemSerialization.serializeItemMeta(itemMeta);
-			if (serializedMetaData == null) {
-				// Ensure that the field is not null after initialization:
-				serializedMetaData = Collections.<@NonNull String, @NonNull Object>emptyMap();
-			}
+			// Not null after initialization:
+			serializedMetaData = ItemSerialization.serializeItemMetaOrEmpty(itemMeta);
 		}
 		assert serializedMetaData != null;
 		return serializedMetaData;
