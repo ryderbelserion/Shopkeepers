@@ -90,11 +90,11 @@ public final class ItemData {
 			Map<? extends @NonNull String, @NonNull ?> serializedMetaData = value.getSerializedMetaData();
 			if (serializedMetaData.isEmpty()) {
 				// Use a more compact representation if there is no additional item data:
-				return value.dataItem.getType().name();
+				return value.getType().name();
 			}
 
 			DataContainer itemDataData = DataContainer.create();
-			itemDataData.set(ITEM_TYPE, value.dataItem.getType());
+			itemDataData.set(ITEM_TYPE, value.getType());
 
 			for (Entry<? extends @NonNull String, @NonNull ?> metaEntry : serializedMetaData.entrySet()) {
 				String metaKey = metaEntry.getKey();
@@ -107,7 +107,7 @@ public final class ItemData {
 				// Omit 'blockMaterial' for empty TILE_ENTITY item meta:
 				if (TILE_ENTITY_BLOCK_MATERIAL_KEY.equals(metaKey)) {
 					// Check if specific meta type only contains unspecific metadata:
-					ItemMeta specificItemMeta = Unsafe.assertNonNull(value.dataItem.getItemMeta());
+					ItemMeta specificItemMeta = Unsafe.assertNonNull(value.getItemMeta());
 					// TODO Relies on some material with unspecific item meta.
 					ItemMeta unspecificItemMeta = Bukkit.getItemFactory().asMetaFor(
 							specificItemMeta,
