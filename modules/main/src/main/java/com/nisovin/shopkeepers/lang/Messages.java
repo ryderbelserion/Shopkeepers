@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -469,110 +470,110 @@ public class Messages extends Config {
 			"Bottom rows: Cost items"
 	));
 
-	public static String sellingEmptyTradeResultItem = c("&dSell Item");
-	public static List<@NonNull String> sellingEmptyTradeResultItemLore = c(Arrays.asList(
+	public static String sellingShop_emptyTrade_resultItem = c("&dSell Item");
+	public static List<@NonNull String> sellingShop_emptyTrade_resultItemLore = c(Arrays.asList(
 			"The item you want to sell.",
 			"Add items to the shop container.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String sellingEmptyTradeItem1 = c("&dBuy Item");
-	public static List<@NonNull String> sellingEmptyTradeItem1Lore = c(Arrays.asList(
+	public static String sellingShop_emptyTrade_item1 = c("&dBuy Item");
+	public static List<@NonNull String> sellingShop_emptyTrade_item1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String sellingEmptyTradeItem2 = c("&dBuy Item 2");
-	public static List<@NonNull String> sellingEmptyTradeItem2Lore = c(Arrays.asList(
+	public static String sellingShop_emptyTrade_item2 = c("&dBuy Item 2");
+	public static List<@NonNull String> sellingShop_emptyTrade_item2Lore = c(Arrays.asList(
 			"The second item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String sellingEmptyItem1 = c("&dBuy Item");
-	public static List<@NonNull String> sellingEmptyItem1Lore = c(Arrays.asList(
+	public static String sellingShop_emptyItem1 = c("&dBuy Item");
+	public static List<@NonNull String> sellingShop_emptyItem1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String sellingEmptyItem2 = c("&dBuy Item 2");
-	public static List<@NonNull String> sellingEmptyItem2Lore = c(Arrays.asList(
+	public static String sellingShop_emptyItem2 = c("&dBuy Item 2");
+	public static List<@NonNull String> sellingShop_emptyItem2Lore = c(Arrays.asList(
 			"The second item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
 
-	public static String buyingEmptyTradeResultItem = c("&dSell Item");
-	public static List<@NonNull String> buyingEmptyTradeResultItemLore = c(Arrays.asList(
+	public static String buyingShop_emptyTrade_resultItem = c("&dSell Item");
+	public static List<@NonNull String> buyingShop_emptyTrade_resultItemLore = c(Arrays.asList(
 			"The item you want to sell.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String buyingEmptyTradeItem1 = c("&dBuy Item");
-	public static List<@NonNull String> buyingEmptyTradeItem1Lore = c(Arrays.asList(
+	public static String buyingShop_emptyTrade_item1 = c("&dBuy Item");
+	public static List<@NonNull String> buyingShop_emptyTrade_item1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Add items to the shop container.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String buyingEmptyResultItem = c("&dSell Item");
-	public static List<@NonNull String> buyingEmptyResultItemLore = c(Arrays.asList(
+	public static String buyingShop_emptyResultItem = c("&dSell Item");
+	public static List<@NonNull String> buyingShop_emptyResultItemLore = c(Arrays.asList(
 			"The item you want to sell.",
 			"Left/Right click to adjust the amount."
 	));
 
-	public static String tradingEmptyTradeResultItem = c("&dSell Item");
-	public static List<@NonNull String> tradingEmptyTradeResultItemLore = c(Arrays.asList(
+	public static String tradingShop_emptyTrade_resultItem = c("&dSell Item");
+	public static List<@NonNull String> tradingShop_emptyTrade_resultItemLore = c(Arrays.asList(
 			"The item you want to sell.",
 			"Add items to the shop container,",
 			"or place an item from your inventory.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String tradingEmptyTradeItem1 = c("&dBuy Item");
-	public static List<@NonNull String> tradingEmptyTradeItem1Lore = c(Arrays.asList(
+	public static String tradingShop_emptyTrade_item1 = c("&dBuy Item");
+	public static List<@NonNull String> tradingShop_emptyTrade_item1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Place an item from your inventory.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String tradingEmptyTradeItem2 = c("&dBuy Item 2");
-	public static List<@NonNull String> tradingEmptyTradeItem2Lore = c(Arrays.asList(
+	public static String tradingShop_emptyTrade_item2 = c("&dBuy Item 2");
+	public static List<@NonNull String> tradingShop_emptyTrade_item2Lore = c(Arrays.asList(
 			"The second item you want to buy.",
 			"Place an item from your inventory.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String tradingEmptyResultItem = c("&dSell Item");
-	public static List<@NonNull String> tradingEmptyResultItemLore = c(Arrays.asList(
+	public static String tradingShop_emptyResultItem = c("&dSell Item");
+	public static List<@NonNull String> tradingShop_emptyResultItemLore = c(Arrays.asList(
 			"The item you want to sell.",
 			"Place an item from your inventory.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String tradingEmptyItem1 = c("&dBuy Item");
-	public static List<@NonNull String> tradingEmptyItem1Lore = c(Arrays.asList(
+	public static String tradingShop_emptyItem1 = c("&dBuy Item");
+	public static List<@NonNull String> tradingShop_emptyItem1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Place an item from your inventory.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String tradingEmptyItem2 = c("&dBuy Item 2");
-	public static List<@NonNull String> tradingEmptyItem2Lore = c(Arrays.asList(
+	public static String tradingShop_emptyItem2 = c("&dBuy Item 2");
+	public static List<@NonNull String> tradingShop_emptyItem2Lore = c(Arrays.asList(
 			"The second item you want to buy.",
 			"Place an item from your inventory.",
 			"Left/Right click to adjust the amount."
 	));
 
-	public static String bookEmptyTradeResultItem = c("&dSell Item");
-	public static List<@NonNull String> bookEmptyTradeResultItemLore = c(Arrays.asList(
+	public static String bookShop_emptyTrade_resultItem = c("&dSell Item");
+	public static List<@NonNull String> bookShop_emptyTrade_resultItemLore = c(Arrays.asList(
 			"The item you want to sell.",
 			"Add written books to the shop container."
 	));
-	public static String bookEmptyTradeItem1 = c("&dBuy Item");
-	public static List<@NonNull String> bookEmptyTradeItem1Lore = c(Arrays.asList(
+	public static String bookShop_emptyTrade_item1 = c("&dBuy Item");
+	public static List<@NonNull String> bookShop_emptyTrade_item1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String bookEmptyTradeItem2 = c("&dBuy Item 2");
-	public static List<@NonNull String> bookEmptyTradeItem2Lore = c(Arrays.asList(
+	public static String bookShop_emptyTrade_item2 = c("&dBuy Item 2");
+	public static List<@NonNull String> bookShop_emptyTrade_item2Lore = c(Arrays.asList(
 			"The second item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String bookEmptyItem1 = c("&dBuy Item");
-	public static List<@NonNull String> bookEmptyItem1Lore = c(Arrays.asList(
+	public static String bookShop_emptyItem1 = c("&dBuy Item");
+	public static List<@NonNull String> bookShop_emptyItem1Lore = c(Arrays.asList(
 			"The item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
-	public static String bookEmptyItem2 = c("&dBuy Item 2");
-	public static List<@NonNull String> bookEmptyItem2Lore = c(Arrays.asList(
+	public static String bookShop_emptyItem2 = c("&dBuy Item 2");
+	public static List<@NonNull String> bookShop_emptyItem2Lore = c(Arrays.asList(
 			"The second item you want to buy.",
 			"Left/Right click to adjust the amount."
 	));
@@ -796,8 +797,14 @@ public class Messages extends Config {
 		} else {
 			Log.info("Loading language file: " + languageFile.getName());
 			try {
-				// Load language config:
-				DataStore languageConfig = BukkitConfigDataStore.ofNewYamlConfig();
+				// Load the language config:
+				// The language config uses a simple key-value format, but the keys may contain dots
+				// to indicate structure. In order to prevent Bukkit from interpreting (and loading)
+				// these dots as config sections, we replace Bukkit's default config path separator
+				// from dot to something else.
+				YamlConfiguration yamlConfig = new YamlConfiguration();
+				yamlConfig.options().pathSeparator(':');
+				DataStore languageConfig = BukkitConfigDataStore.of(yamlConfig);
 				languageConfig.load(languageFile);
 
 				// Load messages:

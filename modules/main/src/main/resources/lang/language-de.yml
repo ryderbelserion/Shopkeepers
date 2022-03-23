@@ -389,92 +389,92 @@ trade-setup-desc-book:
 - 'Obere Reihe: Verkaufte Bücher'
 - 'Untere Reihen: Kosten'
 
-selling-empty-trade-result-item: "&dVerkauf Gegenstand"
-selling-empty-trade-result-item-lore:
+selling-shop.empty-trade.result-item: "&dVerkauf Gegenstand"
+selling-shop.empty-trade.result-item-lore:
 - "Der Gegenstand den du verkaufen möchtest."
 - "Lege Gegenstände in den Behälter."
 - "Links-/Rechtsklick zum Ändern der Menge."
-selling-empty-trade-item1: "&dKauf Gegenstand"
-selling-empty-trade-item1-lore:
+selling-shop.empty-trade.item1: "&dKauf Gegenstand"
+selling-shop.empty-trade.item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-selling-empty-trade-item2: "&dKauf Gegenstand 2"
-selling-empty-trade-item2-lore:
+selling-shop.empty-trade.item2: "&dKauf Gegenstand 2"
+selling-shop.empty-trade.item2-lore:
 - "Der zweite Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-selling-empty-item1: "&dKauf Gegenstand"
-selling-empty-item1-lore:
+selling-shop.empty-item1: "&dKauf Gegenstand"
+selling-shop.empty-item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-selling-empty-item2: "&dKauf Gegenstand 2"
-selling-empty-item2-lore:
+selling-shop.empty-item2: "&dKauf Gegenstand 2"
+selling-shop.empty-item2-lore:
 - "Der zweite Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
 
-buying-empty-trade-result-item: "&dVerkauf Gegenstand"
-buying-empty-trade-result-item-lore:
+buying-shop.empty-trade.result-item: "&dVerkauf Gegenstand"
+buying-shop.empty-trade.result-item-lore:
 - "Der Gegenstand den du verkaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-buying-empty-trade-item1: "&dKauf Gegenstand"
-buying-empty-trade-item1-lore:
+buying-shop.empty-trade.item1: "&dKauf Gegenstand"
+buying-shop.empty-trade.item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Lege Gegenstände in den Behälter."
 - "Links-/Rechtsklick zum Ändern der Menge."
-buying-empty-result-item: "&dVerkauf Gegenstand"
-buying-empty-result-item-lore:
+buying-shop.empty-result-item: "&dVerkauf Gegenstand"
+buying-shop.empty-result-item-lore:
 - "Der Gegenstand den du verkaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
 
-trading-empty-trade-result-item: "&dVerkauf Gegenstand"
-trading-empty-trade-result-item-lore:
+trading-shop.empty-trade.result-item: "&dVerkauf Gegenstand"
+trading-shop.empty-trade.result-item-lore:
 - "Der Gegenstand den du verkaufen möchtest."
 - "Lege Gegenstände in den Behälter, oder"
 - "platziere einen Gegenstand aus deinem Inventar."
 - "Links-/Rechtsklick zum Ändern der Menge."
-trading-empty-trade-item1: "&dKauf Gegenstand"
-trading-empty-trade-item1-lore:
+trading-shop.empty-trade.item1: "&dKauf Gegenstand"
+trading-shop.empty-trade.item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Platziere einen Gegenstand aus deinem Inventar."
 - "Links-/Rechtsklick zum Ändern der Menge."
-trading-empty-trade-item2: "&dKauf Gegenstand 2"
-trading-empty-trade-item2-lore:
+trading-shop.empty-trade.item2: "&dKauf Gegenstand 2"
+trading-shop.empty-trade.item2-lore:
 - "Der zweite Gegenstand den du kaufen möchtest."
 - "Platziere einen Gegenstand aus deinem Inventar."
 - "Links-/Rechtsklick zum Ändern der Menge."
-trading-empty-result-item: "&dVerkauf Gegenstand"
-trading-empty-result-item-lore:
+trading-shop.empty-result-item: "&dVerkauf Gegenstand"
+trading-shop.empty-result-item-lore:
 - "Der Gegenstand den du verkaufen möchtest."
 - "Platziere einen Gegenstand aus deinem Inventar."
 - "Links-/Rechtsklick zum Ändern der Menge."
-trading-empty-item1: "&dBuy Item"
-trading-empty-item1-lore:
+trading-shop.empty-item1: "&dBuy Item"
+trading-shop.empty-item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Platziere einen Gegenstand aus deinem Inventar."
 - "Links-/Rechtsklick zum Ändern der Menge."
-trading-empty-item2: "&dKauf Gegenstand 2"
-trading-empty-item2-lore:
+trading-shop.empty-item2: "&dKauf Gegenstand 2"
+trading-shop.empty-item2-lore:
 - "Der zweite Gegenstand den du kaufen möchtest."
 - "Platziere einen Gegenstand aus deinem Inventar."
 - "Links-/Rechtsklick zum Ändern der Menge."
 
-book-empty-trade-result-item: "&dVerkauf Gegenstand"
-book-empty-trade-result-item-lore:
+book-shop.empty-trade.result-item: "&dVerkauf Gegenstand"
+book-shop.empty-trade.result-item-lore:
 - "Der Gegenstand den du verkaufen möchtest."
 - "Lege geschriebene Bücher in den Behälter."
-book-empty-trade-item1: "&dKauf Gegenstand"
-book-empty-trade-item1-lore:
+book-shop.empty-trade.item1: "&dKauf Gegenstand"
+book-shop.empty-trade.item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-book-empty-trade-item2: "&dKauf Gegenstand 2"
-book-empty-trade-item2-lore:
+book-shop.empty-trade.item2: "&dKauf Gegenstand 2"
+book-shop.empty-trade.item2-lore:
 - "Der zweite Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-book-empty-item1: "&dKauf Gegenstand"
-book-empty-item1-lore:
+book-shop.empty-item1: "&dKauf Gegenstand"
+book-shop.empty-item1-lore:
 - "Der Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
-book-empty-item2: "&dKauf Gegenstand 2"
-book-empty-item2-lore:
+book-shop.empty-item2: "&dKauf Gegenstand 2"
+book-shop.empty-item2-lore:
 - "Der zweite Gegenstand den du kaufen möchtest."
 - "Links-/Rechtsklick zum Ändern der Menge."
 

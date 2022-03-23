@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.config;
 
 import static com.nisovin.shopkeepers.testutil.matchers.IsDataFuzzyEqual.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.AfterClass;
@@ -39,8 +40,20 @@ public class ConfigTests extends AbstractBukkitTest {
 	}
 
 	private DataContainer loadConfigFromResource(String resourcePath) {
+		return loadConfigFromResource(resourcePath, '.');
+	}
+
+	private DataContainer loadConfigFromResource(String resourcePath, char configPathSeparator) {
 		InputStream configResource = ClassUtils.getResource(this.getClass(), resourcePath);
-		Configuration config = YamlConfiguration.loadConfiguration(new InputStreamReader(configResource));
+
+		YamlConfiguration config = new YamlConfiguration();
+		config.options().pathSeparator(configPathSeparator);
+		try {
+			config.load(new InputStreamReader(configResource));
+		} catch (IOException | InvalidConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+
 		// In order to be able to compare the contents of this loaded config with the data of an
 		// in-memory serialized config, we need to convert all config sections to Maps.
 		// Modifiable shallow copy:
@@ -103,7 +116,7 @@ public class ConfigTests extends AbstractBukkitTest {
 				"lang/language-de.yml"
 		};
 		for (String languageFilePath : languageFilePaths) {
-			DataContainer languageFile = this.loadConfigFromResource(languageFilePath);
+			DataContainer languageFile = this.loadConfigFromResource(languageFilePath, ':');
 			Set<? extends @NonNull String> actualKeysSet = languageFile.getKeys();
 			List<? extends @NonNull String> actualKeys = new ArrayList<>(actualKeysSet);
 

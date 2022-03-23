@@ -421,19 +421,19 @@ public class Settings extends Config {
 			sellingEmptyTrade = new TradingRecipeDraft(
 					ItemUtils.setDisplayNameAndLore(
 							sellingEmptyTradeResultItem.createItemStack(),
-							Messages.sellingEmptyTradeResultItem,
-							Messages.sellingEmptyTradeResultItemLore
+							Messages.sellingShop_emptyTrade_resultItem,
+							Messages.sellingShop_emptyTrade_resultItemLore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							sellingEmptyTradeItem1.createItemStack(),
-							Messages.sellingEmptyTradeItem1,
-							Messages.sellingEmptyTradeItem1Lore
+							Messages.sellingShop_emptyTrade_item1,
+							Messages.sellingShop_emptyTrade_item1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
 					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							sellingEmptyTradeItem2.createItemStack(),
-							Messages.sellingEmptyTradeItem2,
-							Messages.sellingEmptyTradeItem2Lore
+							Messages.sellingShop_emptyTrade_item2,
+							Messages.sellingShop_emptyTrade_item2Lore
 					) : sellingEmptyTradeItem2.createItemStack()
 			);
 			sellingEmptyTradeSlotItems = new TradingRecipeDraft(
@@ -442,26 +442,26 @@ public class Settings extends Config {
 					null,
 					ItemUtils.setDisplayNameAndLore(
 							sellingEmptyItem1.createItemStack(),
-							Messages.sellingEmptyItem1,
-							Messages.sellingEmptyItem1Lore
+							Messages.sellingShop_emptyItem1,
+							Messages.sellingShop_emptyItem1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
 					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							sellingEmptyItem2.createItemStack(),
-							Messages.sellingEmptyItem2,
-							Messages.sellingEmptyItem2Lore
+							Messages.sellingShop_emptyItem2,
+							Messages.sellingShop_emptyItem2Lore
 					) : sellingEmptyItem2.createItemStack()
 			);
 			buyingEmptyTrade = new TradingRecipeDraft(
 					ItemUtils.setDisplayNameAndLore(
 							buyingEmptyTradeResultItem.createItemStack(),
-							Messages.buyingEmptyTradeResultItem,
-							Messages.buyingEmptyTradeResultItemLore
+							Messages.buyingShop_emptyTrade_resultItem,
+							Messages.buyingShop_emptyTrade_resultItemLore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							buyingEmptyTradeItem1.createItemStack(),
-							Messages.buyingEmptyTradeItem1,
-							Messages.buyingEmptyTradeItem1Lore
+							Messages.buyingShop_emptyTrade_item1,
+							Messages.buyingShop_emptyTrade_item1Lore
 					),
 					// The editor item can be configured, even though this slot is not used for
 					// anything:
@@ -470,8 +470,8 @@ public class Settings extends Config {
 			buyingEmptyTradeSlotItems = new TradingRecipeDraft(
 					ItemUtils.setDisplayNameAndLore(
 							buyingEmptyResultItem.createItemStack(),
-							Messages.buyingEmptyResultItem,
-							Messages.buyingEmptyResultItemLore
+							Messages.buyingShop_emptyResultItem,
+							Messages.buyingShop_emptyResultItemLore
 					),
 					// This item is never used, because the slot is never empty for a non-empty
 					// trade:
@@ -483,53 +483,53 @@ public class Settings extends Config {
 			tradingEmptyTrade = new TradingRecipeDraft(
 					ItemUtils.setDisplayNameAndLore(
 							tradingEmptyTradeResultItem.createItemStack(),
-							Messages.tradingEmptyTradeResultItem,
-							Messages.tradingEmptyTradeResultItemLore
+							Messages.tradingShop_emptyTrade_resultItem,
+							Messages.tradingShop_emptyTrade_resultItemLore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							tradingEmptyTradeItem1.createItemStack(),
-							Messages.tradingEmptyTradeItem1,
-							Messages.tradingEmptyTradeItem1Lore
+							Messages.tradingShop_emptyTrade_item1,
+							Messages.tradingShop_emptyTrade_item1Lore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							tradingEmptyTradeItem2.createItemStack(),
-							Messages.tradingEmptyTradeItem2,
-							Messages.tradingEmptyTradeItem2Lore
+							Messages.tradingShop_emptyTrade_item2,
+							Messages.tradingShop_emptyTrade_item2Lore
 					)
 			);
 			tradingEmptyTradeSlotItems = new TradingRecipeDraft(
 					ItemUtils.setDisplayNameAndLore(
 							tradingEmptyResultItem.createItemStack(),
-							Messages.tradingEmptyResultItem,
-							Messages.tradingEmptyResultItemLore
+							Messages.tradingShop_emptyResultItem,
+							Messages.tradingShop_emptyResultItemLore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							tradingEmptyItem1.createItemStack(),
-							Messages.tradingEmptyItem1,
-							Messages.tradingEmptyItem1Lore
+							Messages.tradingShop_emptyItem1,
+							Messages.tradingShop_emptyItem1Lore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							tradingEmptyItem2.createItemStack(),
-							Messages.tradingEmptyItem2,
-							Messages.tradingEmptyItem2Lore
+							Messages.tradingShop_emptyItem2,
+							Messages.tradingShop_emptyItem2Lore
 					)
 			);
 			bookEmptyTrade = new TradingRecipeDraft(
 					ItemUtils.setDisplayNameAndLore(
 							bookEmptyTradeResultItem.createItemStack(),
-							Messages.bookEmptyTradeResultItem,
-							Messages.bookEmptyTradeResultItemLore
+							Messages.bookShop_emptyTrade_resultItem,
+							Messages.bookShop_emptyTrade_resultItemLore
 					),
 					ItemUtils.setDisplayNameAndLore(
 							bookEmptyTradeItem1.createItemStack(),
-							Messages.bookEmptyTradeItem1,
-							Messages.bookEmptyTradeItem1Lore
+							Messages.bookShop_emptyTrade_item1,
+							Messages.bookShop_emptyTrade_item1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
 					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							bookEmptyTradeItem2.createItemStack(),
-							Messages.bookEmptyTradeItem2,
-							Messages.bookEmptyTradeItem2Lore
+							Messages.bookShop_emptyTrade_item2,
+							Messages.bookShop_emptyTrade_item2Lore
 					) : bookEmptyTradeItem2.createItemStack()
 			);
 			bookEmptyTradeSlotItems = new TradingRecipeDraft(
@@ -538,14 +538,14 @@ public class Settings extends Config {
 					null,
 					ItemUtils.setDisplayNameAndLore(
 							bookEmptyItem1.createItemStack(),
-							Messages.bookEmptyItem1,
-							Messages.bookEmptyItem1Lore
+							Messages.bookShop_emptyItem1,
+							Messages.bookShop_emptyItem1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
 					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							bookEmptyItem2.createItemStack(),
-							Messages.bookEmptyItem2,
-							Messages.bookEmptyItem2Lore
+							Messages.bookShop_emptyItem2,
+							Messages.bookShop_emptyItem2Lore
 					) : bookEmptyItem2.createItemStack()
 			);
 

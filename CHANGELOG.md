@@ -84,7 +84,6 @@ Date format: (YYYY-MM-DD)
   * Internal API: Various other internal changes that might also affect the internal API of shopkeepers and shop objects.
 * Internal API: Added the ability to attach external 'components' to shopkeepers, which can provide additional state and/or functionality related to a particular shopkeeper.
 * Refactors and preparations to support more than two currency items.
-* Minor internal command library refactors.
 * Reduced the frequency with which we check for remaining async tasks during plugin shutdown.
 * Added nullness annotations and the Checker Framework.
   * In order to also satisfy the Eclipse null annotation checker all packages have been annotated with a custom NonNullByDefault annotation, and the use of some Checker Framework specific features has been avoided.
@@ -100,6 +99,8 @@ Date format: (YYYY-MM-DD)
   * DataAccessor has been split into two separate interfaces: DataSaver and DataLoader. This allows the use of different type parameter bounds for each interface.
   * There are some cases in which DataSerializer#serialize can return null, so we need to account for that. The internal documentation on that has been updated.
 * The ItemData serializer can now be configured to serialize the display name, lore, and loc name in the plain text format with color codes instead of Json. This is primarily used in test cases in which we need to compare the serializer output with item text data in the plain format.
+* Message keys inside the language files may now use dots to indicate structure.
+* Minor command library refactors.
 * Various other internal refactors and documentation changes.
 * Various code formatting changes.
 
@@ -125,44 +126,44 @@ Date format: (YYYY-MM-DD)
 * Added `must-hold-item-in-main-hand`.
 * Added `currency-item-set-to-main-hand-item`.
 * Added `command-description-set-currency`.
-* Added `selling-empty-trade-result-item`.
-* Added `selling-empty-trade-result-item-lore`.
-* Added `selling-empty-trade-item1`.
-* Added `selling-empty-trade-item1-lore`.
-* Added `selling-empty-trade-item2`.
-* Added `selling-empty-trade-item2-lore`.
-* Added `selling-empty-item1`.
-* Added `selling-empty-item1-lore`.
-* Added `selling-empty-item2`.
-* Added `selling-empty-item2-lore`.
-* Added `buying-empty-trade-result-item`.
-* Added `buying-empty-trade-result-item-lore`.
-* Added `buying-empty-trade-item1`.
-* Added `buying-empty-trade-item1-lore`.
-* Added `buying-empty-result-item`.
-* Added `buying-empty-result-item-lore`.
-* Added `trading-empty-trade-result-item`.
-* Added `trading-empty-trade-result-item-lore`.
-* Added `trading-empty-trade-item1`.
-* Added `trading-empty-trade-item1-lore`.
-* Added `trading-empty-trade-item2`.
-* Added `trading-empty-trade-item2-lore`.
-* Added `trading-empty-result-item`.
-* Added `trading-empty-result-item-lore`.
-* Added `trading-empty-item1`.
-* Added `trading-empty-item1-lore`.
-* Added `trading-empty-item2`.
-* Added `trading-empty-item2-lore`.
-* Added `book-empty-trade-result-item`.
-* Added `book-empty-trade-result-item-lore`.
-* Added `book-empty-trade-item1`.
-* Added `book-empty-trade-item1-lore`.
-* Added `book-empty-trade-item2`.
-* Added `book-empty-trade-item2-lore`.
-* Added `book-empty-item1`.
-* Added `book-empty-item1-lore`.
-* Added `book-empty-item2`.
-* Added `book-empty-item2-lore`.
+* Added `selling-shop.empty-trade.result-item`.
+* Added `selling-shop.empty-trade.result-item-lore`.
+* Added `selling-shop.empty-trade.item1`.
+* Added `selling-shop.empty-trade.item1-lore`.
+* Added `selling-shop.empty-trade.item2`.
+* Added `selling-shop.empty-trade.item2-lore`.
+* Added `selling-shop.empty-item1`.
+* Added `selling-shop.empty-item1-lore`.
+* Added `selling-shop.empty-item2`.
+* Added `selling-shop.empty-item2-lore`.
+* Added `buying-shop.empty-trade.result-item`.
+* Added `buying-shop.empty-trade.result-item-lore`.
+* Added `buying-shop.empty-trade.item1`.
+* Added `buying-shop.empty-trade.item1-lore`.
+* Added `buying-shop.empty-result-item`.
+* Added `buying-shop.empty-result-item-lore`.
+* Added `trading-shop.empty-trade.result-item`.
+* Added `trading-shop.empty-trade.result-item-lore`.
+* Added `trading-shop.empty-trade.item1`.
+* Added `trading-shop.empty-trade.item1-lore`.
+* Added `trading-shop.empty-trade.item2`.
+* Added `trading-shop.empty-trade.item2-lore`.
+* Added `trading-shop.empty-result-item`.
+* Added `trading-shop.empty-result-item-lore`.
+* Added `trading-shop.empty-item1`.
+* Added `trading-shop.empty-item1-lore`.
+* Added `trading-shop.empty-item2`.
+* Added `trading-shop.empty-item2-lore`.
+* Added `book-shop.empty-trade.result-item`.
+* Added `book-shop.empty-trade.result-item-lore`.
+* Added `book-shop.empty-trade.item1`.
+* Added `book-shop.empty-trade.item1-lore`.
+* Added `book-shop.empty-trade.item2`.
+* Added `book-shop.empty-trade.item2-lore`.
+* Added `book-shop.empty-item1`.
+* Added `book-shop.empty-item1-lore`.
+* Added `book-shop.empty-item2`.
+* Added `book-shop.empty-item2-lore`.
 * Added `unknown-currency`.
 
 ## v2.14.0 (2021-12-17)

@@ -21,6 +21,8 @@ public final class ConfigHelper {
 	 * <li>Digits are treated like any other lowercase characters and not separated into different
 	 * words.
 	 * <li>All characters are converted to lowercase.
+	 * <li>Single underscores are converted to dots, whereas double underscores are converted to
+	 * single underscores.
 	 * </ul>
 	 * <p>
 	 * Examples:
@@ -31,14 +33,20 @@ public final class ConfigHelper {
 	 * <li>"textLine1" -> "text-line1"
 	 * <li>"1apple" -> "1apple"
 	 * <li>"aBc1De2" -> "a-bc1-de2"
+	 * <li>"someCategory_someValue" -> "some-category.some-value"
+	 * <li>"someCategory__someValue" -> "some-category_some-value"
 	 * </ul>
 	 * 
 	 * @param fieldName
-	 *            the field name
-	 * @return the config key
+	 *            the field name, not <code>null</code>
+	 * @return the config key, not <code>null</code>
 	 */
 	public static String toConfigKey(String fieldName) {
-		return CONFIG_KEY_PATTERN.matcher(fieldName).replaceAll("-$1").toLowerCase(Locale.ROOT);
+		String configKey = CONFIG_KEY_PATTERN.matcher(fieldName).replaceAll("-$1");
+		configKey = configKey.toLowerCase(Locale.ROOT);
+		configKey = configKey.replace('_', '.');
+		configKey = configKey.replace("..", "_");
+		return configKey;
 	}
 
 	private ConfigHelper() {
