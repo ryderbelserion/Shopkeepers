@@ -3,9 +3,7 @@ package com.nisovin.shopkeepers.util.data.persistence.bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.data.container.ConfigBasedDataContainer;
 import com.nisovin.shopkeepers.util.data.persistence.DataStore;
@@ -23,12 +21,10 @@ public class BukkitConfigDataStore extends ConfigBasedDataContainer implements D
 	 * {@link FileConfiguration} to store, save, and load the data.
 	 * 
 	 * @param bukkitConfig
-	 *            the Bukkit configuration, can be <code>null</code>
-	 * @return the data store, or <code>null</code> if the given Bukkit configuration is
-	 *         <code>null</code>
+	 *            the Bukkit configuration, not <code>null</code>
+	 * @return the data store, not <code>null</code>
 	 */
-	public static @Nullable BukkitConfigDataStore of(@Nullable FileConfiguration bukkitConfig) {
-		if (bukkitConfig == null) return null;
+	public static BukkitConfigDataStore of(FileConfiguration bukkitConfig) {
 		return new BukkitConfigDataStore(bukkitConfig);
 	}
 
@@ -39,7 +35,7 @@ public class BukkitConfigDataStore extends ConfigBasedDataContainer implements D
 	 * @return the data store, not <code>null</code>
 	 */
 	public static BukkitConfigDataStore ofNewYamlConfig() {
-		return Unsafe.assertNonNull(of(new YamlConfiguration()));
+		return of(new YamlConfiguration());
 	}
 
 	/////
