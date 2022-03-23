@@ -368,6 +368,7 @@ public final class StringUtils {
 		return ARGUMENTS_REPLACER.replaceArguments(source, arguments); // Checks arguments
 	}
 
+	// Creates and returns a new List:
 	public static List<@NonNull String> replaceArguments(
 			Collection<? extends @NonNull String> messages,
 			@NonNull Object... argumentPairs
@@ -383,8 +384,16 @@ public final class StringUtils {
 
 	// Creates and returns a new List:
 	public static List<@NonNull String> replaceArguments(
-			Collection<@NonNull String> sources,
+			Collection<? extends @NonNull String> sources,
 			Map<? extends @NonNull String, @NonNull ?> arguments
+	) {
+		return replaceArguments(sources, MessageArguments.ofMap(arguments));
+	}
+
+	// Creates and returns a new List:
+	public static List<@NonNull String> replaceArguments(
+			Collection<? extends @NonNull String> sources,
+			MessageArguments arguments
 	) {
 		Validate.notNull(sources, "sources is null");
 		List<@NonNull String> replaced = new ArrayList<>(sources.size());
