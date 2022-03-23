@@ -142,7 +142,8 @@ public final class ClassUtils {
 					Class.forName(className);
 				} catch (LinkageError | ClassNotFoundException e) {
 					// ClassNotFoundException: Not expected here.
-					// LinkageError: If some class dependency could not be found.
+					// LinkageError: If some class dependency could not be found, or if some static
+					// class initialization code fails.
 					logger.log(Level.WARNING, "Could not load class '" + className
 							+ "' from jar file '" + jarFile.getPath() + "'.", e);
 					// Continue loading any other remaining classes.

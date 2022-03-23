@@ -16,17 +16,6 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class SKUser implements User {
 
-	/**
-	 * A {@link User} with nil UUID and undefined name.
-	 * <p>
-	 * The name of this user is not guaranteed to remain constant across plugin versions, so do not
-	 * depend on it always matching its current value.
-	 * <p>
-	 * This can for example be used as an alternative non-<code>null</code> representation of an
-	 * unset, unknown, or missing User.
-	 */
-	public static final User EMPTY = of(new UUID(0L, 0L), "[unset]");
-
 	private static final Map<@NonNull UUID, @NonNull User> cache = new LRUCache<>(100);
 
 	/**
@@ -53,6 +42,17 @@ public final class SKUser implements User {
 		assert user != null;
 		return user;
 	}
+
+	/**
+	 * A {@link User} with nil UUID and undefined name.
+	 * <p>
+	 * The name of this user is not guaranteed to remain constant across plugin versions, so do not
+	 * depend on it always matching its current value.
+	 * <p>
+	 * This can for example be used as an alternative non-<code>null</code> representation of an
+	 * unset, unknown, or missing User.
+	 */
+	public static final User EMPTY = of(new UUID(0L, 0L), "[unset]");
 
 	/////
 
