@@ -45,6 +45,11 @@ public class TradeNotifications implements Listener {
 	private static class TradeContext {
 
 		private final MergedTrades mergedTrades;
+		// Note: The TradeContext is not kept around, but created and processed immediately when we
+		// handle a completed set of merged trades. Changes to the shopkeeper's state or the
+		// settings (e.g. the currency items) are therefore not expected to occur while this
+		// TradeContext is in use, and can therefore not affect the outcome of these lazily
+		// calculated properties.
 		private final Lazy<@NonNull MessageArguments> shopMessageArguments;
 		private final Lazy<@NonNull Map<@NonNull String, @NonNull Object>> tradeMessageArguments;
 		private final Lazy<@NonNull Boolean> isResultItemCurrency;

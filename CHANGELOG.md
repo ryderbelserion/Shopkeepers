@@ -4,6 +4,8 @@ Date format: (YYYY-MM-DD)
 ## v2.15.2 (TBA)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+* Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
+
 **Debugging changes:**
 * We log now when we unexpectedly encounter invalid currency items in the editors of the selling, buying, or book shopkeepers.
 
