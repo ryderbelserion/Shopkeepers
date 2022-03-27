@@ -35,6 +35,17 @@ class ChunkActivationListener implements Listener {
 		this.chunkActivator = chunkActivator;
 	}
 
+	// TODO: Use Bukkit's EntitiesLoadEvent to trigger shopkeeper activation (spawning) once we only
+	// support late versions of 1.17?
+	// We defer the shopkeeper spawning anyway, so we could defer it a bit longer.
+	// This would also resolve the issue of entities spawned after chunk loading but before
+	// EntitiesLoadEvent reporting to be 'invalid' (this could also be fixed in Spigot though).
+	// However, we would need to account for the fact that if the chunk is quickly unloaded again,
+	// we may receive a ChunkUnloadEvent and the chunk may already report as unloaded again before
+	// we receive the corresponding EntitiesLoadEvent and EntitiesUnloadEvent. It is unclear how
+	// well chunk modifications (e.g. despawning of shopkeeper blocks and entities) are still
+	// support at this point. We could however use the EntitiesLoadEvent in combination with the
+	// ChunkUnloadEvent.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onChunkLoad(ChunkLoadEvent event) {
 		Chunk chunk = event.getChunk();
