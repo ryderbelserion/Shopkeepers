@@ -105,9 +105,10 @@ To support the latest mappings version:
 
 * Update the project pages, if required: dev.bukkit.org, spigotmc.org
 
-* Update translations repository, if there have been message changes:
-	* Add a new folder for the new version.
-	* Copy the default language files into it.
+* If there have been message changes, update the language files repository:
+	* Add a new branch for the new version.
+	* Update the contents of the default language files, and delete all other language files that are now outdated.
+	* Change the default branch of the repository online.
 
 ## Upload:
 
