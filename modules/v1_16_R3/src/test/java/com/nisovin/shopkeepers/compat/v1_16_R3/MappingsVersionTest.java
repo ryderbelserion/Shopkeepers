@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.compat.v1_16_R3;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.junit.Test;
@@ -15,6 +15,9 @@ public class MappingsVersionTest {
 		CompatVersion compatVersion = nmsHandler.getCompatVersion();
 		String expectedMappingsVersion = compatVersion.getMappingsVersion();
 		String actualMappingsVersion = ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion();
-		assertEquals("Unexpected mappings version!", expectedMappingsVersion, actualMappingsVersion);
+		assertEquals("Unexpected mappings version!",
+				expectedMappingsVersion,
+				actualMappingsVersion
+		);
 	}
 }

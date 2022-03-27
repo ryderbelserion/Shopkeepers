@@ -72,7 +72,8 @@ public final class NMSHandler implements NMSCallProvider {
 			net.minecraft.world.entity.Mob mcMob = ((CraftMob) entity).getHandle();
 
 			// Make the goal selector items accessible:
-			Field activeGoalsField = GoalSelector.class.getDeclaredField("c"); // lockedFlags (Active goals)
+			// lockedFlags (Active goals)
+			Field activeGoalsField = GoalSelector.class.getDeclaredField("c");
 			activeGoalsField.setAccessible(true);
 
 			// Overwrite the goal selector: Clear old goals
@@ -84,7 +85,15 @@ public final class NMSHandler implements NMSCallProvider {
 			goalSelector.removeAllGoals();
 
 			// Add new goals:
-			goalSelector.addGoal(0, new LookAtPlayerGoal(mcMob, net.minecraft.world.entity.player.Player.class, LivingEntityAI.LOOK_RANGE, 1.0F));
+			goalSelector.addGoal(
+					0,
+					new LookAtPlayerGoal(
+							mcMob,
+							net.minecraft.world.entity.player.Player.class,
+							LivingEntityAI.LOOK_RANGE,
+							1.0F
+					)
+			);
 
 			// Overwrite the target selector:
 			GoalSelector targetSelector = mcMob.targetSelector;
@@ -110,21 +119,26 @@ public final class NMSHandler implements NMSCallProvider {
 		for (int i = 0; i < ticks; ++i) {
 			mcMob.goalSelector.tick();
 			if (!mcMob.getLookControl().isLookingAtTarget()) {
-				// If there is no target to look at, the entity rotates towards its current body rotation.
-				// We reset the entity's body rotation here to the initial yaw it was spawned with, causing it to rotate
-				// back towards this initial direction whenever it has no target to look at anymore.
-				// This rotating back towards its initial orientation only works if the entity is still ticked: Since we
-				// only tick shopkeeper mobs near players, the entity may remain in its previous rotation whenever the
-				// last nearby player teleports away, until the ticking resumes when a player comes close again.
+				// If there is no target to look at, the entity rotates towards its current body
+				// rotation.
+				// We reset the entity's body rotation here to the initial yaw it was spawned with,
+				// causing it to rotate back towards this initial direction whenever it has no
+				// target to look at anymore.
+				// This rotating back towards its initial orientation only works if the entity is
+				// still ticked: Since we only tick shopkeeper mobs near players, the entity may
+				// remain in its previous rotation whenever the last nearby player teleports away,
+				// until the ticking resumes when a player comes close again.
 
-				// Setting the body rotation also ensures that it initially matches the entity's intended yaw, because
-				// CraftBukkit itself does not automatically set the body rotation when spawning the entity (only its
-				// yRot and head rotation are set). Omitting this would therefore cause the entity to initially rotate
-				// towards some random direction if it is being ticked and has no target to look at.
+				// Setting the body rotation also ensures that it initially matches the entity's
+				// intended yaw, because CraftBukkit itself does not automatically set the body
+				// rotation when spawning the entity (only its yRot and head rotation are set).
+				// Omitting this would therefore cause the entity to initially rotate towards some
+				// random direction if it is being ticked and has no target to look at.
 				mcMob.setYBodyRot(mcMob.getYRot());
 			}
 			// Tick the look controller:
-			// This makes the entity's head (and indirectly also its body) rotate towards the current target.
+			// This makes the entity's head (and indirectly also its body) rotate towards the
+			// current target.
 			mcMob.getLookControl().tick();
 		}
 		mcMob.getSensing().tick(); // Clear the sensing cache
@@ -163,8 +177,8 @@ public final class NMSHandler implements NMSCallProvider {
 		wanderingTrader.setDespawnDelay(despawnDelay);
 	}
 
-	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without making a copy of it.
-	// Otherwise, this falls back to using CraftItemStack#asNMSCopy.
+	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without
+	// making a copy of it. Otherwise, this falls back to using CraftItemStack#asNMSCopy.
 	private net.minecraft.world.item.ItemStack asNMSItemStack(ItemStack itemStack) {
 		assert itemStack != null;
 		if (itemStack instanceof CraftItemStack) {
@@ -210,7 +224,8 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.world.item.trading.Merchant nmsMerchant;
 		boolean regularVillager = false;
 		boolean canRestock = false;
-		// Note: When using the 'is-regular-villager'-flag, using level 0 allows hiding the level name suffix.
+		// Note: When using the 'is-regular-villager'-flag, using level 0 allows hiding the level
+		// name suffix.
 		int merchantLevel = 1;
 		int merchantExperience = 0;
 		if (merchant instanceof Villager) {
@@ -227,11 +242,14 @@ public final class NMSHandler implements NMSCallProvider {
 			merchantLevel = 0; // Hide name suffix
 		}
 		MerchantOffers merchantRecipeList = nmsMerchant.getOffers();
-		if (merchantRecipeList == null) merchantRecipeList = new MerchantOffers(); // Just in case
+		if (merchantRecipeList == null) {
+			// Just in case:
+			merchantRecipeList = new MerchantOffers();
+		}
 
-		// Send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
-		// Master), merchant total experience, is-regular-villager flag (false: hides some gui elements), can-restock
-		// flag (false: hides restock message if out of stock)
+		// Send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1:
+		// Novice, .., 5: Master), merchant total experience, is-regular-villager flag (false: hides
+		// some gui elements), can-restock flag (false: hides restock message if out of stock)
 		ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
 		nmsPlayer.sendMerchantOffers(
 				nmsPlayer.containerMenu.containerId,
@@ -268,7 +286,11 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String cycleAxolotlVariant(String variantName, boolean backwards) {
-		return EnumUtils.cycleEnumConstant(Axolotl.Variant.class, Axolotl.Variant.valueOf(variantName), backwards).name();
+		return EnumUtils.cycleEnumConstant(
+				Axolotl.Variant.class,
+				Axolotl.Variant.valueOf(variantName),
+				backwards
+		).name();
 	}
 
 	@Override

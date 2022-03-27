@@ -87,7 +87,15 @@ public final class NMSHandler implements NMSCallProvider {
 			goals_d.clear();
 
 			// Add new goals:
-			goals.a(0, new PathfinderGoalLookAtPlayer(mcInsentientEntity, EntityHuman.class, LivingEntityAI.LOOK_RANGE, 1.0F));
+			goals.a(
+					0,
+					new PathfinderGoalLookAtPlayer(
+							mcInsentientEntity,
+							EntityHuman.class,
+							LivingEntityAI.LOOK_RANGE,
+							1.0F
+					)
+			);
 
 			// Overwrite the target selector:
 			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
@@ -116,21 +124,26 @@ public final class NMSHandler implements NMSCallProvider {
 		for (int i = 0; i < ticks; ++i) {
 			mcMob.goalSelector.doTick();
 			if (!mcMob.getControllerLook().c()) { // isHasWanted
-				// If there is no target to look at, the entity rotates towards its current body rotation.
-				// We reset the entity's body rotation here to the initial yaw it was spawned with, causing it to rotate
-				// back towards this initial direction whenever it has no target to look at anymore.
-				// This rotating back towards its initial orientation only works if the entity is still ticked: Since we
-				// only tick shopkeeper mobs near players, the entity may remain in its previous rotation whenever the
-				// last nearby player teleports away, until the ticking resumes when a player comes close again.
+				// If there is no target to look at, the entity rotates towards its current body
+				// rotation.
+				// We reset the entity's body rotation here to the initial yaw it was spawned with,
+				// causing it to rotate back towards this initial direction whenever it has no
+				// target to look at anymore.
+				// This rotating back towards its initial orientation only works if the entity is
+				// still ticked: Since we only tick shopkeeper mobs near players, the entity may
+				// remain in its previous rotation whenever the last nearby player teleports away,
+				// until the ticking resumes when a player comes close again.
 
-				// Setting the body rotation also ensures that it initially matches the entity's intended yaw, because
-				// CraftBukkit itself does not automatically set the body rotation when spawning the entity (only its
-				// yRot and head rotation are set). Omitting this would therefore cause the entity to initially rotate
-				// towards some random direction if it is being ticked and has no target to look at.
+				// Setting the body rotation also ensures that it initially matches the entity's
+				// intended yaw, because CraftBukkit itself does not automatically set the body
+				// rotation when spawning the entity (only its yRot and head rotation are set).
+				// Omitting this would therefore cause the entity to initially rotate towards some
+				// random direction if it is being ticked and has no target to look at.
 				mcMob.n(mcMob.yaw); // setYBodyRot
 			}
 			// Tick the look controller:
-			// This makes the entity's head (and indirectly also its body) rotate towards the current target.
+			// This makes the entity's head (and indirectly also its body) rotate towards the
+			// current target.
 			mcMob.getControllerLook().a();
 		}
 		mcMob.getEntitySenses().a(); // Clear the sensing cache
@@ -170,13 +183,14 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
-		// This API method is not yet available in Bukkit 1.16.4, or in early versions of Bukkit 1.16.5:
+		// This API method is not yet available in Bukkit 1.16.4, or in early versions of Bukkit
+		// 1.16.5:
 		// wanderingTrader.setDespawnDelay(despawnDelay);
 		((CraftWanderingTrader) wanderingTrader).getHandle().u(despawnDelay);
 	}
 
-	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without making a copy of it.
-	// Otherwise, this falls back to using CraftItemStack#asNMSCopy.
+	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without
+	// making a copy of it. Otherwise, this falls back to using CraftItemStack#asNMSCopy.
 	private net.minecraft.server.v1_16_R3.ItemStack asNMSItemStack(ItemStack itemStack) {
 		assert itemStack != null;
 		if (itemStack instanceof CraftItemStack) {
@@ -222,7 +236,8 @@ public final class NMSHandler implements NMSCallProvider {
 		IMerchant nmsMerchant;
 		boolean regularVillager = false;
 		boolean canRestock = false;
-		// Note: When using the 'is-regular-villager'-flag, using level 0 allows hiding the level name suffix.
+		// Note: When using the 'is-regular-villager'-flag, using level 0 allows hiding the level
+		// name suffix.
 		int merchantLevel = 1;
 		int merchantExperience = 0;
 		if (merchant instanceof Villager) {
@@ -239,11 +254,14 @@ public final class NMSHandler implements NMSCallProvider {
 			merchantLevel = 0; // Hide name suffix
 		}
 		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
-		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // Just in case
+		if (merchantRecipeList == null) {
+			// Just in case:
+			merchantRecipeList = new MerchantRecipeList();
+		}
 
-		// Send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
-		// Master), merchant total experience, is-regular-villager flag (false: hides some gui elements), can-restock
-		// flag (false: hides restock message if out of stock)
+		// Send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1:
+		// Novice, .., 5: Master), merchant total experience, is-regular-villager flag (false: hides
+		// some gui elements), can-restock flag (false: hides restock message if out of stock)
 		EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
 		nmsPlayer.openTrade(
 				nmsPlayer.activeContainer.windowId,

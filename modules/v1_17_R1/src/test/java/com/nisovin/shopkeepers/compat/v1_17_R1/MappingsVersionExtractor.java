@@ -13,15 +13,16 @@ import com.nisovin.shopkeepers.util.java.Box;
 /**
  * Extracts the mappings version from the byte code of the CraftMagicNumbers class.
  * <p>
- * During tests, we cannot instantiate the CraftMagicNumbers class to then retrieve the mappings version like normal,
- * because the static initializers of this class access Minecraft registries, which check whether the server has
- * performed its usual startup routines (which is not the case during tests). If we attempt to access the class anyways,
- * these static initializers will trigger a 'bootstrap exception'.
+ * During tests, we cannot instantiate the CraftMagicNumbers class to then retrieve the mappings
+ * version like normal, because the static initializers of this class access Minecraft registries,
+ * which check whether the server has performed its usual startup routines (which is not the case
+ * during tests). If we attempt to access the class anyways, these static initializers will trigger
+ * a 'bootstrap exception'.
  */
 public final class MappingsVersionExtractor {
 
-	// Loading and passing the class is fine, as long as we don't access any members, which then results in the static
-	// initializers to be executed.
+	// Loading and passing the class is fine, as long as we don't access any members, which then
+	// results in the static initializers to be executed.
 	public static String getMappingsVersion(Class<?> craftMagicNumbersClass) throws IOException {
 		Box<@Nullable String> result = new Box<>();
 		ClassReader reader = new ClassReader(craftMagicNumbersClass.getName());
@@ -45,6 +46,7 @@ public final class MappingsVersionExtractor {
 				return null;
 			}
 		}, 0);
+
 		String mappingsVersion = result.getValue();
 		if (mappingsVersion == null) {
 			throw new RuntimeException("Could not extract the mappings version!");

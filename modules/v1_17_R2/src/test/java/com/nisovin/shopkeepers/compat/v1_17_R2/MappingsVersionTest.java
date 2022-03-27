@@ -13,7 +13,12 @@ public class MappingsVersionTest {
 		NMSHandler nmsHandler = new NMSHandler();
 		CompatVersion compatVersion = nmsHandler.getCompatVersion();
 		String expectedMappingsVersion = compatVersion.getMappingsVersion();
-		String actualMappingsVersion = MappingsVersionExtractor.getMappingsVersion(nmsHandler.getCraftMagicNumbersClass());
-		assertEquals("Unexpected mappings version!", expectedMappingsVersion, actualMappingsVersion);
+		String actualMappingsVersion = MappingsVersionExtractor.getMappingsVersion(
+				nmsHandler.getCraftMagicNumbersClass()
+		);
+		assertEquals("Unexpected mappings version!",
+				expectedMappingsVersion,
+				actualMappingsVersion
+		);
 	}
 }
