@@ -2,8 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.15.0 (TBA)
-### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
+### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+* Added support for MC 1.18.2. Make sure that you are using the very latest build of Spigot 1.18.2, because initial builds of 1.18.2 had some chunk loading related issue that might affect the activation (spawning, ticking, etc.) of shopkeepers.
 * Dropped support for all Bukkit versions below 1.16.5 (1.14.4, 1.15.2, 1.16.1-1.16.4).
 * Bumped the Towny dependency to version 0.98.1.0 and using the glaremasters repository for it now (Jitpack seems to be having issues with Towny currently).
 * Config: The translations repository has been renamed and is now located at `https://github.com/Shopkeepers/Language-Files`.

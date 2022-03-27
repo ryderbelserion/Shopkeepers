@@ -33,6 +33,8 @@ public final class NMSManager {
 	static {
 		// Registered in the order from latest to oldest.
 		// Different CB revision:
+		register(new CompatVersion("1_18_R3", "1.18.2", "eaeedbff51b16ead3170906872fda334"));
+		// Different CB revision:
 		register(new CompatVersion("1_18_R2", "1.18.1", "20b026e774dbf715e40a0b2afe114792"));
 		register(new CompatVersion("1_18_R1", "1.18", "9e9fe6961a80f3e586c25601590b51ec"));
 		// Different CB revision:
