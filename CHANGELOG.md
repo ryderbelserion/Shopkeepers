@@ -1,7 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.15.0 (TBA)
+## v2.15.1 (TBA)
+### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
+
+
+## v2.15.0 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
 * Added support for MC 1.18.2. Make sure that you are using the very latest build of Spigot 1.18.2, because initial builds of 1.18.2 had some chunk loading related issue that might affect the activation (spawning, ticking, etc.) of shopkeepers.
