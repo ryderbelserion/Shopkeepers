@@ -86,7 +86,7 @@ public final class Currencies {
 	}
 
 	public static @Nullable Currency match(@ReadOnly @Nullable ItemStack itemStack) {
-		if (itemStack == null) return null;
+		if (ItemUtils.isEmpty(itemStack)) return null;
 		for (int i = 0; i < ALL.size(); i++) {
 			Currency currency = ALL.get(i);
 			if (currency.getItemData().matches(itemStack)) {
