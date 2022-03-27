@@ -422,8 +422,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		this.indicateTickActivity();
 
 		// This is only called for shopkeepers in active (i.e. loaded) chunks, and shopkeepers are
-		// despawned on chunk
-		// unload:
+		// despawned on chunk unload:
 		assert Unsafe.assertNonNull(shopkeeper.getChunkCoords()).isChunkLoaded();
 
 		if (!this.isActive()) {
