@@ -393,7 +393,11 @@ public class ShopkeeperChunkActivator {
 	}
 
 	private void activateChunk(ChunkData chunkData) {
-		assert chunkData != null && chunkData.getChunkCoords().isChunkLoaded();
+		assert chunkData != null;
+		// Note (SPIGOT-6980): On early versions of 1.18.2, chunks may report to not be loaded
+		// during ChunkLoadEvents, which breaks this and several similar assertions (not so bad),
+		// but likely also actual code related to chunk/shopkeeper activation (potentially bad).
+		assert chunkData.getChunkCoords().isChunkLoaded() : "Chunk not loaded";
 
 		// Update the chunk's target activation state:
 		boolean oldShouldBeActive = chunkData.isShouldBeActive();
