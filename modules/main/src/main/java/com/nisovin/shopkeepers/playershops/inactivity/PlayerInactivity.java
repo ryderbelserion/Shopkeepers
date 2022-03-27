@@ -7,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.util.bukkit.Ticks;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -50,7 +51,7 @@ public class PlayerInactivity {
 	private final class DeleteInactivePlayerShopsTask implements Runnable {
 
 		// ~4 hours (can be noticeably longer if the server lags)
-		private static final long INTERVAL_TICKS = 20 * 60 * 60 * 4;
+		private static final long INTERVAL_TICKS = Ticks.PER_SECOND * 60 * 60 * 4;
 
 		private final Plugin plugin;
 		private @Nullable BukkitTask task = null;
