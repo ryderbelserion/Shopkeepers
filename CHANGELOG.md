@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.15.1 (TBA)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+* Fixed: The refactors in version 2.15.0 broke the deletion of shopkeepers of inactive players.
 
 ## v2.15.0 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5

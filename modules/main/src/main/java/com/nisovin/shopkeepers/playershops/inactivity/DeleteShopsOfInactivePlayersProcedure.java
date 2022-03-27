@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -114,7 +115,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 				// disabled or reloaded):
 				if (this.isCancelled()) return;
 
-				continueWithInactiveShopOwners();
+				SchedulerUtils.runTaskOrOmit(plugin, () -> continueWithInactiveShopOwners());
 			}
 		}.runTaskAsynchronously(plugin);
 	}
@@ -160,6 +161,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 	}
 
 	private void continueWithInactiveShopOwners() {
+		assert Bukkit.isPrimaryThread();
 		assert !inactivePlayers.isEmpty();
 		assert !CollectionUtils.containsNull(inactivePlayers.values());
 		this.collectShopsOfInactivePlayers();
@@ -176,8 +178,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 			}
 		});
 		// Note: For some inactive shop owners we might no longer find any shopkeepers. Their
-		// entries will then not
-		// contain any shopkeepers.
+		// entries will then not contain any shopkeepers.
 	}
 
 	private void deleteShopsOfInactivePlayers() {
@@ -197,10 +198,11 @@ class DeleteShopsOfInactivePlayersProcedure {
 			Bukkit.getPluginManager().callEvent(event);
 
 			if (event.isCancelled() || shopkeepers.isEmpty()) {
-				Log.debug("Ignoring inactive player " + TextUtils.getPlayerString(user)
+				Log.debug(() -> "Ignoring inactive player " + TextUtils.getPlayerString(user)
 						+ " (last seen " + inactivePlayerData.getLastSeenDaysAgo() + " days ago)"
 						+ " and their " + originalShopkeepersCount + " shopkeepers"
-						+ (shopkeepers.size() == originalShopkeepersCount ? "" : " (reduced to " + shopkeepers.size() + ")")
+						+ (shopkeepers.size() != originalShopkeepersCount
+								? " (reduced to " + shopkeepers.size() + ")" : "")
 						+ ": Cancelled by a plugin.");
 				return;
 			}
