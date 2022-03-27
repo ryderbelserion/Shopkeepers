@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.currency.Currency;
@@ -23,6 +22,7 @@ import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
@@ -104,9 +104,12 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 			// We can reuse the trading recipe draft's items without copying them first.
 			UnmodifiableItemStack priceItem = Unsafe.assertNonNull(recipe.getResultItem());
-			// Make sure that the item is actually currency, this just in case:
-			if (priceItem.getType() != Settings.currencyItem.getType()) {
-				return null; // Invalid recipe
+			// Make sure that the item is actually currency, just in case:
+			if (!Currencies.getBase().getItemData().matches(priceItem)) {
+				// Unexpected.
+				Log.debug(shopkeeper.getLogPrefix()
+						+ "Price item does not match the base currency!");
+				return null; // Ignore invalid recipe
 			}
 			assert priceItem.getAmount() > 0;
 			int price = priceItem.getAmount();

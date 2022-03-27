@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
@@ -102,8 +103,11 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			String bookTitle = BookItems.getTitle(bookMeta);
 			if (bookTitle == null) return null; // Invalid recipe
 
-			int price = getPrice(recipe);
-			if (price <= 0) return null; // Invalid recipe
+			int price = getPrice(shopkeeper, recipe);
+			if (price <= 0) {
+				// Unexpected.
+				return null; // Ignore invalid recipe
+			}
 
 			return BookOffer.create(bookTitle, price);
 		}

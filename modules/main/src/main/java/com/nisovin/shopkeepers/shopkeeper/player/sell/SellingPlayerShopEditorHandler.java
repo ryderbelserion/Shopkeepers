@@ -97,8 +97,11 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		@Override
 		protected @Nullable PriceOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
-			int price = getPrice(recipe);
-			if (price <= 0) return null; // Invalid recipe
+			int price = getPrice(shopkeeper, recipe);
+			if (price <= 0) {
+				// Unexpected.
+				return null; // Ignore invalid recipe
+			}
 
 			// We can reuse the trading recipe draft's items without copying them first.
 			// Not null because the recipe is valid:

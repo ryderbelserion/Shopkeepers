@@ -11,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -32,6 +33,7 @@ import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class PlayerShopEditorHandler extends EditorHandler {
 
@@ -263,7 +265,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		return new TradingRecipeDraft(resultItem, lowCostItem, highCostItem);
 	}
 
-	protected static int getPrice(TradingRecipeDraft recipe) {
+	protected static int getPrice(Shopkeeper shopkeeper, TradingRecipeDraft recipe) {
 		Validate.notNull(recipe, "recipe is null");
 		int price = 0;
 
@@ -272,6 +274,9 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		if (currency1 != null) {
 			assert item1 != null;
 			price += (currency1.getValue() * Unsafe.assertNonNull(item1).getAmount());
+		} else if (!ItemUtils.isEmpty(item1)) {
+			// Unexpected.
+			Log.debug(shopkeeper.getLogPrefix() + "Price item 1 does not match any currency!");
 		}
 
 		UnmodifiableItemStack item2 = recipe.getItem2();
@@ -279,6 +284,9 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		if (currency2 != null) {
 			assert item2 != null;
 			price += (currency2.getValue() * Unsafe.assertNonNull(item2).getAmount());
+		} else if (!ItemUtils.isEmpty(item2)) {
+			// Unexpected.
+			Log.debug(shopkeeper.getLogPrefix() + "Price item 2 does not match any currency!");
 		}
 		return price;
 	}

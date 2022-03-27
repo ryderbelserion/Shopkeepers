@@ -4,6 +4,8 @@ Date format: (YYYY-MM-DD)
 ## v2.15.2 (TBA)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+**Debugging changes:**
+* We log now when we unexpectedly encounter invalid currency items in the editors of the selling, buying, or book shopkeepers.
 
 ## v2.15.1 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
