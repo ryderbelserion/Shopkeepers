@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.text.Text;
 
 class CommandDebugCreateShops extends PlayerCommand {
 
-	private final static String ARGUMENT_SHOP_COUNT = "shopCount";
+	private static final String ARGUMENT_SHOP_COUNT = "shopCount";
 
 	private final SKShopkeepersPlugin plugin;
 
