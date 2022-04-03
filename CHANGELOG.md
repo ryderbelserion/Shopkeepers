@@ -42,7 +42,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: A related but more minor issue has been that Citizens NPCs can already be spawned while their chunk is still pending to be activated by the Shopkeepers plugin. During this short time period (roughly one second after chunk loads), the Citizens NPCs were not yet recognized as shopkeepers. This has been fixed by separating the registration of ticking (i.e. active) shopkeepers from the registration of spawned shop objects: Citizens shopkeepers now register their NPC entity already before the chunk is activated.
 * Fixed: We no longer attempt to save the data of Citizens shopkeeper NPCs when the corresponding NPC has not yet been created (i.e. when no NPC has been attached to the shopkeeper yet).
 * Fixed: Updating a shopkeeper's location also updates the shopkeeper's activation state now. Previously, it was possible for a shopkeeper's new chunk to not get activated until the chunk is reloaded.
-* Command: Added command "/shopkeeper setCurrency ['low'|'high']", which allows you to change the currency item(s) from in-game.
+* Command: Added command "/shopkeeper setCurrency ['base'|'high']", which allows you to change the currency item(s) from in-game.
 * Permission: Added permission `shopkeeper.setcurrency` (default: `op`) which provides access to the new set-currency command.
 * Fixed: When setting the zero currency item to AIR, the selling and book shopkeepers were not able to derive the price of a trade from the editor when only the high currency price is specified.
 * Added placeholder items for empty trade slots inside the editors of player shops.
