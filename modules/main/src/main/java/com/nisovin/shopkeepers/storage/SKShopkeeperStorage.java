@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.SingletonTask;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.persistence.DataStore;
+import com.nisovin.shopkeepers.util.data.persistence.InvalidDataFormatException;
 import com.nisovin.shopkeepers.util.data.persistence.bukkit.BukkitConfigDataStore;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -453,6 +454,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Since Bukkit 1.16.5, this automatically clears the save data before loading the new
 			// entries.
 			saveData.load(reader);
+		} catch (InvalidDataFormatException e) {
+			Log.severe("Failed to load the save file! Note: Server downgrades or manually "
+					+ "editing the save file are not supported!", e);
+			return false; // Disable without save
 		} catch (Exception e) {
 			Log.severe("Failed to load the save file!", e);
 			return false; // Disable without save
