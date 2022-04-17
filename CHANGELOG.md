@@ -11,6 +11,9 @@ Date format: (YYYY-MM-DD)
 * We log now when we unexpectedly encounter invalid currency items in the editors of the selling, buying, or book shopkeepers.
 * Added an additional note to the error message about server downgrades not being supported when the save file cannot be loaded.
 
+**Internal changes:**  
+* Refactors related to chat input handling.
+
 ## v2.15.1 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
