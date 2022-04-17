@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.dependencies.citizens;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -76,13 +75,8 @@ public final class CitizensUtils {
 			// as the NPC type or name, are not applied until the NPC entity is recreated.
 			// Note: We don't use NPC#isSpawned here because it takes into account whether the
 			// entity has died.
-			Entity entity = npc.getEntity();
-			boolean spawned = (npc.getEntity() != null);
-			Location previousLocation = spawned ? entity.getLocation() : null;
-			boolean despawnFailed = false;
-			if (spawned) {
-				despawnFailed = !npc.despawn();
-				if (despawnFailed) {
+			if (npc.getEntity() != null) {
+				if (!npc.despawn()) {
 					Log.warning("Failed to despawn Citizens NPC " + npc.getId()
 							+ "! Some changes to the NPC's data might have no effect!");
 				}
@@ -108,21 +102,9 @@ public final class CitizensUtils {
 				npc.setBukkitEntityType(mobType);
 			}
 
-			// This might automatically respawn the NPC again:
+			// This automatically respawns the NPC again, if it is meant to be spawned (i.e. based
+			// on the loaded 'Spawned' and 'CurrentLocation' traits):
 			npc.load(npcDataKey);
-
-			// If the NPC was previously spawned, despawning did not fail, and the NPC was not
-			// already respawned by NPC#load, we respawn it ourselves:
-			if (spawned && !despawnFailed && npc.getEntity() == null) {
-				Location spawnLocation = npc.getStoredLocation();
-				if (spawnLocation == null) {
-					assert previousLocation != null; // The NPC was spawned earlier
-					spawnLocation = Unsafe.assertNonNull(previousLocation);
-				}
-				if (!npc.spawn(spawnLocation)) {
-					Log.warning("Failed to respawn Citizens NPC " + npc.getId() + "!");
-				}
-			}
 		}
 
 		private Internal() {
