@@ -7,7 +7,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
 * We no longer forcefully spawn Citizens shopkeeper NPCs when we reload their NPC data (e.g. when we apply a shopkeeper snapshot). Instead, the NPC is spawned based on its stored spawn state and location.
 
-**Debugging changes:**
+**Debugging changes:**  
 * We log now when we unexpectedly encounter invalid currency items in the editors of the selling, buying, or book shopkeepers.
 * Added an additional note to the error message about server downgrades not being supported when the save file cannot be loaded.
 
@@ -63,7 +63,7 @@ Date format: (YYYY-MM-DD)
 * Command: Confirmations account for proxied command senders now: Since the original caller of the command receives the command's feedback messages, we also require confirmation from the original caller.
 * Fixed: When removing or translating color codes in text we also account for Bukkit's hex color code now (x).
 
-**Debugging changes:**
+**Debugging changes:**  
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.
 * Added additional debug output when chunks are activated and deactivated. Also, the debug output when shopkeepers are spawned due to chunk activations has slightly changed.
 * The debug output for entity interactions is no longer limited to living entities, and also mentions the entity type now.
@@ -71,7 +71,7 @@ Date format: (YYYY-MM-DD)
 * Added additional log output when we fail to re-register a listener when we reorder the event handlers of some event. In order to resolve certain plugin incompatibility issues, we reorder the event handlers for some types of events. However, as it turns out, some plugins modify the internals of the Bukkit event system. If these plugins have flaws, they can break our event handler reordering. This additional log output should make it easier to identify the culprit plugin in those cases.
 * We log now whenever we save the config.
 
-**API changes:**
+**API changes:**  
 * The ShopkeeperRemoveEvent is now called earlier during the shopkeeper removal, before the shopkeeper is deactivated (i.e. despawned, UIs closed, ticking stopped, etc.).
 * Added nullness annotations.
 * Some methods are more strict now and no longer accept null as input.
@@ -1086,7 +1086,7 @@ Changed messages:
 ## v2.10.0 (2020-06-26)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
-**Update for MC 1.16.1:**
+**Update for MC 1.16.1:**  
 * Added zombified piglin, piglin, hoglin, zoglin and strider to the by default enabled mob types. If you are updating, you will have to manually add these to your config's 'enabled-living-shops' setting.
 * During my quick initial testing I did not encounter any major issues with these new mobs, but there are some oddities you might want to be aware of:
   * We don't support changing the baby property of piglin and zoglin shopkeepers yet. However, we at least ensure that they always spawn as adult.
@@ -1102,10 +1102,10 @@ Changed messages:
   * Any items stored inside the shopkeepers (e.g. for their trades or hire cost items) are automatically migrated.
 * Note on Minecraft's new RGB color codes and other new text related features: I have not yet looked into supporting those in the texts and messages of the Shopkeepers plugin.
 
-**Other migration notes:**
+**Other migration notes:**  
 * Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead, any unknown item types get migrated to their default now.
 
-**Other changes:**
+**Other changes:**  
 * Changed/Improved: We use a combination of our own 'Shopkeepers data version' (which has been bumped to 2) and Minecraft's data version for the data version stored inside the save.yml now. Minecraft's data version is incremented on every Minecraft release (including minor updates) and may indicate that new item migrations have been added. So whenever you update your server, we automatically trigger a full migration of all your shopkeeper data to ensure that your save.yml is always up-to-date.
 * Fixed: Some mobs randomly spawn with passengers. We remove these passengers now.
 * Fixed: When a mob randomly spawns with a passenger, this would previously interfere with our 'bypass-spawn-blocking' feature and print a warning inside the log about an unexpected entity (the passenger) being spawned.
@@ -1207,7 +1207,7 @@ Internal changes:
 ## v2.9.0 (2019-12-28)
 ### Supported MC versions: 1.15.1, 1.14.4
 
-**Update for MC 1.15.1:**
+**Update for MC 1.15.1:**  
 * Added bees to the by default enabled mob types. If you are migrating from a previous version, you will have to manually enable them in the config.
 
 **Other changes:**  
@@ -1475,7 +1475,7 @@ Checkout the changelog of v2.7.0 regarding the update to 1.14.
 ## v2.7.0 (2019-05-29)
 ### Supported MC versions: 1.14.2
 
-**Update for MC 1.14:**
+**Update for MC 1.14:**  
 * Dropped support for MC 1.13. This version only supports MC 1.14.2!
 * If you are upgrading, make sure that you have successfully updated Shopkeepers to 1.13 first. Migration from older MC versions are not supported and might not work. Reverting to older versions isn't supported either.
   * Removed pre 1.13 sheep color migration.
@@ -1600,7 +1600,7 @@ Changed messages (if you are updating, you have to manually apply those changes)
 
 Since the changes of this update are manifold and prone to potentially exploitable issues, this update is initially marked as 'alpha' version to see if any issues come up.
 
-**Completely changed the editor interface(s):**
+**Completely changed the editor interface(s):**  
 * Unified the trade representation in the editor among all shopkeeper types to be more consistent:
   * The top item is now always representing the result item and the next two items represent from bottom to top the buy items 1 and 2.
   * The only exception to this are the selling and book shopkeeper: Here the high cost item will appear as buy item 2 inside the editor, but as first item inside the trading recipe (like before).
@@ -1733,7 +1733,7 @@ Removed messages:
 * Changed: If 'delete-shopkeeper-on-break-chest' is enabled, the shopkeeper will now no longer be removed if the half of a double chest gets broken that is not directly used by the shopkeeper.
 * Changed: If 'delete-shopkeeper-on-break-chest' is enabled, the shopkeepers will now also be removed if the chest gets destroyed by an explosion. And if 'deleting-player-shop-returns-creation-item' is enabled, shop creations items will be dropped for those shopkeepers as well.
 
-**Improved shopkeeper placement:**
+**Improved shopkeeper placement:**  
 * Fixed: Treating other air variants as empty as well when trying to place a shopkeeper.
 * Slightly changed how the spawn block is determined to more closely match the behavior of vanilla Minecraft: If the clicked / targeted block is passable (i.e. tall grass, etc.) this block gets used as spawn location. Only otherwise the spawn location is shifted according to the clicked / targeted block face.
   * This now also allows placement of shopkeepers underwater (Update aquatic)! Signs can still only be placed at air blocks.
@@ -1851,7 +1851,7 @@ See 2.3.3 instead.
 ## v2.3.0 Alpha (2018-07-18)
 ### Supported MC versions: 1.13
 **This update brings support for MC 1.13:**  
-**Some important notices to begin with:**
+**Some important notices to begin with:**  
 * Support for versions below 1.13 has been dropped. It is only compatible with the latest builds of Spigot 1.13-pre7.
 * This update is **experimental**! Don't use it for live servers yet, until any upcoming issue have been fixed.
 * Before installing: **Back up your existing shopkeeper data!** This update will make irreversible changes and might not even be able to import all the previous data.
@@ -1865,20 +1865,20 @@ Item data values have been removed and various material (item/block) names have 
 * The plugin will trigger a save of all shopkeeper data, so that any legacy materials that got converted by Bukkit during loading of the shopkeepers will also end up being saved with their updated materials to the save data. However, any shopkeepers that cannot be loaded for some reason will skip this procedure. So make sure that all your existing shopkeepers load fine prior to installing the update, or you might have to update the data of those shopkeepers manually in the future.
 * If some materials cannot be converted, the result might be some kind of fallback: Empty spawn eggs for example will be converted to pig spawn eggs by Bukkit. There is no existing documentation available so far regarding which fallbacks exist.
 
-**Updating is only supported from version v2.2.1 and MC 1.12.2:**
+**Updating is only supported from version v2.2.1 and MC 1.12.2:**  
 * Removed support for loading very old (MC 1.8) serialized item attributes.
 * Removed MC 1.10 villager profession id migrations.
 * Removed MC 1.11 entity type migrations.
 * Removed support for importing very old shopkeeper trades (changed somewhere in 2015).
 
-**Other changes related to the update:**
+**Other changes related to the update:**  
 * Removed the `skip-custom-head-saving` setting: Previously, this was meant to work around some issue with saving custom head items (head items with custom texture and no player name) causing corrupted save data. The data corruption / crashing should be fixed by Bukkit by now (by completely dropping 'support' for those custom head items though).
 * Added: All 1.13 mobs have been added to the default config. There is no support for them beyond that yet (no support to switch to baby variants, etc.).
 * Improvement: The chest and sign protection takes block explosions into account.
 * Internal: Reduced the amount of version specific code, since for many things there are Bukkit alternatives available by now.
 * Internal: The save data now contains a 'data-version'. This can be used to determine required migrations (not used for that currently), or force a save of all loaded shopkeeper data.
 
-**Other changes:**
+**Other changes:**  
 * Internal: Sheep colors were previous saved by using the old wool data values. They are now converted and saved by their color names.
 * Improvement: Logging a message when importing old book offers (changed during late 1.12.2) and old sheep colors (changed with this update).
 * Improvement: Added a warning message when not able to load a cat type or sheep color and falling back to the default in that case.
@@ -1911,7 +1911,7 @@ Since there have been no reported issues with the previous beta versions, I mark
 
 ## v2.1.0 Beta (2018-06-18)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
-**Major internal changes to the way shopkeepers get created and their data gets saved:**
+**Major internal changes to the way shopkeepers get created and their data gets saved:**  
 * Changes to shopkeeper ids: 'Session id' is now named only 'id' , and persists across server restarts / plugin reloads.
   * API: Renamed getShopkeeper-methods to ShopkeeperRegistry#getShopkeeperById and ShopkeeperRegistry#getShopkeeperByUniqueId
 * All shopkeeper data gets kept in memory now and during saves, only the data of dirty shopkeepers gets updated.
@@ -1936,13 +1936,13 @@ Since there have been no reported issues with the previous beta versions, I mark
   * API: Added ShopkeeperRemoveEvent that gets called for the deletion and unloading of all shopkeepers.
   * API: OpenTradeEvent was removed and replaced with a more generic ShopkeeperOpenUIEvent
 
-**Major restructuring of command handling:**
+**Major restructuring of command handling:**  
 * All commands come with fancy command completion now.
   * Shopkeeper completions are limited to 30 entries, will prefer shopkeeper names over ids and unique ids, and will suggest only shopkeeper names if an empty argument is given.
 * Various command-related message have been changed, removed and added.
 * Behavior-wise commands should work like before. But if you notice any issues (especially related to permissions, or argument handling), let me know.
 
-**Other changes:**
+**Other changes:**  
 * Changed: 'normal' player shopkeeper was renamed to 'selling' player shopkeeper everywhere.
   * The permission node has changed to 'shopkeeper.player.sell' ('shopkeeper.player.normal' keeps working though).
   * Messages related to this have changed.
@@ -1973,7 +1973,7 @@ Due to the various message related changes, you will have to update your message
 
 ## v2.0 Beta (2018-06-05)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
-**Major change to Shopkeepers' mob behavior:**
+**Major change to Shopkeepers' mob behavior:**  
 * Shopkeeper mobs by default use Minecraft's NoAI flag now:
   * This disables various internal AI behavior that would otherwise still be active in the background (villagers for example would periodically search for nearby villages and even cause chunk loads by that).
   * This makes shop entities unpushable (at least on certain MC versions, see below).
@@ -1981,7 +1981,7 @@ Due to the various message related changes, you will have to update your message
   * In order to keep the look-at-nearby-players behavior, the plugin now manually triggers the Minecraft logic responsible for that.
   * In order for the entities to still be affected by gravity, the plugin now manually periodically checks for block collisions below mobs and then teleports them downwards. This doesn't look as smooth as Minecraft's gravity motion, but it should suffice (especially since the shopkeeper mobs are usually not falling far from their initial spawn position anyways).
   
-**Impact on performance:**
+**Impact on performance:**  
 * Shopkeepers only runs the AI and the gravity for mobs that are in range of players (AI: 1 chunk around players, gravity: 4 chunks around players by default).
 * You can experiment with the gravity chunk range by tuning the config setting 'gravity-chunk-range'. Setting it lower than your server's entity tracking range might however result in players being able to see mobs floating above the ground until they get closer.
 * Internal: The active AI and gravity chunks are currently determined only once every 20 ticks, and falling conditions of mobs are checked only once every 10 ticks (with a random initial offset to distribute the falling checks over all ticks).
@@ -1989,7 +1989,7 @@ Due to the various message related changes, you will have to update your message
   * However, during our simulated 'falling' the flag gets disabled and enabled again at the end of the fall in order to work around some visual glitch that might otherwise affect players near the entity tracking range (see MC-130725 and SPIGOT-3948).
 * Please note: Since at least some AI stuff is now run or triggered by the Shopkeepers plugin, your timings reports will show that Shopkeepers is using quite a bit more of your server's ticking time now. Don't be irritated by that though: I tried to optimize this quite a bit, so hopefully if you compare the performance of your server overall before and after the update, it should in summary even be a small improvement, since lots of unneeded AI and movement logic is no longer getting run.
 
-**Other related changes:**
+**Other related changes:**  
 * Shopkeeper mobs get the 'collidable' flag set on MC 1.9 and above now. Unfortunately this alone will not prevent them from getting pushed around, however it might be beneficial regardless, due them being fully ignored by minecarts, boats and projectiles now.
 * You can disable the new mob behavior with the setting 'use-legacy-mob-behavior' (default: false). AI and gravity will then be handled by Minecraft directly again. By the way, please use this setting and compare the overall performance of your server with and without the new mob behavior and let me know of your findings!
   * Side note: Spigot added a new setting 'tick-inactive-villagers' (default: true). If you have areas with lots of villagers, and you are using the old (legacy) mob behavior, consider disabling this setting. Otherwise, those villagers might cause lots of unneeded additional chunk loads due to their search for nearby villages.
@@ -1999,11 +1999,11 @@ Due to the various message related changes, you will have to update your message
   * With gravity enabled, mobs spawn 0.5 blocks above their spawning position (like before).
   * With gravity disabled, mobs will be spawned exactly at the position they are meant to be. Note however, that if your shopkeeper's spawn location is already above the ground (for example if they were placed on top of grass or other collision-less blocks), those shopkeepers will end up floating above the ground.
 
-**Note on MC version differences:**
+**Note on MC version differences:**  
 * On MC 1.9 and MC 1.10 the NoAI tag does not disable Minecraft's gravity and collision handling. Mobs will therefore by default be pushable on those versions, even with the new mob behavior.
 * However, if gravity gets disabled on MC 1.10 and above, we are also able to disable collisions/pushing of mobs (by using Minecraft's internal noclip flag of entities).
 
-**Various improvements when running on a not yet supported version of Minecraft:**
+**Various improvements when running on a not yet supported version of Minecraft:**  
 * Fixed: Freezing of mobs via a slowness potion effect didn't properly work. Instead, we now set the movement speed of mobs to zero via a custom attribute modifier.
 * Fixed: The fallback handler supports silencing of entities now.
 * Fixed: The fallback handler wasn't able to handle trading recipes with empty second item.
@@ -2012,7 +2012,7 @@ Due to the various message related changes, you will have to update your message
   * As a workaround, you may enable the legacy mob behavior in this case then: Minecraft will handle AI and gravity again then. However, this might be unperformant due to lots of unneeded internal AI logic being active then.
   * When using the legacy mob behavior and also disabling gravity, the mobs will additionally not be affected by gravity, and they can no longer be pushed around by players.
 
-**Other changes:**
+**Other changes:**  
 * Changed: The default help page header message now includes the plugin's version. If you are updating, you will have to manually update the message or let it regenerate.
 * Added: A new message 'msg-name-has-not-changed' gets sent when a player attempts to change the name of a shopkeeper and the new name matches the old one.
 * Fixed: If renaming via item is enabled and the new shopkeeper name matches the old one, no item is removed from the player.
@@ -2029,7 +2029,7 @@ Due to the various message related changes, you will have to update your message
 * Fixed/Internal: The license file gets properly included inside the plugin jar now.
 * Internal: Added a few plugins as soft dependencies (Vault, WorldGuard, Towny, Gringotts). They will now get reliably loaded before Shopkeepers.
 
-**Major internal restructuring (affects the API) and version bump to 2.0:**
+**Major internal restructuring (affects the API) and version bump to 2.0:**  
 * All functions related to the public API of the plugin have been moved into a separate package, and are mostly behind interfaces now. This will break every plugin currently depending on Shopkeepers, sorry! However, this should make it far easier to differentiate between the public API and the internal API and implementation. This is only the first step towards providing a more stable and therefore more useful public API in the future. The functionality of the API hasn't changed much yet, and things will still keep changing quite a lot, until I have refined all the currently existing functions.
 * Various classes were split into abstract base classes (internal API) and interfaces (public API).
 * Everything related to shop type and shop object type was moved into the corresponding packages.
@@ -2040,7 +2040,7 @@ Due to the various message related changes, you will have to update your message
 * Renamed a few primary classes: ShopkeepersPlugin is an interface now, ShopkeepersAPI provides static access to the methods of ShopkeepersPlugin, the actual main plugin class is called SKShopkeepersPlugin now.
 * Some restructuring and cleanup related to the internal project structure and how the plugin gets built. The API part gets built separately and can be depended on separately now from other projects.
 
-**Other API related changes:**
+**Other API related changes:**  
 * CreatePlayerShopkeeperEvent has changed a bit. It also no longer supports changing the shop type.
 * Removed createNewAdminShopkeeper and createNewPlayerShopkeeper and added a general createShopkeeper method instead.
 * The getShopkeepersFromChunk method now returns an empty list instead of null, in case a chunk doesn't contain any shopkeepers.
@@ -2055,7 +2055,7 @@ Due to the various message related changes, you will have to update your message
 
 ## v1.87 Beta (2018-05-17)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
-**Major rewrite of the processing of trades:**
+**Major rewrite of the processing of trades:**  
 
 Shopkeepers is now implementing the inventory actions that might trigger trades itself.
 
@@ -2068,7 +2068,7 @@ Secondly, when relying on Minecraft's implementation we are only able to allow o
 
 Implementing the trading ourselves has a few advantages, but also comes with caveats:
 
-**Caveats:** 
+**Caveats:**  
 * Increased risk for bugs which we need to fix ourselves. Increased maintenance and testing effort.
 * Increased possibility for inconsistencies between vanilla inventory/trading behaviour and our own implementation.
 * Minecraft performs some map initialization when certain map items are created by crafting or via trades: This seems to be responsible for updating the scaling (after crafting a larger map) and enabling tracking (this doesn't seem to be used anywhere inside Minecraft though). Since this is only the case if the map item has some special internal nbt data (which shouldn't be obtainable in vanilla Minecraft), we currently simply ignore this inside Shopkeepers.
@@ -2211,7 +2211,7 @@ Thanks.
 
 ## v1.79 Release (2016-11-18)
 ### Supported MC versions: 1.11, 1.10, 1.9, 1.8
-**Update for MC 1.11:** 
+**Update for MC 1.11:**  
 * Minecraft represents the different variants of skeletons (stray, wither_skeleton) and zombies (zombie_villager) now in the form of different entity types. Shopkeepers using these variants get automatically converted to use the new mob types instead.  
   This however means that you cannot switch back to previous Minecraft versions without loosing those converted shopkeepers.  
   And you will have to give all your players, which were previously able to create zombie or skeleton shopkeepers the required permission nodes for stray, wither_skeleton and zombie_villager, otherwise they won't be able to access/edit their shops after this conversion.  
