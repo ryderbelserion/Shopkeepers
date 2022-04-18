@@ -125,7 +125,7 @@ public interface Shopkeeper {
 	public String getLocatedLogPrefix();
 
 	/**
-	 * Gets the type of this shopkeeper (ex: admin, selling player, buying player, trading player,
+	 * Gets the type of this shopkeeper (e.g.: admin, selling player, buying player, trading player,
 	 * etc.).
 	 * 
 	 * @return the shopkeeper type

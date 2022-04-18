@@ -114,7 +114,7 @@ convert-player-items-exceptions: []
 ignore-failed-server-assumption-tests: false
 
 # If enabled, Shopkeepers tries to bypass other plugins which deny mob spawning
-# (ex. land protection plugins).
+# (e.g. land protection plugins).
 bypass-spawn-blocking: true
 # If enabled, Shopkeepers takes into account whether other plugins deny
 # interaction with the shopkeepers.

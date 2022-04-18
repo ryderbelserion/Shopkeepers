@@ -45,7 +45,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <ul>
  * <li>Protected containers cannot be accessed.
  * <li>Protected containers cannot be broken or destroyed by explosions.
- * <li>Protected containers don't transfer items, ex. into or from hoppers, droppers, etc.
+ * <li>Protected containers don't transfer items, e.g. into or from hoppers, droppers, etc.
  * <li>Chests cannot be placed adjacent to a directly protected chest, if they would connect to it
  * and form a double chest.
  * <li>Hoppers and droppers cannot be placed adjacent to a protected container, if they would be

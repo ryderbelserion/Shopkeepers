@@ -264,7 +264,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return false;
 		}
 
-		// If re-spawning fails due to the sign dropping for some reason (ex. attached block
+		// If re-spawning fails due to the sign dropping for some reason (e.g. attached block
 		// missing) this could be abused (sign drop farming), therefore we limit the number of spawn
 		// attempts:
 		if (System.currentTimeMillis() - lastFailedRespawnAttemptMillis < RESPAWN_TIMEOUT_MILLIS) {

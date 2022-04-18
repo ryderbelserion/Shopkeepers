@@ -41,7 +41,7 @@ public interface NMSCallProvider {
 
 	public void setOnGround(Entity entity, boolean onGround);
 
-	// On some MC versions (ex. MC 1.9, 1.10) NoAI only disables AI.
+	// On some MC versions (e.g. MC 1.9, 1.10) NoAI only disables AI.
 	public default boolean isNoAIDisablingGravity() {
 		return true;
 	}
