@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopcreation;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -16,7 +15,6 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ShopkeeperPlacement {
@@ -26,18 +24,6 @@ public class ShopkeeperPlacement {
 	public ShopkeeperPlacement(ShopkeeperRegistry shopkeeperRegistry) {
 		Validate.notNull(shopkeeperRegistry, "shopkeeperRegistry is null");
 		this.shopkeeperRegistry = shopkeeperRegistry;
-	}
-
-	public boolean isInteractionIgnored(Material clickedBlockType) {
-		// We ignore interactions with some types of blocks that are relevant for navigation (doors,
-		// buttons, etc.):
-		// This only accounts for some interactable blocks. Plugin-implemented triggers, such as
-		// command signs, or interactions with other types of interactable blocks, such as beds,
-		// work benches, etc., although they are ignored in vanilla Minecraft, are not ignored by us
-		// because we want shopkeepers to be placeable against those types of blocks.
-		if (ItemUtils.isClickableDoor(clickedBlockType)) return true;
-		if (ItemUtils.isClickableSwitch(clickedBlockType)) return true;
-		return false;
 	}
 
 	public Location determineSpawnLocation(

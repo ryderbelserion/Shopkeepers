@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.moving;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -10,7 +11,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -66,13 +67,25 @@ public class ShopkeeperMoving {
 
 			// Ignore interactions with certain types of blocks:
 			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
-			if (shopkeeperPlacement.isInteractionIgnored(clickedBlock.getType())) {
+			if (this.isInteractionIgnored(clickedBlock.getType())) {
 				Log.debug(() -> "Shopkeeper moving: Ignoring interaction with block of type "
 						+ clickedBlock.getType());
 				return false;
 			}
 
 			return true;
+		}
+
+		private boolean isInteractionIgnored(Material clickedBlockType) {
+			// We ignore interactions with some types of blocks that are relevant for navigation
+			// (doors, buttons, etc.):
+			// This only accounts for some interactable blocks. Plugin-implemented triggers, such as
+			// command signs, or interactions with other types of interactable blocks, such as beds,
+			// work benches, etc., although they are ignored in vanilla Minecraft, are not ignored
+			// by us because we want shopkeepers to be placeable against those types of blocks.
+			if (ItemUtils.isClickableDoor(clickedBlockType)) return true;
+			if (ItemUtils.isClickableSwitch(clickedBlockType)) return true;
+			return false;
 		}
 
 		@Override
@@ -87,10 +100,6 @@ public class ShopkeeperMoving {
 
 			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
 			BlockFace clickedBlockFace = event.getBlockFace();
-
-			ShopkeeperPlacement shopkeeperPlacement = SKShopkeepersPlugin.getInstance()
-					.getShopkeeperCreation()
-					.getShopkeeperPlacement();
 			Location spawnLocation = shopkeeperPlacement.determineSpawnLocation(
 					player,
 					clickedBlock,

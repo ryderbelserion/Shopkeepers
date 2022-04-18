@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -256,13 +255,6 @@ class CreateListener implements Listener {
 			}
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
-			Material clickedBlockType = clickedBlock.getType();
-
-			// Ignore interactions with certain types of blocks:
-			if (shopkeeperPlacement.isInteractionIgnored(clickedBlockType)) {
-				Log.debug(() -> "Ignoring interaction with block of type " + clickedBlockType);
-				return;
-			}
 
 			Block selectedContainer = containerSelection.getSelectedContainer(player);
 			// Validate old selected container:
@@ -275,7 +267,7 @@ class CreateListener implements Listener {
 			// Handle container selection:
 			boolean isContainerSelection = false;
 			if (!clickedBlock.equals(selectedContainer)) {
-				if (ShopContainers.isSupportedContainer(clickedBlockType)) {
+				if (ShopContainers.isSupportedContainer(clickedBlock.getType())) {
 					isContainerSelection = true;
 					// Check if the container can be used for a shop:
 					if (containerSelection.validateContainer(player, clickedBlock)) {
@@ -283,7 +275,7 @@ class CreateListener implements Listener {
 						containerSelection.selectContainer(player, clickedBlock);
 						TextUtils.sendMessage(player, Messages.containerSelected);
 					}
-				} else if (ItemUtils.isContainer(clickedBlockType)) {
+				} else if (ItemUtils.isContainer(clickedBlock.getType())) {
 					// Player clicked a type of container which cannot be used for shops:
 					isContainerSelection = true;
 					TextUtils.sendMessage(player, Messages.unsupportedContainer);
