@@ -128,6 +128,32 @@ public final class ItemUtils {
 	}
 
 	/**
+	 * Checks if the given {@link Material} is some kind of clickable door block, such as a door,
+	 * trap door, or fence gate.
+	 * 
+	 * @param material
+	 *            the material, not <code>null</code>
+	 * @return <code>true</code> if the material is a door block
+	 */
+	public static boolean isClickableDoor(Material material) {
+		return material.data == org.bukkit.block.data.type.Door.class
+				|| material.data == org.bukkit.block.data.type.TrapDoor.class
+				|| material.data == org.bukkit.block.data.type.Gate.class;
+	}
+
+	/**
+	 * Checks if the given {@link Material} is some kind of clickable switch block, such as a button
+	 * or lever.
+	 * 
+	 * @param material
+	 *            the material, not <code>null</code>
+	 * @return <code>true</code> if the material is a switch block
+	 */
+	public static boolean isClickableSwitch(Material material) {
+		return material.data == org.bukkit.block.data.type.Switch.class;
+	}
+
+	/**
 	 * Formats the name of the given {@link Material} to a more user-friendly representation. See
 	 * also {@link EnumUtils#formatEnumName(String)}.
 	 * 

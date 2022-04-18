@@ -258,6 +258,12 @@ class CreateListener implements Listener {
 			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
 			Material clickedBlockType = clickedBlock.getType();
 
+			// Ignore interactions with certain types of blocks:
+			if (shopkeeperPlacement.isInteractionIgnored(clickedBlockType)) {
+				Log.debug(() -> "Ignoring interaction with block of type " + clickedBlockType);
+				return;
+			}
+
 			Block selectedContainer = containerSelection.getSelectedContainer(player);
 			// Validate old selected container:
 			if (selectedContainer != null
