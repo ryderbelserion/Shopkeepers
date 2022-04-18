@@ -36,10 +36,12 @@ import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
 import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
 import com.nisovin.shopkeepers.input.chat.ChatInput;
+import com.nisovin.shopkeepers.input.interaction.InteractionInput;
 import com.nisovin.shopkeepers.internals.SKApiInternals;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.metrics.PluginMetrics;
+import com.nisovin.shopkeepers.moving.ShopkeeperMoving;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.playershops.PlayerShops;
 import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
@@ -119,7 +121,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	private final ItemConversions itemConversions = new ItemConversions(Unsafe.initialized(this));
 	private final Commands commands = new Commands(Unsafe.initialized(this));
 	private final ChatInput chatInput = new ChatInput(Unsafe.initialized(this));
-	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
+	private final InteractionInput interactionInput = new InteractionInput(Unsafe.initialized(this));
+
 	private final TradeLoggers tradeLoggers = new TradeLoggers(Unsafe.initialized(this));
 	private final TradeNotifications tradeNotifications = new TradeNotifications(
 			Unsafe.initialized(this)
@@ -136,10 +139,16 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			shopkeeperRegistry,
 			protectedContainers
 	);
+	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
+	private final ShopkeeperMoving shopkeeperMoving = new ShopkeeperMoving(
+			interactionInput,
+			shopkeeperCreation.getShopkeeperPlacement()
+	);
 	private final RemoveShopOnContainerBreak removeShopOnContainerBreak = new RemoveShopOnContainerBreak(
 			Unsafe.initialized(this),
 			protectedContainers
 	);
+
 	private final LivingShops livingShops = new LivingShops(Unsafe.initialized(this));
 	private final SignShops signShops = new SignShops(Unsafe.initialized(this));
 	private final CitizensShops citizensShops = new CitizensShops(Unsafe.initialized(this));
@@ -371,14 +380,16 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Enable commands:
 		commands.onEnable();
 
-		// Chat input:
+		// Input:
 		chatInput.onEnable();
-
-		// Enable shopkeeper naming:
-		shopkeeperNaming.onEnable();
+		interactionInput.onEnable();
 
 		// Enable shopkeeper creation:
 		shopkeeperCreation.onEnable();
+
+		// Enable shopkeeper naming and moving:
+		shopkeeperNaming.onEnable();
+		shopkeeperMoving.onEnable();
 
 		// Enable shopkeeper storage:
 		shopkeeperStorage.onEnable();
@@ -466,8 +477,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Disable commands:
 		commands.onDisable();
 
-		// Chat input:
+		// Input:
 		chatInput.onDisable();
+		interactionInput.onDisable();
 
 		// Item conversions:
 		itemConversions.onDisable();
@@ -476,6 +488,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		regularVillagers.onDisable();
 
 		shopkeeperNaming.onDisable();
+		shopkeeperMoving.onDisable();
+
 		shopkeeperCreation.onDisable();
 
 		// Player shops:
@@ -553,10 +567,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		return commands;
 	}
 
-	// CHAT INPUT
+	// INPUT
 
 	public ChatInput getChatInput() {
 		return chatInput;
+	}
+
+	public InteractionInput getInteractionInput() {
+		return interactionInput;
 	}
 
 	// UI
@@ -629,6 +647,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	public ShopkeeperNaming getShopkeeperNaming() {
 		return shopkeeperNaming;
+	}
+
+	// SHOPKEEPER MOVING
+
+	public ShopkeeperMoving getShopkeeperMoving() {
+		return shopkeeperMoving;
 	}
 
 	// REGULAR VILLAGERS

@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
@@ -587,6 +588,31 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	// TODO Use De/SpawnReason PendingRespawn/Respawn for respawns?
+
+	@Override
+	public boolean move() {
+		// TODO If the NPC or the shopkeeper's world is not loaded currently, the NPC remains at its
+		// previous location, and it may update the shopkeeper's location back to its current
+		// location once the NPC is loaded. I.e. moving the shopkeeper will have no effect then.
+		// Maybe remember the target location and apply it to the NPC once it is loaded? But what if
+		// the NPC's location has changed in the meantime as well (e.g. externally or while the
+		// Shopkeepers plugin was not enabled)?
+		NPC npc = this.getNPC();
+		if (npc == null) return false;
+
+		Location spawnLocation = this.getSpawnLocation();
+		if (spawnLocation == null) return false;
+
+		if (npc.isSpawned()) {
+			npc.teleport(spawnLocation, TeleportCause.PLUGIN);
+			// For simplicity, we assume that the teleport succeeded:
+			return true;
+		} else {
+			// TODO This also changes the NPC's spawn state (similar to Citizens own teleport
+			// command though).
+			return npc.spawn(spawnLocation, SpawnReason.PLUGIN);
+		}
+	}
 
 	// Null if the NPC entity despawned or should no longer be tracked.
 	void setEntity(@Nullable Entity entity) {

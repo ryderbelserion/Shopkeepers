@@ -76,6 +76,11 @@ public class Messages extends Config {
 			"Lets you rename",
 			"your shopkeeper"
 	));
+	public static String buttonMove = c("&aMove shopkeeper");
+	public static List<@NonNull String> buttonMoveLore = c(Arrays.asList(
+			"Lets you move",
+			"your shopkeeper"
+	));
 	public static String buttonContainer = c("&aView shop inventory");
 	public static List<@NonNull String> buttonContainerLore = c(Arrays.asList(
 			"Lets you view the inventory",
@@ -311,8 +316,8 @@ public class Messages extends Config {
 	public static Text missingSpawnLocation = Text.parse("&7You must specify a spawn location for this type of shop.");
 	public static Text spawnBlockNotEmpty = Text.parse("&7The spawn location must be empty.");
 	public static Text invalidSpawnBlockFace = Text.parse("&7The shopkeeper cannot be placed on this side of the block.");
-	public static Text mobCannotSpawnOnPeacefulDifficulty = Text.parse("&7The selected mob type cannot spawn on peaceful difficulty.");
-	public static Text restrictedArea = Text.parse("&7You cannot create a shopkeeper in this area.");
+	public static Text mobCannotSpawnOnPeacefulDifficulty = Text.parse("&7The selected mob type cannot spawn here on peaceful difficulty.");
+	public static Text restrictedArea = Text.parse("&7You cannot place a shopkeeper in this area.");
 	public static Text locationAlreadyInUse = Text.parse("&7This location is already used by another shopkeeper.");
 
 	public static Text containerSelected = Text.parse("&aContainer selected! Right-click a block to place your shopkeeper.");
@@ -333,6 +338,11 @@ public class Messages extends Config {
 	public static Text nameHasNotChanged = Text.parse("&aThe shop's name has not changed.");
 	public static Text nameInvalid = Text.parse("&cInvalid shop name: '&e{name}&c'");
 	public static String nameplatePrefix = c("&2");
+
+	public static Text clickNewShopLocation = Text.parse("&aPlease right-click the shop's new location.\n"
+			+ "  &aLeft-click to abort.");
+	public static Text shopkeeperMoved = Text.parse("&aThe shopkeeper has been moved!");
+	public static Text shopkeeperMoveAborted = Text.parse("&7Shopkeeper move aborted.");
 
 	public static Text shopTypeDisabled = Text.parse("&7The shop type '&6{type}&7' is disabled.");
 	public static Text shopObjectTypeDisabled = Text.parse("&7The shop object type '&6{type}&7' is disabled.");

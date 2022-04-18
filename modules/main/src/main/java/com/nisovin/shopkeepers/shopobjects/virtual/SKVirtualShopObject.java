@@ -74,6 +74,11 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 		return null;
 	}
 
+	@Override
+	public boolean move() {
+		return false;
+	}
+
 	// TICKING
 
 	@Override

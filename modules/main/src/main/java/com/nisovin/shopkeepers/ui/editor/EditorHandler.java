@@ -19,6 +19,8 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.moving.ShopkeeperMoving;
+import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
@@ -93,6 +95,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	protected void setupShopkeeperButtons() {
 		this.addButtonOrIgnore(this.createDeleteButton());
 		this.addButtonOrIgnore(this.createNamingButton());
+		this.addButtonOrIgnore(this.createMoveButton());
 	}
 
 	protected void setupShopObjectButtons() {
@@ -190,16 +193,46 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 					EditorSession editorSession,
 					InventoryClickEvent clickEvent
 			) {
-				// Also triggers save:
+				// Also triggers a save:
 				editorSession.getUISession().closeDelayed();
 
 				// Start naming:
 				Player player = editorSession.getPlayer();
-				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(
-						player,
-						shopkeeper
-				);
+				ShopkeeperNaming shopkeeperNaming = SKShopkeepersPlugin.getInstance().getShopkeeperNaming();
+				shopkeeperNaming.startNaming(player, shopkeeper);
+
 				TextUtils.sendMessage(player, Messages.typeNewName);
+				return true;
+			}
+		};
+	}
+
+	protected @Nullable Button createMoveButton() {
+		if (shopkeeper.getType() instanceof PlayerShopType
+				&& !Settings.enableMovingOfPlayerShops) {
+			return null;
+		}
+
+		return new ActionButton() {
+			@Override
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
+				return DerivedSettings.moveButtonItem.createItemStack();
+			}
+
+			@Override
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
+				// Also triggers a save:
+				editorSession.getUISession().closeDelayed();
+
+				// Start moving:
+				Player player = editorSession.getPlayer();
+				ShopkeeperMoving shopkeeperMoving = SKShopkeepersPlugin.getInstance().getShopkeeperMoving();
+				shopkeeperMoving.startMoving(player, shopkeeper);
+
+				TextUtils.sendMessage(player, Messages.clickNewShopLocation);
 				return true;
 			}
 		};

@@ -472,6 +472,18 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		this.onIdChanged();
 	}
 
+	@Override
+	public boolean move() {
+		Entity entity = this.entity;
+		if (entity == null) return false; // Ignore if not spawned
+
+		Location spawnLocation = this.getSpawnLocation();
+		if (spawnLocation == null) return false;
+
+		this.lastSpawnLocation = spawnLocation;
+		return entity.teleport(spawnLocation);
+	}
+
 	// TICKING
 
 	@Override

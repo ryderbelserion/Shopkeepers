@@ -403,6 +403,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		sign.setLine(3, StringUtils.replaceArguments(Messages.adminSignShopLine4, arguments));
 	}
 
+	@Override
+	public boolean move() {
+		if (!this.isSpawned()) return false;
+		return this.respawn();
+	}
+
 	// TICKING
 
 	@Override

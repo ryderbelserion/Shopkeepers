@@ -261,6 +261,9 @@ public class Settings extends Config {
 
 	public static ItemData nameItem = new ItemData(Material.NAME_TAG);
 
+	public static boolean enableMovingOfPlayerShops = true;
+	public static ItemData moveItem = new ItemData(Material.ENDER_PEARL);
+
 	public static boolean enableContainerOptionOnPlayerShop = true;
 	public static ItemData containerItem = new ItemData(Material.CHEST);
 
@@ -367,6 +370,7 @@ public class Settings extends Config {
 
 		// Button items:
 		public static ItemData nameButtonItem = Unsafe.uncheckedNull();
+		public static ItemData moveButtonItem = Unsafe.uncheckedNull();
 		public static ItemData containerButtonItem = Unsafe.uncheckedNull();
 		public static ItemData deleteButtonItem = Unsafe.uncheckedNull();
 		public static ItemData hireButtonItem = Unsafe.uncheckedNull();
@@ -565,6 +569,11 @@ public class Settings extends Config {
 					nameItem,
 					Messages.buttonName,
 					Messages.buttonNameLore
+			);
+			moveButtonItem = new ItemData(
+					moveItem,
+					Messages.buttonMove,
+					Messages.buttonMoveLore
 			);
 			containerButtonItem = new ItemData(
 					containerItem,

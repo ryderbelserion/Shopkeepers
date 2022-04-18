@@ -969,6 +969,34 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
+	 * Teleports the shopkeeper to a new location.
+	 * <p>
+	 * This updates the shopkeeper's {@link #setLocation(Location) location} and then
+	 * {@link AbstractShopObject#move() moves} the shop object if necessary.
+	 * 
+	 * @param location
+	 *            the new spawn location, not <code>null</code>
+	 */
+	public void teleport(Location location) {
+		Validate.notNull(location, "location is null");
+
+		boolean spawned = shopObject.isSpawned();
+
+		// This throws an exception if the shopkeeper cannot be moved (virtual shopkeepers) or if
+		// the location provides no valid world:
+		this.setLocation(location);
+
+		// Teleport the shop object to its new location:
+		// If the shop object does not handle its spawning itself, we only need to teleport the shop
+		// object if it was previously already spawned and is currently still spawned (checked by
+		// the move method itself), because otherwise the shop object has already been spawned or
+		// despawned by the location update.
+		if (spawned || !shopObject.getType().mustBeSpawned()) {
+			shopObject.move();
+		}
+	}
+
+	/**
 	 * Sets the yaw of this shopkeeper.
 	 * <p>
 	 * This will not automatically rotate the shop object until the next time it is spawned or

@@ -453,6 +453,11 @@ placeholder-item: PAPER
 # The item used for the set-name button, and the naming item (if enabled).
 name-item: NAME_TAG
 
+# Whether to allow shop owners to move their shops.
+enable-moving-of-player-shops: true
+# The item used for the move button.
+move-item: ENDER_PEARL
+
 # Whether the editor menu of player shops contains an option to open the shop's
 # container.
 enable-container-option-on-player-shop: true
