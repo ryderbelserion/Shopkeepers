@@ -40,6 +40,8 @@ import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.DespawnReason;
+import net.citizensnpcs.api.event.SpawnReason;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.trait.MobType;
 import net.citizensnpcs.api.trait.trait.Owner;
@@ -567,13 +569,24 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public boolean spawn() {
-		return false; // Handled by Citizens.
+		NPC npc = this.getNPC();
+		if (npc == null) return false;
+
+		Location spawnLocation = this.getSpawnLocation();
+		if (spawnLocation == null) return false;
+
+		return npc.spawn(spawnLocation, SpawnReason.PLUGIN);
 	}
 
 	@Override
 	public void despawn() {
-		// Handled by Citizens.
+		NPC npc = this.getNPC();
+		if (npc == null) return;
+
+		npc.despawn(DespawnReason.PLUGIN);
 	}
+
+	// TODO Use De/SpawnReason PendingRespawn/Respawn for respawns?
 
 	// Null if the NPC entity despawned or should no longer be tracked.
 	void setEntity(@Nullable Entity entity) {
