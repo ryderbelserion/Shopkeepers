@@ -90,14 +90,15 @@ public class ShopkeeperMoving {
 
 		@Override
 		public void onInteract(PlayerInteractEvent event) {
-			Player player = event.getPlayer();
+			// Cancel the event, including when the move is aborted:
+			event.setCancelled(true);
+
 			if (this.isAbortAction(event.getAction())) {
 				this.onAborted();
 				return;
 			}
 
-			event.setCancelled(true);
-
+			Player player = event.getPlayer();
 			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
 			BlockFace clickedBlockFace = event.getBlockFace();
 			Location spawnLocation = shopkeeperPlacement.determineSpawnLocation(
