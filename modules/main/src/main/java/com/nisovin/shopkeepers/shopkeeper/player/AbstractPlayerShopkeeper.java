@@ -578,6 +578,10 @@ public abstract class AbstractPlayerShopkeeper
 		return container.getZ();
 	}
 
+	public BlockLocation getContainerLocation() {
+		return container;
+	}
+
 	@Override
 	public void setContainer(int containerX, int containerY, int containerZ) {
 		this._setContainer(containerX, containerY, containerZ);

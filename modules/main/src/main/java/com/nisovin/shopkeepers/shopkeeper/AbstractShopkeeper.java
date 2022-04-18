@@ -943,7 +943,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public final void setLocation(BlockLocation location) {
 		Validate.State.isTrue(!this.isVirtual(), "Cannot set location of virtual shopkeeper!");
 		Validate.notNull(location, "location is null");
-		Validate.isTrue(location.hasWorldName(), "location has not world name");
+		Validate.isTrue(location.hasWorldName(), "location has no world name");
 
 		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for
 		// example player shops which currently use the shopkeeper's world name to locate their

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -21,6 +22,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * {@link #immutable()} to get a block location that is guaranteed to be immutable.
  */
 public class BlockLocation {
+
+	private static final Vector VECTOR_ZERO = new Vector();
+	private static final Vector BLOCK_CENTER_OFFSET = new Vector(0.5D, 0.5D, 0.5D);
 
 	/**
 	 * An immutable block location with unset world name and all coordinates being zero.
@@ -335,6 +339,74 @@ public class BlockLocation {
 	public final boolean matches(@Nullable Block block) {
 		if (block == null) return false;
 		return this.matches(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+	}
+
+	/**
+	 * Checks if the {@link #getWorldName() world name} of this {@link BlockLocation} matches the
+	 * world name of the given {@link Location}.
+	 * <p>
+	 * If both locations specify no world, this returns <code>true</code>. If one of the locations
+	 * specifies no world but the other does, this returns <code>false</code>.
+	 * 
+	 * @param location
+	 *            the location to compare with, not <code>null</code>
+	 * @return <code>true</code> if the world names match
+	 * @throws IllegalArgumentException
+	 *             if the given location contains a world but it is no longer loaded
+	 */
+	public final boolean isSameWorld(Location location) {
+		Validate.notNull(location, "location is null");
+		World world = location.getWorld(); // Throws an exception if the world is no longer loaded
+		String otherWorldName = world != null ? world.getName() : null;
+		return Objects.equals(this.worldName, otherWorldName);
+	}
+
+	/**
+	 * Gets the squared distance between this and the given location.
+	 * <p>
+	 * If the locations are located in different worlds, this returns {@link Double#MAX_VALUE}.
+	 * 
+	 * @param location
+	 *            the other location, not <code>null</code>
+	 * @return the squared distance
+	 */
+	public final double getDistanceSquared(Location location) {
+		return this.getDistanceSquared(VECTOR_ZERO, location);
+	}
+
+	/**
+	 * Gets the squared distance between this and the given location, with an offset added to the
+	 * coordinates of this location.
+	 * <p>
+	 * If the locations are located in different worlds, this returns {@link Double#MAX_VALUE}.
+	 * 
+	 * @param offset
+	 *            the offset to add to the coordinates of this location when calculating the
+	 *            distance, not <code>null</code>
+	 * @param location
+	 *            the other location, not <code>null</code>
+	 * @return the squared distance
+	 */
+	public final double getDistanceSquared(Vector offset, Location location) {
+		Validate.notNull(offset, "offset is null");
+		if (!this.isSameWorld(location)) return Double.MAX_VALUE;
+
+		double dx = this.getX() + offset.getX() - location.getX();
+		double dy = this.getY() + offset.getY() - location.getY();
+		double dz = this.getZ() + offset.getZ() - location.getZ();
+		return dx * dx + dy * dy + dz * dz;
+	}
+
+	/**
+	 * Gets the squared distance between the block center of this block location and the given
+	 * location.
+	 * 
+	 * @param location
+	 *            the other location, not <code>null</code>
+	 * @return the squared distance
+	 */
+	public final double getBlockCenterDistanceSquared(Location location) {
+		return this.getDistanceSquared(BLOCK_CENTER_OFFSET, location);
 	}
 
 	/**

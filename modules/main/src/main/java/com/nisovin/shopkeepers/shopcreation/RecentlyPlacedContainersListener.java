@@ -10,17 +10,17 @@ import com.nisovin.shopkeepers.container.ShopContainers;
 
 class RecentlyPlacedContainersListener implements Listener {
 
-	private final ShopkeeperCreation shopkeeperCreation;
+	private final ContainerSelection containerSelection;
 
-	RecentlyPlacedContainersListener(ShopkeeperCreation shopkeeperCreation) {
-		this.shopkeeperCreation = shopkeeperCreation;
+	RecentlyPlacedContainersListener(ContainerSelection containerSelection) {
+		this.containerSelection = containerSelection;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		if (ShopContainers.isSupportedContainer(block.getType())) {
-			shopkeeperCreation.addRecentlyPlacedContainer(event.getPlayer(), block);
+			containerSelection.addRecentlyPlacedContainer(event.getPlayer(), block);
 		}
 	}
 }

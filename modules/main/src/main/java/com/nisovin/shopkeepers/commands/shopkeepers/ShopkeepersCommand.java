@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.shopkeepers.snapshot.CommandSnapshot;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopcreation.ShopkeeperPlacement;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -188,7 +189,8 @@ public class ShopkeepersCommand extends BaseCommand {
 		}
 
 		// Determine spawn location:
-		Location spawnLocation = plugin.getShopkeeperCreation().determineSpawnLocation(
+		ShopkeeperPlacement shopkeeperPlacement = plugin.getShopkeeperCreation().getShopkeeperPlacement();
+		Location spawnLocation = shopkeeperPlacement.determineSpawnLocation(
 				player,
 				targetBlock,
 				targetBlockFace

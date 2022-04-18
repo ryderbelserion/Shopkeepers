@@ -120,9 +120,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	private final Commands commands = new Commands(Unsafe.initialized(this));
 	private final ChatInput chatInput = new ChatInput(Unsafe.initialized(this));
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
-	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(
-			Unsafe.initialized(this)
-	);
 	private final TradeLoggers tradeLoggers = new TradeLoggers(Unsafe.initialized(this));
 	private final TradeNotifications tradeNotifications = new TradeNotifications(
 			Unsafe.initialized(this)
@@ -133,6 +130,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	private final ProtectedContainers protectedContainers = new ProtectedContainers(
 			Unsafe.initialized(this)
+	);
+	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(
+			Unsafe.initialized(this),
+			shopkeeperRegistry,
+			protectedContainers
 	);
 	private final RemoveShopOnContainerBreak removeShopOnContainerBreak = new RemoveShopOnContainerBreak(
 			Unsafe.initialized(this),

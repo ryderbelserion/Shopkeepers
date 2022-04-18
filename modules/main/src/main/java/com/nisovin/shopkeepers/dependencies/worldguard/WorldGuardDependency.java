@@ -42,8 +42,21 @@ public final class WorldGuardDependency {
 		Internal.registerAllowShopFlag();
 	}
 
-	public static boolean isShopAllowed(Player player, Location location) {
-		Validate.notNull(player, "player is null");
+	/**
+	 * Checks if any WorldGuard restrictions prevent a shop from being placed at the given location.
+	 * <p>
+	 * If no {@code player} is specified, any player specific restrictions or additional permissions
+	 * (e.g. based on region memberships) are ignored. When some WorldGuard query requires a player
+	 * but no player is specified, we skip the check with a lenient result.
+	 * 
+	 * @param player
+	 *            the player who is trying to place the shop, or <code>null</code> to ignore any
+	 *            player specific restrictions and permissions
+	 * @param location
+	 *            the shop location, not <code>null</code>
+	 * @return <code>true</code> if the shop is allowed to be placed at the given location
+	 */
+	public static boolean isShopAllowed(@Nullable Player player, Location location) {
 		Validate.notNull(location, "location is null");
 		Plugin wgPlugin = getPlugin();
 		if (wgPlugin == null || !wgPlugin.isEnabled()) return true;
@@ -68,11 +81,11 @@ public final class WorldGuardDependency {
 
 		public static boolean isShopAllowed(
 				Plugin worldGuardPlugin,
-				Player player,
+				@Nullable Player player,
 				Location location
 		) {
 			assert worldGuardPlugin instanceof WorldGuardPlugin && worldGuardPlugin.isEnabled();
-			assert player != null && location != null;
+			assert location != null;
 			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuardPlugin;
 			RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
@@ -82,18 +95,23 @@ public final class WorldGuardDependency {
 			// Get shop flag:
 			Flag<?> shopFlag = WorldGuard.getInstance().getFlagRegistry().get(FLAG_ALLOW_SHOP);
 			if (shopFlag != null) {
+				if (shopFlag.requiresSubject() && player == null) {
+					// Cannot check the shop flag without a player. Lenient fallback:
+					return true;
+				}
+
 				// Check if shop flag is set:
 				if (shopFlag instanceof StateFlag) {
 					allowShopFlag = query.testState(
 							BukkitAdapter.adapt(location),
-							wgPlugin.wrapPlayer(player),
+							player != null ? wgPlugin.wrapPlayer(player) : null,
 							(StateFlag) shopFlag
 					);
 				} else if (shopFlag instanceof BooleanFlag) {
 					// Value might be null:
 					Boolean shopFlagValue = query.queryValue(
 							BukkitAdapter.adapt(location),
-							wgPlugin.wrapPlayer(player),
+							player != null ? wgPlugin.wrapPlayer(player) : null,
 							(BooleanFlag) shopFlag
 					);
 					allowShopFlag = (Boolean.TRUE.equals(shopFlagValue));
@@ -110,6 +128,10 @@ public final class WorldGuardDependency {
 			} else {
 				// Allow shops in regions where the shop flag is set OR the player can build:
 				if (allowShopFlag) return true;
+				if (player == null) {
+					// Cannot check the build flag without a player. Lenient fallback:
+					return true;
+				}
 				return query.testState(
 						BukkitAdapter.adapt(location),
 						wgPlugin.wrapPlayer(player),

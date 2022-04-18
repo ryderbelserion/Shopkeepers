@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -22,9 +23,11 @@ import com.nisovin.shopkeepers.dependencies.towny.TownyDependency;
 import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
+import com.nisovin.shopkeepers.shopcreation.ContainerSelection;
 import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
-import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -59,7 +62,7 @@ public abstract class AbstractPlayerShopType<T extends @NonNull AbstractPlayerSh
 		// The creator, not null here:
 		Player creator = Unsafe.assertNonNull(shopCreationData.getCreator());
 
-		// Validate container block:
+		// Validate the container block:
 		Block containerBlock = playerShopCreationData.getShopContainer();
 		if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
 			// The block is not / no longer a supported type of container:
@@ -71,37 +74,10 @@ public abstract class AbstractPlayerShopType<T extends @NonNull AbstractPlayerSh
 			return false;
 		}
 
-		// Check selected container:
 		ShopkeeperCreation shopkeeperCreation = SKShopkeepersPlugin.getInstance().getShopkeeperCreation();
-		if (!shopkeeperCreation.handleCheckContainer(creator, containerBlock)) {
+		ContainerSelection containerSelection = shopkeeperCreation.getContainerSelection();
+		if (!containerSelection.validateContainer(creator, containerBlock)) {
 			return false;
-		}
-
-		Location spawnLocation = shopCreationData.getSpawnLocation();
-		if (spawnLocation != null) {
-			// Check if the selected container is too far away:
-			Location containerLocation = LocationUtils.getBlockCenterLocation(containerBlock);
-			double maxContainerDistanceSq = Settings.maxContainerDistance * Settings.maxContainerDistance;
-			if (LocationUtils.getDistanceSquared(containerLocation, spawnLocation) > maxContainerDistanceSq) {
-				TextUtils.sendMessage(creator, Messages.containerTooFarAway);
-				return false;
-			}
-
-			// Check WorldGuard:
-			if (Settings.enableWorldGuardRestrictions) {
-				if (!WorldGuardDependency.isShopAllowed(creator, spawnLocation)) {
-					TextUtils.sendMessage(creator, Messages.restrictedArea);
-					return false;
-				}
-			}
-
-			// Check Towny:
-			if (Settings.enableTownyRestrictions) {
-				if (!TownyDependency.isCommercialArea(spawnLocation)) {
-					TextUtils.sendMessage(creator, Messages.restrictedArea);
-					return false;
-				}
-			}
 		}
 
 		int maxShopsLimit = PlayerShopsLimit.getMaxShopsLimit(creator);
@@ -118,7 +94,7 @@ public abstract class AbstractPlayerShopType<T extends @NonNull AbstractPlayerSh
 			maxShopsLimit = createEvent.getMaxShopsLimit();
 		}
 
-		// Count owned shops:
+		// Check the max shops limit:
 		if (maxShopsLimit != Integer.MAX_VALUE) {
 			ShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
 			int count = shopkeeperRegistry.getPlayerShopkeepersByOwner(creator.getUniqueId()).size();
@@ -127,6 +103,66 @@ public abstract class AbstractPlayerShopType<T extends @NonNull AbstractPlayerSh
 				return false;
 			}
 		}
+		return true;
+	}
+
+	@Override
+	public boolean validateSpawnLocation(
+			@Nullable Player player,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace blockFace,
+			@Nullable ShopCreationData shopCreationData,
+			@Nullable AbstractShopkeeper shopkeeper
+	) {
+		if (!super.validateSpawnLocation(player, spawnLocation, blockFace, shopCreationData, shopkeeper)) {
+			return false;
+		}
+
+		if (spawnLocation == null) return true; // Nothing to validate
+
+		// Check if the shop container is too far away:
+		BlockLocation containerLocation = null;
+		if (shopCreationData != null) {
+			assert shopCreationData instanceof PlayerShopCreationData;
+			PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
+			containerLocation = BlockLocation.of(playerShopCreationData.getShopContainer());
+		} else if (shopkeeper != null) {
+			assert shopkeeper instanceof AbstractPlayerShopkeeper;
+			AbstractPlayerShopkeeper playerShopkeeper = (AbstractPlayerShopkeeper) shopkeeper;
+			containerLocation = playerShopkeeper.getContainerLocation();
+		}
+
+		if (containerLocation != null) {
+			// Check if the selected container is too far away:
+			double maxContainerDistanceSq = Settings.maxContainerDistance * Settings.maxContainerDistance;
+			if (containerLocation.getBlockCenterDistanceSquared(spawnLocation) > maxContainerDistanceSq) {
+				if (player != null) {
+					TextUtils.sendMessage(player, Messages.containerTooFarAway);
+				}
+				return false;
+			}
+		}
+
+		// Check WorldGuard restrictions:
+		if (Settings.enableWorldGuardRestrictions) {
+			if (!WorldGuardDependency.isShopAllowed(player, spawnLocation)) {
+				if (player != null) {
+					TextUtils.sendMessage(player, Messages.restrictedArea);
+				}
+				return false;
+			}
+		}
+
+		// Check Towny restrictions:
+		if (Settings.enableTownyRestrictions) {
+			if (!TownyDependency.isCommercialArea(spawnLocation)) {
+				if (player != null) {
+					TextUtils.sendMessage(player, Messages.restrictedArea);
+				}
+				return false;
+			}
+		}
+
 		return true;
 	}
 }

@@ -13,6 +13,7 @@ Date format: (YYYY-MM-DD)
 
 **Internal changes:**  
 * Refactors related to chat input handling.
+* Refactors related to shop creation, container selection, and shopkeeper placement.
 
 ## v2.15.1 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5

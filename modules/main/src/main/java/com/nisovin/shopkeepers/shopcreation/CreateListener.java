@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -63,7 +64,8 @@ class CreateListener implements Listener {
 	private static final long INTERACTION_DELAY_MILLIS = 50L;
 
 	private final SKShopkeepersPlugin plugin;
-	private final ShopkeeperCreation shopkeeperCreation;
+	private final ContainerSelection containerSelection;
+	private final ShopkeeperPlacement shopkeeperPlacement;
 
 	// By player UUID:
 	private final Map<@NonNull UUID, @NonNull MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
@@ -71,9 +73,14 @@ class CreateListener implements Listener {
 	// Cached value whether the shop creation item selection message is enabled:
 	private boolean shopCreationItemSelectedMessageEnabled;
 
-	CreateListener(SKShopkeepersPlugin plugin, ShopkeeperCreation shopkeeperCreation) {
+	CreateListener(
+			SKShopkeepersPlugin plugin,
+			ContainerSelection containerSelection,
+			ShopkeeperPlacement shopkeeperPlacement
+	) {
 		this.plugin = plugin;
-		this.shopkeeperCreation = shopkeeperCreation;
+		this.containerSelection = containerSelection;
+		this.shopkeeperPlacement = shopkeeperPlacement;
 	}
 
 	void onEnable() {
@@ -249,27 +256,28 @@ class CreateListener implements Listener {
 			}
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block clickedBlock = Unsafe.assertNonNull(event.getClickedBlock());
+			Material clickedBlockType = clickedBlock.getType();
 
-			Block selectedContainer = shopkeeperCreation.getSelectedContainer(player);
+			Block selectedContainer = containerSelection.getSelectedContainer(player);
 			// Validate old selected container:
 			if (selectedContainer != null
 					&& !ShopContainers.isSupportedContainer(selectedContainer.getType())) {
-				shopkeeperCreation.selectContainer(player, null);
+				containerSelection.selectContainer(player, null);
 				selectedContainer = null;
 			}
 
 			// Handle container selection:
 			boolean isContainerSelection = false;
 			if (!clickedBlock.equals(selectedContainer)) {
-				if (ShopContainers.isSupportedContainer(clickedBlock.getType())) {
+				if (ShopContainers.isSupportedContainer(clickedBlockType)) {
 					isContainerSelection = true;
 					// Check if the container can be used for a shop:
-					if (shopkeeperCreation.handleCheckContainer(player, clickedBlock)) {
+					if (containerSelection.validateContainer(player, clickedBlock)) {
 						// Select container:
-						shopkeeperCreation.selectContainer(player, clickedBlock);
+						containerSelection.selectContainer(player, clickedBlock);
 						TextUtils.sendMessage(player, Messages.containerSelected);
 					}
-				} else if (ItemUtils.isContainer(clickedBlock.getType())) {
+				} else if (ItemUtils.isContainer(clickedBlockType)) {
 					// Player clicked a type of container which cannot be used for shops:
 					isContainerSelection = true;
 					TextUtils.sendMessage(player, Messages.unsupportedContainer);
@@ -291,7 +299,7 @@ class CreateListener implements Listener {
 
 				// Determine spawn location:
 				BlockFace clickedBlockFace = event.getBlockFace();
-				Location spawnLocation = shopkeeperCreation.determineSpawnLocation(
+				Location spawnLocation = shopkeeperPlacement.determineSpawnLocation(
 						player,
 						clickedBlock,
 						clickedBlockFace
@@ -311,7 +319,7 @@ class CreateListener implements Listener {
 					// Shopkeeper creation was successful:
 
 					// Reset selected container:
-					shopkeeperCreation.selectContainer(player, null);
+					containerSelection.selectContainer(player, null);
 
 					// Manually remove creation item from player's hand after this event is
 					// processed:

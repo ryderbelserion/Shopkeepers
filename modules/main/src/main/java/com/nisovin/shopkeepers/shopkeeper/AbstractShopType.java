@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopcreation.ShopkeeperPlacement;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.text.Text;
@@ -227,17 +228,21 @@ public abstract class AbstractShopType<T extends @NonNull AbstractShopkeeper>
 		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace(); // Can be null
 
 		// Validate the spawn location:
-		// This is also expected to send feedback to the shop creator if necessary.
-		if (!shopObjectType.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
+		// This is expected to send feedback to the shop creator if necessary.
+		ShopkeeperPlacement shopkeeperPlacement = SKShopkeepersPlugin.getInstance()
+				.getShopkeeperCreation()
+				.getShopkeeperPlacement();
+		boolean isSpawnLocationValid = shopkeeperPlacement.validateSpawnLocation(
+				creator,
+				shopType,
+				shopObjectType,
+				spawnLocation,
+				targetedBlockFace,
+				shopCreationData,
+				null
+		);
+		if (!isSpawnLocationValid) {
 			return null;
-		}
-
-		// Check if the location is already used by another shopkeeper:
-		if (spawnLocation != null) {
-			if (!shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
-				TextUtils.sendMessage(creator, Messages.locationAlreadyInUse);
-				return null;
-			}
 		}
 
 		try {
@@ -265,7 +270,8 @@ public abstract class AbstractShopType<T extends @NonNull AbstractShopkeeper>
 		}
 	}
 
-	// Shop type specific handling of shopkeeper creation by players.
+	// Shop type specific handling of the shopkeeper creation by players (except any spawn location
+	// validation).
 	// Returns null in case of failure.
 	protected boolean handleSpecificShopkeeperCreation(ShopCreationData creationData) {
 		// Call event:
@@ -275,6 +281,48 @@ public abstract class AbstractShopType<T extends @NonNull AbstractShopkeeper>
 			Log.debug("ShopkeeperCreateEvent was cancelled!");
 			return false;
 		}
+		return true;
+	}
+
+	/**
+	 * Validates the given spawn location according to any shop-type specific validation rules.
+	 * <p>
+	 * If a player is specified, this sends feedback about failed validation rules to the player.
+	 * <p>
+	 * Only the {@code shopCreationData} or the {@code shopkeeper} can be specified, but not both.
+	 * 
+	 * @param player
+	 *            the player who is trying to place the shop, or <code>null</code>
+	 * @param spawnLocation
+	 *            the spawn location, can be <code>null</code> for virtual shops, has to provide a
+	 *            loaded world if not <code>null</code>
+	 * @param blockFace
+	 *            the block face, can be <code>null</code> for virtual shops or if not available
+	 * @param shopCreationData
+	 *            the {@link ShopCreationData} for which the spawn location is validated, or
+	 *            <code>null</code> if not available
+	 * @param shopkeeper
+	 *            the shopkeeper for which the spawn location is validated, or <code>null</code> if
+	 *            not available
+	 * @return <code>true</code> if the spawn location is valid
+	 */
+	public boolean validateSpawnLocation(
+			@Nullable Player player,
+			@Nullable Location spawnLocation,
+			@Nullable BlockFace blockFace,
+			@Nullable ShopCreationData shopCreationData,
+			@Nullable AbstractShopkeeper shopkeeper
+	) {
+		// Common argument validation:
+		if (shopCreationData != null) {
+			Validate.isTrue(shopkeeper == null,
+					"shopCreationData and shopkeeper cannot both be specified");
+			this.validateCreationData(shopCreationData);
+		} else if (shopkeeper != null) {
+			Validate.isTrue(shopkeeper.getType() == this, "shopkeeper is of a different type");
+		}
+
+		// There are no default shop-type specific validation rules.
 		return true;
 	}
 }
