@@ -23,6 +23,7 @@ Date format: (YYYY-MM-DD)
 * Added InteractionInput for keeping track of interaction requests.
 * Added AbstractShopkeeper#teleport for moving a shopkeeper.
 * Added AbstractShopObject#move which moves the shop object to its intended spawn location based on its associated shopkeeper.
+* Fixed: The Citizens shopkeeper trait reference was not properly cleaned up. This also resulted in a failed assertion on plugin reloads.
 
 **Message changes:**  
 * Changed `mob-cannot-spawn-on-peaceful-difficulty`.

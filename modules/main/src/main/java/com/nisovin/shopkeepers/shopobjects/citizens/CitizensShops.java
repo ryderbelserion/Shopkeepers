@@ -208,7 +208,7 @@ public class CitizensShops {
 			} catch (Throwable e) {
 				Log.debug("Shopkeeper trait deregistration failed!", e);
 			} finally {
-				shopkeeperTrait = null;
+				this.shopkeeperTrait = null;
 			}
 		}
 	}
