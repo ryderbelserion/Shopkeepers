@@ -347,11 +347,10 @@ public class ShopkeeperSpawner {
 		// an active chunk of a world that is currently being saved, we need to despawn the
 		// shopkeeper and wait for the new world's pending respawn.
 		// 3) If the shopkeeper was previously queued to be spawned, but is then moved somewhere, we
-		// want to spawn it
-		// immediately. This ensures that when a the shopkeeper is teleported near a player, the
-		// player does not need to wait for the shopkeeper to appear. This applies even if the old
-		// and new worlds are the same. To handle this case, we cannot ignore shopkeepers here even
-		// if they are not affected by world saves.
+		// want to spawn it immediately. This ensures that when a the shopkeeper is teleported near
+		// a player, the player does not need to wait for the shopkeeper to appear. This applies
+		// even if the old and new worlds are the same. To handle this case, we cannot ignore
+		// shopkeepers here even if they are not affected by world saves.
 
 		// Ignore if the shopkeeper's activation state has changed:
 		// The activation change has already triggered either a spawn or a despawn of the
@@ -359,9 +358,9 @@ public class ShopkeeperSpawner {
 		// into account.
 		if (activationStateChanged) return;
 
-		// The shopkeeper's activation has not changed, and the shopkeeper is currently inactive:
-		// I.e. the shopkeeper was previously inactive, and does not need to be spawned in its new
-		// chunk either.
+		// Ignore if the shopkeeper's activation has not changed, and the shopkeeper is currently
+		// inactive: I.e. the shopkeeper was previously inactive, and does not need to be spawned in
+		// its new chunk either.
 		if (!shopkeeper.isActive()) return;
 
 		// The shopkeeper moved from one active chunk to another. It is meant to be spawned

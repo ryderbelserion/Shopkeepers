@@ -93,6 +93,7 @@ public final class LocationUtils {
 		// the same UUID but are different instances, it is unclear whether they can be treated as
 		// equal, since some operations on a previously unloaded world might have no effect.
 		if (world1 != world2) return Double.MAX_VALUE; // Different worlds
+
 		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
 		double dx = location1.getX() - location2.getX();
 		double dy = location1.getY() - location2.getY();
