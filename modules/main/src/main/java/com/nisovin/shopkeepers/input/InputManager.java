@@ -49,9 +49,9 @@ public abstract class InputManager<@NonNull T> {
 		}
 
 		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-		void onPlayerQuit(PlayerQuitEvent event) {
+		void onPlayerQuitEvent(PlayerQuitEvent event) {
 			Player player = event.getPlayer();
-			abortRequest(player);
+			onPlayerQuit(player);
 		}
 	}
 
@@ -84,6 +84,19 @@ public abstract class InputManager<@NonNull T> {
 		HandlerList.unregisterAll(playerQuitListener);
 		pendingRequests.values().forEach(InputRequest::onAborted);
 		pendingRequests.clear();
+	}
+
+	/**
+	 * This is called when a player quits the server.
+	 * <p>
+	 * This can be used to perform certain cleanup related to the player. By default, this aborts
+	 * any pending request for the player.
+	 * 
+	 * @param player
+	 *            the player, not <code>null</code>
+	 */
+	protected void onPlayerQuit(Player player) {
+		this.abortRequest(player);
 	}
 
 	/**

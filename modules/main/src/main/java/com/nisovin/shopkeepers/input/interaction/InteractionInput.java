@@ -1,7 +1,12 @@
 package com.nisovin.shopkeepers.input.interaction;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,6 +24,8 @@ import com.nisovin.shopkeepers.input.InputRequest;
 import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEntityEvent;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEvent;
+import com.nisovin.shopkeepers.util.java.MutableLong;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Manages requests for interaction input from players.
@@ -114,6 +121,15 @@ public class InteractionInput extends InputManager<@NonNull Event>
 		}
 	}
 
+	// We sometimes receive two interact events for a single player interaction: A normal left or
+	// right click block or air, and then an additional left click air due to the player's arm swing
+	// animation. By only handling one interaction event within a small time span, we ignore the
+	// additional left click air event.
+	private static final long INTERACTION_DELAY_MILLIS = 50L;
+
+	// By player UUID:
+	private final Map<@NonNull UUID, @NonNull MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
+
 	public InteractionInput(Plugin plugin) {
 		super(plugin);
 	}
@@ -128,6 +144,9 @@ public class InteractionInput extends InputManager<@NonNull Event>
 		// Shopkeepers plugin (e.g. shopkeeper creation and sign shop interactions).
 		EventUtils.enforceExecuteFirst(PlayerInteractEvent.class, EventPriority.LOWEST, this);
 		EventUtils.enforceExecuteFirst(PlayerInteractEntityEvent.class, EventPriority.LOWEST, this);
+		// TODO For entity interactions, we receive both interact-at and interact-with-entity events
+		// (in this order). We usually prefer handling the interact with event in this case (but
+		// might still want to cancel the interact-at event).
 		EventUtils.enforceExecuteFirst(PlayerInteractAtEntityEvent.class, EventPriority.LOWEST, this);
 	}
 
@@ -135,6 +154,13 @@ public class InteractionInput extends InputManager<@NonNull Event>
 	public void onDisable() {
 		super.onDisable();
 		HandlerList.unregisterAll(this);
+		lastHandledPlayerInteractionsMillis.clear();
+	}
+
+	@Override
+	protected void onPlayerQuit(Player player) {
+		super.onPlayerQuit(player);
+		lastHandledPlayerInteractionsMillis.remove(player.getUniqueId());
 	}
 
 	// We don't ignore cancelled events.
@@ -159,14 +185,44 @@ public class InteractionInput extends InputManager<@NonNull Event>
 		this.onPlayerInteractEntity(event);
 	}
 
-	private void handleInteraction(PlayerEvent event) {
-		// Check if there is a request for the player that reacts to the event:
-		// If there is a request, it is removed and then subsequently processed.
+	private <E extends @NonNull PlayerEvent & Cancellable> void handleInteraction(E event) {
+		// Check if there is a pending request for the player:
 		Player player = event.getPlayer();
-		InputRequest<@NonNull Event> request = this.removeRequestIf(player, req -> {
-			return this.isInteractionAccepted(req, event);
-		});
+		InputRequest<@NonNull Event> request = this.getRequest(player);
 		if (request == null) return; // There is no request for the player
+
+		// Ignore the event if we already handled an interaction for the player recently:
+		// This filters out additional left click air interaction events that we sometimes receive
+		// after a 'normal' interaction event.
+		// TODO Maybe only ignore additional left click air events specifically? However, we might
+		// also receive multiple interaction events when a player interacts with an entity and
+		// targets a block at the same time.
+		// TODO Combine this with the same logic found in the shopkeeper creation listener.
+		MutableLong lastHandledInteractionMillis = lastHandledPlayerInteractionsMillis.computeIfAbsent(
+				player.getUniqueId(),
+				uuid -> new MutableLong()
+		);
+		assert lastHandledInteractionMillis != null;
+		long nowMillis = System.currentTimeMillis();
+		long millisSinceLastInteraction = (nowMillis - lastHandledInteractionMillis.getValue());
+		if (millisSinceLastInteraction < INTERACTION_DELAY_MILLIS) {
+			Log.debug(() -> "Interaction input: Ignoring interaction (" + event.getEventName()
+					+ ") of player " + player.getName() + ": Last handled interaction was "
+					+ millisSinceLastInteraction + " ms ago.");
+			// We always cancel this additional event:
+			event.setCancelled(true);
+			return;
+		}
+		// We only update the last interaction timestamp when we actually process the event. This
+		// prevents that delays between individual events accumulate and that we always process the
+		// event after the intended delay is over.
+		lastHandledInteractionMillis.setValue(nowMillis);
+
+		// Check if the request accepts the event:
+		if (!this.isInteractionAccepted(request, event)) return;
+
+		// Remove and fulfill the request:
+		this.removeRequest(player);
 
 		// Process the request, immediately, so that the request can affect the outcome of the
 		// event:
