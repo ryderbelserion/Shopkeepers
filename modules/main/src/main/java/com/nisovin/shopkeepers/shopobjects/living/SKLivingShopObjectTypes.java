@@ -145,7 +145,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>HOGLIN: okay
  * <li>ZOGLIN: okay, TODO add baby property
  * <li>STRIDER: okay, shakes outside the nether, randomly spawns with passenger (gets cleared),
- * randomly spawns with saddle (TODO) # 1.16.2
+ * randomly spawns with saddle (gets cleared), TODO saddle property, shivering property (may require
+ * continuously updating the entity state) # 1.16.2
  * <li>PIGLIN_BRUTE: okay, TODO add baby property # 1.17
  * <li>AXOLOTL: okay, spawns with random variant in vanilla
  * <li>GLOW_SQUID: okay

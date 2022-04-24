@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Steerable;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -202,6 +203,13 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 				// for their baby variants).
 				equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
 			}
+		}
+
+		// Some entities (e.g. striders) may randomly spawn with a saddle that does not count as
+		// equipment:
+		if (entity instanceof Steerable) {
+			Steerable steerable = (Steerable) entity;
+			steerable.setSaddle(false);
 		}
 
 		// Any version-specific preparation:
