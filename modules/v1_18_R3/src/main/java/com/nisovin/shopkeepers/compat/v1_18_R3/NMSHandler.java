@@ -22,9 +22,7 @@ import org.bukkit.entity.Goat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -159,22 +157,6 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setNoclip(Entity entity) {
 		net.minecraft.world.entity.Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.noPhysics = true;
-	}
-
-	@Override
-	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		// Only works in the latest versions of Bukkit 1.15.1 and upwards:
-		raider.setCanJoinRaid(canJoinRaid);
-	}
-
-	@Override
-	public void setExclusiveAdult(LivingEntity entity) {
-		// There are no mobs in this MC version to which this applies.
-	}
-
-	@Override
-	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
-		wanderingTrader.setDespawnDelay(despawnDelay);
 	}
 
 	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without

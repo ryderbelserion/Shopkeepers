@@ -89,22 +89,6 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 
 	// CAT TYPE
 
-	// MC 1.14: Conversion from ocelot types to similar cat types:
-	public static Cat.Type fromOcelotType(String ocelotType) {
-		assert ocelotType != null;
-		switch (ocelotType) {
-		case "BLACK_CAT":
-			return Cat.Type.BLACK;
-		case "RED_CAT":
-		case "WILD_OCELOT": // There is no equivalent, RED seems to visually match the best
-			return Cat.Type.RED;
-		case "SIAMESE_CAT":
-			return Cat.Type.SIAMESE;
-		default:
-			return Cat.Type.TABBY; // Fallback to default cat type
-		}
-	}
-
 	public Cat.Type getCatType() {
 		return catTypeProperty.getValue();
 	}

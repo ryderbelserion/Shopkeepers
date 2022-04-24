@@ -176,13 +176,13 @@ public class Settings extends Config {
 					EntityType.TRADER_LLAMA.name(), // MC 1.14
 					EntityType.WANDERING_TRADER.name(), // MC 1.14
 					EntityType.FOX.name(), // MC 1.14
-					"BEE", // MC 1.15
-					"ZOMBIFIED_PIGLIN", // MC 1.16, replaced PIG_ZOMBIE
-					"PIGLIN", // MC 1.16
-					"HOGLIN", // MC 1.16
-					"ZOGLIN", // MC 1.16
-					"STRIDER", // MC 1.16
-					"PIGLIN_BRUTE", // MC 1.16.2
+					EntityType.BEE.name(), // MC 1.15
+					EntityType.ZOMBIFIED_PIGLIN.name(), // MC 1.16, replaced PIG_ZOMBIE
+					EntityType.PIGLIN.name(), // MC 1.16
+					EntityType.HOGLIN.name(), // MC 1.16
+					EntityType.ZOGLIN.name(), // MC 1.16
+					EntityType.STRIDER.name(), // MC 1.16
+					EntityType.PIGLIN_BRUTE.name(), // MC 1.16.2
 					"AXOLOTL", // MC 1.17
 					"GOAT", // MC 1.17
 					"GLOW_SQUID" // MC 1.17
@@ -640,6 +640,8 @@ public class Settings extends Config {
 								+ " This mob no longer exist since MC 1.16."
 								+ " Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
 					} else {
+						// TODO This logs warnings for the default settings when we run on an older
+						// (but supported) MC version.
 						Log.warning(INSTANCE.getLogPrefix()
 								+ "Invalid living entity type name in 'enabled-living-shops': "
 								+ entityTypeId);

@@ -48,11 +48,8 @@ public class TestItemStacks {
 				// https://hub.spigotmc.org/jira/browse/SPIGOT-6257
 				// createItemStackBlockData(),
 				createItemStackUncommonMeta(),
-				// TODO The deserialization of the text data of books is broken in Bukkit 1.14 and
-				// should be fixed in late versions of 1.16. See
-				// https://hub.spigotmc.org/jira/browse/SPIGOT-3206
-				// createItemStackWritableBook(),
-				// createItemStackWrittenBook(),
+				createItemStackWritableBook(),
+				createItemStackWrittenBook(),
 				createItemStackBasicTileEntity(),
 				createItemStackTileEntityDisplayName()
 		);

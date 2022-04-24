@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Breedable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -289,16 +290,16 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			// in panic due to nearby hostile mob shopkeepers).
 			entity.setInvulnerable(true);
 
-			// Disable breeding:
+			// Disable aging and breeding:
 			if (entity instanceof Ageable) {
-				Ageable ageable = ((Ageable) entity);
+				Ageable ageable = (Ageable) entity;
 				ageable.setAdult();
-				ageable.setBreed(false);
-				ageable.setAgeLock(true);
 			}
-
-			// Set the entity to an adult if we don't support its baby property yet:
-			NMSManager.getProvider().setExclusiveAdult(entity);
+			if (entity instanceof Breedable) {
+				Breedable breedable = (Breedable) entity;
+				breedable.setBreed(false);
+				breedable.setAgeLock(true);
+			}
 
 			// Any version-specific setup:
 			NMSManager.getProvider().setupSpawnedEntity(entity);
@@ -315,7 +316,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 
 			// Prevent raider shopkeepers from participating in nearby raids:
 			if (entity instanceof Raider) {
-				NMSManager.getProvider().setCanJoinRaid((Raider) entity, false);
+				Raider raider = (Raider) entity;
+				raider.setCanJoinRaid(false);
 			}
 
 			// Apply sub-type:
@@ -432,9 +434,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		entity.setAI(false);
 		// Note on Bukkit's 'isAware' flag added in MC 1.15: Disables the AI logic similarly to
 		// NoAI, but the mob can still move when being pushed around or due to gravity.
-		// TODO The collidable API has been reworked to actually work now. Together with the isAware
-		// flag this could be an alternative to using NoAI and then having to handle gravity on our
-		// own.
+		// The collidable API has been reworked to actually work now. Together with the isAware flag
+		// this could be an alternative to using NoAI and then having to handle gravity on our own.
 		// However, for now we prefer using NoAI. This might be safer in regards to potential future
 		// issues and also automatically handles other cases, like players pushing entities around
 		// by hitting them.

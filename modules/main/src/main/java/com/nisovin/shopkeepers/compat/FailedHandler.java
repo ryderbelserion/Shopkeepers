@@ -6,8 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Raider;
-import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -35,10 +33,6 @@ public final class FailedHandler implements NMSCallProvider {
 
 	private final Class<?> obcCraftEntityClass;
 	private final Method obcGetHandleMethod;
-
-	// Bukkit
-	private final Method raiderSetCanJoinRaidMethod;
-	private final Method wanderingTraderSetDespawnDelayMethod;
 
 	public FailedHandler() throws Exception {
 		String cbVersion = ServerUtils.getCraftBukkitVersion();
@@ -69,18 +63,6 @@ public final class FailedHandler implements NMSCallProvider {
 
 		obcCraftEntityClass = Class.forName(obcPackageString + "entity.CraftEntity");
 		obcGetHandleMethod = obcCraftEntityClass.getDeclaredMethod("getHandle");
-
-		// Bukkit
-		// Only available on Bukkit 1.15.1 and upwards:
-		raiderSetCanJoinRaidMethod = Raider.class.getDeclaredMethod(
-				"setCanJoinRaid",
-				boolean.class
-		);
-		// Only available in later versions of Bukkit 1.16.5 and upwards:
-		wanderingTraderSetDespawnDelayMethod = WanderingTrader.class.getDeclaredMethod(
-				"setDespawnDelay",
-				int.class
-		);
 	}
 
 	@Override
@@ -118,25 +100,6 @@ public final class FailedHandler implements NMSCallProvider {
 	public void setNoclip(Entity entity) {
 		// Not supported, but also not necessarily required (just provides a small performance
 		// benefit).
-	}
-
-	@Override
-	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		try {
-			raiderSetCanJoinRaidMethod.invoke(raider, canJoinRaid);
-		} catch (Exception e) {
-			// Not supported. Raider mobs might interfere with nearby raids :(
-		}
-	}
-
-	@Override
-	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
-		try {
-			wanderingTraderSetDespawnDelayMethod.invoke(wanderingTrader, despawnDelay);
-		} catch (Exception e) {
-			// Not supported. The wandering trader might periodically despawn, but is then respawned
-			// shortly afterwards.
-		}
 	}
 
 	@Override

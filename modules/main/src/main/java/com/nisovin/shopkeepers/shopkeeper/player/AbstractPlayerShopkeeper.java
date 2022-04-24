@@ -254,13 +254,6 @@ public abstract class AbstractPlayerShopkeeper
 	public static final Property<@NonNull String> OWNER_NAME = new BasicProperty<@NonNull String>()
 			.dataKeyAccessor("owner", StringSerializers.SCALAR)
 			.validator(StringValidators.NON_EMPTY)
-			.validator(value -> {
-				// TODO We no longer use the fallback name (since late 1.14.4). Remove the
-				// "unknown"-check again in the
-				// future (as soon as possible, because it conflicts with any player actually named
-				// 'unknown').
-				Validate.isTrue(!value.equals("unknown"), "Invalid owner name: 'unknown'");
-			})
 			.build();
 	public static final Property<@NonNull User> OWNER = new BasicProperty<@NonNull User>()
 			.name("owner")

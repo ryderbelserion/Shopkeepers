@@ -9,7 +9,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -71,7 +70,7 @@ public class WanderingTraderShop extends BabyableShop<@NonNull WanderingTrader> 
 		}
 
 		// Disable the delayed despawning of the wandering trader:
-		NMSManager.getProvider().setDespawnDelay(entity, 0);
+		entity.setDespawnDelay(0);
 	}
 
 	@Override

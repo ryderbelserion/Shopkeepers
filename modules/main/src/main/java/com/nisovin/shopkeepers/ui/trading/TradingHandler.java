@@ -355,13 +355,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Prevent unsupported types of special clicks:
 		if (action == InventoryAction.COLLECT_TO_CURSOR
 				&& ItemUtils.isSimilar(resultItem, cursor)) {
-			// TODO Might no longer be supported in 1.14 and 1.15, see:
-			// https://bugs.mojang.com/browse/MC-148867
-			// Weird behavior and buggy, see MC-129515
-			// For now: Only allowed if the item on the cursor and inside the result slot are
-			// different.
-			// TODO Maybe replicate the behavior of this inventory action, but limit its effect to
-			// the player's inventory?
+			// MC-129515: In the past, the behavior of this inventory action was rather weird and
+			// buggy if the clicked item matches the trade result item. We therefore cancle and
+			// ignore it if the cursor item matches the result item.
+			// MC-148867: Since MC 1.14, Mojang fully disabled this inventory action inside the
+			// trading UI, so this case should no longer be reached. We still explicitly cancel it,
+			// just in case.
 			Log.debug(() -> shopkeeper.getLogPrefix()
 					+ "Prevented unsupported type of trading UI click by player " + player.getName()
 					+ ": " + action);

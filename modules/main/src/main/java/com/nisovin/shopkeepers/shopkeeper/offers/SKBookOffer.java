@@ -23,9 +23,7 @@ import com.nisovin.shopkeepers.util.data.serialization.MissingDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
-import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKBookOffer implements BookOffer {
 
@@ -192,54 +190,7 @@ public class SKBookOffer implements BookOffer {
 			String logPrefix
 	) throws InvalidDataException {
 		Validate.notNull(logPrefix, "logPrefix is null");
-		// TODO Remove this migration again at some point (added in late MC 1.14.4).
-		List<? extends @NonNull BookOffer> legacyOffers = loadLegacyOffers(dataValue);
-		if (legacyOffers.isEmpty()) {
-			// Nothing to migrate.
-			return false;
-		}
-
-		// Assertion: We do not expect there to be a mix of legacy and non-legacy offers. We can
-		// therefore skip loading any non-legacy offers.
-		// Write back the migrated offers:
-		saveOffers(dataValue, legacyOffers);
-		Log.info(logPrefix + "Migrated old book offers.");
-		return true;
-	}
-
-	// Legacy format: bookTitle -> price mapping
-	private static List<? extends @NonNull BookOffer> loadLegacyOffers(
-			DataValue dataValue
-	) throws InvalidDataException {
-		Validate.notNull(dataValue, "dataValue is null");
-		DataContainer offerListData = dataValue.getContainer();
-		if (offerListData == null) {
-			return Collections.emptyList();
-		}
-
-		List<@NonNull BookOffer> offers = new ArrayList<>();
-		for (String bookTitle : offerListData.getKeys()) {
-			if (offerListData.isContainer(bookTitle)) {
-				// Found a container instead of an integer. -> We assume that the offers have
-				// already been migrated to the new data format, and therefore abort the loading of
-				// legacy book offers.
-				if (!offers.isEmpty()) {
-					throw new InvalidDataException(
-							"Found a mix of legacy and non-legacy book offers!"
-					);
-				}
-				return Collections.emptyList(); // Abort
-			}
-			if (StringUtils.isEmpty(bookTitle)) {
-				throw new InvalidDataException("Invalid book offer: Book title is empty.");
-			}
-			int price = offerListData.getInt(bookTitle);
-			if (price <= 0) {
-				throw new InvalidDataException("Invalid book offer for '" + bookTitle
-						+ "': Price has to be positive, but is " + price + ".");
-			}
-			offers.add(new SKBookOffer(bookTitle, price));
-		}
-		return offers;
+		// There is currently nothing to migrate.
+		return false;
 	}
 }

@@ -7,7 +7,6 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
-import com.nisovin.shopkeepers.compat.MC_1_16;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -47,31 +46,10 @@ public class LivingShops {
 
 				boolean migrated = false;
 
-				// TODO Remove these migrations again at some point
-				// MC 1.14:
-				// Convert ocelots to cats:
-				if (objectTypeId.equals("ocelot")) {
-					String ocelotType = shopObjectData.getString("catType");
-					if (ocelotType != null) {
-						if (ocelotType.equals("WILD_OCELOT")) {
-							// Stays an ocelot, but remove cat type data:
-							shopObjectData.remove("catType");
-							migrated = true;
-						} else {
-							// Convert to cat:
-							shopObjectData.set(AbstractShopObject.SHOP_OBJECT_TYPE_ID, "cat");
-							String catType = CatShop.fromOcelotType(ocelotType).name();
-							shopObjectData.set("catType", catType);
-							Log.warning(logPrefix + "Migrated ocelot type '" + ocelotType
-									+ "' to cat type '" + catType + "'.");
-							migrated = true;
-						}
-					} // Else: Stays ocelot.
-				}
-
+				// TODO Remove this migration again at some point
 				// MC 1.16:
 				// Convert pig-zombie to zombified-piglin (but only if we run on MC 1.16 or above):
-				if (MC_1_16.ZOMBIFIED_PIGLIN != null && objectTypeId.equals("pig-zombie")) {
+				if (objectTypeId.equals("pig-zombie")) {
 					shopObjectData.set(AbstractShopObject.SHOP_OBJECT_TYPE_ID, "zombified-piglin");
 					Log.warning(logPrefix + "Migrated object type 'pig-zombie' to 'zombified-piglin'.");
 					migrated = true;

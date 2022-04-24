@@ -47,11 +47,10 @@ public final class EntityUtils {
 		// Even though blazes sink to the ground in vanilla Minecraft, we allow them to stand on top
 		// of lava because that makes them more useful in nether themed shops. They are also able to
 		// fly and hover in mid-air, so this deviation from vanilla is not that severe.
-		// TODO Replace with enum constant once we only support 1.16+
-		switch (entityType.name()) {
-		case "STRIDER":
-		case "MAGMA_CUBE":
-		case "BLAZE":
+		switch (entityType) {
+		case STRIDER:
+		case MAGMA_CUBE:
+		case BLAZE:
 			return LAVA;
 		default:
 			return Collections.emptySet();

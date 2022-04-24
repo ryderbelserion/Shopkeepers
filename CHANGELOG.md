@@ -12,6 +12,11 @@ Date format: (YYYY-MM-DD)
   * Some default messages related to the validation of spawn locations were slightly changed to better fit when we move shopkeepers.
   * When right clicking a new shopkeeper location, we ignore interactions with certain types of blocks that are relevant for navigation, such as doors, trap doors, fence doors, buttons, levers, etc. Other types of interactable blocks (work benches, chests, signs, etc.) are not ignored, because we want shopkeepers to be placeable against those (even if some plugins may use them for navigation purposes, e.g. command signs).
   * Limitation: Moving Citizens shopkeepers silently fails if the Citizens plugin is not enabled currently.
+* Data: Removed various old data migrations:
+  * Removed the importing from the old book offer data format (changed in late MC 1.14.4).
+  * Removed the importing of pre MC 1.14 cat typed ocelot shopkeepers.
+  * Removed the importing of pre MC 1.14 villager profession data.
+  * Removed the 'unknown' owner name validation (no longer used since late 1.14.4). This conflicted with any player actually named 'unknown'.
 
 **Debugging changes:**  
 * We log now when we unexpectedly encounter invalid currency items in the editors of the selling, buying, or book shopkeepers.
@@ -24,6 +29,13 @@ Date format: (YYYY-MM-DD)
 * Added AbstractShopkeeper#teleport for moving a shopkeeper.
 * Added AbstractShopObject#move which moves the shop object to its intended spawn location based on its associated shopkeeper.
 * Fixed: The Citizens shopkeeper trait reference was not properly cleaned up. This also resulted in a failed assertion on plugin reloads.
+* Removed no longer needed compatibility code for versions below 1.16.5:
+  * Removed the no longer needed compatibility code related to raiders, piglins, zoglins, and the despawn delay of wandering traders.
+  * Removed the MC 1.16 features guard. These features are always available now, so the guard is no longer required.
+  * Use the EntityType and Material enums instead of String-based names for any entity types and materials available in Bukkit 1.16.
+  * Removed the restriction of not being able to interact with shopkeeper mobs while holding a written book. The underlying Minecraft issue (MC-141494) has been fixed by now.
+  * Just in case, we still disallow the double clicking of items in the trading UI inventory if they match the trade result item. But this check should no longer be required and no longer results in a restriction that is not also present in vanilla Minecraft: MC-129515 has been fixed by now by disabling all double clicking of items in the trading UI (MC-148867).
+  * Test cases related to written books have been enabled again. They were broken in Bukkit versions before 1.16.
 
 **Message changes:**  
 * Changed `mob-cannot-spawn-on-peaceful-difficulty`.

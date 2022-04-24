@@ -5,8 +5,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Raider;
-import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -47,21 +45,6 @@ public interface NMSCallProvider {
 	}
 
 	public void setNoclip(Entity entity);
-
-	// TODO Replace this once only the latest versions of 1.15.1 and upwards are supported.
-	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
-
-	// Sets the entity as adult for mob types for which we don't support the baby property yet, i.e.
-	// because they are exclusive to the specific MC version and don't extend Ageable:
-	// TODO Remove this once there are no exclusive mobs anymore to which this applies (currently,
-	// once we only support MC 1.16.1. upwards)
-	public default void setExclusiveAdult(LivingEntity entity) {
-		// No exclusive mobs by default.
-	}
-
-	// TODO Remove this once we only support later versions of Bukkit 1.16.5 and upwards (those have
-	// an API method to set the DespawnDelay).
-	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay);
 
 	// Performs any version-specific setup that needs to happen before the entity is spawned. The
 	// available operations may be limited during this phase of the entity spawning.

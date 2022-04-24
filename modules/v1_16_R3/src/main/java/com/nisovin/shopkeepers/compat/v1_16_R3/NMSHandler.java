@@ -10,18 +10,13 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftWanderingTrader;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.PiglinAbstract;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.WanderingTrader;
-import org.bukkit.entity.Zoglin;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -164,29 +159,6 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setNoclip(org.bukkit.entity.Entity entity) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.noclip = true;
-	}
-
-	@Override
-	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		// Only works in the latest versions of Bukkit 1.15.1 and upwards:
-		raider.setCanJoinRaid(canJoinRaid);
-	}
-
-	@Override
-	public void setExclusiveAdult(LivingEntity entity) {
-		if (entity instanceof PiglinAbstract) {
-			((PiglinAbstract) entity).setBaby(false);
-		} else if (entity instanceof Zoglin) {
-			((Zoglin) entity).setBaby(false);
-		}
-	}
-
-	@Override
-	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
-		// This API method is not yet available in Bukkit 1.16.4, or in early versions of Bukkit
-		// 1.16.5:
-		// wanderingTrader.setDespawnDelay(despawnDelay);
-		((CraftWanderingTrader) wanderingTrader).getHandle().u(despawnDelay);
 	}
 
 	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without
