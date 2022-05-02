@@ -54,7 +54,7 @@ The API may still be quite unstable: On every Minecraft release, as well as when
 
 The API is still quite limited. For example, it is not yet possible to implement custom shopkeeper types via the API. And many aspects, for example related to how trades are processed, cannot be altered via the API.
 
-If you only want to check if a given entity is a shopkeeper: Every shopkeeper entity is tagged with the `'shopkeeper'` metadata, so you can check for that: `entity.hasMetadata("shopkeeper")`
+If you only want to check if a given entity is a shopkeeper, there is no need to hook into the Shopkeepers API: Every shopkeeper entity is tagged with the `'shopkeeper'` metadata, so you can check for that via `entity.hasMetadata("shopkeeper")`.
 
 Cloning and Building
 ----------------
