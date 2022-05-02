@@ -16,11 +16,43 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 **Discord**: https://discord.gg/d9NKd5z  
 **Source code**: https://github.com/Shopkeepers/Shopkeepers/  
 
-Maven repository for releases: https://nexus.lichtspiele.org/repository/releases/  
-Maven repository for dev builds (snapshots): https://nexus.lichtspiele.org/repository/snapshots/  
+Shopkeepers API
+----------------
 
-If the above Maven repository is currently not available, you can also use Jitpack: https://jitpack.io/#Shopkeepers/Shopkeepers/  
-Maven Jitpack snapshots: https://jitpack.io/#Shopkeepers/Shopkeepers/master-SNAPSHOT  
+If you want to write an add-on plugin for Shopkeepers, or integrate some Shopkeepers aspect into your plugin, you can add `ShopkeepersAPI` as a dependency to your plugin.
+
+Maven repository:
+```
+<repositories>
+  <repository>
+    <id>shopkeepers-repo</id>
+    <url>https://nexus.lichtspiele.org/repository/releases/</url>
+  </repository>
+</repositories>
+```
+Snapshot repository (development builds): https://nexus.lichtspiele.org/repository/snapshots/  
+
+If the above Maven repository is currently not available, you can also try to use Jitpack: https://jitpack.io/#Shopkeepers/Shopkeepers/  
+Jitpack snapshots: https://jitpack.io/#Shopkeepers/Shopkeepers/master-SNAPSHOT  
+However, this is not guaranteed to always work either.
+
+Maven dependency:
+```
+<dependency>
+  <groupId>com.nisovin.shopkeepers</groupId>
+  <artifactId>ShopkeepersAPI</artifactId>
+  <!-- Replace this with the latest Shopkeepers version -->
+  <version>2.15.1</version>
+  <scope>provided</scope>
+</dependency>
+```
+
+There is no documentation yet on how to use the API. But the various API classes and interfaces have some code documentation. You can find those here: https://github.com/Shopkeepers/Shopkeepers/tree/master/modules/api/src/main/java/com/nisovin/shopkeepers/api
+As an entry point to other components, you can use the class [`ShopkeepersAPI`](https://github.com/Shopkeepers/Shopkeepers/blob/master/modules/api/src/main/java/com/nisovin/shopkeepers/api/ShopkeepersAPI.java). For example, `ShopkeepersAPI.getShopkeeperRegistry()` returns you the `ShopkeeperRegistry`, with which you can query the loaded shopkeepers.
+
+The API may still be quite unstable: On every Minecraft release, as well as whenever some API or data breaking change is made, the `Major` component of the Shopkeepers version is incremented (which occurs quite regularly). Most of the time, only some aspects of the API change, so your plugin might still work fine without changes. But nevertheless, be prepared to check for breaking API changes at least as frequently as Minecraft updates are released.
+
+The API is still quite limited. For example, it is not yet possible to implement custom shopkeeper types via the API. And many aspects, for example related to how trades are processed, cannot be altered via the API.
 
 Cloning and Building
 ----------------
