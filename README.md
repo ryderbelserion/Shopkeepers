@@ -47,7 +47,7 @@ Maven dependency:
 </dependency>
 ```
 
-There is no documentation yet on how to use the API. But the various API classes and interfaces have some code documentation. You can find those here: https://github.com/Shopkeepers/Shopkeepers/tree/master/modules/api/src/main/java/com/nisovin/shopkeepers/api
+There is no documentation yet on how to use the API. But the various API classes and interfaces have some code documentation. You can find those here: https://github.com/Shopkeepers/Shopkeepers/tree/master/modules/api/src/main/java/com/nisovin/shopkeepers/api  
 As an entry point to other components, you can use the class [`ShopkeepersAPI`](https://github.com/Shopkeepers/Shopkeepers/blob/master/modules/api/src/main/java/com/nisovin/shopkeepers/api/ShopkeepersAPI.java). For example, `ShopkeepersAPI.getShopkeeperRegistry()` returns you the `ShopkeeperRegistry`, with which you can query the loaded shopkeepers.
 
 The API may still be quite unstable: On every Minecraft release, as well as whenever some API or data breaking change is made, the `Major` component of the Shopkeepers version is incremented (which occurs quite regularly). Most of the time, only some aspects of the API change, so your plugin might still work fine without changes. But nevertheless, be prepared to check for breaking API changes at least as frequently as Minecraft updates are released.
