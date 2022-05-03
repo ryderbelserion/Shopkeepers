@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
+import com.nisovin.shopkeepers.ui.UIState;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -114,15 +115,16 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 					EditorSession editorSession,
 					InventoryClickEvent clickEvent
 			) {
+				UIState capturedUIState = captureState(editorSession.getUISession());
 				editorSession.getUISession().closeDelayedAndRunTask(() -> {
-					requestConfirmationDeleteShop(editorSession.getPlayer());
+					requestConfirmationDeleteShop(editorSession.getPlayer(), capturedUIState);
 				});
 				return true;
 			}
 		};
 	}
 
-	private void requestConfirmationDeleteShop(Player player) {
+	private void requestConfirmationDeleteShop(Player player, UIState previousUIState) {
 		ConfirmationUI.requestConfirmation(player, CONFIRMATION_UI_CONFIG_DELETE_SHOP, () -> {
 			// Delete confirmed.
 			if (!player.isValid()) return;
@@ -154,12 +156,14 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 			if (!shopkeeper.isValid()) return;
 
 			// Try to open the editor again:
-			// Note: This may currently not remember the previous editor state (such as the selected
-			// trades page).
+			// We freshly determine the currently configured editor UIHandler of the shopkeeper,
+			// because it might have been replaced in the meantime. If the previously captured UI
+			// state is incompatible with the new UIHandler, it is silently ignored.
 			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(
 					this.getUIType(),
 					shopkeeper,
-					player
+					player,
+					previousUIState
 			);
 		});
 	}

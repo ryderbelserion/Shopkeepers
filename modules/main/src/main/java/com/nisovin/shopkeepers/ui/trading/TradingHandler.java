@@ -41,6 +41,7 @@ import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
+import com.nisovin.shopkeepers.ui.UIState;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
@@ -114,8 +115,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	@Override
-	protected boolean openWindow(UISession uiSession) {
+	protected boolean openWindow(UISession uiSession, UIState uiState) {
 		Validate.notNull(uiSession, "uiSession is null");
+		this.validateState(uiState);
+
 		// Create and open the trading window:
 		Player player = uiSession.getPlayer();
 		Shopkeeper shopkeeper = this.getShopkeeper();

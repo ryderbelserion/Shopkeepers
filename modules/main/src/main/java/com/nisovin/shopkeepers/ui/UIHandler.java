@@ -82,9 +82,12 @@ public abstract class UIHandler {
 	 * 
 	 * @param uiSession
 	 *            the {@link UISession}, not <code>null</code>
+	 * @param uiState
+	 *            a previously captured {@link UIState} to {@link #restoreState(UISession, UIState)
+	 *            restore}, or {@link UIState#EMPTY}
 	 * @return <code>true</code> if the interface window was successfully opened
 	 */
-	protected abstract boolean openWindow(UISession uiSession);
+	protected abstract boolean openWindow(UISession uiSession, UIState uiState);
 
 	/**
 	 * Checks whether the given inventory view is managed by this UI handler.
@@ -113,6 +116,69 @@ public abstract class UIHandler {
 		SKUISession session = SKShopkeepersPlugin.getInstance().getUIRegistry().getUISession(player);
 		if (session == null || session.getUIHandler() != this) return false;
 		return (Settings.disableInventoryVerification || this.isWindow(player.getOpenInventory()));
+	}
+
+	/**
+	 * Captures the current {@link UIState} for the given session.
+	 * <p>
+	 * Not all types of UIs may support this, or may be able to fully restore all aspects of the
+	 * current UI session.
+	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
+	 * @return the {@link UIState}, not <code>null</code>, but can be {@link UIState#EMPTY}
+	 */
+	protected UIState captureState(UISession uiSession) {
+		return UIState.EMPTY; // Not supported by default
+	}
+
+	/**
+	 * Checks if the given {@link UIState} is compatible with this UI.
+	 * <p>
+	 * {@link UIState#EMPTY} is always compatible.
+	 * 
+	 * @param uiState
+	 *            the {@link UIState}, not <code>null</code>
+	 * @return <code>true</code> if the {@link UIState} is compatible
+	 */
+	protected boolean isCompatibleState(UIState uiState) {
+		// The empty state is always accepted.
+		if (uiState == UIState.EMPTY) return true;
+		return false;
+	}
+
+	/**
+	 * Validates the given {@link UIState} according to {@link #isCompatibleState(UIState)}.
+	 * 
+	 * @param uiState
+	 *            the {@link UIState}, not <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the given {@link UIState} is {@link #isCompatibleState(UIState) incompatible}
+	 *             with this type of UI
+	 */
+	protected final void validateState(UIState uiState) {
+		Validate.notNull(uiState, "uiState is null");
+		Validate.isTrue(this.isCompatibleState(uiState),
+				() -> "uiState of type " + uiState.getClass().getName()
+						+ " is incompatible with UI of type " + this.getUIType().getIdentifier());
+	}
+
+	/**
+	 * Tries to restore the given {@link UIState} in a best-effort manner.
+	 * <p>
+	 * Any current state is silently replaced with the captured state.
+	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
+	 * @param uiState
+	 *            the {@link UIState}, not <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the given {@link UIState} is {@link #isCompatibleState(UIState) incompatible}
+	 *             with this type of UI
+	 */
+	protected void restoreState(UISession uiSession, UIState uiState) {
+		this.validateState(uiState);
+		// Not supported by default.
 	}
 
 	/**

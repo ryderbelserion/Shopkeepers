@@ -34,6 +34,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
+import com.nisovin.shopkeepers.ui.UIState;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
 import com.nisovin.shopkeepers.ui.editor.AbstractEditorHandler;
@@ -227,8 +228,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	public boolean openWindow(UISession uiSession) {
-		boolean result = super.openWindow(uiSession);
+	public boolean openWindow(UISession uiSession, UIState uiState) {
+		boolean result = super.openWindow(uiSession, uiState);
 		return result;
 	}
 
@@ -275,15 +276,17 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					InventoryClickEvent clickEvent
 			) {
 				if (!checkVillagerExistence(editorSession)) return false;
+
+				UIState capturedUIState = captureState(editorSession.getUISession());
 				editorSession.getUISession().closeDelayedAndRunTask(() -> {
-					requestConfirmationDeleteVillager(editorSession);
+					requestConfirmationDeleteVillager(editorSession, capturedUIState);
 				});
 				return true;
 			}
 		};
 	}
 
-	private void requestConfirmationDeleteVillager(EditorSession editorSession) {
+	private void requestConfirmationDeleteVillager(EditorSession editorSession, UIState previousUIState) {
 		Player player = editorSession.getPlayer();
 		ConfirmationUI.requestConfirmation(player, CONFIRMATION_UI_CONFIG_DELETE_VILLAGER, () -> {
 			// Delete confirmed.
@@ -298,9 +301,11 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			if (!checkVillagerExistence(editorSession)) return;
 
 			// Try to open the editor again:
-			// Note: This may currently not remember the previous editor state (such as the selected
-			// trades page).
-			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(this, player);
+			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(
+					this,
+					player,
+					previousUIState
+			);
 		});
 	}
 

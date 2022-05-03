@@ -125,4 +125,30 @@ public final class SKUISession implements UISession {
 			}
 		});
 	}
+
+	/**
+	 * Captures the current {@link UIState}.
+	 * <p>
+	 * Not all types of UIs may support this, or may be able to fully restore all aspects of the
+	 * current UI session.
+	 * 
+	 * @return the {@link UIState}, not <code>null</code>, but may be {@link UIState#EMPTY}
+	 */
+	public final UIState captureState() {
+		return uiHandler.captureState(this);
+	}
+
+	/**
+	 * Tries to restore the given {@link UIState} in a best-effort manner.
+	 * <p>
+	 * Any current state is silently replaced with the captured state.
+	 * 
+	 * @param uiState
+	 *            the {@link UIState}, not <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the given {@link UIState} is incompatible with the UI type of this session
+	 */
+	public final void restoreState(UIState uiState) {
+		uiHandler.restoreState(this, uiState);
+	}
 }

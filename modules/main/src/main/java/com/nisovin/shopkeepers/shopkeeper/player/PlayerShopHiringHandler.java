@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
+import com.nisovin.shopkeepers.ui.UIState;
 import com.nisovin.shopkeepers.ui.hiring.HiringHandler;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -43,8 +44,10 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	}
 
 	@Override
-	protected boolean openWindow(UISession uiSession) {
+	protected boolean openWindow(UISession uiSession, UIState uiState) {
 		Validate.notNull(uiSession, "uiSession is null");
+		this.validateState(uiState);
+
 		Player player = uiSession.getPlayer();
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Inventory inventory = Bukkit.createInventory(player, 9, Messages.forHireTitle);

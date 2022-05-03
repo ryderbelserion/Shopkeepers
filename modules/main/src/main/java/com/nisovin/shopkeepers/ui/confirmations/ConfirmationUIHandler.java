@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
+import com.nisovin.shopkeepers.ui.UIState;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -59,7 +60,10 @@ public class ConfirmationUIHandler extends UIHandler {
 	}
 
 	@Override
-	protected boolean openWindow(UISession uiSession) {
+	protected boolean openWindow(UISession uiSession, UIState uiState) {
+		Validate.notNull(uiSession, "uiSession is null");
+		this.validateState(uiState);
+
 		Player player = uiSession.getPlayer();
 		Inventory inventory = Bukkit.createInventory(player, INVENTORY_SIZE, config.getTitle());
 

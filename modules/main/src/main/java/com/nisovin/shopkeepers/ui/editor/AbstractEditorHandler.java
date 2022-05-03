@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
+import com.nisovin.shopkeepers.ui.UIState;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
@@ -381,19 +382,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 				// Ignore double clicks:
 				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
 
-				// Save the current page:
-				saveEditorPage(editorSession);
-
 				// Switch to previous page:
 				int currentPage = editorSession.getCurrentPage();
-				int newPage = Math.max(1, currentPage - 1);
-				if (newPage == currentPage) return false; // Page has not changed
-
-				// Update page:
-				editorSession.setPage(newPage);
-				setupPage(editorSession, newPage);
-				editorSession.updateInventory();
-				return true;
+				return switchPage(editorSession, currentPage - 1, true);
 			}
 		};
 	}
@@ -422,19 +413,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 				// Ignore double clicks:
 				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
 
-				// Save the current page:
-				saveEditorPage(editorSession);
-
 				// Switch to next page:
 				int currentPage = editorSession.getCurrentPage();
-				int newPage = Math.min(getMaxTradesPages(), currentPage + 1);
-				if (newPage == currentPage) return false; // Page has not changed
-
-				// Update page:
-				editorSession.setPage(newPage);
-				setupPage(editorSession, newPage);
-				editorSession.updateInventory();
-				return true;
+				return switchPage(editorSession, currentPage + 1, true);
 			}
 		};
 	}
@@ -631,14 +612,16 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean openWindow(UISession uiSession) {
+	public boolean openWindow(UISession uiSession, UIState uiState) {
 		Validate.notNull(uiSession, "uiSession is null");
+		this.validateState(uiState);
+
 		Player player = uiSession.getPlayer();
 
 		// Lazy setup:
 		this.setup();
 
-		// Setup session:
+		// Set up session:
 		List<@NonNull TradingRecipeDraft> recipes = tradingRecipesAdapter.getTradingRecipes();
 
 		// Create inventory:
@@ -650,15 +633,23 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		EditorSession editorSession = this.createEditorSession(uiSession, recipes, inventory);
 		editorSessions.put(player.getUniqueId(), editorSession);
 
-		// Setup and open first page:
-		this.setupPage(editorSession, 1);
+		// Determine the initial page:
+		int page = 1;
+		if (uiState instanceof EditorUIState) {
+			EditorUIState editorState = (EditorUIState) uiState;
+			page = this.getValidPage(editorState.getCurrentPage());
+		}
+
+		// Set up and open the initial page:
+		editorSession.setPage(page);
+		this.setupCurrentPage(editorSession);
 		player.openInventory(inventory);
 		return true;
 	}
 
 	protected abstract String getEditorTitle();
 
-	protected void setupPage(EditorSession editorSession, int page) {
+	protected void setupCurrentPage(EditorSession editorSession) {
 		assert editorSession != null;
 
 		// Setup inventory:
@@ -752,6 +743,32 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		});
 	}
 
+	protected final int getValidPage(int targetPage) {
+		return Math.max(1, Math.min(this.getMaxTradesPages(), targetPage));
+	}
+
+	// Returns true if the page has changed.
+	protected boolean switchPage(
+			EditorSession editorSession,
+			int targetPage,
+			boolean saveCurrentPage
+	) {
+		int newPage = this.getValidPage(targetPage);
+		int currentPage = editorSession.getCurrentPage();
+		if (newPage == currentPage) return false; // Page has not changed
+
+		// Save the current page:
+		if (saveCurrentPage) {
+			this.saveEditorPage(editorSession);
+		}
+
+		// Update page:
+		editorSession.setPage(newPage);
+		this.setupCurrentPage(editorSession);
+		editorSession.updateInventory();
+		return true;
+	}
+
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
 		Validate.notNull(player, "player is null");
@@ -765,6 +782,31 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected boolean isWindow(InventoryView view) {
 		Validate.notNull(view, "view is null");
 		return view.getTitle().equals(this.getEditorTitle());
+	}
+
+	@Override
+	protected UIState captureState(UISession uiSession) {
+		EditorSession editorSession = Unsafe.assertNonNull(
+				this.getEditorSession(uiSession.getPlayer())
+		);
+		return new EditorUIState(editorSession.getCurrentPage());
+	}
+
+	@Override
+	protected boolean isCompatibleState(UIState uiState) {
+		if (super.isCompatibleState(uiState)) return true;
+		if (uiState instanceof EditorUIState) return true;
+		return false;
+	}
+
+	@Override
+	protected void restoreState(UISession uiSession, UIState uiState) {
+		this.validateState(uiState);
+		EditorUIState editorState = (EditorUIState) uiState;
+		EditorSession editorSession = Unsafe.assertNonNull(
+				this.getEditorSession(uiSession.getPlayer())
+		);
+		this.switchPage(editorSession, editorState.getCurrentPage(), true);
 	}
 
 	@Override

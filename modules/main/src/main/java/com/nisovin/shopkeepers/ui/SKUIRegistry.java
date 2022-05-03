@@ -64,6 +64,15 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 	}
 
 	public boolean requestUI(UIType uiType, AbstractShopkeeper shopkeeper, Player player) {
+		return this.requestUI(uiType, shopkeeper, player, UIState.EMPTY);
+	}
+
+	public boolean requestUI(
+			UIType uiType,
+			AbstractShopkeeper shopkeeper,
+			Player player,
+			UIState uiState
+	) {
 		Validate.notNull(uiType, "uiHandler is null");
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		Validate.notNull(player, "player is null");
@@ -76,14 +85,37 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 					+ ": This shopkeeper does not support this type of UI.");
 			return false;
 		}
-		return this.requestUI(uiHandler, player);
+
+		// Ignore the given UI state if it is incompatible:
+		UIState effectiveUIState = uiState;
+		if (!uiHandler.isCompatibleState(uiState)) {
+			Log.debug(() -> shopkeeper.getLogPrefix()
+					+ "Ignoring incompatible captured UI state of type "
+					+ uiState.getClass().getName() + "' for player " + player.getName() + ".");
+			effectiveUIState = UIState.EMPTY;
+		}
+
+		return this.requestUI(uiHandler, player, effectiveUIState);
 	}
 
 	public boolean requestUI(UIHandler uiHandler, Player player) {
-		return this.requestUI(uiHandler, player, false);
+		return this.requestUI(uiHandler, player, false, UIState.EMPTY);
+	}
+
+	public boolean requestUI(UIHandler uiHandler, Player player, UIState uiState) {
+		return this.requestUI(uiHandler, player, false, uiState);
 	}
 
 	public boolean requestUI(UIHandler uiHandler, Player player, boolean silentRequest) {
+		return this.requestUI(uiHandler, player, silentRequest, UIState.EMPTY);
+	}
+
+	public boolean requestUI(
+			UIHandler uiHandler,
+			Player player,
+			boolean silentRequest,
+			UIState uiState
+	) {
 		Validate.notNull(uiHandler, "uiHandler is null");
 		Validate.notNull(player, "player is null");
 		UIType uiType = uiHandler.getUIType();
@@ -145,7 +177,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 
 		// Open the new UI:
 		Log.debug(() -> "Opening UI '" + uiIdentifier + "' ...");
-		boolean isOpen = uiHandler.openWindow(session);
+		boolean isOpen = uiHandler.openWindow(session, uiState);
 		if (!isOpen) {
 			Log.debug(() -> "Failed to open UI '" + uiIdentifier + "'!");
 			this.endUISession(player, null);
