@@ -1,6 +1,4 @@
-package com.nisovin.shopkeepers.ui;
-
-import com.nisovin.shopkeepers.api.ui.UIType;
+package com.nisovin.shopkeepers.ui.state;
 
 /**
  * A captured UI state that provides hints on how to restore a previous UI session.
@@ -12,15 +10,17 @@ import com.nisovin.shopkeepers.api.ui.UIType;
  * UI session. A captured UI state is restored in a best-effort manner, but should not be strictly
  * relied upon.
  * <p>
- * UI states are often specific to a particular {@link UIType}. Attempting to restore an
+ * It is up to a specific UI to decide which {@link UIState}s it accepts. Attempting to restore an
  * incompatible UI state will result in a {@link RuntimeException}.
+ * <p>
+ * Other possible uses of {@link UIState} are the ability to pass inputs to a UI or receive outputs
+ * from it. For example, the {@link UIState} may implement {@link UIOutput} to receive results or
+ * messages from the UI and transfer them back to the creator of the {@link UIState}.
  */
 public interface UIState {
 
 	/**
 	 * An empty {@link UIState}.
-	 * <p>
-	 * This state is always accepted by all UI types.
 	 */
 	public static final UIState EMPTY = new UIState() {
 	};

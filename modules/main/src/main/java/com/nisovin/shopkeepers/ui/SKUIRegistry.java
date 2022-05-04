@@ -26,6 +26,7 @@ import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.types.AbstractTypeRegistry;
+import com.nisovin.shopkeepers.ui.state.UIState;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -88,7 +89,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 
 		// Ignore the given UI state if it is incompatible:
 		UIState effectiveUIState = uiState;
-		if (!uiHandler.isCompatibleState(uiState)) {
+		if (!uiHandler.isAcceptedState(uiState)) {
 			Log.debug(() -> shopkeeper.getLogPrefix()
 					+ "Ignoring incompatible captured UI state of type "
 					+ uiState.getClass().getName() + "' for player " + player.getName() + ".");

@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIState;
+import com.nisovin.shopkeepers.ui.state.UIState;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
@@ -793,8 +793,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected boolean isCompatibleState(UIState uiState) {
-		if (super.isCompatibleState(uiState)) return true;
+	protected boolean isAcceptedState(UIState uiState) {
+		if (super.isAcceptedState(uiState)) return true;
 		if (uiState instanceof EditorUIState) return true;
 		return false;
 	}

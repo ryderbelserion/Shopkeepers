@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.ui.state.UIState;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -133,38 +134,38 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Checks if the given {@link UIState} is compatible with this UI.
+	 * Checks if the given {@link UIState} is accepted by this UI.
 	 * <p>
-	 * {@link UIState#EMPTY} is always compatible.
+	 * By default, only {@link UIState#EMPTY} is accepted.
 	 * 
 	 * @param uiState
 	 *            the {@link UIState}, not <code>null</code>
-	 * @return <code>true</code> if the {@link UIState} is compatible
+	 * @return <code>true</code> if the {@link UIState} is accepted
 	 */
-	protected boolean isCompatibleState(UIState uiState) {
-		// The empty state is always accepted.
+	protected boolean isAcceptedState(UIState uiState) {
 		if (uiState == UIState.EMPTY) return true;
 		return false;
 	}
 
 	/**
-	 * Validates the given {@link UIState} according to {@link #isCompatibleState(UIState)}.
+	 * Validates the given {@link UIState} according to {@link #isAcceptedState(UIState)}.
 	 * 
 	 * @param uiState
 	 *            the {@link UIState}, not <code>null</code>
 	 * @throws IllegalArgumentException
-	 *             if the given {@link UIState} is {@link #isCompatibleState(UIState) incompatible}
-	 *             with this type of UI
+	 *             if the given {@link UIState} is not {@link #isAcceptedState(UIState) accepted} by
+	 *             this UI
 	 */
 	protected final void validateState(UIState uiState) {
 		Validate.notNull(uiState, "uiState is null");
-		Validate.isTrue(this.isCompatibleState(uiState),
+		Validate.isTrue(this.isAcceptedState(uiState),
 				() -> "uiState of type " + uiState.getClass().getName()
-						+ " is incompatible with UI of type " + this.getUIType().getIdentifier());
+						+ " is not accepted by UI of type " + this.getUIType().getIdentifier());
 	}
 
 	/**
-	 * Tries to restore the given {@link UIState} in a best-effort manner.
+	 * Tries to restore a previously {@link #captureState(UISession) captured} {@link UIState} in a
+	 * best-effort manner.
 	 * <p>
 	 * Any current state is silently replaced with the captured state.
 	 * 
@@ -173,8 +174,8 @@ public abstract class UIHandler {
 	 * @param uiState
 	 *            the {@link UIState}, not <code>null</code>
 	 * @throws IllegalArgumentException
-	 *             if the given {@link UIState} is {@link #isCompatibleState(UIState) incompatible}
-	 *             with this type of UI
+	 *             if the given {@link UIState} is not {@link #isAcceptedState(UIState) accepted} by
+	 *             this UI
 	 */
 	protected void restoreState(UISession uiSession, UIState uiState) {
 		this.validateState(uiState);
