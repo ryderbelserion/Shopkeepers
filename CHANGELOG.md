@@ -1,9 +1,10 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.15.2 (TBA)
-### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
+## v2.16.0 (TBA)
+### Supported MC versions: 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+* Update for MC 1.19.
 * Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
 * We no longer forcefully spawn Citizens shopkeeper NPCs when we reload their NPC data (e.g. when we apply a shopkeeper snapshot). Instead, the NPC is spawned based on its stored spawn state and location.
 * Added a new editor option to move shopkeepers.
