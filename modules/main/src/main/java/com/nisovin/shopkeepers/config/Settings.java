@@ -185,7 +185,11 @@ public class Settings extends Config {
 					EntityType.PIGLIN_BRUTE.name(), // MC 1.16.2
 					"AXOLOTL", // MC 1.17
 					"GOAT", // MC 1.17
-					"GLOW_SQUID" // MC 1.17
+					"GLOW_SQUID", // MC 1.17
+					"ALLAY", // MC 1.19
+					"FROG", // MC 1.19
+					"TADPOLE", // MC 1.19
+					"WARDEN" // MC 1.19
 			), String::compareTo)
 	);
 

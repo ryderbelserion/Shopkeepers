@@ -227,6 +227,7 @@ player-shopkeeper-inactive-days: 0
 # work and can cause all kinds of issues.
 enabled-living-shops:
 - VILLAGER
+- ALLAY
 - AXOLOTL
 - BEE
 - BLAZE
@@ -242,6 +243,7 @@ enabled-living-shops:
 - ENDERMAN
 - EVOKER
 - FOX
+- FROG
 - GHAST
 - GIANT
 - GLOW_SQUID
@@ -279,12 +281,14 @@ enabled-living-shops:
 - SQUID
 - STRAY
 - STRIDER
+- TADPOLE
 - TRADER_LLAMA
 - TROPICAL_FISH
 - TURTLE
 - VEX
 - VINDICATOR
 - WANDERING_TRADER
+- WARDEN
 - WITCH
 - WITHER_SKELETON
 - WOLF
