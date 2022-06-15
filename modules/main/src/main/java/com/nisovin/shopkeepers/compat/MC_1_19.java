@@ -13,6 +13,12 @@ public final class MC_1_19 {
 	public static final Optional<@NonNull Material> GOAT_HORN = Optional.ofNullable(
 			CompatUtils.getMaterial("GOAT_HORN")
 	);
+	public static final Optional<@NonNull Material> MANGROVE_SIGN = Optional.ofNullable(
+			CompatUtils.getMaterial("MANGROVE_SIGN")
+	);
+	public static final Optional<@NonNull Material> MANGROVE_WALL_SIGN = Optional.ofNullable(
+			CompatUtils.getMaterial("MANGROVE_WALL_SIGN")
+	);
 
 	public static void init() {
 		if (isAvailable()) {
