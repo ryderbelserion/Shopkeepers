@@ -307,4 +307,14 @@ public final class NMSHandler implements NMSCallProvider {
 				backwards
 		).name();
 	}
+
+	@Override
+	public void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
+		((Goat) goat).setLeftHorn(hasLeftHorn);
+	}
+
+	@Override
+	public void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
+		((Goat) goat).setRightHorn(hasRightHorn);
+	}
 }

@@ -270,6 +270,16 @@ public class Messages extends Config {
 			"Toggles between a normal",
 			"and a screaming goat"
 	));
+	public static String buttonGoatLeftHorn = c("&aToggle left horn");
+	public static List<@NonNull String> buttonGoatLeftHornLore = c(Arrays.asList(
+			"Toggles the goat's",
+			"left horn"
+	));
+	public static String buttonGoatRightHorn = c("&aToggle right horn");
+	public static List<@NonNull String> buttonGoatRightHornLore = c(Arrays.asList(
+			"Toggles the goat's",
+			"right horn"
+	));
 	public static String buttonTropicalFishPattern = c("&aChoose variant");
 	public static List<@NonNull String> buttonTropicalFishPatternLore = c(Arrays.asList(
 			"Changes the shape and pattern",

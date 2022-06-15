@@ -131,4 +131,12 @@ public interface NMSCallProvider {
 		// Not supported by default.
 		return variantName;
 	}
+
+	public default void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
+		// Not supported by default.
+	}
+
+	public default void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
+		// Not supported by default.
+	}
 }

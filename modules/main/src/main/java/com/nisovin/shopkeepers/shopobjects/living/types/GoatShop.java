@@ -11,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.compat.MC_1_19;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -36,8 +37,24 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 			.defaultValue(false)
 			.build();
 
+	public static final Property<@NonNull Boolean> LEFT_HORN = new BasicProperty<@NonNull Boolean>()
+			.dataKeyAccessor("leftHorn", BooleanSerializers.LENIENT)
+			.defaultValue(true)
+			.build();
+
+	public static final Property<@NonNull Boolean> RIGHT_HORN = new BasicProperty<@NonNull Boolean>()
+			.dataKeyAccessor("rightHorn", BooleanSerializers.LENIENT)
+			.defaultValue(true)
+			.build();
+
 	private final PropertyValue<@NonNull Boolean> screamingProperty = new PropertyValue<>(SCREAMING)
 			.onValueChanged(Unsafe.initialized(this)::applyScreaming)
+			.build(properties);
+	private final PropertyValue<@NonNull Boolean> leftHornProperty = new PropertyValue<>(LEFT_HORN)
+			.onValueChanged(Unsafe.initialized(this)::applyLeftHorn)
+			.build(properties);
+	private final PropertyValue<@NonNull Boolean> rightHornProperty = new PropertyValue<>(RIGHT_HORN)
+			.onValueChanged(Unsafe.initialized(this)::applyRightHorn)
 			.build(properties);
 
 	public GoatShop(
@@ -53,18 +70,24 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		screamingProperty.load(shopObjectData);
+		leftHornProperty.load(shopObjectData);
+		rightHornProperty.load(shopObjectData);
 	}
 
 	@Override
 	public void save(ShopObjectData shopObjectData, boolean saveAll) {
 		super.save(shopObjectData, saveAll);
 		screamingProperty.save(shopObjectData);
+		leftHornProperty.save(shopObjectData);
+		rightHornProperty.save(shopObjectData);
 	}
 
 	@Override
 	protected void onSpawn() {
 		super.onSpawn();
 		this.applyScreaming();
+		this.applyLeftHorn();
+		this.applyRightHorn();
 	}
 
 	@Override
@@ -73,6 +96,10 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 		// The screaming option is hidden if shopkeeper mobs are silent.
 		if (!Settings.silenceLivingShopEntities) {
 			editorButtons.add(this.getScreamingEditorButton());
+		}
+		if (MC_1_19.isAvailable()) {
+			editorButtons.add(this.getLeftHornEditorButton());
+			editorButtons.add(this.getRightHornEditorButton());
 		}
 		return editorButtons;
 	}
@@ -125,6 +152,116 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleScreaming(backwards);
+				return true;
+			}
+		};
+	}
+
+	// LEFT HORN
+
+	public boolean hasLeftHorn() {
+		return leftHornProperty.getValue();
+	}
+
+	public void setLeftHorn(boolean hasLeftHorn) {
+		leftHornProperty.setValue(hasLeftHorn);
+	}
+
+	public void cycleLeftHorn(boolean backwards) {
+		this.setLeftHorn(!this.hasLeftHorn());
+	}
+
+	private void applyLeftHorn() {
+		Animals entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+		NMSManager.getProvider().setGoatLeftHorn(entity, this.hasLeftHorn());
+	}
+
+	private ItemStack getLeftHornEditorItem() {
+		ItemStack iconItem;
+		if (this.hasLeftHorn()) {
+			Material iconType = Unsafe.assertNonNull(
+					MC_1_19.GOAT_HORN.orElse(Material.LIME_STAINED_GLASS_PANE)
+			);
+			iconItem = new ItemStack(iconType);
+		} else {
+			iconItem = new ItemStack(Material.BARRIER);
+		}
+		return ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonGoatLeftHorn,
+				Messages.buttonGoatLeftHornLore
+		);
+	}
+
+	private Button getLeftHornEditorButton() {
+		return new ShopkeeperActionButton() {
+			@Override
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
+				return getLeftHornEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
+				boolean backwards = clickEvent.isRightClick();
+				cycleLeftHorn(backwards);
+				return true;
+			}
+		};
+	}
+
+	// RIGHT HORN
+
+	public boolean hasRightHorn() {
+		return rightHornProperty.getValue();
+	}
+
+	public void setRightHorn(boolean hasRightHorn) {
+		rightHornProperty.setValue(hasRightHorn);
+	}
+
+	public void cycleRightHorn(boolean backwards) {
+		this.setRightHorn(!this.hasRightHorn());
+	}
+
+	private void applyRightHorn() {
+		Animals entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+		NMSManager.getProvider().setGoatRightHorn(entity, this.hasRightHorn());
+	}
+
+	private ItemStack getRightHornEditorItem() {
+		ItemStack iconItem;
+		if (this.hasRightHorn()) {
+			Material iconType = Unsafe.assertNonNull(
+					MC_1_19.GOAT_HORN.orElse(Material.LIME_STAINED_GLASS_PANE)
+			);
+			iconItem = new ItemStack(iconType);
+		} else {
+			iconItem = new ItemStack(Material.BARRIER);
+		}
+		return ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonGoatRightHorn,
+				Messages.buttonGoatRightHornLore
+		);
+	}
+
+	private Button getRightHornEditorButton() {
+		return new ShopkeeperActionButton() {
+			@Override
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
+				return getRightHornEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
+				boolean backwards = clickEvent.isRightClick();
+				cycleRightHorn(backwards);
 				return true;
 			}
 		};

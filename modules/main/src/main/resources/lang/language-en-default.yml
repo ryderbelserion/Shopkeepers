@@ -205,6 +205,14 @@ button-goat-screaming: "&aToggle screaming goat"
 button-goat-screaming-lore:
 - "Toggles between a normal"
 - "and a screaming goat"
+button-goat-left-horn: "&aToggle left horn"
+button-goat-left-horn-lore:
+- "Toggles the goat's"
+- "left horn"
+button-goat-right-horn: "&aToggle right horn"
+button-goat-right-horn-lore:
+- "Toggles the goat's"
+- "right horn"
 button-tropical-fish-pattern: "&aChoose variant"
 button-tropical-fish-pattern-lore:
 - "Changes the shape and pattern"

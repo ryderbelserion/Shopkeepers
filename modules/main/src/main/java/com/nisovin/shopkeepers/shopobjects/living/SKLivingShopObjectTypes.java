@@ -151,7 +151,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>PIGLIN_BRUTE: okay, TODO add baby property # 1.17
  * <li>AXOLOTL: okay, spawns with random variant in vanilla
  * <li>GLOW_SQUID: okay
- * <li>GOAT: okay, randomly spawns as screaming variant in vanilla, TODO 1.19: left/right horn
+ * <li>GOAT: okay, randomly spawns as screaming variant in vanilla
  * <li>ALLAY: okay
  * <li>FROG: okay, starts running animation when touched, has no baby variant
  * <li>TADPOLE: okay

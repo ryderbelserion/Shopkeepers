@@ -7,6 +7,7 @@ Date format: (YYYY-MM-DD)
 * Update for MC 1.19.
   * Added the new MC 1.19 mobs to the by default enabled mobs. If you are updating, you will have to manually enable these mobs inside your config.
   * Added an editor option to switch between different frog variants.
+  * Added editor options to toggle the left and right horns of goats.
 * Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
 * We no longer forcefully spawn Citizens shopkeeper NPCs when we reload their NPC data (e.g. when we apply a shopkeeper snapshot). Instead, the NPC is spawned based on its stored spawn state and location.
 * Added a new editor option to move shopkeepers.
@@ -52,6 +53,10 @@ Date format: (YYYY-MM-DD)
 * Added `shopkeeper-move-aborted`.
 * Added `button-frog-variant`.
 * Added `button-frog-variant-lore`.
+* Added `button-goat-left-horn`.
+* Added `button-goat-left-horn-lore`.
+* Added `button-goat-right-horn`.
+* Added `button-goat-right-horn-lore`.
 
 ## v2.15.1 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5

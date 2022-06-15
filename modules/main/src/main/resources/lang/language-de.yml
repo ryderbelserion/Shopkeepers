@@ -206,6 +206,14 @@ button-goat-screaming: "&aSchreiende Ziege umschalten"
 button-goat-screaming-lore:
 - "Schaltet zwischen einer normalen"
 - "und einer schreienden Ziege um"
+button-goat-left-horn: "&aLinkes Horn umschalten"
+button-goat-left-horn-lore:
+- "Schaltet das linke"
+- "Ziegenhorn an und aus"
+button-goat-right-horn: "&aRechtes Horn umschalten"
+button-goat-right-horn-lore:
+- "Schaltet das rechte"
+- "Ziegenhorn an und aus"
 button-tropical-fish-pattern: "&aVariante ändern"
 button-tropical-fish-pattern-lore:
 - "Ändert die Form und das"
