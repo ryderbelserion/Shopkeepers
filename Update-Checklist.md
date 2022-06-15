@@ -44,8 +44,8 @@ To support the latest mappings version:
 	* If there are no severe issues, add them to the by default enabled living shop types.
 
 * New features for new or existing shop objects (mobs, signs, etc.):
-	* Consider adding them to the editor menu of that shop object.
-		* Add new editor buttons and messages.
+	* If not yet existing: Add a new shop object type and register it inside SKLivingShopObjectTypes.
+	* Add new editor buttons and messages to the editor menu of the shop object.
 
 * New blocks or items:
 	* Check the ItemUtils if there are any material lists or mappings that need to be updated.

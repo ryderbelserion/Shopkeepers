@@ -17,6 +17,7 @@ import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Frog;
 import org.bukkit.entity.GlowSquid;
 import org.bukkit.entity.Goat;
 import org.bukkit.entity.LivingEntity;
@@ -289,5 +290,21 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void setGlowingText(Sign sign, boolean glowingText) {
 		sign.setGlowingText(glowingText);
+	}
+
+	// MC 1.19 specific features
+
+	@Override
+	public void setFrogVariant(LivingEntity frog, String variantName) {
+		((Frog) frog).setVariant(Frog.Variant.valueOf(variantName));
+	}
+
+	@Override
+	public String cycleFrogVariant(String variantName, boolean backwards) {
+		return EnumUtils.cycleEnumConstant(
+				Frog.Variant.class,
+				Frog.Variant.valueOf(variantName),
+				backwards
+		).name();
 	}
 }

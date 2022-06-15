@@ -292,6 +292,10 @@ public class Messages extends Config {
 			"of the puffer fish.",
 			"Currently: &e{puffState}"
 	));
+	public static String buttonFrogVariant = c("&aChoose frog variant");
+	public static List<@NonNull String> buttonFrogVariantLore = c(Arrays.asList(
+			"Changes the frog's look"
+	));
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");

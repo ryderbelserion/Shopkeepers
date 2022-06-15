@@ -119,4 +119,16 @@ public interface NMSCallProvider {
 	public default void setGlowingText(Sign sign, boolean glowingText) {
 		// Not supported by default.
 	}
+
+	// MC 1.19 specific features
+	// TODO Remove this once we only support MC 1.19 and above.
+
+	public default void setFrogVariant(LivingEntity frog, String variantName) {
+		// Not supported by default.
+	}
+
+	public default String cycleFrogVariant(String variantName, boolean backwards) {
+		// Not supported by default.
+		return variantName;
+	}
 }

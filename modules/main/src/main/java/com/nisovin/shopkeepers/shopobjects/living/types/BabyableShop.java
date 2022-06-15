@@ -54,6 +54,7 @@ public class BabyableShop<E extends @NonNull Ageable> extends SKLivingShopObject
 		case "PARROT":
 		case "WANDERING_TRADER":
 		case "PIGLIN_BRUTE": // Added in MC 1.16.2
+		case "FROG": // Added in MC 1.19
 			return false;
 		default:
 			return true;

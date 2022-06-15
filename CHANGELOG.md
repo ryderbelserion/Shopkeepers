@@ -5,6 +5,8 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
 * Update for MC 1.19.
+  * Added the new MC 1.19 mobs to the by default enabled mobs. If you are updating, you will have to manually enable these mobs inside your config.
+  * Added an editor option to switch between different frog variants.
 * Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
 * We no longer forcefully spawn Citizens shopkeeper NPCs when we reload their NPC data (e.g. when we apply a shopkeeper snapshot). Instead, the NPC is spawned based on its stored spawn state and location.
 * Added a new editor option to move shopkeepers.
@@ -48,6 +50,8 @@ Date format: (YYYY-MM-DD)
 * Added `click-new-shop-location`.
 * Added `shopkeeper-moved`.
 * Added `shopkeeper-move-aborted`.
+* Added `button-frog-variant`.
+* Added `button-frog-variant-lore`.
 
 ## v2.15.1 (2022-03-27)
 ### Supported MC versions: 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5

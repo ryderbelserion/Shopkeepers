@@ -223,6 +223,9 @@ button-puffer-fish-puff-state-lore:
 - "Changes the puff state"
 - "of the puffer fish."
 - "Currently: &e{puffState}"
+button-frog-variant: "&aChoose frog variant"
+button-frog-variant-lore:
+- "Changes the frog's look"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

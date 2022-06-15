@@ -31,6 +31,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ChestedHorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.FrogShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.GlowSquidShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.GoatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.HorseShop;
@@ -150,9 +151,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>PIGLIN_BRUTE: okay, TODO add baby property # 1.17
  * <li>AXOLOTL: okay, spawns with random variant in vanilla
  * <li>GLOW_SQUID: okay
- * <li>GOAT: okay, randomly spawns as screaming variant in vanilla, TODO Bukkit 1.19: left/right horn
+ * <li>GOAT: okay, randomly spawns as screaming variant in vanilla, TODO 1.19: left/right horn
  * <li>ALLAY: okay
- * <li>FROG: okay, starts running animation when touched, TODO variant (currently based on biome)
+ * <li>FROG: okay, starts running animation when touched, has no baby variant
  * <li>TADPOLE: okay
  * <li>WARDEN: okay
  * </ul>
@@ -590,6 +591,17 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 						permission,
 						GoatShop.class,
 						GoatShop::new
+				);
+				break;
+			case "FROG": // TODO Move up once we only support MC 1.19 upwards.
+				objectType = new SKLivingShopObjectType<>(
+						livingShops,
+						entityType,
+						identifier,
+						aliases,
+						permission,
+						FrogShop.class,
+						FrogShop::new
 				);
 				break;
 			default:
