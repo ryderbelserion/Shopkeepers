@@ -117,6 +117,7 @@ public class Settings extends Config {
 	 */
 	// Villager is the default and therefore first. The other entity types are alphabetically
 	// sorted.
+	// TODO Generate the default enabled mobs list based on the server's version.
 	public static List<@NonNull String> enabledLivingShops = CollectionUtils.addAll(
 			new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())),
 			CollectionUtils.sort(Arrays.asList(
@@ -355,6 +356,8 @@ public class Settings extends Config {
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
+		private static boolean initialSetup = true;
+
 		public static DateTimeFormatter dateTimeFormatter = Unsafe.uncheckedNull();
 
 		public static Charset fileCharset = Unsafe.uncheckedNull();
@@ -393,6 +396,7 @@ public class Settings extends Config {
 		static {
 			// Initial setup of default values:
 			setup();
+			initialSetup = false;
 		}
 
 		// Gets called after setting values have changed (e.g. after the config has been loaded):
@@ -641,11 +645,12 @@ public class Settings extends Config {
 						// Migration note for MC 1.16 TODO Remove this again at some point?
 						Log.warning(INSTANCE.getLogPrefix()
 								+ "Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'."
-								+ " This mob no longer exist since MC 1.16."
+								+ " This mob no longer exists since MC 1.16."
 								+ " Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
-					} else {
-						// TODO This logs warnings for the default settings when we run on an older
-						// (but supported) MC version.
+					} else if (!initialSetup) {
+						// We omit the warning when we initialize the derived settings for the
+						// default settings, because we might run on an older but supported MC
+						// version.
 						Log.warning(INSTANCE.getLogPrefix()
 								+ "Invalid living entity type name in 'enabled-living-shops': "
 								+ entityTypeId);

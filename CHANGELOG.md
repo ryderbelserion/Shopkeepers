@@ -24,6 +24,7 @@ Date format: (YYYY-MM-DD)
   * Removed the 'unknown' owner name validation (no longer used since late 1.14.4). This conflicted with any player actually named 'unknown'.
 * Fixed: Striders no longer randomly spawn with a saddle.
 * The shopkeeper and villager editors try to restore the previously open page now when the deletion confirmation is cancelled.
+* Config: We no longer log a warning about invalid living entity types when we internally initialize the default config settings and are running on an older but supported MC version.
 
 **Debugging changes:**  
 * We log now when we unexpectedly encounter invalid currency items in the editors of the selling, buying, or book shopkeepers.
