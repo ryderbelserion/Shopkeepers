@@ -22,8 +22,8 @@ public enum SignType {
 	CRIMSON(Material.CRIMSON_SIGN, Material.CRIMSON_WALL_SIGN),
 	WARPED(Material.WARPED_SIGN, Material.WARPED_WALL_SIGN),
 	MANGROVE(
-			MC_1_19.MANGROVE_SIGN.orElseGet(Unsafe.uncheckedNull()),
-			MC_1_19.MANGROVE_WALL_SIGN.orElseGet(Unsafe.uncheckedNull())//
+			MC_1_19.MANGROVE_SIGN.orElse(null),
+			MC_1_19.MANGROVE_WALL_SIGN.orElse(null)//
 	);
 
 	public static final Predicate<SignType> IS_SUPPORTED = SignType::isSupported;
