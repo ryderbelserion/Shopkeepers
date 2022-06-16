@@ -614,7 +614,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// LIFE CYCLE
 
 	@Override
-	public boolean isValid() {
+	public final boolean isValid() {
 		return valid;
 	}
 
@@ -671,7 +671,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public void delete() {
+	public final void delete() {
 		this.delete(null);
 	}
 
@@ -822,17 +822,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			.build();
 
 	@Override
-	public int getId() {
+	public final int getId() {
 		return id;
 	}
 
 	@Override
-	public UUID getUniqueId() {
+	public final UUID getUniqueId() {
 		return uniqueId;
 	}
 
 	@Override
-	public String getIdString() {
+	public final String getIdString() {
 		return id + " (" + uniqueId.toString() + ")";
 	}
 
@@ -863,38 +863,33 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public @Nullable String getWorldName() {
+	public final @Nullable String getWorldName() {
 		return (location != null) ? location.getWorldName() : null;
 	}
 
 	@Override
-	public int getX() {
+	public final int getX() {
 		return (location != null) ? location.getX() : 0;
 	}
 
 	@Override
-	public int getY() {
+	public final int getY() {
 		return (location != null) ? location.getY() : 0;
 	}
 
 	@Override
-	public int getZ() {
+	public final int getZ() {
 		return (location != null) ? location.getZ() : 0;
 	}
 
 	@Override
-	public float getYaw() {
-		return yaw;
-	}
-
-	@Override
-	public String getPositionString() {
+	public final String getPositionString() {
 		if (this.isVirtual()) return VIRTUAL_SHOPKEEPER_MARKER;
 		return TextUtils.getLocationString(Unsafe.assertNonNull(location));
 	}
 
 	@Override
-	public @Nullable Location getLocation() {
+	public final @Nullable Location getLocation() {
 		if (this.isVirtual()) return null;
 		BlockLocation location = Unsafe.assertNonNull(this.location);
 		assert location != null && location.hasWorldName();
@@ -911,7 +906,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @return the shopkeeper's block location, or <code>null</code> if the shopkeeper is virtual
 	 */
-	public @Nullable BlockLocation getBlockLocation() {
+	public final @Nullable BlockLocation getBlockLocation() {
 		return location;
 	}
 
@@ -977,7 +972,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param location
 	 *            the new spawn location, not <code>null</code>
 	 */
-	public void teleport(Location location) {
+	public final void teleport(Location location) {
 		Validate.notNull(location, "location is null");
 
 		boolean spawned = shopObject.isSpawned();
@@ -996,6 +991,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 	}
 
+	@Override
+	public final float getYaw() {
+		return yaw;
+	}
+
 	/**
 	 * Sets the yaw of this shopkeeper.
 	 * <p>
@@ -1005,14 +1005,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param yaw
 	 *            the new yaw
 	 */
-	public void setYaw(float yaw) {
+	public final void setYaw(float yaw) {
 		Validate.State.isTrue(!this.isVirtual(), "Cannot set yaw of virtual shopkeeper!");
 		this.yaw = yaw;
 		this.markDirty();
 	}
 
 	@Override
-	public @Nullable ChunkCoords getChunkCoords() {
+	public final @Nullable ChunkCoords getChunkCoords() {
 		return chunkCoords;
 	}
 
@@ -1109,12 +1109,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			.build();
 
 	@Override
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
 	@Override
-	public void setName(@Nullable String newName) {
+	public final void setName(@Nullable String newName) {
 		this._setName(newName);
 		this.markDirty();
 	}
@@ -1244,17 +1244,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public List<? extends @NonNull ShopkeeperSnapshot> getSnapshots() {
+	public final List<? extends @NonNull ShopkeeperSnapshot> getSnapshots() {
 		return snapshotsView;
 	}
 
 	@Override
-	public ShopkeeperSnapshot getSnapshot(int index) {
+	public final ShopkeeperSnapshot getSnapshot(int index) {
 		return snapshotsView.get(index);
 	}
 
 	@Override
-	public int getSnapshotIndex(String name) {
+	public final int getSnapshotIndex(String name) {
 		String normalizedName = StringUtils.normalize(name);
 		if (StringUtils.isEmpty(normalizedName)) return -1;
 		for (int index = 0; index < snapshotsView.size(); index++) {
@@ -1268,13 +1268,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public @Nullable ShopkeeperSnapshot getSnapshot(String name) {
+	public final @Nullable ShopkeeperSnapshot getSnapshot(String name) {
 		int index = this.getSnapshotIndex(name);
 		return (index != -1) ? this.getSnapshot(index) : null;
 	}
 
 	@Override
-	public ShopkeeperSnapshot createSnapshot(String name) {
+	public final ShopkeeperSnapshot createSnapshot(String name) {
 		// The name is validated during the creation of the snapshot.
 		Instant timestamp = Instant.now();
 		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.ofNonNull(DataContainer.create());
@@ -1283,7 +1283,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public void addSnapshot(ShopkeeperSnapshot snapshot) {
+	public final void addSnapshot(ShopkeeperSnapshot snapshot) {
 		this._addSnapshot(snapshot);
 		this.checkSnapshotsCountLimit();
 		this.markDirty();
@@ -1310,20 +1310,20 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public ShopkeeperSnapshot removeSnapshot(int index) {
+	public final ShopkeeperSnapshot removeSnapshot(int index) {
 		ShopkeeperSnapshot snapshot = snapshots.remove(index);
 		this.markDirty();
 		return snapshot;
 	}
 
 	@Override
-	public void removeAllSnapshots() {
+	public final void removeAllSnapshots() {
 		snapshots.clear();
 		this.markDirty();
 	}
 
 	@Override
-	public void applySnapshot(ShopkeeperSnapshot snapshot) throws ShopkeeperLoadException {
+	public final void applySnapshot(ShopkeeperSnapshot snapshot) throws ShopkeeperLoadException {
 		Validate.notNull(snapshot, "snapshot is null");
 		// Note: The given snapshot is not necessarily stored by or based on this shopkeeper. Its
 		// application may fail if it is not compatible with this shopkeeper.
@@ -1354,17 +1354,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// USER INTERFACES
 
 	@Override
-	public Collection<? extends @NonNull UISession> getUISessions() {
+	public final Collection<? extends @NonNull UISession> getUISessions() {
 		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISessions(this);
 	}
 
 	@Override
-	public Collection<? extends UISession> getUISessions(UIType uiType) {
+	public final Collection<? extends UISession> getUISessions(UIType uiType) {
 		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISessions(this, uiType);
 	}
 
 	@Override
-	public void abortUISessionsDelayed() {
+	public final void abortUISessionsDelayed() {
 		ShopkeepersPlugin.getInstance().getUIRegistry().abortUISessionsDelayed(this);
 	}
 
@@ -1378,7 +1378,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param uiHandler
 	 *            the UI handler
 	 */
-	public void registerUIHandler(UIHandler uiHandler) {
+	public final void registerUIHandler(UIHandler uiHandler) {
 		Validate.notNull(uiHandler, "uiHandler is null");
 		uiHandlers.put(uiHandler.getUIType().getIdentifier(), uiHandler);
 	}
@@ -1390,25 +1390,25 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the UI type
 	 * @return the UI handler, or <code>null</code> if none is available
 	 */
-	public @Nullable UIHandler getUIHandler(UIType uiType) {
+	public final @Nullable UIHandler getUIHandler(UIType uiType) {
 		Validate.notNull(uiType, "uiType is null");
 		return uiHandlers.get(uiType.getIdentifier());
 	}
 
 	@Override
-	public boolean openWindow(UIType uiType, Player player) {
+	public final boolean openWindow(UIType uiType, Player player) {
 		return SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(uiType, this, player);
 	}
 
 	// Shortcuts for the default UI types:
 
 	@Override
-	public boolean openEditorWindow(Player player) {
+	public final boolean openEditorWindow(Player player) {
 		return this.openWindow(DefaultUITypes.EDITOR(), player);
 	}
 
 	@Override
-	public boolean openTradingWindow(Player player) {
+	public final boolean openTradingWindow(Player player) {
 		return this.openWindow(DefaultUITypes.TRADING(), player);
 	}
 
