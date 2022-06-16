@@ -640,6 +640,12 @@ public class Settings extends Config {
 			for (String entityTypeId : Settings.enabledLivingShops) {
 				EntityType entityType = EntityUtils.parseEntityType(entityTypeId);
 				if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
+					// We omit the warning when we initialize the derived settings for the default
+					// settings, because we might run on an older but supported MC version.
+					if (initialSetup) {
+						continue;
+					}
+
 					foundInvalidEntityType = true;
 					if ("PIG_ZOMBIE".equals(entityTypeId)) {
 						// Migration note for MC 1.16 TODO Remove this again at some point?
@@ -647,10 +653,7 @@ public class Settings extends Config {
 								+ "Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'."
 								+ " This mob no longer exists since MC 1.16."
 								+ " Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
-					} else if (!initialSetup) {
-						// We omit the warning when we initialize the derived settings for the
-						// default settings, because we might run on an older but supported MC
-						// version.
+					} else {
 						Log.warning(INSTANCE.getLogPrefix()
 								+ "Invalid living entity type name in 'enabled-living-shops': "
 								+ entityTypeId);
