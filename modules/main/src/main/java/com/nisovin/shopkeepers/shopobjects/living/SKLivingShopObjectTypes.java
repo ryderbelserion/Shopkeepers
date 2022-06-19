@@ -101,8 +101,11 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>ENDERMITE: seems to work, however it shows strange movement
  * <li>GUARDIAN: does not work, error when trying to apply common AI goals
  * <li>ARMOR_STAND: cannot be clicked / accessed yet
- * <li>SHULKER: okay, dynamically attaches to another adjacent block when the block they are
- * attached to is broken TODO peek state
+ * <li>SHULKER: okay, dynamically attaches to another adjacent block when the block it is attached
+ * to is broken, or is not a full block face, or when a block in the opposite direction would block
+ * it from opening, but this does not apply when the shulker is placed in a non-empty (i.e.
+ * passable) block: In that case it considers all orientations invalid and therefore keeps its
+ * current orientation, TODO peek state
  * <li>HORSE: okay
  * <li>MULE: okay
  * <li>DONKEY: okay
