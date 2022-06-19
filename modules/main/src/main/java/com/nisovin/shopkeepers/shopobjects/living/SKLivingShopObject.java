@@ -123,6 +123,23 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		return entity;
 	}
 
+	private @Nullable Location getSpawnLocation() {
+		Location spawnLocation = shopkeeper.getLocation();
+		if (spawnLocation == null) return null; // World not loaded
+
+		spawnLocation.add(0.5D, 0.0D, 0.5D); // Center of block
+
+		if (this.shallAdjustSpawnLocation()) {
+			this.adjustSpawnLocation(spawnLocation);
+		}
+
+		return spawnLocation;
+	}
+
+	protected boolean shallAdjustSpawnLocation() {
+		return true;
+	}
+
 	// Shopkeepers might be located 1 block above passable (especially in the past) or non-full
 	// blocks. In order to not have these shopkeepers hover but stand on the ground, we determine
 	// the exact spawn location their entity would fall to within the range of up to 1 block below
@@ -131,12 +148,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	// now: Passable blocks like grass or non-full blocks like carpets or slabs might have been
 	// broken since the shopkeeper was created. We still want to place the shopkeeper nicely on the
 	// ground in those cases.
-	private @Nullable Location getSpawnLocation() {
-		Location spawnLocation = shopkeeper.getLocation();
-		if (spawnLocation == null) return null; // World not loaded
-
-		spawnLocation.add(0.5D, SPAWN_LOCATION_OFFSET, 0.5D); // Center of block
-
+	private void adjustSpawnLocation(Location spawnLocation) {
 		// The entity may be able to stand on certain types of fluids:
 		Set<? extends @NonNull Material> collidableFluids = EntityUtils.getCollidableFluids(
 				this.getEntityType()
@@ -158,19 +170,23 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			}
 		}
 
+		// We check for collisions from the top of the block:
+		spawnLocation.add(0.0D, SPAWN_LOCATION_OFFSET, 0.0D);
+
 		double distanceToGround = WorldUtils.getCollisionDistanceToGround(
 				spawnLocation,
 				SPAWN_LOCATION_RANGE,
 				collidableFluids
 		);
+
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
 			// No collision within the checked range: Remove the initial offset from the spawn
-			// location.
+			// location again.
 			distanceToGround = SPAWN_LOCATION_OFFSET;
 		}
-		// Adjust spawn location:
+
+		// Adjust the spawn location:
 		spawnLocation.add(0.0D, -distanceToGround, 0.0D);
-		return spawnLocation;
 	}
 
 	// Any preparation that needs to be done before spawning. Might only allow limited operations.
@@ -427,6 +443,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		if (Settings.silenceLivingShopEntities) {
 			entity.setSilent(true);
 		}
+
 		if (Settings.disableGravity) {
 			this.setNoGravity(entity);
 			// When gravity is disabled, we may also be able to disable collisions / the pushing of

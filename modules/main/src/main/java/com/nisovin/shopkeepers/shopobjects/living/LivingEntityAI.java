@@ -145,6 +145,15 @@ public class LivingEntityAI implements Listener {
 			this.entity = entity;
 			this.chunkData = chunkData;
 		}
+
+		public boolean isAffectedByGravity() {
+			switch (entity.getType()) {
+			case SHULKER:
+				return false;
+			default:
+				return true;
+			}
+		}
 	}
 
 	private static class ChunkData {
@@ -570,9 +579,9 @@ public class LivingEntityAI implements Listener {
 
 		// Process gravity:
 		gravityTimings.resume();
-		if (chunkData.activeGravity) {
+		if (chunkData.activeGravity && entityData.isAffectedByGravity()) {
 			activeGravityEntityCount++;
-			processGravity(entityData);
+			this.processGravity(entityData);
 		}
 		gravityTimings.pause();
 
@@ -580,7 +589,7 @@ public class LivingEntityAI implements Listener {
 		aiTimings.resume();
 		if (chunkData.activeAI) {
 			activeAIEntityCount++;
-			processAI(entityData);
+			this.processAI(entityData);
 		}
 		aiTimings.pause();
 	}

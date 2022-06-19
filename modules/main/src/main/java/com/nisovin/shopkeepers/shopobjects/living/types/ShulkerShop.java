@@ -89,6 +89,13 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	}
 
 	@Override
+	protected boolean shallAdjustSpawnLocation() {
+		// Only adjust the spawn location downwards if the shulker is oriented to stand on top of a
+		// block:
+		return this.getAttachedFace() == BlockFace.DOWN;
+	}
+
+	@Override
 	public List<@NonNull Button> createEditorButtons() {
 		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
