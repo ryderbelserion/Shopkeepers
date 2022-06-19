@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import java.util.Collections;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,6 +16,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
+import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public final class SKSignShopObjectType
@@ -47,30 +49,33 @@ public final class SKSignShopObjectType
 	public boolean validateSpawnLocation(
 			@Nullable Player creator,
 			@Nullable Location spawnLocation,
-			@Nullable BlockFace targetedBlockFace
+			@Nullable BlockFace attachedBlockFace
 	) {
-		if (!super.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
+		if (!super.validateSpawnLocation(creator, spawnLocation, attachedBlockFace)) {
 			return false;
 		}
 		assert spawnLocation != null;
+		Unsafe.assertNonNull(spawnLocation);
 
 		// Block has to be empty:
-		if (!Unsafe.assertNonNull(spawnLocation).getBlock().isEmpty()) {
+		Block spawnBlock = spawnLocation.getBlock();
+		if (!spawnBlock.isEmpty()) {
 			if (creator != null) {
 				TextUtils.sendMessage(creator, Messages.spawnBlockNotEmpty);
 			}
 			return false;
 		}
 
-		// If sign posts are disabled, only wall sign block faces are allowed:
-		// The super implementation already limits the block face to block sides, and already
-		// excludes BlockFace#DOWN.
-		if (targetedBlockFace == BlockFace.UP && !Settings.enableSignPostShops) {
+		// If sign posts are disabled, only wall sign block faces (or null) are allowed:
+		if (attachedBlockFace == BlockFace.DOWN
+				|| (attachedBlockFace == BlockFace.UP && !Settings.enableSignPostShops)
+				|| (attachedBlockFace != null && !BlockFaceUtils.isBlockSide(attachedBlockFace))) {
 			if (creator != null) {
 				TextUtils.sendMessage(creator, Messages.invalidSpawnBlockFace);
 			}
 			return false;
 		}
+
 		return true;
 	}
 

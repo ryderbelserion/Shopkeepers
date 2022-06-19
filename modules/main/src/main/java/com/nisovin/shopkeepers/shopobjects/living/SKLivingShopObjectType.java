@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,6 +19,7 @@ import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
+import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -97,17 +99,44 @@ public final class SKLivingShopObjectType<T extends @NonNull SKLivingShopObject<
 		return false;
 	}
 
+	private boolean isDownValidAttachedBlockFace() {
+		switch (entityType) {
+		case SHULKER:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	@Override
 	public boolean validateSpawnLocation(
 			@Nullable Player creator,
 			@Nullable Location spawnLocation,
-			@Nullable BlockFace targetedBlockFace
+			@Nullable BlockFace attachedBlockFace
 	) {
-		if (!super.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
+		if (!super.validateSpawnLocation(creator, spawnLocation, attachedBlockFace)) {
 			return false;
 		}
 		assert spawnLocation != null;
 		Unsafe.assertNonNull(spawnLocation);
+
+		Block spawnBlock = spawnLocation.getBlock();
+		// TODO Require an empty block for shulkers? However, placing a shulker on a non-empty block
+		// actually works fine and preserves the block.
+		if (!spawnBlock.isPassable()) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.spawnBlockNotEmpty);
+			}
+			return false;
+		}
+
+		if ((attachedBlockFace == BlockFace.DOWN && !this.isDownValidAttachedBlockFace())
+				|| (attachedBlockFace != null && !BlockFaceUtils.isBlockSide(attachedBlockFace))) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.invalidSpawnBlockFace);
+			}
+			return false;
+		}
 
 		// Check if the world's difficulty would prevent the mob from spawning:
 		if (EntityUtils.isRemovedOnPeacefulDifficulty(entityType)) {

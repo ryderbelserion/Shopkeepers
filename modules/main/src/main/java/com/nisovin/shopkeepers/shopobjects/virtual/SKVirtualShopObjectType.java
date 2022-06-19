@@ -44,7 +44,7 @@ public final class SKVirtualShopObjectType
 	public boolean validateSpawnLocation(
 			@Nullable Player creator,
 			@Nullable Location spawnLocation,
-			@Nullable BlockFace targetedBlockFace
+			@Nullable BlockFace attachedBlockFace
 	) {
 		return true; // Does not use any spawn location
 	}

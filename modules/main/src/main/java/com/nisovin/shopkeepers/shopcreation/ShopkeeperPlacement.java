@@ -37,6 +37,9 @@ public class ShopkeeperPlacement {
 		// If the target block is passable (and not a liquid, which can only come up as target block
 		// when we try to place the shopkeeper on top of water or lava), spawn there, otherwise
 		// shift according to target block face:
+		// TODO When placing sign shopkeepers it may make more sense to check isSolid here instead
+		// of isPassable. At least in some cases, such as placing a sign onto another sign, so that
+		// the sign placement is consistent with vanilla sign placement.
 		Block spawnBlock;
 		if (targetBlock.isPassable() && !targetBlock.isLiquid()) {
 			spawnBlock = targetBlock;

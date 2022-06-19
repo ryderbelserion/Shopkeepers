@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -19,7 +18,6 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.registry.ShopObjectRegistry;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
-import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -91,9 +89,9 @@ public abstract class AbstractShopObjectType<T extends @NonNull AbstractShopObje
 	@Override
 	public final boolean isValidSpawnLocation(
 			@Nullable Location spawnLocation,
-			@Nullable BlockFace targetedBlockFace
+			@Nullable BlockFace attachedBlockFace
 	) {
-		return this.validateSpawnLocation(null, spawnLocation, targetedBlockFace);
+		return this.validateSpawnLocation(null, spawnLocation, attachedBlockFace);
 	}
 
 	/**
@@ -106,14 +104,14 @@ public abstract class AbstractShopObjectType<T extends @NonNull AbstractShopObje
 	 *            the shop creator, can be <code>null</code>
 	 * @param spawnLocation
 	 *            the spawn location, can be <code>null</code>
-	 * @param targetedBlockFace
+	 * @param attachedBlockFace
 	 *            the block face against which to spawn the object, or <code>null</code> if unknown
 	 * @return <code>true</code> if the shop object can be spawned at the specified location
 	 */
 	public boolean validateSpawnLocation(
 			@Nullable Player creator,
 			@Nullable Location spawnLocation,
-			@Nullable BlockFace targetedBlockFace
+			@Nullable BlockFace attachedBlockFace
 	) {
 		// TODO Check the actual object size?
 		if (spawnLocation == null || !spawnLocation.isWorldLoaded()) {
@@ -121,27 +119,6 @@ public abstract class AbstractShopObjectType<T extends @NonNull AbstractShopObje
 				TextUtils.sendMessage(creator, Messages.missingSpawnLocation);
 			}
 			return false;
-		}
-
-		Block spawnBlock = spawnLocation.getBlock();
-		if (!spawnBlock.isPassable()) {
-			if (creator != null) {
-				TextUtils.sendMessage(creator, Messages.spawnBlockNotEmpty);
-			}
-			return false;
-		}
-
-		if (targetedBlockFace != null) {
-			// TODO DOWN might be a valid block face for some shop types (in the future). However,
-			// it certainly is not for sign and entity shops (the current by default available
-			// types).
-			if (targetedBlockFace == BlockFace.DOWN
-					|| !BlockFaceUtils.isBlockSide(targetedBlockFace)) {
-				if (creator != null) {
-					TextUtils.sendMessage(creator, Messages.invalidSpawnBlockFace);
-				}
-				return false;
-			}
 		}
 		return true;
 	}
