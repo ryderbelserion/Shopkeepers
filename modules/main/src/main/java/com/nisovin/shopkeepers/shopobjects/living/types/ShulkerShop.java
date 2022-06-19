@@ -48,7 +48,7 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 			})
 			// For versions before 2.16.0:
 			.useDefaultIfMissing()
-			.defaultValue(BlockFace.UP)
+			.defaultValue(BlockFace.DOWN)
 			.build();
 
 	private final PropertyValue<@Nullable DyeColor> colorProperty = new PropertyValue<>(COLOR)
@@ -65,6 +65,12 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 			@Nullable ShopCreationData creationData
 	) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
+		if (creationData != null) {
+			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
+			if (targetedBlockFace != null) {
+				Unsafe.initialized(this).setAttachedBlockFace(targetedBlockFace);
+			}
+		}
 	}
 
 	@Override
