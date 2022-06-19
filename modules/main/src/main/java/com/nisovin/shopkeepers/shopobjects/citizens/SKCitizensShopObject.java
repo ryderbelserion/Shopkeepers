@@ -733,7 +733,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	// SHOPKEEPER LOCATION
 
-	// TODO Maybe avoid this immediate location update (we cannot relibably catch all location
+	// TODO Maybe avoid this immediate location update (we cannot reliably catch all location
 	// updates immediately anyways) and instead ensure that we keep all shop objects ticking for as
 	// long as they are still spawned. I.e. tick shopkeepers if either their chunks is active, or
 	// they have been spawned and not despawned yet.
