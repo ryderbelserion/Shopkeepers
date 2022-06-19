@@ -91,7 +91,12 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	protected void onSpawn() {
 		super.onSpawn();
 		this.applyColor();
-		this.applyAttachedFace();
+	}
+
+	@Override
+	protected void prepareEntity(Shulker entity) {
+		super.prepareEntity(entity);
+		this.applyAttachedFace(entity);
 	}
 
 	@Override
@@ -188,6 +193,10 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	private void applyAttachedFace() {
 		Shulker entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+		this.applyAttachedFace(entity);
+	}
+
+	private void applyAttachedFace(Shulker entity) {
 		entity.setAttachedFace(this.getAttachedFace());
 	}
 
