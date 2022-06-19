@@ -179,7 +179,7 @@ public class ShopkeeperMoving {
 		}
 
 		// Move the shopkeeper:
-		((AbstractShopkeeper) shopkeeper).teleport(newLocation);
+		((AbstractShopkeeper) shopkeeper).teleport(newLocation, blockFace);
 
 		// Inform the player:
 		TextUtils.sendMessage(player, Messages.shopkeeperMoved);

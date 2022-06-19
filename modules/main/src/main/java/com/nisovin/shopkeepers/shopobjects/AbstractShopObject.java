@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -25,6 +26,7 @@ import com.nisovin.shopkeepers.shopkeeper.registry.ShopObjectRegistry;
 import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
@@ -238,6 +240,25 @@ public abstract class AbstractShopObject implements ShopObject {
 	public void delete() {
 	}
 
+	// ATTACHED BLOCK FACE
+
+	/**
+	 * Sets the {@link BlockFace} against which the shop object is attached.
+	 * <p>
+	 * The block face is relative to the block the shopkeeper is attached to. E.g. a shulker
+	 * attached to the south of a block has an "AttachFace" of "north".
+	 * <p>
+	 * Not all types of shop objects might use or store the attached block face.
+	 * 
+	 * @param attachedBlockFace
+	 *            the block side block face, not <code>null</code>
+	 */
+	public void setAttachedBlockFace(BlockFace attachedBlockFace) {
+		Validate.notNull(attachedBlockFace, "attachedBlockFace is null");
+		Validate.isTrue(BlockFaceUtils.isBlockSide(attachedBlockFace),
+				"attachedBlockFace is not a block side");
+	}
+
 	// SPAWNING
 
 	/**
@@ -369,8 +390,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * Note: There is intentionally no method to teleport a shop object to a specific location,
 	 * because the location of a shop object is meant to always match the location of its associated
 	 * shopkeeper. If a shop object is able to change its location independently of the location of
-	 * its shopkeeper, it is required to manually {@link AbstractShopkeeper#setLocation(Location)
-	 * update} the location of the shopkeeper in order to keep it synchronized.
+	 * its shopkeeper, it is required to manually
+	 * {@link AbstractShopkeeper#setLocation(Location, BlockFace) update} the location of the
+	 * shopkeeper in order to keep it synchronized.
 	 * 
 	 * @return <code>true</code> if the shop object was successfully moved
 	 */

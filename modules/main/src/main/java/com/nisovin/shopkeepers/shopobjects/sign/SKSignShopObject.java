@@ -495,6 +495,20 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	// WALL SIGN (vs sign post)
 
+	// Can be edited by moving the shopkeeper.
+	@Override
+	public void setAttachedBlockFace(BlockFace attachedBlockFace) {
+		super.setAttachedBlockFace(attachedBlockFace);
+		Validate.isTrue(attachedBlockFace != BlockFace.DOWN, "Invalid sign block face: DOWN.");
+		if (attachedBlockFace == BlockFace.UP) {
+			wallSignProperty.setValue(false);
+		} else {
+			// Update the yaw accordingly:
+			shopkeeper.setYaw(BlockFaceUtils.getYaw(attachedBlockFace));
+			wallSignProperty.setValue(true);
+		}
+	}
+
 	public boolean isWallSign() {
 		return wallSignProperty.getValue();
 	}

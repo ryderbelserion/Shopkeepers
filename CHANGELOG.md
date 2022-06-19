@@ -11,11 +11,13 @@ Date format: (YYYY-MM-DD)
   * Added the mangrove sign variant.
 * Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
 * We no longer forcefully spawn Citizens shopkeeper NPCs when we reload their NPC data (e.g. when we apply a shopkeeper snapshot). Instead, the NPC is spawned based on its stored spawn state and location.
+* Shulkers are now oriented according to the block face they are placed against.
 * Added a new editor option to move shopkeepers.
   * Config: Added `move-item` (default: `ENDER_PEARL`).
   * Config: Moving of player shops can be disabled via the new `enable-moving-of-player-shops` setting (default: `true`).
   * Some default messages related to the validation of spawn locations were slightly changed to better fit when we move shopkeepers.
   * When right clicking a new shopkeeper location, we ignore interactions with certain types of blocks that are relevant for navigation, such as doors, trap doors, fence doors, buttons, levers, etc. Other types of interactable blocks (work benches, chests, signs, etc.) are not ignored, because we want shopkeepers to be placeable against those (even if some plugins may use them for navigation purposes, e.g. command signs).
+  * It is also possible to move sign shopkeepers between their sign post and wall sign variant, or to change the orientation of shulker shopkeepers. However, it is not yet possible to change the sign or shulker orientation 'in place', i.e. without first moving the shopkeeper to another location.
   * Limitation: Moving Citizens shopkeepers silently fails if the Citizens plugin is not enabled currently.
 * Data: Removed various old data migrations:
   * Removed the importing from the old book offer data format (changed in late MC 1.14.4).

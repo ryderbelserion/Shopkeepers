@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -785,8 +786,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			.build();
 	public static final Property<@NonNull Float> YAW = new BasicProperty<@NonNull Float>()
 			.dataKeyAccessor("yaw", NumberSerializers.FLOAT)
-			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (e.g. in pre 2.13.4
-									 // versions)
+			// For virtual shopkeepers, and if missing (e.g. in pre 2.13.4 versions):
+			.useDefaultIfMissing()
 			.defaultValue(0.0F) // South
 			.build();
 	// This always loads a non-null location, even for virtual shopkeepers.
@@ -915,15 +916,34 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @param location
 	 *            the new stored location of this shopkeeper, not <code>null</code>
+	 * @see #setLocation(Location, BlockFace)
+	 */
+	public final void setLocation(Location location) {
+		this.setLocation(location, null);
+	}
+
+	/**
+	 * Sets the stored location, yaw, and attached block face of this shopkeeper.
+	 * 
+	 * @param location
+	 *            the new stored location of this shopkeeper, not <code>null</code>
+	 * @param attachedBlockFace
+	 *            The block face against which the shopkeeper is attached, or <code>null</code> to
+	 *            not update the block face. This might not be used or stored by the shopkeeper
+	 *            itself, but may be used by the shop object.
 	 * @see #setLocation(BlockLocation)
 	 * @see #setYaw(float)
 	 */
-	public final void setLocation(Location location) {
+	public final void setLocation(Location location, @Nullable BlockFace attachedBlockFace) {
 		// This validates the given location, and throws an exception if the location's world is no
 		// longer loaded:
 		this.setLocation(BlockLocation.of(location));
 		assert location != null;
 		this.setYaw(location.getYaw());
+		if (attachedBlockFace != null) {
+			// This validates the given block face:
+			shopObject.setAttachedBlockFace(attachedBlockFace);
+		}
 	}
 
 	/**
@@ -966,20 +986,27 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Teleports the shopkeeper to a new location.
 	 * <p>
-	 * This updates the shopkeeper's {@link #setLocation(Location) location} and then
+	 * This updates the shopkeeper's {@link #setLocation(Location, BlockFace) location} and then
 	 * {@link AbstractShopObject#move() moves} the shop object if necessary.
 	 * 
 	 * @param location
 	 *            the new spawn location, not <code>null</code>
+	 * @param attachedBlockFace
+	 *            The block face against which the shopkeeper is attached, or <code>null</code> to
+	 *            not update the block face. This might not be used or stored by the shopkeeper
+	 *            itself, but may be used by the shop object.
 	 */
-	public final void teleport(Location location) {
+	public final void teleport(Location location, @Nullable BlockFace attachedBlockFace) {
 		Validate.notNull(location, "location is null");
 
 		boolean spawned = shopObject.isSpawned();
 
 		// This throws an exception if the shopkeeper cannot be moved (virtual shopkeepers) or if
-		// the location provides no valid world:
-		this.setLocation(location);
+		// the location provides no valid world.
+		// This also validates the given attached block face.
+		// TODO For some shop objects, setting the attached block face already respawns the shop
+		// object.
+		this.setLocation(location, attachedBlockFace);
 
 		// Teleport the shop object to its new location:
 		// If the shop object does not handle its spawning itself, we only need to teleport the shop

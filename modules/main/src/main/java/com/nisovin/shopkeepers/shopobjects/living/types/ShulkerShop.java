@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Shulker;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +22,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
@@ -28,6 +30,7 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 
@@ -37,8 +40,22 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 			.defaultValue(null)
 			.build();
 
+	public static final Property<@NonNull BlockFace> ATTACHED_FACE = new BasicProperty<@NonNull BlockFace>()
+			.dataKeyAccessor("attachedFace", EnumSerializers.lenient(BlockFace.class))
+			.validator(value -> {
+				Validate.isTrue(BlockFaceUtils.isBlockSide(value),
+						"Not a valid block side: '" + value + "'.");
+			})
+			// For versions before 2.16.0:
+			.useDefaultIfMissing()
+			.defaultValue(BlockFace.UP)
+			.build();
+
 	private final PropertyValue<@Nullable DyeColor> colorProperty = new PropertyValue<>(COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyColor)
+			.build(properties);
+	private final PropertyValue<@NonNull BlockFace> attachedFaceProperty = new PropertyValue<>(ATTACHED_FACE)
+			.onValueChanged(Unsafe.initialized(this)::applyAttachedFace)
 			.build(properties);
 
 	public ShulkerShop(
@@ -54,18 +71,21 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		colorProperty.load(shopObjectData);
+		attachedFaceProperty.load(shopObjectData);
 	}
 
 	@Override
 	public void save(ShopObjectData shopObjectData, boolean saveAll) {
 		super.save(shopObjectData, saveAll);
 		colorProperty.save(shopObjectData);
+		attachedFaceProperty.save(shopObjectData);
 	}
 
 	@Override
 	protected void onSpawn() {
 		super.onSpawn();
 		this.applyColor();
+		this.applyAttachedFace();
 	}
 
 	@Override
@@ -133,6 +153,30 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 		};
 	}
 
-	// TODO Attached block face
+	// ATTACHED BLOCK FACE
+
+	// Can be edited by moving the shopkeeper.
+	@Override
+	public void setAttachedBlockFace(BlockFace attachedBlockFace) {
+		super.setAttachedBlockFace(attachedBlockFace);
+		// The "attached face" of the shulker is the opposite of the block face the shulker is
+		// attached against:
+		this.setAttachedFace(attachedBlockFace.getOppositeFace());
+	}
+
+	public void setAttachedFace(BlockFace attachedFace) {
+		attachedFaceProperty.setValue(attachedFace);
+	}
+
+	public BlockFace getAttachedFace() {
+		return attachedFaceProperty.getValue();
+	}
+
+	private void applyAttachedFace() {
+		Shulker entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+		entity.setAttachedFace(this.getAttachedFace());
+	}
+
 	// TODO Open state (Peek)
 }
