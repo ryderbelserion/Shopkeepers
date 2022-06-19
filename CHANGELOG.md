@@ -11,7 +11,7 @@ Date format: (YYYY-MM-DD)
   * Added the mangrove sign variant.
 * Fixed: When a currency item is changed via the "/shopkeeper setCurrency" command, we close all currently open player shopkeeper UIs now so that the change is immediately in effect.
 * We no longer forcefully spawn Citizens shopkeeper NPCs when we reload their NPC data (e.g. when we apply a shopkeeper snapshot). Instead, the NPC is spawned based on its stored spawn state and location.
-* Shulkers are now oriented according to the block face they are placed against.
+* Shulkers are now oriented according to the block face they are placed against. However, when the block they are attached to is broken, they can dynamically attach to another adjacent block.
 * Shulkers are no longer affected by gravity. However, if they are oriented to stand on top of a block, we still adjust their spawn location downwards by up to 1 block, as we do for any other mob even if gravity is disabled.
 * Added a new editor option to move shopkeepers.
   * Config: Added `move-item` (default: `ENDER_PEARL`).

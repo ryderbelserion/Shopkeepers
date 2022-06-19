@@ -101,7 +101,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>ENDERMITE: seems to work, however it shows strange movement
  * <li>GUARDIAN: does not work, error when trying to apply common AI goals
  * <li>ARMOR_STAND: cannot be clicked / accessed yet
- * <li>SHULKER: seems to work, but stays in closed state
+ * <li>SHULKER: okay, dynamically attaches to another adjacent block when the block they are
+ * attached to is broken TODO peek state
  * <li>HORSE: okay
  * <li>MULE: okay
  * <li>DONKEY: okay
