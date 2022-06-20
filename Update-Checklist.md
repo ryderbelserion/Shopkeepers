@@ -108,6 +108,7 @@ To support the latest mappings version:
 * If there have been message changes, update the language files repository:
 	* Add a new branch for the new version.
 	* Update the contents of the default language files, and delete all other language files that are now outdated.
+	* Update the changelog of the language files repository.
 	* Change the default branch of the repository online.
 
 ## Upload:
