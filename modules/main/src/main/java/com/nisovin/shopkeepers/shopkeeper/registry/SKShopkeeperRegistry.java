@@ -346,6 +346,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperRemoveEvent(shopkeeper, cause));
 
+		if (!shopkeeper.isValid())
+		{
+			Log.warning(shopkeeper.getLogPrefix()
+					+ "Aborting removal, because already removed during ShopkeeperRemoveEvent!");
+			return;
+		}
+
 		// Delayed closing of all active UI sessions:
 		// TODO UI handlers might want/need to handle the UI closing immediately here (e.g. to save
 		// UI state and apply shopkeeper changes).
