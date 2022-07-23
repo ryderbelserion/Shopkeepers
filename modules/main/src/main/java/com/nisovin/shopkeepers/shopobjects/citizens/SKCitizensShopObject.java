@@ -497,17 +497,20 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	/**
 	 * Called when the corresponding Citizens NPC is about to be deleted.
 	 * <p>
-	 * This can be called before the NPC is despawned.
+	 * This might be called before the NPC is despawned.
 	 * 
 	 * @param player
 	 *            the player who deleted the NPC, can be <code>null</code> if not available
 	 */
 	void onNPCDeleted(@Nullable Player player) {
+		// Ignore if the NPC is deleted due to the shopkeeper being deleted:
+		if (!shopkeeper.isValid()) return;
+
 		NPC npc = Unsafe.assertNonNull(this.getNPC());
 		Log.debug(() -> shopkeeper.getUniqueIdLogPrefix()
 				+ "Deletion due to the deletion of Citizens NPC " + CitizensShops.getNPCIdString(npc)
 				+ (player != null ? " by player " + TextUtils.getPlayerString(player) : ""));
-		// The NPC is already getting deleted, so we don't need to delete it.:
+		// The NPC is already getting deleted, so we don't need to delete it:
 		this.setKeepNPCOnDeletion();
 		shopkeeper.delete(player);
 	}
@@ -621,8 +624,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			assert npc.getEntity() == entity;
 			// Check if our shopkeeper location is still correct:
 			// If not yet done, this will also activate the shopkeeper's chunk and start ticking the
-			// shopkeeper. While the shopkeeper is ticked, we regularly update the its location to
-			// match that of the NPC.
+			// shopkeeper. While the shopkeeper is ticked, we regularly update its location to match
+			// that of the NPC.
 			// We also update the shopkeeper's location once the shopkeeper's chunk is deactivated,
 			// i.e. once the shopkeeper stops ticking: If the NPC has been moved to a different
 			// chunk since the last shopkeeper tick, this ensures that we continue to activate the

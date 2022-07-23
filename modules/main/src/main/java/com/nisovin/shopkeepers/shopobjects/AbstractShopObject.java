@@ -216,7 +216,8 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	/**
 	 * This is called when the {@link ShopObject} is removed, usually when the corresponding
-	 * shopkeeper is removed from the {@link ShopkeeperRegistry}.
+	 * shopkeeper is removed from the {@link ShopkeeperRegistry}. The shopkeeper has already been
+	 * marked as {@link Shopkeeper#isValid() invalid} at this point.
 	 * <p>
 	 * This can for example be used to disable any active components (e.g. listeners) for this shop
 	 * object.

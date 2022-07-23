@@ -183,6 +183,7 @@ public abstract class AbstractPlayerShopkeeper
 				world.dropItem(dropLocation, shopCreationItem);
 			}
 		}
+
 		super.delete(player);
 	}
 

@@ -82,8 +82,11 @@ public class CitizensShopkeeperTrait extends Trait {
 	 *            the player who deleted the trait, or <code>null</code> if not available
 	 */
 	public void onTraitDeleted(@Nullable Player player) {
+		// Note: This returns null if the trait got deleted due to the shopkeeper being deleted (the
+		// NPC-shopkeeper association is cleared before the trait is deleted). But to make this more
+		// clear, we also check if the shopkeeper is still valid before we delete it.
 		Shopkeeper shopkeeper = this.getShopkeeper();
-		if (shopkeeper != null) {
+		if (shopkeeper != null && shopkeeper.isValid()) {
 			NPC npc = this.getNPC();
 			assert npc != null;
 			Log.debug(() -> shopkeeper.getUniqueIdLogPrefix()

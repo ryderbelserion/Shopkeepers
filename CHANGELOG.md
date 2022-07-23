@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.16.1 (TBA)
 ### Supported MC versions: 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+* Fix #809: Deleting a Citizens shopkeeper via the shopkeeper editor menu resulted in an error.
 * Config: Add setting `cancel-citizen-npc-interactions` (default `true`).  
   By default, we will now cancel interactions with Citizen shopkeeper NPCs, similar to how it is already the case for all the other types of shopkeeper objects. Not canceling the interaction with shopkeeper NPCs can result in some unintentional behaviors to take place (e.g. villager NPCs will increment the player's 'talked-to-villager' statistic).  
   However, there may be cases in which server admins don't mind these additional interaction effects and actually want the normal NPC interaction behavior to take place in addition to the shopkeeper specific behavior, for example to still trigger attached NPC commands. These server admins have the option to revert to the previous behavior by disabling this setting.

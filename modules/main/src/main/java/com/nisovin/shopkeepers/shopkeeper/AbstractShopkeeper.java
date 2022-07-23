@@ -647,22 +647,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	public final void informRemoval(ShopkeeperRemoveEvent.Cause cause) {
 		assert valid;
+		valid = false;
+
 		this.onRemoval(cause);
 		if (cause == ShopkeeperRemoveEvent.Cause.DELETE) {
 			this.onDeletion();
 		}
-		valid = false;
 	}
 
 	/**
 	 * This is called when the shopkeeper is about to be removed from the
 	 * {@link ShopkeeperRegistry}.
 	 * <p>
-	 * The shopkeeper has already been deactivated at this point, i.e. its ticking has been stopped
-	 * and, if the shop object's spawning is {@link AbstractShopObjectType#mustBeSpawned() managed}
-	 * by the Shopkeepers plugin, it has already been despawned. If the shop object handles its
-	 * spawning itself, it may still be spawned and is then responsible to
-	 * {@link AbstractShopObject#remove() unregister} itself during this call.
+	 * The shopkeeper has already been deactivated and marked as {@link #isValid() invalid} at this
+	 * point, i.e. its ticking has been stopped and, if the shop object's spawning is
+	 * {@link AbstractShopObjectType#mustBeSpawned() managed} by the Shopkeepers plugin, it has
+	 * already been despawned. If the shop object handles its spawning itself, it may still be
+	 * spawned and is then responsible to {@link AbstractShopObject#remove() unregister} itself
+	 * during this call.
 	 * 
 	 * @param cause
 	 *            the cause of the removal, not <code>null</code>
