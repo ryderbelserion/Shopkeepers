@@ -344,6 +344,19 @@ default-citizen-npc-type: 'PLAYER'
 # for your players accordingly, you can allow shop owners to use the commands
 # of the Citizens plugin to edit the Citizens NPCs of their NPC shopkeepers.
 set-citizen-npc-owner-of-player-shops: false
+# Whether to cancel interactions with Citizen shopkeeper NPCs.
+# The default behavior is to cancel all interactions with shopkeeper shop objects (mobs, signs,
+# citizen NPCs, etc.) in order to prevent any usual interaction behaviors to take place (e.g.
+# villagers opening their vanilla trading interface instead of the shopkeeper trading interface).
+# However, Citizen NPCs can be configured to trigger certain actions when they are interacted with,
+# such as executing attached commands. By disabling this setting, the usual NPC actions are still
+# triggered in addition to the shopkeeper specific behavior of opening the trading or editor UI.
+# However, be aware that this can result in additional unintentional behaviors to be triggered as
+# well. For example, when interacting with a villager NPC, by default the Citizens plugin prevents
+# the villager's normal trading interface to open, but other vanilla actions such as incrementing
+# the player's 'talked-to-villager' statistic may still take place. So if you disable this setting,
+# you will have to make sure that the resulting interaction behavior is what you intend it to be.
+cancel-citizen-npc-interactions: true
 # Whether to immediately save all Citizens NPCs whenever the Shopkeepers plugin
 # modifies a Citizens NPC. If disabled, the Citizens plugin handles the saving
 # of the Citizens NPCs as usual: They are saved when the Citizens plugin shuts

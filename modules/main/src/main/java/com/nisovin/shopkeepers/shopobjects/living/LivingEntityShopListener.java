@@ -167,10 +167,12 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// If Citizens NPC: Don't cancel the event, let Citizens perform other actions as
-		// appropriate.
-		if (shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
-			// Always cancel interactions with shopkeepers, to prevent any default behavior:
+		// Always cancel all interactions with shopkeepers to prevent any default behaviors:
+		// For Citizen shopkeepers, server admins can decide whether they want the usual NPC
+		// interaction behavior to take place (e.g. triggering attached NPC commands) in addition to
+		// the shopkeeper-specific behavior.
+		if (Settings.cancelCitizenNpcInteractions
+				|| shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
 			Log.debug("  Cancelling entity interaction");
 			event.setCancelled(true);
 			// Update inventory in case the interaction would trigger an item action normally (such
