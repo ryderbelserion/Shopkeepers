@@ -149,7 +149,8 @@ subprojects {
 			sourceCompatibility = JavaVersion.VERSION_1_8
 		}
 
-		compileJava {
+		// Configure all JavaCompile tasks (compileJava, compileTestJava, etc):
+		tasks.withType(JavaCompile) {
 			options.encoding = 'UTF-8'
 			options.compilerArgs += ['-Xmaxerrs', '10000', '-Xmaxwarns', '10000']
 		}
@@ -169,6 +170,7 @@ subprojects {
 		}
 
 		test {
+			systemProperty 'file.encoding', 'UTF-8'
 			workingDir project.file("${project.buildDir}/test-work/")
 			// Gradle complains when this folder does not yet exist.
 			doFirst {
