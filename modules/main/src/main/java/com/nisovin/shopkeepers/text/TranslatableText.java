@@ -14,8 +14,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * A {@link Text} that gets translated on the client.
  * <p>
  * In case translatable texts are not supported or when converting to {@link #toPlainText() plain}
- * or {@link #toPlainFormatText() plain format} text, its {@link #getChild() child} is used as
- * fallback. Otherwise, the child is ignored.
+ * or {@link #toFormat() plain format} text, its {@link #getChild() child} is used as fallback.
+ * Otherwise, the child is ignored.
  */
 public class TranslatableText extends TextBuilder {
 

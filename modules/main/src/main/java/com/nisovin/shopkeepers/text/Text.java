@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.text;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,21 +17,22 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
 /**
  * A text representation with support for various interaction and formatting features.
  * <p>
- * A text is represented as a chain of Texts, each linked to its subsequent Text via its
- * {@link #getNext() next} reference. Each Text in the chain represents one feature, i.e.
- * {@link PlainText text}, {@link FormattingText formatting} or interaction features such as
- * {@link HoverEventText hover events}, {@link ClickEventText click events} or {@link InsertionText
- * insertions}. Formatting and interaction features can be inherited to following Texts via the
- * {@link #getChild() child} reference, allowing them to encompass a series of Texts. The next Text
- * in the chain only inherits the formatting features from the previous Texts (including the
- * previous child Texts). The formatting can be reset by inserting a {@link FormattingText} with
- * {@link ChatColor#RESET}.
+ * A text is represented as a chain of {@link Text}s, each linked to its subsequent {@link Text} via
+ * its {@link #getNext() next} reference. Each {@link Text} in the chain represents one feature,
+ * i.e. {@link PlainText text}, {@link FormattingText formatting}, or interaction features such as
+ * {@link HoverEventText hover events}, {@link ClickEventText click events}, or {@link InsertionText
+ * insertions}. Formatting and interaction features can be inherited to following {@link Text}s via
+ * the {@link #getChild() child} reference, allowing them to encompass a series of {@link Text}s.
+ * The next {@link Text} in the chain only inherits the formatting features from the previous
+ * {@link Text}s (including the previous child {@link Text}s). The formatting can be reset by
+ * inserting a {@link FormattingText} with {@link ChatColor#RESET}.
  * <p>
- * The structure and semantics of this Text representation are closely oriented on regular text with
+ * The structure and semantics of this text representation are closely oriented on plain text with
  * color codes, but still supports advanced text features such as {@link HoverEventText hover
- * events}. The goal is that {@link #toPlainText()} for Texts produced by {@link Text#parse(String)}
- * will reproduce the original input text (using '§' as color character though). These differences
- * to Minecraft's / Spigot's text components need to be considered during conversions.
+ * events}. The goal is that {@link #toFormat()} for {@link Text}s produced by
+ * {@link Text#parse(String)} will reproduce the original input text as closely as possible (with a
+ * few minor exceptions, see {@link TextParser}). These differences to Minecraft's / Spigot's text
+ * components need to be considered during conversions.
  */
 public interface Text {
 
@@ -165,9 +167,24 @@ public interface Text {
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given formatting.
+	 * Creates a new {@link TextBuilder} with the given formatting code.
 	 * <p>
-	 * The formatting may be a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat()
+	 * The formatting code can be the code of a {@link ChatColor#isColor() color}, a
+	 * {@link ChatColor#isFormat() format}, or {@link ChatColor#RESET}, or a hex color in the format
+	 * "#aabbcc".
+	 * 
+	 * @param code
+	 *            the formatting code, not <code>null</code>
+	 * @return the new {@link TextBuilder}
+	 */
+	public static TextBuilder formatting(String code) {
+		return new FormattingText(code);
+	}
+
+	/**
+	 * Creates a new {@link TextBuilder} with the given {@link ChatColor} formatting.
+	 * <p>
+	 * The formatting can be a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat()
 	 * format}, or {@link ChatColor#RESET}.
 	 * 
 	 * @param formatting
@@ -175,13 +192,13 @@ public interface Text {
 	 * @return the new {@link TextBuilder}
 	 */
 	public static TextBuilder formatting(ChatColor formatting) {
-		return new FormattingText(formatting);
+		return formatting(String.valueOf(formatting.getChar()));
 	}
 
 	/**
-	 * Creates a new {@link TextBuilder} with the given color.
+	 * Creates a new {@link TextBuilder} with the given {@link ChatColor}.
 	 * <p>
-	 * This is simply an alias for {@link #formatting(ChatColor)} and actually accepts any type of
+	 * This is an alias for {@link #formatting(ChatColor)} and accepts any type of {@link ChatColor}
 	 * formatting.
 	 * 
 	 * @param color
@@ -190,6 +207,17 @@ public interface Text {
 	 */
 	public static TextBuilder color(ChatColor color) {
 		return formatting(color);
+	}
+
+	/**
+	 * Creates a new {@link TextBuilder} with the given color.
+	 * 
+	 * @param color
+	 *            the color, not <code>null</code>
+	 * @return the new {@link TextBuilder}
+	 */
+	public static TextBuilder color(Color color) {
+		return formatting("#" + String.format("%08x", color.getRGB()).substring(2));
 	}
 
 	/**
@@ -335,7 +363,7 @@ public interface Text {
 	/**
 	 * Assigns the given arguments to their corresponding {@link PlaceholderText placeholders} used
 	 * inside this {@link Text}, its {@link #getChild() child} and {@link #getNext() subsequent}
-	 * Texts and any {@link HoverEventText hover events}.
+	 * Texts, and any {@link HoverEventText hover events}.
 	 * <p>
 	 * Any placeholders for which no corresponding argument is provided will retain their currently
 	 * assigned placeholder argument if any.
@@ -356,7 +384,7 @@ public interface Text {
 	/**
 	 * Assigns the given arguments to their corresponding {@link PlaceholderText placeholders} used
 	 * inside this {@link Text}, its {@link #getChild() child} and {@link #getNext() subsequent}
-	 * Texts and any {@link HoverEventText hover events}.
+	 * Texts, and any {@link HoverEventText hover events}.
 	 * <p>
 	 * This is provided as a convenience over having to manually prepare a {@link MessageArguments}
 	 * when calling {@link #setPlaceholderArguments(MessageArguments)}. However, to simplify the
@@ -372,7 +400,7 @@ public interface Text {
 	/**
 	 * Assigns the given arguments to their corresponding {@link PlaceholderText placeholders} used
 	 * inside this {@link Text}, its {@link #getChild() child} and {@link #getNext() subsequent}
-	 * Texts and any {@link HoverEventText hover events}.
+	 * Texts, and any {@link HoverEventText hover events}.
 	 * <p>
 	 * This is provided as a convenience over having to manually prepare a {@link Map} and
 	 * {@link MessageArguments} when calling {@link #setPlaceholderArguments(MessageArguments)}.
@@ -397,25 +425,26 @@ public interface Text {
 	 */
 	public Text clearPlaceholderArguments();
 
-	// PLAIN TEXT
+	// PLAIN TEXT CONVERSIONS
 
 	/**
-	 * Converts this {@link Text} to a plain String text.
-	 * <p>
-	 * This includes color and formatting codes.
+	 * Converts this {@link Text} to a plain String text that only includes color and formatting
+	 * codes. Hex colors are converted to Bukkit's "§x§a§a§b§b§c§c" format.
 	 * 
 	 * @return the plain text
 	 */
 	public String toPlainText();
 
 	/**
-	 * Converts this {@link Text} to a plain String text, but omits any assigned
-	 * {@link PlaceholderText placeholder} arguments and prints their
-	 * {@link PlaceholderText#getFormattedPlaceholderKey() formatted placeholder key} instead.
+	 * Converts this {@link Text} to a plain format String.
+	 * <p>
+	 * Color and formatting codes are converted to use character '{@literal &}'.
+	 * {@link PlaceholderText}s print their {@link PlaceholderText#getFormattedPlaceholderKey()
+	 * formatted placeholder key} instead of their assigned argument.
 	 * 
-	 * @return the plain format text
+	 * @return the plain format string
 	 */
-	public String toPlainFormatText();
+	public String toFormat();
 
 	/**
 	 * Checks whether this {@link Text} or any of its childs uses non-plain text features such as
@@ -432,13 +461,11 @@ public interface Text {
 	 */
 	public boolean isPlainTextEmpty();
 
-	// UNFORMATTED TEXT
-
 	/**
-	 * Converts this {@link Text} to a plain String text and excludes any color and formatting
+	 * Converts this {@link Text} to a plain String text that also excludes any color and formatting
 	 * codes.
 	 * 
-	 * @return the plain text without formatting codes
+	 * @return the plain text without any formatting codes
 	 */
 	public String toUnformattedText();
 

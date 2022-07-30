@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.spigot.text;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -59,7 +58,7 @@ public final class SpigotText {
 			if (debugging) {
 				Log.info("Text: " + message);
 				Log.info("Plain text: " + message.toPlainText());
-				Log.info("Plain format text: " + message.toPlainFormatText());
+				Log.info("Format: " + message.toFormat());
 				Log.info("Component: " + component);
 				Bukkit.getConsoleSender().spigot().sendMessage(component);
 			}
@@ -70,43 +69,36 @@ public final class SpigotText {
 
 		private static final class TextStyle {
 
-			private @Nullable ChatColor color = null;
+			private net.md_5.bungee.api.@Nullable ChatColor color = null;
 			private @Nullable Boolean bold = null;
 			private @Nullable Boolean italic = null;
 			private @Nullable Boolean underlined = null;
 			private @Nullable Boolean strikethrough = null;
 			private @Nullable Boolean obfuscated = null;
 
-			public void setColor(ChatColor color) {
-				assert color != null && color.isColor();
-				this.color = color;
-			}
-
-			public void setFormatting(ChatColor formatting) {
-				assert formatting != null && formatting.isFormat();
-				switch (formatting) {
-				case BOLD:
+			public void setFormatting(net.md_5.bungee.api.ChatColor formatting) {
+				assert formatting != null;
+				if (formatting.getColor() != null) {
+					this.color = formatting;
+				} else if (formatting == net.md_5.bungee.api.ChatColor.BOLD) {
 					bold = true;
-					break;
-				case ITALIC:
+				} else if (formatting == net.md_5.bungee.api.ChatColor.ITALIC) {
 					italic = true;
-					break;
-				case UNDERLINE:
+				} else if (formatting == net.md_5.bungee.api.ChatColor.UNDERLINE) {
 					underlined = true;
-					break;
-				case STRIKETHROUGH:
+				} else if (formatting == net.md_5.bungee.api.ChatColor.STRIKETHROUGH) {
 					strikethrough = true;
-					break;
-				case MAGIC:
+				} else if (formatting == net.md_5.bungee.api.ChatColor.MAGIC) {
 					obfuscated = true;
-					break;
-				default:
+				} else if (formatting == net.md_5.bungee.api.ChatColor.RESET) {
+					this.reset();
+					this.color = formatting;
+				} else {
 					Log.warning("Unexpected Text formatting: " + formatting);
-					break;
 				}
 			}
 
-			public void reset() {
+			private void reset() {
 				color = null;
 				bold = null;
 				italic = null;
@@ -117,7 +109,7 @@ public final class SpigotText {
 
 			public void apply(BaseComponent component) {
 				assert component != null;
-				component.setColor(Unsafe.nullableAsNonNull(toSpigot(color)));
+				component.setColor(Unsafe.nullableAsNonNull(color));
 				component.setBold(Unsafe.nullableAsNonNull(bold));
 				component.setItalic(Unsafe.nullableAsNonNull(italic));
 				component.setUnderlined(Unsafe.nullableAsNonNull(underlined));
@@ -147,28 +139,25 @@ public final class SpigotText {
 			BaseComponent component;
 			boolean ignoreChild = false;
 			if (text instanceof FormattingText) {
-				ChatColor formatting = ((FormattingText) text).getFormatting();
-				if (formatting == ChatColor.RESET) {
-					textStyle.reset();
-					current = newTextComponent(parent, textStyle);
-					current.setColor(Unsafe.nullableAsNonNull(toSpigot(ChatColor.RESET)));
-				} else if (formatting.isColor()) {
-					textStyle.setColor(formatting);
+				String formattingCode = ((FormattingText) text).getFormattingCode();
+				net.md_5.bungee.api.@Nullable ChatColor chatColor = toSpigotChatColor(formattingCode);
+				if (chatColor == null) {
+					// The formatting code is not recognized. -> Append as plain text.
 					if (current == null || hasText(current) || hasExtra(current)) {
 						current = newTextComponent(parent, textStyle);
-					} else {
-						current.setColor(Unsafe.nullableAsNonNull(toSpigot(formatting)));
 					}
+					current.setText(((FormattingText) text).toPlainText());
+					component = current;
 				} else {
-					assert formatting.isFormat();
-					textStyle.setFormatting(formatting);
-					if (current == null || hasText(current) || hasExtra(current)) {
+					textStyle.setFormatting(chatColor);
+					if (current == null || hasText(current) || hasExtra(current)
+							|| chatColor == net.md_5.bungee.api.ChatColor.RESET) {
 						current = newTextComponent(parent, textStyle);
 					} else {
-						setFormatting(current, formatting);
+						textStyle.apply(current);
 					}
+					component = current;
 				}
-				component = current;
 			} else if (text instanceof PlainText) {
 				if (current == null || hasText(current) || hasExtra(current)) {
 					current = newTextComponent(parent, textStyle);
@@ -269,34 +258,21 @@ public final class SpigotText {
 
 		// CHAT COLOR
 
-		private static net.md_5.bungee.api.@Nullable ChatColor toSpigot(
-				@Nullable ChatColor chatColor
+		private static net.md_5.bungee.api.@Nullable ChatColor toSpigotChatColor(
+				String formattingCode
 		) {
-			if (chatColor == null) return null;
-			return net.md_5.bungee.api.ChatColor.getByChar(chatColor.getChar());
-		}
-
-		private static void setFormatting(BaseComponent component, ChatColor formatting) {
-			assert component != null && formatting != null;
-			switch (formatting) {
-			case BOLD:
-				component.setBold(true);
-				break;
-			case ITALIC:
-				component.setItalic(true);
-				break;
-			case UNDERLINE:
-				component.setUnderlined(true);
-				break;
-			case STRIKETHROUGH:
-				component.setStrikethrough(true);
-				break;
-			case MAGIC:
-				component.setObfuscated(true);
-				break;
-			default:
-				Log.warning("Unexpected Text formatting: " + formatting);
-				break;
+			assert formattingCode != null;
+			if (formattingCode.length() == 1) {
+				char formattingChar = Character.toLowerCase(formattingCode.charAt(0));
+				// Returns null if the formatting code is not recognized:
+				return net.md_5.bungee.api.ChatColor.getByChar(formattingChar);
+			} else {
+				// Hex color code:
+				try {
+					return net.md_5.bungee.api.ChatColor.of(formattingCode);
+				} catch (IllegalArgumentException e) {
+					return null; // Not recognized
+				}
 			}
 		}
 

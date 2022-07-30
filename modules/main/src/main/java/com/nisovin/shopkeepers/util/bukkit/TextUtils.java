@@ -199,19 +199,6 @@ public final class TextUtils {
 		return c == ChatColor.COLOR_CHAR || c == COLOR_CHAR_ALTERNATIVE;
 	}
 
-	// TODO Does not support hex colors.
-	public static @Nullable ChatColor getChatColor(char c1, char c2, boolean anyColorChar) {
-		if (anyColorChar ? isAnyColorChar(c1) : (c1 == ChatColor.COLOR_CHAR)) {
-			return getChatColorByChar(c2);
-		}
-		return null;
-	}
-
-	// TODO Does not support hex colors.
-	public static @Nullable ChatColor getChatColorByChar(char c) {
-		return ChatColor.getByChar(Character.toLowerCase(c));
-	}
-
 	// Only checks for the Minecraft color code character, not the alternative color code character.
 	public static boolean containsColorChar(String text) {
 		return StringUtils.contains(text, ChatColor.COLOR_CHAR);
@@ -311,6 +298,89 @@ public final class TextUtils {
 			colored.add(colorizedEntry);
 		}
 		return colored;
+	}
+
+	// HEX COLORS
+
+	public static final char HEX_CHAR = '#';
+	private static final String HEX_DIGITS = "0123456789AaBbCcDdEeFf";
+
+	private static boolean isHexDigit(char c) {
+		return (HEX_DIGITS.indexOf(c) != -1);
+	}
+
+	// "#aabbcc"
+	public static boolean isHexCode(String string) {
+		if (string.length() != 7) return false;
+		if (string.charAt(0) != '#') return false;
+		for (int i = 1; i < 7; i++) {
+			char c = string.charAt(i);
+			if (!isHexDigit(c)) return false;
+		}
+		return true;
+	}
+
+	// "&x&a&a&b&b&c&c"
+	public static boolean isBukkitHexCode(String string) {
+		if (string.length() != 14) return false;
+
+		if (!isAnyColorChar(string.charAt(0))) return false;
+		char c1 = string.charAt(1);
+		if (c1 != 'x' && c1 != 'X') return false;
+
+		for (int i = 2; i < 14; i += 2) {
+			if (!isAnyColorChar(string.charAt(i))) return false;
+			if (!isHexDigit(string.charAt(i + 1))) return false;
+		}
+		return true;
+	}
+
+	// Converts from "#aabbcc" to "&x&a&a&b&b&c&c" (using the given formatting code)
+	public static String toBukkitHexCode(String hexCode, char formattingCode) {
+		Validate.notEmpty(hexCode, "hexCode is null or empty");
+		Validate.isTrue(hexCode.length() == 7, () -> "Invalid hexCode: " + hexCode);
+		StringBuilder bukkitHexCode = new StringBuilder(14);
+		bukkitHexCode.append(formattingCode).append('x');
+		for (int i = 1; i < 7; i++) {
+			char c = hexCode.charAt(i);
+			bukkitHexCode.append(formattingCode).append(c);
+		}
+		return bukkitHexCode.toString();
+	}
+
+	// Converts all "&#aabbcc" to "&x&a&a&b&b&c&c" (uses the found color code character)
+	public static String convertHexColorsToBukkit(String text) {
+		Validate.notNull(text, "text is null");
+		StringBuilder result = new StringBuilder(text);
+		for (int i = 0; i < result.length() - 1; i++) {
+			char colorChar = result.charAt(i);
+			if (!isAnyColorChar(colorChar)) continue;
+
+			if (result.charAt(i + 1) != '#') continue;
+			if (i + 7 >= result.length()) continue;
+
+			result.setCharAt(i, colorChar);
+			result.setCharAt(i + 1, 'x');
+			for (int j = 2; j < 14; j += 2) {
+				result.insert(i + j, colorChar);
+			}
+			i += 13;
+		}
+		return result.toString();
+	}
+
+	// Converts from "&x&a&a&b&b&c&c" or "§x§a§a§b§b§c§c" to "#aabbcc"
+	public static String fromBukkitHexCode(String bukkitHexCode) {
+		Validate.notEmpty(bukkitHexCode, "bukkitHexCode is null or empty");
+		Validate.isTrue(bukkitHexCode.length() == 14,
+				() -> "Invalid bukkitHexCode: " + bukkitHexCode);
+		StringBuilder hexCode = new StringBuilder(7);
+		hexCode.append('#');
+		for (int i = 3; i < 14; i += 2) {
+			char c = bukkitHexCode.charAt(i);
+			hexCode.append(c);
+		}
+		return hexCode.toString();
 	}
 
 	// SENDING

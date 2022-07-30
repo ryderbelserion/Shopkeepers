@@ -186,7 +186,7 @@ public abstract class AbstractText implements Text {
 	}
 
 	@Override
-	public String toPlainFormatText() {
+	public String toFormat() {
 		StringBuilder builder = new StringBuilder();
 		this.appendPlainText(builder, true);
 		return builder.toString();

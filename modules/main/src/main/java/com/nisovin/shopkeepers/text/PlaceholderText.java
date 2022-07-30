@@ -84,9 +84,9 @@ public class PlaceholderText extends TextBuilder {
 	/**
 	 * Sets the argument {@link Text} that is currently assigned to this {@link PlaceholderText}.
 	 * <p>
-	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its
-	 * {@link Object#toString() String representation}. If the argument is a {@link Supplier} it
-	 * will be invoked to obtain the actual argument.
+	 * Any non-{@link Text} argument is first converted to a corresponding {@link Text} by using its
+	 * {@link Object#toString() String representation}. If the argument is a {@link Supplier}, it is
+	 * invoked to obtain the actual argument.
 	 * <p>
 	 * If the argument is a {@link Text} that has not yet been {@link TextBuilder#isBuilt() built},
 	 * this method may build it.

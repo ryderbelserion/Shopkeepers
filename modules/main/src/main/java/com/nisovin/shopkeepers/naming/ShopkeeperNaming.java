@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.input.InputRequest;
 import com.nisovin.shopkeepers.input.chat.ChatInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -68,6 +69,7 @@ public class ShopkeeperNaming {
 
 		// Prepare the new name:
 		String preparedName = newName.trim();
+		preparedName = TextUtils.convertHexColorsToBukkit(preparedName);
 
 		// Update name:
 		if (preparedName.isEmpty() || preparedName.equals("-")) {
@@ -92,12 +94,14 @@ public class ShopkeeperNaming {
 
 		// Compare the new name to the previous name:
 		if (oldName.equals(actualNewName)) {
-			TextUtils.sendMessage(player, Messages.nameHasNotChanged, "name", actualNewName);
+			TextUtils.sendMessage(player, Messages.nameHasNotChanged,
+					"name", Text.parse(actualNewName)
+			);
 			return false;
 		}
 
 		// Inform player:
-		TextUtils.sendMessage(player, Messages.nameSet, "name", actualNewName);
+		TextUtils.sendMessage(player, Messages.nameSet, "name", Text.parse(actualNewName));
 
 		// Close all open windows:
 		shopkeeper.abortUISessionsDelayed(); // TODO Really needed?

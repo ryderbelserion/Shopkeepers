@@ -345,6 +345,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 		// Prepare the new name:
 		String preparedName = newName.trim();
+		preparedName = TextUtils.colorize(preparedName);
+		preparedName = TextUtils.convertHexColorsToBukkit(preparedName);
 
 		if (preparedName.isEmpty() || preparedName.equals("-")) {
 			// Remove name:
@@ -362,7 +364,6 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			villager.setCustomName(null);
 		} else {
 			// Further preparation:
-			preparedName = TextUtils.colorize(preparedName);
 			villager.setCustomName(preparedName);
 		}
 

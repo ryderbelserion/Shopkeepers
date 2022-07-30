@@ -11,13 +11,20 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Produces a {@link Text} from a plain String representation.
  * <p>
- * The primary goal of the mapping between the chosen String representation and its corresponding
- * parsed {@link Text} is to not only preserve the visual appearance, but also the structure, i.e.
- * the internal representation, of the given input text: Ideally, {@link Text#toPlainFormatText()}
- * of the parsed {@link Text} should be able to reproduce the original input.
+ * One important goal of the mapping between the chosen String representation and the corresponding
+ * parsed {@link Text}s is to not only preserve the visual appearance of the resulting texts, but to
+ * also be able to {@link Text#toFormat() convert} the parsed {@link Text}s back to String
+ * representations that match the original inputs as closely as possible. There are, however, a few
+ * exceptions to this:
+ * <ul>
+ * <li>Color and formatting codes may get normalized to their lower-case variant.
+ * <li>Hex colors may get converted from format "&x&a&a&b&b&c&c" to format "&#aabbcc".
+ * <li>{@link Text#toFormat()} uses '{@literal &}' as formatting character, but parsing supports
+ * both '{@literal &}' and '§'.
+ * </ul>
  * <p>
- * The input String gets split at every color and formatting code, and at every placeholder, and
- * these segments are chained via {@link TextBuilder#next(Text)}.
+ * The input String is split at every color and formatting code, and at every placeholder. The
+ * resulting segments are chained together via {@link TextBuilder#next(Text)}.
  */
 class TextParser {
 
@@ -55,21 +62,46 @@ class TextParser {
 		for (int i = 0; i < length; ++i) {
 			char c = input.charAt(i);
 
-			// Color codes:
-			// TODO This does not account for hex colors. Bukkit's ChatColor is not able to
-			// represent hex colors. We will need to switch to Spigot's BungeeCord ChatColor to
-			// represent those.
-			ChatColor color = null;
-			if (i + 1 < length) {
-				color = TextUtils.getChatColor(c, input.charAt(i + 1), true);
-			}
-			if (color != null) {
-				// Append formatting:
-				next(Text.formatting(color));
+			// Formatting codes:
+			if (TextUtils.isAnyColorChar(c) && i + 1 < length) {
+				char c2 = input.charAt(i + 1);
+				char c2Lower = Character.toLowerCase(c2);
 
-				i += 1; // Skip color character
-				continue;
-			} // Else: Continue and treat as regular character.
+				String formattingCode = null;
+				int skip = 0; // Number of subsequent formatting characters to skip
+				if (c2Lower == 'x') { // Hex color in Bukkit format: "&x&a&a&b&b&c&c"
+					if (i + 13 < length) {
+						String hexString = input.substring(i, i + 14);
+						if (TextUtils.isBukkitHexCode(hexString)) {
+							formattingCode = TextUtils.fromBukkitHexCode(hexString);
+							skip = 13;
+						}
+					}
+				} else if (c2 == '#') { // Hex color in hex format: "&#aabbcc"
+					if (i + 7 < length) {
+						String hexString = input.substring(i + 1, i + 8);
+						if (TextUtils.isHexCode(hexString)) {
+							formattingCode = hexString;
+							skip = 7;
+						}
+					}
+				} else {
+					ChatColor color = ChatColor.getByChar(c2Lower);
+					if (color != null) {
+						// Note: Preserves the case of the input character.
+						formattingCode = String.valueOf(c2);
+						skip = 1;
+					}
+				}
+
+				if (formattingCode != null) {
+					// Append formatting (preserve case of input character):
+					next(Text.formatting(formattingCode));
+
+					i += skip; // Skip formatting character(s)
+					continue;
+				} // Else: Continue and treat as regular character(s).
+			}
 
 			// Placeholder:
 			if (c == PlaceholderText.PLACEHOLDER_PREFIX_CHAR) {

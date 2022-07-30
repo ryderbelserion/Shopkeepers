@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.MC_1_19;
 import com.nisovin.shopkeepers.util.java.Validate;
 

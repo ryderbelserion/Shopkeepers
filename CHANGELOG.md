@@ -9,6 +9,10 @@ Date format: (YYYY-MM-DD)
 * Config: Add setting `cancel-citizen-npc-interactions` (default `true`).  
   By default, we will now cancel interactions with Citizen shopkeeper NPCs, similar to how it is already the case for all the other types of shopkeeper objects. Not canceling the interaction with shopkeeper NPCs can result in some unintentional behaviors to take place (e.g. villager NPCs will increment the player's 'talked-to-villager' statistic).  
   However, there may be cases in which server admins don't mind these additional interaction effects and actually want the normal NPC interaction behavior to take place in addition to the shopkeeper specific behavior, for example to still trigger attached NPC commands. These server admins have the option to revert to the previous behavior by disabling this setting.
+* Improve support for hex colors in translated messages and shopkeeper names.
+  * We support both the Bukkit hex syntax ('&x&a&a&b&b&c&c') and the more compact hex syntax ('&#aabbcc') now. The Bukkit syntax already worked before for shopkeeper names and some texts, but is supported for more messages now.
+  * When a player renames a shopkeeper using the compact hex syntax, the player's input is expanded to the Bukkit syntax due to compatibility reasons (Spigot only supports the expanded hex syntax in certain contexts). Validations like the shopkeeper name length limit are applied to the expanded syntax.
+  * Note: In order for hex colored shopkeeper names to properly work in the trading UI, you need to use the latest Spigot 1.19 version or newer.
 
 **Internal changes:**  
 * Build: Compilation and running of tests also use UTF-8 as file encoding now.

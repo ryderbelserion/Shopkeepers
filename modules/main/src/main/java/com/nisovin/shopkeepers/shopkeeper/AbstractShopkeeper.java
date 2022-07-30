@@ -51,6 +51,7 @@ import com.nisovin.shopkeepers.shopkeeper.ticking.ShopkeeperTicker;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
@@ -1116,7 +1117,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	) {
 		messageArguments.put("id", this::getId);
 		messageArguments.put("uuid", this::getUniqueId);
-		messageArguments.put("name", this::getName);
+		messageArguments.put("name", () -> Text.parse(this.getName()));
 		messageArguments.put("world", () -> StringUtils.getOrEmpty(this.getWorldName()));
 		messageArguments.put("x", this::getX);
 		messageArguments.put("y", this::getY);
@@ -1160,6 +1161,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private String prepareName(@Nullable String name) {
 		String preparedName = (name != null) ? name : "";
 		preparedName = TextUtils.colorize(preparedName);
+		preparedName = TextUtils.convertHexColorsToBukkit(preparedName);
 		preparedName = this.trimName(preparedName);
 		return preparedName;
 	}
@@ -1176,8 +1178,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	public boolean isValidName(@Nullable String name) {
-		return (name != null && name.length() <= MAX_NAME_LENGTH
-				&& Settings.DerivedSettings.shopNamePattern.matcher(name).matches());
+		return name != null && name.length() <= MAX_NAME_LENGTH
+				&& Settings.DerivedSettings.shopNamePattern.matcher(name).matches();
 	}
 
 	// SHOP OBJECT
