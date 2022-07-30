@@ -35,5 +35,6 @@ buildSpigotIfMissing 1.18 remapped
 buildSpigotIfMissing 1.18.1 remapped
 buildSpigotIfMissing 1.18.2 remapped
 buildSpigotIfMissing 1.19 remapped
+buildSpigotIfMissing 1.19.1 remapped
 
 popd

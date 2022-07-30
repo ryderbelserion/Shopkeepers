@@ -2,8 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.16.1 (TBA)
-### Supported MC versions: 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
+### Supported MC versions: 1.19.1, 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
+* Update for MC 1.19.1.
 * Fix #809: Deleting a Citizens shopkeeper via the shopkeeper editor menu resulted in an error.
 * We log a warning now if another plugin deletes the shopkeeper while the ShopkeeperRemoveEvent is handled.
 * Config: Add setting `cancel-citizen-npc-interactions` (default `true`).  
