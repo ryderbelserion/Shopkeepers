@@ -358,6 +358,7 @@ public final class TextUtils {
 
 			if (result.charAt(i + 1) != '#') continue;
 			if (i + 7 >= result.length()) continue;
+			if (!isHexCode(result.substring(i + 1, i + 8))) continue;
 
 			result.setCharAt(i, colorChar);
 			result.setCharAt(i + 1, 'x');
