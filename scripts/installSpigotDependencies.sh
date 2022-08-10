@@ -25,13 +25,11 @@ buildSpigotIfMissing 1.16.5
 # The following versions require JDK 16 to build:
 source installJDK.sh 16
 
-buildSpigotIfMissing 1.17 remapped
 buildSpigotIfMissing 1.17.1 remapped
 
 # The following versions require JDK 17 to build:
 source installJDK.sh 17
 
-buildSpigotIfMissing 1.18 remapped
 buildSpigotIfMissing 1.18.1 remapped
 buildSpigotIfMissing 1.18.2 remapped
 buildSpigotIfMissing 1.19 remapped
