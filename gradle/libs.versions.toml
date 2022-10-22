@@ -12,7 +12,7 @@ checkerframework = "3.21.2"
 worldguard = "7.0.0"
 towny = "0.98.1.0"
 citizens = "2.0.30-SNAPSHOT"
-vault = "1.7"
+vault = "1.7.1"
 bstats = "1.5"
 
 junit = "4.13.1"
@@ -31,7 +31,7 @@ worldguard-bukkit = { module = "com.sk89q.worldguard:worldguard-bukkit", version
 #towny = { module = "com.github.TownyAdvanced:Towny", version.ref = "towny" }
 towny = { module = "com.palmergames.bukkit.towny:towny", version.ref = "towny" }
 citizens-main = { module = "net.citizensnpcs:citizens-main", version.ref = "citizens" }
-vault-api = { module = "net.milkbowl.vault:VaultAPI", version.ref = "vault" }
+vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
