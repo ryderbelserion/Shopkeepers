@@ -9,7 +9,7 @@ repositories {
 	// WorldGuard
 	maven { url 'https://maven.enginehub.org/repo/' }
 	// Citizens
-	maven { url 'https://repo.citizensnpcs.co' }
+	maven { url 'https://maven.citizensnpcs.co/repo' }
 	// bStats
 	maven { url 'https://repo.codemc.org/repository/maven-public/' }
 	// Towny

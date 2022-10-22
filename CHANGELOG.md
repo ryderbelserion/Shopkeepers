@@ -6,6 +6,9 @@ Date format: (YYYY-MM-DD)
 
 * Drop support for MC 1.17 and MC 1.18. These versions are only used by a few servers. Removing their support speeds up builds times by several minutes. MC 1.17.1, 1.18.2, and 1.18.1 are still supported and can be updated to without issues.
 
+**Internal changes:**  
+* Build: Update Citizens repository and bump dependency to v2.0.30.
+
 ## v2.16.2 (2022-8-10)
 ### Supported MC versions: 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
 
