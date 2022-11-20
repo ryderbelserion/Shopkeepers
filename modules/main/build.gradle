@@ -38,7 +38,7 @@ dependencies {
 	compileOnly libs.spigot.api // Includes the Bukkit API
 	compileOnly libs.worldguard.bukkit
 	compileOnly libs.towny
-	compileOnly libs.citizens.main
+	(compileOnly libs.citizens.main) { transitive = false }
 	compileOnly libs.vault.api
 	compileOnly libs.bstats.bukkit
 
