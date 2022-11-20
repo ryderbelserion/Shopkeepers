@@ -5,6 +5,10 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
 * Drop support for MC 1.17 and MC 1.18. These versions are only used by a few servers. Removing their support speeds up build times by several minutes. MC 1.17.1, 1.18.2, and 1.18.1 are still supported and can be updated to without issues.
+* Increase the maximum name length limit from 128 to 256 characters.
+  * This is especially useful for names that contain many hex color codes.
+  * This does not affect the default name length limit defined inside the default config.
+  * Also increase the name length limit of Citizens shopkeepers: The latest Citizens versions support names up to 256 characters long, regardless of the mob type.
 
 **Internal changes:**  
 * Build: Update Citizens repository and bump dependency to v2.0.30.

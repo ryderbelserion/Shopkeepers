@@ -791,11 +791,11 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public int getNameLengthLimit() {
-		// Citizens uses different limits depending on the NPC type (64 for mobs, 46 for players).
-		// Citizens might dynamically truncate the name of the corresponding NPC, and will then
-		// print a warning.
-		if (this.getEntityType() == EntityType.PLAYER) return 46;
-		return 64;
+		// Note: We are not using Citizens' SpigotUtil.getMaxNameLength here because this might be
+		// called even when Citizens is not enabled.
+		// When exceeding the limit, Citizens will dynamically truncate the name of the NPC and log
+		// a warning.
+		return 256;
 	}
 
 	@Override

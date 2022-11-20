@@ -96,7 +96,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// The maximum supported name length:
 	// The actual maximum name length that can be used might be lower depending on config settings
 	// and on shop object specific limits.
-	public static final int MAX_NAME_LENGTH = 128;
+	public static final int MAX_NAME_LENGTH = 256;
 
 	/**
 	 * We log a warning when a shopkeeper has more than this amount of snapshots.
