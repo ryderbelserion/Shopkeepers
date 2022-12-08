@@ -2,8 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.16.3 (TBA)
-### Supported MC versions: 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
+### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
+* Update for MC 1.19.3. Experimental MC 1.20 features are not yet supported.
 * Drop support for MC 1.17 and MC 1.18. These versions are only used by a few servers. Removing their support speeds up build times by several minutes. MC 1.17.1, 1.18.2, and 1.18.1 are still supported and can be updated to without issues.
 * Increase the maximum name length limit from 128 to 256 characters.
   * This is especially useful for names that contain many hex color codes.
