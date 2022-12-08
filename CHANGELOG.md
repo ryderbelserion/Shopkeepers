@@ -1,7 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.16.3 (TBA)
+## v2.16.4 (TBA)
+### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
+
+
+## v2.16.3 (2022-12-8)
 ### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
 * Update for MC 1.19.3. Experimental MC 1.20 features are not yet supported.
