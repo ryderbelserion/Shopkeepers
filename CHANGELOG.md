@@ -15,6 +15,7 @@ Date format: (YYYY-MM-DD)
 * Build: Update Citizens repository and bump dependency to v2.0.30.
 * Build: Update VaultAPI dependency to v1.7.1 and fix retrieval from JitPack.
 * Build: Exclude transitive Citizens dependencies.
+* Build: Update GitHub actions.
 
 ## v2.16.2 (2022-8-10)
 ### Supported MC versions: 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5
