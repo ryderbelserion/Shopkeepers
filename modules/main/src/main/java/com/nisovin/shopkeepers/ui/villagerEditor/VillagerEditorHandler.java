@@ -345,8 +345,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 		// Prepare the new name:
 		String preparedName = newName.trim();
-		preparedName = TextUtils.colorize(preparedName);
 		preparedName = TextUtils.convertHexColorsToBukkit(preparedName);
+		preparedName = TextUtils.colorize(preparedName);
 
 		if (preparedName.isEmpty() || preparedName.equals("-")) {
 			// Remove name:

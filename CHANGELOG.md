@@ -4,6 +4,10 @@ Date format: (YYYY-MM-DD)
 ## v2.16.4 (TBA)
 ### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
+* Fix: The villager editor did not correctly translate hex color codes of the form `&#555555Test`.
+
+**API:**  
+* Fix: `Shopkeeper#setName` did not correctly translate hex color codes of the form `&#555555Test`. The result used the alternative `&` color code instead of Minecraft's `§` code.
 
 ## v2.16.3 (2022-12-8)
 ### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5

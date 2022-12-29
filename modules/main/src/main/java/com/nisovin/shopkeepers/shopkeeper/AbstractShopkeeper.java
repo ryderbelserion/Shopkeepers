@@ -1160,8 +1160,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private String prepareName(@Nullable String name) {
 		String preparedName = (name != null) ? name : "";
-		preparedName = TextUtils.colorize(preparedName);
 		preparedName = TextUtils.convertHexColorsToBukkit(preparedName);
+		preparedName = TextUtils.colorize(preparedName);
 		preparedName = this.trimName(preparedName);
 		return preparedName;
 	}
