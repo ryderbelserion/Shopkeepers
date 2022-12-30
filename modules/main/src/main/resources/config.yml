@@ -2,7 +2,6 @@
 # Shopkeepers Config
 # Wiki: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki/Configuration
 # The wiki also explains how item data gets specified inside the config.
-# Community translations: https://github.com/Shopkeepers/Language-Files
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Determines the required config migrations. Do not edit manually!
@@ -43,6 +42,8 @@ enable-metrics: true
 # Messages
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
+# Find community translations at https://github.com/Shopkeepers/Language-Files
+# Wiki: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki/Language-Files
 language: en-default
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
