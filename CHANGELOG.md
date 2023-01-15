@@ -1,7 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.16.4 (TBA)
+## v2.16.5 (TBA)
+### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
+
+
+## v2.16.4 (2023-01-15)
 ### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
 * Fix: Immediately end the UI session if the GUI is not successfully opened (e.g. if another plugin cancels the corresponding InventoryOpenEvent).
