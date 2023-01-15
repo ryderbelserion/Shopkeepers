@@ -154,16 +154,15 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 			return false;
 		}
 
-		// Opening a window should automatically trigger a close of the previous window.
-		// However, we do this manually here just in case, because we cannot be sure what the UI
-		// handler is actually doing inside openWindow.
-		// Close previous window:
-		if (oldSession != null) {
-			Log.debug(() -> "Closing previous UI '" + uiIdentifier + "' for player "
-					+ playerName + ".");
-			// This will call a PlayerCloseInventoryEvent, which will end the current UI session:
-			player.closeInventory();
-		}
+		// Close any previous inventory view before we start a new UI session:
+		// Opening a new inventory view should already automatically close any previous inventory.
+		// However, we need to do this before we start the new UI session, otherwise the closing of
+		// the previous inventory view is incorrectly interpreted as the new UI being closed, which
+		// immediately ends the new UI session again (possibly even with the UI remaining open
+		// without an active UI session).
+		// Also, we cannot be sure what the UI handler is actually doing inside openWindow().
+		// This will call a PlayerCloseInventoryEvent, which also ends any previous UI session.
+		player.closeInventory();
 		assert this.getUISession(player) == null;
 
 		// Register event handlers for any not yet handled types of inventory events:
