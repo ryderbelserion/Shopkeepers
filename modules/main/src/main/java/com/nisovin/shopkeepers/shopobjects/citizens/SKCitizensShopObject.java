@@ -832,7 +832,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// use scoreboards or holograms to display the NPC name, which are not affected by this
 			// length limitation.
 			npc.data().setPersistent(
-					NPC.NAMEPLATE_VISIBLE_METADATA,
+					NPC.Metadata.NAMEPLATE_VISIBLE,
 					Settings.alwaysShowNameplates || isPlayerNPC ? "true" : "hover"
 			);
 		} else {
@@ -840,7 +840,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			npc.setName("");
 
 			// Update the nameplate visibility:
-			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, "false");
+			npc.data().setPersistent(NPC.Metadata.NAMEPLATE_VISIBLE, "false");
 		}
 		return true;
 	}
