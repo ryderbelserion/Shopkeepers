@@ -229,8 +229,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 	@Override
 	public boolean openWindow(UISession uiSession, UIState uiState) {
-		boolean result = super.openWindow(uiSession, uiState);
-		return result;
+		return super.openWindow(uiSession, uiState);
 	}
 
 	@Override

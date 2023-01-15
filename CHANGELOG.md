@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.16.4 (TBA)
 ### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
+* Fix: Immediately end the UI session if the GUI is not successfully opened (e.g. if another plugin cancels the corresponding InventoryOpenEvent).
 * Fix: Item duplication related to shopkeeper GUIs being opened while another GUI is already open.
 * Fix: Update for the latest breaking changes in the Citizens API related to metadata strings. This version of Shopkeepers is only compatible with the latest development version of Citizens!
 * Fix: The villager editor did not correctly translate hex color codes of the form `&#555555Test`.

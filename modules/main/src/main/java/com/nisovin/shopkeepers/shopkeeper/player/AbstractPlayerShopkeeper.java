@@ -727,8 +727,7 @@ public abstract class AbstractPlayerShopkeeper
 
 		Log.debug(() -> "Opening container inventory for player '" + player.getName() + "'.");
 		// Open the container directly for the player (no need for a custom UI):
-		player.openInventory(containerInventory);
-		return true;
+		return player.openInventory(containerInventory) != null;
 	}
 
 	// TICKING

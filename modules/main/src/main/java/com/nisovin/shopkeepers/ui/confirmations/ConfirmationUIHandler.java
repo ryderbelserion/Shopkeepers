@@ -83,8 +83,7 @@ public class ConfirmationUIHandler extends UIHandler {
 		);
 		inventory.setItem(SLOT_CANCEL, cancelItem);
 
-		player.openInventory(inventory);
-		return true;
+		return player.openInventory(inventory) != null;
 	}
 
 	@Override

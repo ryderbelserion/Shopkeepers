@@ -643,8 +643,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		// Set up and open the initial page:
 		editorSession.setPage(page);
 		this.setupCurrentPage(editorSession);
-		player.openInventory(inventory);
-		return true;
+
+		return player.openInventory(inventory) != null;
 	}
 
 	protected abstract String getEditorTitle();

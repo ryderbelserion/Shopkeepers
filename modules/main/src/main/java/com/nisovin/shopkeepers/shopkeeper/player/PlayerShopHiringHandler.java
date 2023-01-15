@@ -61,8 +61,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 		// Inventory#setItem copies the item, so we do not need to copy it ourselves here.
 		inventory.setItem(HIRE_COST, hireCost.asItemStack());
 
-		player.openInventory(inventory);
-		return true;
+		return player.openInventory(inventory) != null;
 	}
 
 	private boolean canPlayerHireShopType(Player player, Shopkeeper shopkeeper) {
