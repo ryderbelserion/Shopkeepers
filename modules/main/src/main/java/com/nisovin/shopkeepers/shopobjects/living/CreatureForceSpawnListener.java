@@ -27,7 +27,7 @@ public class CreatureForceSpawnListener implements Listener {
 		if (this.matchesForcedCreatureSpawn(event)) {
 			event.setCancelled(false);
 		} else {
-			// This shouldn't normally be reached..
+			// This should normally not be reached.
 			Log.debug(() -> "Shopkeeper entity-spawning seems to be out of sync: "
 					+ "spawn-force was activated for an entity of type " + nextEntityType
 					+ " at location " + nextSpawnLocation + ", but a different entity of type "
@@ -39,13 +39,8 @@ public class CreatureForceSpawnListener implements Listener {
 	}
 
 	private boolean matchesForcedCreatureSpawn(CreatureSpawnEvent event) {
-		if (event.getEntityType() != nextEntityType) {
-			return false;
-		}
-		if (!LocationUtils.isEqualPosition(nextSpawnLocation, event.getLocation())) {
-			return false;
-		}
-		return true;
+		return event.getEntityType() == nextEntityType
+				&& LocationUtils.getSafeDistanceSquared(event.getLocation(), nextSpawnLocation) < 0.6D;
 	}
 
 	void forceCreatureSpawn(@Nullable Location location, @Nullable EntityType entityType) {

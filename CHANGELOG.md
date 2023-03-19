@@ -5,6 +5,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 
 * Update for MC 1.19.4.
+* Fix: When using `bypass-spawn-blocking`, we now compare spawn locations fuzzily.
 
 ## v2.16.4 (2023-01-15)
 ### Supported MC versions: 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5

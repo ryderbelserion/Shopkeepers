@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
-import java.util.Objects;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -25,47 +23,6 @@ public final class LocationUtils {
 		// Throws an exception if the world is no longer loaded:
 		World world = location.getWorld();
 		return Validate.notNull(world, "location's world is null");
-	}
-
-	/**
-	 * Checks if the given locations represent the same position.
-	 * <p>
-	 * This compares the precise coordinates of the given locations, as well as their worlds. If
-	 * both locations do not store any world, or both their worlds are no longer loaded, their
-	 * worlds are considered equal. The pitch and yaw of the given locations are ignored.
-	 * <p>
-	 * If both locations are <code>null</code>, this returns <code>true</code>.
-	 * 
-	 * @param location1
-	 *            the first location
-	 * @param location2
-	 *            the second location
-	 * @return <code>true</code> if the locations correspond to the same position
-	 */
-	public static boolean isEqualPosition(
-			@Nullable Location location1,
-			@Nullable Location location2
-	) {
-		if (location1 == location2) return true; // Also handles both being null
-		if (location1 == null || location2 == null) return false;
-		if (Double.doubleToLongBits(location1.getX()) != Double.doubleToLongBits(location2.getX())) {
-			return false;
-		}
-		if (Double.doubleToLongBits(location1.getY()) != Double.doubleToLongBits(location2.getY())) {
-			return false;
-		}
-		if (Double.doubleToLongBits(location1.getZ()) != Double.doubleToLongBits(location2.getZ())) {
-			return false;
-		}
-		boolean world1Loaded = location1.isWorldLoaded();
-		boolean world2Loaded = location2.isWorldLoaded();
-		if (world1Loaded != world2Loaded) {
-			return false;
-		}
-		if (world1Loaded && !Objects.equals(location1.getWorld(), location2.getWorld())) {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -95,6 +52,36 @@ public final class LocationUtils {
 		if (world1 != world2) return Double.MAX_VALUE; // Different worlds
 
 		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
+		double dx = location1.getX() - location2.getX();
+		double dy = location1.getY() - location2.getY();
+		double dz = location1.getZ() - location2.getZ();
+		return dx * dx + dy * dy + dz * dz;
+	}
+
+	/**
+	 * Gets the squared distance between the given locations.
+	 * <p>
+	 * Unlike {@link #getDistanceSquared(Location, Location)}, this does not throw an exception, but
+	 * returns {@link Double#MAX_VALUE} if at least one of the locations is <code>null</code>, or if
+	 * one of the locations' worlds is not loaded or <code>null</code>.
+	 * 
+	 * @param location1
+	 *            the first location
+	 * @param location2
+	 *            the second location
+	 * @return the squared distance
+	 */
+	public static double getSafeDistanceSquared(
+			@Nullable Location location1,
+			@Nullable Location location2
+	) {
+		if (location1 == null || location2 == null) return Double.MAX_VALUE;
+		if (!location1.isWorldLoaded() || !location2.isWorldLoaded()) return Double.MAX_VALUE;
+
+		World world1 = location1.getWorld();
+		World world2 = location2.getWorld();
+		if (world1 == null || world1 != world2) return Double.MAX_VALUE;
+
 		double dx = location1.getX() - location2.getX();
 		double dy = location1.getY() - location2.getY();
 		double dz = location1.getZ() - location2.getZ();
