@@ -22,6 +22,17 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
  * able to represent configuration sections in the future. This class therefore extends Bukkit's
  * {@link YamlRepresenter} and ensures that the previous {@link Represent} for
  * {@link ConfigurationSection}s is still registered.
+ * <p>
+ * History:
+ * <ul>
+ * <li>This class was added 2021-12-16 (v2.14.0):
+ * https://github.com/Shopkeepers/Shopkeepers/commit/193283b0661363f02b71fc1327fe3cb46633b4fe
+ * <li>It became necessary 2021-12-20 (MC 1.18.1):
+ * https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/3e2dd2bc120754ea4db193e878050d0eb31a6894
+ * <li>This class might no longer be necessary because some change was reverted 2022-4-22 (MC
+ * 1.18.2):
+ * https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/31514774479a17c4a8cfb2d44f392a590a2b282c
+ * </ul>
  */
 class OldBukkitYamlRepresenter extends YamlRepresenter {
 

@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util.yaml;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -10,30 +9,36 @@ import org.junit.Test;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.AbstractItemStackSerializationTest;
-import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class YamlSerializationTest extends AbstractItemStackSerializationTest {
+public class CompactYamlSerializationTest extends AbstractItemStackSerializationTest<@Nullable String> {
 
 	@Override
 	protected @Nullable String serialize(@Nullable ItemStack itemStack) {
-		return YamlUtils.toYaml(itemStack);
-	}
-
-	@Override
-	protected @Nullable ItemStack deserialize(@Nullable Object data) {
-		if (data == null) return null;
-		return YamlUtils.fromYaml((String) data);
-	}
-
-	// Compact Yaml tests
-
-	private String serializeCompact(@Nullable ItemStack itemStack) {
 		return YamlUtils.toCompactYaml(itemStack);
 	}
 
+	@Override
+	protected @Nullable ItemStack deserialize(@Nullable String serialized) {
+		if (serialized == null) return null;
+		return YamlUtils.fromYaml(serialized);
+	}
+
+	@Override
+	protected void testDeserialization(
+			@Nullable ItemStack itemStack,
+			@Nullable String serialized,
+			@Nullable ItemStack deserialized
+	) {
+		super.testDeserialization(itemStack, serialized, deserialized);
+		Assert.assertTrue(
+				"Compact Yaml contains line breaks! <" + serialized + ">",
+				!StringUtils.containsNewline(serialized)
+		);
+	}
+
 	private void testCompactSerialization(@Nullable ItemStack itemStack) {
-		String compactYaml = this.serializeCompact(itemStack);
+		String compactYaml = this.serialize(itemStack);
 		ItemStack deserialized = this.deserialize(compactYaml);
 		Assert.assertEquals(
 				Unsafe.nullableAsNonNull(itemStack),
@@ -62,23 +67,5 @@ public class YamlSerializationTest extends AbstractItemStackSerializationTest {
 				"[\"Multiline\\nText\\n\\nWith empty lines and trailing\\n\"]",
 				YamlUtils.toCompactYaml(Arrays.asList(multiLineString))
 		);
-	}
-
-	// Our Yaml instance should be configured to produce the same output as Bukkit's
-	// YamlConfiguration
-	@Test
-	public void testYamlMirrorsBukkit() {
-		this.createTestItemStacks().forEach(this::testYamlMirrorsBukkit);
-	}
-
-	private void testYamlMirrorsBukkit(@Nullable ItemStack itemStack) {
-		String yaml = this.serialize(itemStack);
-		String bukkitYaml;
-		if (itemStack == null) {
-			bukkitYaml = ConfigUtils.toFlatConfigYaml(Collections.emptyMap());
-		} else {
-			bukkitYaml = ConfigUtils.toFlatConfigYaml(ConfigUtils.serialize(itemStack));
-		}
-		Assert.assertEquals(bukkitYaml, Unsafe.nullableAsNonNull(yaml));
 	}
 }

@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.util.yaml.YamlUtils;
 
 // Note: We test the ItemStack deserialization through ItemData. Since ItemData is defined by its
 // stored ItemStack, this is sufficient to also test the deserialization of the ItemData itself.
-public class ItemDataTest extends AbstractItemStackSerializationTest {
+public class ItemDataTest extends AbstractItemStackSerializationTest<@Nullable String> {
 
 	@BeforeClass
 	public static void setup() {
@@ -67,10 +67,9 @@ public class ItemDataTest extends AbstractItemStackSerializationTest {
 	}
 
 	@Override
-	protected @Nullable ItemStack deserialize(@Nullable Object data) {
-		if (data == null) return null;
-		String configString = (String) data;
-		ItemData deserialized = deserializeFromYamlConfig(configString);
+	protected @Nullable ItemStack deserialize(@Nullable String serialized) {
+		if (serialized == null) return null;
+		ItemData deserialized = this.deserializeFromYamlConfig(serialized);
 		return (deserialized != null) ? deserialized.createItemStack() : null;
 	}
 

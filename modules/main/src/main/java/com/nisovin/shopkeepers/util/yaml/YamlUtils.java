@@ -14,40 +14,22 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class YamlUtils {
 
-	// Roughly mimics Bukkit's Yaml configuration:
-	@SuppressWarnings("nullness:type.argument")
-	private static final ThreadLocal<@NonNull Yaml> YAML = ThreadLocal.withInitial(() -> {
-		DumperOptions yamlOptions = new DumperOptions();
-		yamlOptions.setIndent(2);
-		yamlOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		Representer yamlRepresenter = new OldBukkitYamlRepresenter();
-		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		BaseConstructor yamlConstructor = new YamlConstructor();
-		Yaml yaml = new Yaml(yamlConstructor, yamlRepresenter, yamlOptions);
-		return yaml;
-	});
-
 	// Compact (single line) Yaml formatting:
 	@SuppressWarnings("nullness:type.argument")
 	private static final ThreadLocal<@NonNull Yaml> YAML_COMPACT = ThreadLocal.withInitial(() -> {
-		DumperOptions yamlOptions = new DumperOptions();
-		yamlOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
-		yamlOptions.setDefaultScalarStyle(ScalarStyle.PLAIN);
-		yamlOptions.setSplitLines(false);
-		yamlOptions.setWidth(Integer.MAX_VALUE);
+		DumperOptions yamlDumperOptions = new DumperOptions();
+		yamlDumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
+		yamlDumperOptions.setDefaultScalarStyle(ScalarStyle.PLAIN);
+		yamlDumperOptions.setSplitLines(false);
+		yamlDumperOptions.setWidth(Integer.MAX_VALUE);
 		Representer yamlRepresenter = new CompactYamlRepresenter();
 		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
 		yamlRepresenter.setDefaultScalarStyle(ScalarStyle.PLAIN);
 		BaseConstructor yamlConstructor = new YamlConstructor();
-		Yaml yaml = new Yaml(yamlConstructor, yamlRepresenter, yamlOptions);
-		return yaml;
+		return new Yaml(yamlConstructor, yamlRepresenter, yamlDumperOptions);
 	});
 
 	private static final String YAML_NEWLINE = "\n"; // YAML uses Unix line breaks by default
-
-	public static String toYaml(@Nullable Object object) {
-		return toYaml(YAML.get(), object);
-	}
 
 	public static String toCompactYaml(@Nullable Object object) {
 		String yamlString = toYaml(YAML_COMPACT.get(), object);
@@ -68,7 +50,7 @@ public final class YamlUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> @Nullable T fromYaml(String yamlString) {
 		Validate.notNull(yamlString, "yamlString is null");
-		Yaml yaml = YAML.get();
+		Yaml yaml = YAML_COMPACT.get();
 		Object object = yaml.load(yamlString); // Can be null (e.g. for an empty String)
 		return (T) object;
 	}

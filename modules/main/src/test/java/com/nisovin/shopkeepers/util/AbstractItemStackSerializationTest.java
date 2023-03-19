@@ -10,19 +10,27 @@ import org.junit.Test;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 
-public abstract class AbstractItemStackSerializationTest extends AbstractBukkitTest {
+public abstract class AbstractItemStackSerializationTest<@Nullable S> extends AbstractBukkitTest {
 
 	protected List<? extends @Nullable ItemStack> createTestItemStacks() {
 		return TestItemStacks.createAllItemStacks();
 	}
 
-	protected abstract @Nullable Object serialize(@Nullable ItemStack itemStack);
+	protected abstract @Nullable S serialize(@Nullable ItemStack itemStack);
 
-	protected abstract @Nullable ItemStack deserialize(@Nullable Object data);
+	protected abstract @Nullable ItemStack deserialize(@Nullable S serialized);
 
-	protected void testDeserialization(@Nullable ItemStack itemStack) {
-		Object data = this.serialize(itemStack);
-		ItemStack deserialized = this.deserialize(data);
+	private void testDeserialization(@Nullable ItemStack itemStack) {
+		S serialized = this.serialize(itemStack);
+		ItemStack deserialized = this.deserialize(serialized);
+		this.testDeserialization(itemStack, serialized, deserialized);
+	}
+
+	protected void testDeserialization(
+			@Nullable ItemStack itemStack,
+			@Nullable S serialized,
+			@Nullable ItemStack deserialized)
+	{
 		Assert.assertEquals(
 				Unsafe.nullableAsNonNull(itemStack),
 				Unsafe.nullableAsNonNull(deserialized)

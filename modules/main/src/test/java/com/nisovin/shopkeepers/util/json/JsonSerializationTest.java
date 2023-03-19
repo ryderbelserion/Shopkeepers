@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.AbstractItemStackSerializationTest;
 
-public class JsonSerializationTest extends AbstractItemStackSerializationTest {
+public class JsonSerializationTest extends AbstractItemStackSerializationTest<@Nullable String> {
 
 	@Override
 	protected @Nullable String serialize(@Nullable ItemStack itemStack) {
@@ -16,8 +16,8 @@ public class JsonSerializationTest extends AbstractItemStackSerializationTest {
 	}
 
 	@Override
-	protected @Nullable ItemStack deserialize(@Nullable Object data) {
-		return JsonUtils.fromJson((String) data);
+	protected @Nullable ItemStack deserialize(@Nullable String serialized) {
+		return JsonUtils.fromJson(serialized);
 	}
 
 	@Test
