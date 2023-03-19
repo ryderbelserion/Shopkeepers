@@ -32,6 +32,7 @@ public final class NMSManager {
 	// remapping.
 	static {
 		// Registered in the order from latest to oldest.
+		register(new CompatVersion("1_19_R5", "1.19.4", "3009edc0fff87fa34680686663bd59df"));
 		register(new CompatVersion("1_19_R4", "1.19.3", "1afe2ffe8a9d7fc510442a168b3d4338"));
 		register(new CompatVersion("1_19_R3", "1.19.2", "69c84c88aeb92ce9fa9525438b93f4fe"));
 		register(new CompatVersion("1_19_R2", "1.19.1", "4cc0cc97cac491651bff3af8b124a214"));
