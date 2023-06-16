@@ -32,6 +32,9 @@ public final class NMSManager {
 	// remapping.
 	static {
 		// Registered in the order from latest to oldest.
+		// Different CB revision:
+		register(new CompatVersion("1_20_R2", "1.20.1", "bcf3dcb22ad42792794079f9443df2c0"));
+		register(new CompatVersion("1_20_R1", "1.20", "34f399b4f2033891290b7f0700e9e47b"));
 		register(new CompatVersion("1_19_R5", "1.19.4", "3009edc0fff87fa34680686663bd59df"));
 		register(new CompatVersion("1_19_R4", "1.19.3", "1afe2ffe8a9d7fc510442a168b3d4338"));
 		register(new CompatVersion("1_19_R3", "1.19.2", "69c84c88aeb92ce9fa9525438b93f4fe"));
