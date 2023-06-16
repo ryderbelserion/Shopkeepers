@@ -2,7 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.16.6 (TBA)
-### Supported MC versions: 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
+### Supported MC versions: 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
+
+* Drop support for MC 1.18.1 and 1.19.1. These versions are only used by a few servers. Removing their support speeds up build times. MC 1.18.2 and 1.19.4 are still supported and can be updated to without issues.
 
 ## v2.16.5 (2023-03-20)
 ### Supported MC versions: 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
