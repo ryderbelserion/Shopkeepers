@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.MC_1_19;
+import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.compat.ServerAssumptionsTest;
 import com.nisovin.shopkeepers.config.Settings;
@@ -306,6 +307,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Check for and initialize version dependent utilities:
 		MC_1_17.init();
 		MC_1_19.init();
+		MC_1_20.init();
 
 		// Inform about Spigot exclusive features:
 		if (SpigotFeatures.isSpigotAvailable()) {

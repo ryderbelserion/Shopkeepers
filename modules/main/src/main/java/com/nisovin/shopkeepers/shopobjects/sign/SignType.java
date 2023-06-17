@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.compat.MC_1_19;
+import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public enum SignType {
@@ -23,6 +24,10 @@ public enum SignType {
 	MANGROVE(
 			MC_1_19.MANGROVE_SIGN.orElse(null),
 			MC_1_19.MANGROVE_WALL_SIGN.orElse(null)//
+	),
+	CHERRY(
+			MC_1_20.CHERRY_SIGN.orElse(null),
+			MC_1_20.CHERRY_WALL_SIGN.orElse(null)//
 	);
 
 	public static final Predicate<SignType> IS_SUPPORTED = SignType::isSupported;

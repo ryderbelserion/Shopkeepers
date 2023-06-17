@@ -6,6 +6,7 @@ Date format: (YYYY-MM-DD)
 
 * Add support for MC 1.20 and 1.20.1.
   * Add camel and sniffer to the by default enabled mob types.
+  * Add cherry sign type.
 * Drop support for MC 1.18.1 and 1.19.1. These versions are only used by a few servers. Removing their support speeds up build times. MC 1.18.2 and 1.19.4 are still supported and can be updated to without issues.
 
 ## v2.16.5 (2023-03-20)
