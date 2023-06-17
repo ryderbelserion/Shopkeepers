@@ -232,6 +232,7 @@ enabled-living-shops:
 - AXOLOTL
 - BEE
 - BLAZE
+- CAMEL
 - CAT
 - CAVE_SPIDER
 - CHICKEN
@@ -277,6 +278,7 @@ enabled-living-shops:
 - SKELETON
 - SKELETON_HORSE
 - SLIME
+- SNIFFER
 - SNOWMAN
 - SPIDER
 - SQUID

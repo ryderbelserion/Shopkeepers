@@ -106,7 +106,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * it from opening, but this does not apply when the shulker is placed in a non-empty (i.e.
  * passable) block: In that case it considers all orientations invalid and therefore keeps its
  * current orientation, TODO peek state
- * <li>HORSE: okay
+ * <li>HORSE: okay, TODO Add support for more armor variants (1.20)
  * <li>MULE: okay
  * <li>DONKEY: okay
  * <li>SKELETON_HORSE: okay
@@ -160,6 +160,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>FROG: okay, starts running animation when touched, has no baby variant
  * <li>TADPOLE: okay
  * <li>WARDEN: okay
+ * <li>CAMEL: okay TODO support sittable # 1.20
+ * <li>SNIFFER: okay
  * </ul>
  **/
 public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
