@@ -2,9 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.16.6 (TBA)
-### Supported MC versions: 1.20.1, 1.20, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
+### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
-* Add support for MC 1.20 and 1.20.1.
+* Add support for 1.20.1. MC 1.20 is not supported!
   * Add camel and sniffer to the by default enabled mob types.
   * Add bamboo and cherry sign types.
 * Drop support for MC 1.18.1 and 1.19.1. These versions are only used by a few servers. Removing their support speeds up build times. MC 1.18.2 and 1.19.4 are still supported and can be updated to without issues.
