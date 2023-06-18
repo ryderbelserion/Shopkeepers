@@ -25,6 +25,10 @@ public enum SignType {
 			MC_1_19.MANGROVE_SIGN.orElse(null),
 			MC_1_19.MANGROVE_WALL_SIGN.orElse(null)//
 	),
+	BAMBOO(
+			MC_1_20.BAMBOO_SIGN.orElse(null),
+			MC_1_20.BAMBOO_WALL_SIGN.orElse(null)//
+	),
 	CHERRY(
 			MC_1_20.CHERRY_SIGN.orElse(null),
 			MC_1_20.CHERRY_WALL_SIGN.orElse(null)//

@@ -10,6 +10,12 @@ import com.nisovin.shopkeepers.util.logging.Log;
 // TODO This can be removed once we only support Bukkit 1.20 upwards.
 public final class MC_1_20 {
 
+	public static final Optional<@NonNull Material> BAMBOO_SIGN = Optional.ofNullable(
+			CompatUtils.getMaterial("BAMBOO_SIGN")
+	);
+	public static final Optional<@NonNull Material> BAMBOO_WALL_SIGN = Optional.ofNullable(
+			CompatUtils.getMaterial("BAMBOO_WALL_SIGN")
+	);
 	public static final Optional<@NonNull Material> CHERRY_SIGN = Optional.ofNullable(
 			CompatUtils.getMaterial("CHERRY_SIGN")
 	);
@@ -26,7 +32,7 @@ public final class MC_1_20 {
 	}
 
 	public static boolean isAvailable() {
-		return CHERRY_SIGN.isPresent();
+		return BAMBOO_SIGN.isPresent();
 	}
 
 	private MC_1_20() {
