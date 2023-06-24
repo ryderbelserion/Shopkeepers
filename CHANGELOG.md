@@ -9,6 +9,9 @@ Date format: (YYYY-MM-DD)
   * Add bamboo and cherry sign types.
 * Drop support for MC 1.18.1 and 1.19.1. These versions are only used by a few servers. Removing their support speeds up build times. MC 1.18.2 and 1.19.4 are still supported and can be updated to without issues.
 
+**Internal changes:**  
+* Use the optimized shared block shop object id for block shop lookups in the ShopkeeperRegistry.
+
 ## v2.16.5 (2023-03-20)
 ### Supported MC versions: 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5
 

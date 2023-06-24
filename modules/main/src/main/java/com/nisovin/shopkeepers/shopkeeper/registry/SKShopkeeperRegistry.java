@@ -654,7 +654,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public @Nullable AbstractShopkeeper getShopkeeperByBlock(Block block) {
 		Validate.notNull(block, "block is null");
-		Object objectId = BlockShopObjectIds.getObjectId(block);
+		Object objectId = BlockShopObjectIds.getSharedObjectId(block);
 		return shopObjectRegistry.getShopkeeperByObjectId(objectId);
 	}
 
