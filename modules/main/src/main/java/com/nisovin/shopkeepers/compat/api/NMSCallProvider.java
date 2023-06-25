@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -137,6 +138,17 @@ public interface NMSCallProvider {
 	}
 
 	public default void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
+		// Not supported by default.
+	}
+
+	// MC 1.20 specific features
+	// TODO Remove this once we only support MC 1.20 and above.
+
+	public default void setSignBackLines(Sign sign, @NonNull String[] lines) {
+		// Not supported by default.
+	}
+
+	public default void setSignBackGlowingText(Sign sign, boolean glowingText) {
 		// Not supported by default.
 	}
 }

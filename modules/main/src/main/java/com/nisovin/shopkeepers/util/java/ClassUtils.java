@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 
 public final class ClassUtils {
@@ -174,6 +176,14 @@ public final class ClassUtils {
 			);
 		}
 		return resource;
+	}
+
+	public static @Nullable Class<?> getClassOrNull(String className) {
+		try {
+			return Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
 	}
 
 	private ClassUtils() {

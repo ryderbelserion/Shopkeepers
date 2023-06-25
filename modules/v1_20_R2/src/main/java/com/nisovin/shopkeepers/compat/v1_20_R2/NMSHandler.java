@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
@@ -28,6 +30,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -289,7 +292,7 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setGlowingText(Sign sign, boolean glowingText) {
-		sign.setGlowingText(glowingText);
+		sign.getSide(Side.FRONT).setGlowingText(glowingText);
 	}
 
 	// MC 1.19 specific features
@@ -316,5 +319,22 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
 		((Goat) goat).setRightHorn(hasRightHorn);
+	}
+
+	// MC 1.20 specific features
+
+	@Override
+	public void setSignBackLines(Sign sign, @NonNull String[] lines) {
+		SignSide signSide = sign.getSide(Side.BACK);
+		signSide.setLine(0, lines[0]);
+		signSide.setLine(1, lines[1]);
+		signSide.setLine(2, lines[2]);
+		signSide.setLine(3, lines[3]);
+	}
+
+	@Override
+	public void setSignBackGlowingText(Sign sign, boolean glowingText) {
+		SignSide signSide = sign.getSide(Side.BACK);
+		signSide.setGlowingText(glowingText);
 	}
 }

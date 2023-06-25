@@ -7,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectTypes;
+import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
 
 /**
@@ -35,6 +36,13 @@ public interface DefaultShopObjectTypes {
 	 * @return the default sign shop object type
 	 */
 	public SignShopObjectType<?> getSignShopObjectType();
+
+	/**
+	 * Gets the default {@link ShopObjectType} of hanging sign shopkeepers.
+	 * 
+	 * @return the default hanging sign shop object type
+	 */
+	public HangingSignShopObjectType<?> getHangingSignShopObjectType();
 
 	/**
 	 * Gets the default {@link CitizensShopObjectType}.
@@ -73,6 +81,16 @@ public interface DefaultShopObjectTypes {
 	 */
 	public static SignShopObjectType<?> SIGN() {
 		return getInstance().getSignShopObjectType();
+	}
+
+	/**
+	 * Gets the default {@link ShopObjectType} of hanging sign shopkeepers.
+	 * 
+	 * @return the default hanging sign shop object type
+	 * @see #getHangingSignShopObjectType()
+	 */
+	public static HangingSignShopObjectType<?> HANGING_SIGN() {
+		return getInstance().getHangingSignShopObjectType();
 	}
 
 	/**

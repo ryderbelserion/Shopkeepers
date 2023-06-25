@@ -156,6 +156,9 @@ permissions:
     shopkeeper.sign:
         description: Create sign shopkeepers
         default: true
+    shopkeeper.hanging-sign:
+        description: Create hanging sign shopkeepers
+        default: true
     shopkeeper.citizen:
         description: Create Citizens NPC shopkeepers
         default: op

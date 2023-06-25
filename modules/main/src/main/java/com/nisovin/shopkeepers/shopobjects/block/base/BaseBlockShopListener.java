@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopobjects.sign;
+package com.nisovin.shopkeepers.shopobjects.block.base;
 
 import java.util.List;
 
@@ -28,32 +28,33 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEvent;
-import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-class SignShopListener implements Listener {
+class BaseBlockShopListener implements Listener {
 
 	// Local copy as array (enables a very high-performance iteration):
-	// Note: This also includes the direction DOWN, even though signs cannot be attached to the
-	// bottom of blocks, because physics updates can also propagate from the block above to a
-	// non-attached sign block below.
+	// This includes all directions that physic updates can propagate from, regardless of whether
+	// the block shops can be attached in that direction.
 	private static final @NonNull BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides()
 			.toArray(new @NonNull BlockFace[0]);
 
 	private final SKShopkeepersPlugin plugin;
-	private final SKSignShopObjectType signShopObjectType;
+	private final BaseBlockShops baseBlockShops;
+	private final SKShopkeeperRegistry shopkeeperRegistry;
 
 	private final MutableBlockLocation cancelNextBlockPhysics = new MutableBlockLocation();
 
-	SignShopListener(SKShopkeepersPlugin plugin, SignShops signShops) {
+	BaseBlockShopListener(SKShopkeepersPlugin plugin, BaseBlockShops blockShops) {
 		this.plugin = plugin;
-		this.signShopObjectType = signShops.getSignShopObjectType();
+		this.baseBlockShops = blockShops;
+		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
 	}
 
 	void onEnable() {
@@ -81,27 +82,29 @@ class SignShopListener implements Listener {
 	// See LivingEntityShopListener for the reasoning behind using event priority LOWEST and
 	// ignoring cancelled events.
 	// The shop creation item reacts to player interactions as well. If a player interacts with a
-	// sign shop while holding a shop creation item in his hand, we want the sign shop interaction
-	// to take precedence. This listener therefore has to be registered before the shop creation
-	// listener.
+	// base block shop while holding a shop creation item in his hand, we want the base block shop
+	// interaction to take precedence. This listener therefore has to be registered before the shop
+	// creation listener.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// Ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
 
-		// Check for sign shop interaction:
+		// Check for base block shop interaction:
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-		Block block = Unsafe.assertNonNull(event.getClickedBlock());
-		if (!ItemUtils.isSign(block.getType())) return;
-
 		Player player = event.getPlayer();
+		Block block = Unsafe.assertNonNull(event.getClickedBlock());
 		Log.debug(() -> "Player " + player.getName() + " is interacting (" + event.getHand()
-				+ ") with sign at " + TextUtils.getLocationString(block));
+				+ ") with block at " + TextUtils.getLocationString(block));
 
-		AbstractShopkeeper shopkeeper = signShopObjectType.getShopkeeper(block);
+		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByBlock(block);
 		if (shopkeeper == null) {
 			Log.debug("  Non-shopkeeper");
+			return;
+		}
+		if (!baseBlockShops.isBaseBlockShop(shopkeeper)) {
+			Log.debug("  Not using default block shop behaviors");
 			return;
 		}
 
@@ -126,7 +129,7 @@ class SignShopListener implements Listener {
 			return;
 		}
 
-		// Check the sign interaction result by calling another interact event:
+		// Check the block interaction result by calling another interact event:
 		if (Settings.checkShopInteractionResult) {
 			if (!InteractionUtils.checkBlockInteract(player, block)) {
 				Log.debug("  Cancelled by another plugin");
@@ -138,15 +141,15 @@ class SignShopListener implements Listener {
 		shopkeeper.onPlayerInteraction(player);
 	}
 
-	// Protect sign block:
+	// Protect shop blocks:
 
 	private boolean isProtectedBlock(Block block) {
-		// Check if the block itself is a sign shop:
-		if (signShopObjectType.isShopkeeper(block)) {
+		// Check if the block itself is a base block shop:
+		if (baseBlockShops.isBaseBlockShop(block)) {
 			return true;
 		}
 
-		// Check if there is a sign shop attached to this block:
+		// Check if there is a base block shop attached to this block:
 		String worldName = block.getWorld().getName();
 		int blockX = block.getX();
 		int blockY = block.getY();
@@ -156,24 +159,21 @@ class SignShopListener implements Listener {
 			int adjacentX = blockX + blockFace.getModX();
 			int adjacentY = blockY + blockFace.getModY();
 			int adjacentZ = blockZ + blockFace.getModZ();
-			Shopkeeper shopkeeper = signShopObjectType.getShopkeeper(
+			Shopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByBlock(
 					worldName,
 					adjacentX,
 					adjacentY,
 					adjacentZ
 			);
-			if (shopkeeper == null) continue;
+			if (shopkeeper == null || !baseBlockShops.isBaseBlockShop(shopkeeper)) continue;
 
-			SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
-			BlockFace attachedFace = BlockFace.UP; // In case of sign post
-			if (signObject.isWallSign()) {
-				attachedFace = signObject.getSignFacing();
-			}
+			BaseBlockShopObject blockShop = (BaseBlockShopObject) shopkeeper.getShopObject();
+			BlockFace attachedFace = blockShop.getAttachedBlockFace();
 			if (blockFace == attachedFace) {
-				// The sign shop is attached to the given block:
+				// The block shop is attached to the given block:
 				return true;
 			}
-			// Else continue: There might be other signs shops that are actually attached to the
+			// Else continue: There might be other block shops that are actually attached to the
 			// block in the remaining block directions.
 		}
 		return false;
@@ -190,7 +190,7 @@ class SignShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
-		if (signShopObjectType.isShopkeeper(block)) {
+		if (baseBlockShops.isBaseBlockShop(block)) {
 			event.setCancelled(true);
 		}
 	}
@@ -225,7 +225,7 @@ class SignShopListener implements Listener {
 	private boolean checkCancelPhysics(String worldName, int blockX, int blockY, int blockZ) {
 		if (cancelNextBlockPhysics.matches(worldName, blockX, blockY, blockZ)) {
 			return true;
-		} else if (signShopObjectType.isShopkeeper(worldName, blockX, blockY, blockZ)) {
+		} else if (baseBlockShops.isBaseBlockShop(worldName, blockX, blockY, blockZ)) {
 			return true;
 		}
 		return false;

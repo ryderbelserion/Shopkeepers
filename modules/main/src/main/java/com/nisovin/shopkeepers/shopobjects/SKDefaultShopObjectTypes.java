@@ -7,8 +7,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.block.base.BaseBlockShops;
 import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.sign.SKHangingSignShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObjectType;
 
 public final class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
@@ -17,8 +19,13 @@ public final class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
 	private final SKShopkeepersPlugin plugin;
 
-	public SKDefaultShopObjectTypes(SKShopkeepersPlugin plugin) {
+	private final SKSignShopObjectType signShopObjectType;
+	private final SKHangingSignShopObjectType hangingSignShopObjectType;
+
+	public SKDefaultShopObjectTypes(SKShopkeepersPlugin plugin, BaseBlockShops blockShops) {
 		this.plugin = plugin;
+		this.signShopObjectType = new SKSignShopObjectType(blockShops);
+		this.hangingSignShopObjectType = new SKHangingSignShopObjectType(blockShops);
 	}
 
 	@Override
@@ -26,6 +33,7 @@ public final class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 		List<@NonNull AbstractShopObjectType<?>> shopObjectTypes = new ArrayList<>();
 		shopObjectTypes.addAll(this.getLivingShopObjectTypes().getAll());
 		shopObjectTypes.add(this.getSignShopObjectType());
+		shopObjectTypes.add(this.getHangingSignShopObjectType());
 		shopObjectTypes.add(this.getCitizensShopObjectType());
 		return shopObjectTypes;
 	}
@@ -37,7 +45,12 @@ public final class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
 	@Override
 	public SKSignShopObjectType getSignShopObjectType() {
-		return plugin.getSignShops().getSignShopObjectType();
+		return signShopObjectType;
+	}
+
+	@Override
+	public SKHangingSignShopObjectType getHangingSignShopObjectType() {
+		return hangingSignShopObjectType;
 	}
 
 	@Override
@@ -57,6 +70,10 @@ public final class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
 	public static SKSignShopObjectType SIGN() {
 		return getInstance().getSignShopObjectType();
+	}
+
+	public static SKHangingSignShopObjectType HANGING_SIGN() {
+		return getInstance().getHangingSignShopObjectType();
 	}
 
 	public static SKCitizensShopObjectType CITIZEN() {

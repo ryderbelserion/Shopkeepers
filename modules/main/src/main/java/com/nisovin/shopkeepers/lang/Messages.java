@@ -46,6 +46,7 @@ public class Messages extends Config {
 
 	public static String shopObjectTypeLiving = c("{type}");
 	public static String shopObjectTypeSign = c("sign");
+	public static String shopObjectTypeHangingSign = c("hanging sign");
 	public static String shopObjectTypeNpc = c("npc");
 
 	public static Text selectedShopType = Text.parse("&aSelected shop type: &6{type} &7({description})");

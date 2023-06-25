@@ -222,6 +222,7 @@ public class Settings extends Config {
 
 	public static boolean enableSignShops = true;
 	public static boolean enableSignPostShops = true;
+	public static boolean enableHangingSignShops = true;
 
 	/*
 	 * Naming

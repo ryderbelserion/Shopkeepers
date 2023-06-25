@@ -293,6 +293,31 @@ public interface ShopkeeperRegistry {
 	public @Nullable Shopkeeper getShopkeeperByBlock(Block block);
 
 	/**
+	 * Gets the shopkeeper that is represented by the block at the specified coordinates (for
+	 * example in the case of sign shops).
+	 * <p>
+	 * The return value may only be accurate if the shopkeeper's {@link ShopObject} is currently
+	 * {@link ShopObject#isSpawned() spawned}. For example, if the shopkeeper's chunk is not
+	 * {@link #isChunkActive(ChunkCoords) active}, or if the block could not be placed with its
+	 * intended state, this may or may not return <code>false</code> for that block.
+	 * <p>
+	 * In order to get the shopkeepers at a specific location, regardless of whether that chunk is
+	 * currently loaded and whether the shopkeepers inside it have already been spawned, use
+	 * {@link #getShopkeepersAtLocation(Location)} instead.
+	 * 
+	 * @param worldName
+	 *            the world name
+	 * @param x
+	 *            the block's x coordinate
+	 * @param y
+	 *            the block's y coordinate
+	 * @param z
+	 *            the block's z coordinate
+	 * @return the shopkeeper, or <code>null</code> if the specified block is not a shopkeeper
+	 */
+	public @Nullable Shopkeeper getShopkeeperByBlock(String worldName, int x, int y, int z);
+
+	/**
 	 * Checks if the given block is a shopkeeper.
 	 * 
 	 * @param block

@@ -9,8 +9,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Attachable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -18,15 +20,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
+import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObject;
 import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
-import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
-import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
-import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.block.base.BaseBlockShopObject;
@@ -35,7 +33,6 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
-import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
@@ -45,16 +42,15 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
-import com.nisovin.shopkeepers.util.logging.Log;
 
-public class SKSignShopObject extends BaseBlockShopObject implements SignShopObject {
+public class SKHangingSignShopObject extends BaseBlockShopObject implements HangingSignShopObject {
 
 	private static final String DATA_KEY_SIGN_TYPE = "signType";
 	public static final Property<@NonNull SignType> SIGN_TYPE = new BasicProperty<@NonNull SignType>()
 			.dataKeyAccessor(DATA_KEY_SIGN_TYPE, EnumSerializers.lenient(SignType.class))
 			.validator(value -> {
-				Validate.isTrue(value.isSupported(),
-						() -> "Unsupported sign type: '" + value.name() + "'.");
+				Validate.isTrue(value.isHangingSupported(),
+						() -> "Unsupported hanging sign type: '" + value.name() + "'.");
 			})
 			.defaultValue(SignType.OAK)
 			.build();
@@ -69,92 +65,6 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 			.defaultValue(false)
 			.build();
 
-	static {
-		// Register shopkeeper data migrations:
-
-		// Migration from TreeSpecies to SignType.
-		// TODO Remove this again at some point. Added in v2.10.0.
-		ShopkeeperDataMigrator.registerMigration(new Migration(
-				"sign-type",
-				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)
-		) {
-			@Override
-			public boolean migrate(
-					ShopkeeperData shopkeeperData,
-					String logPrefix
-			) throws InvalidDataException {
-				boolean migrated = false;
-				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
-				String signTypeName = shopObjectData.getString(DATA_KEY_SIGN_TYPE);
-				if ("GENERIC".equals(signTypeName)) {
-					Log.warning(logPrefix + "Migrating sign type from '" + signTypeName + "' to '"
-							+ SignType.OAK + "'.");
-					shopObjectData.set(SIGN_TYPE, SignType.OAK);
-					migrated = true;
-				} else if ("REDWOOD".equals(signTypeName)) {
-					Log.warning(logPrefix + "Migrating sign type from '" + signTypeName + "' to '"
-							+ SignType.SPRUCE + "'.");
-					shopObjectData.set(SIGN_TYPE, SignType.SPRUCE);
-					migrated = true;
-				}
-				return migrated;
-			}
-		});
-
-		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
-		// TODO Remove this migration again at some point.
-		ShopkeeperDataMigrator.registerMigration(new Migration(
-				"sign-facing-to-yaw",
-				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)
-		) {
-			@Override
-			public boolean migrate(
-					ShopkeeperData shopkeeperData,
-					String logPrefix
-			) throws InvalidDataException {
-				boolean migrated = false;
-				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
-				String signFacingName = shopObjectData.getString("signFacing");
-				if (signFacingName != null) {
-					BlockFace signFacing = BlockFace.SOUTH;
-					try {
-						signFacing = BlockFace.valueOf(signFacingName);
-					} catch (IllegalArgumentException e) {
-						Log.warning(logPrefix + "Could not parse sign facing '" + signFacingName
-								+ "'. Falling back to SOUTH.");
-					}
-
-					// Validate the sign facing:
-					if (!this.isValidSignFacing(shopObjectData, signFacing)) {
-						Log.warning(logPrefix + "Invalid sign facing '" + signFacingName
-								+ "'. Falling back to SOUTH.");
-						signFacing = BlockFace.SOUTH;
-					}
-
-					float yaw = BlockFaceUtils.getYaw(signFacing);
-					Log.warning(logPrefix + "Migrating sign facing '" + signFacing + "' to yaw "
-							+ TextUtils.format(yaw));
-					shopkeeperData.set(AbstractShopkeeper.YAW, yaw);
-					migrated = true;
-				}
-				return migrated;
-			}
-
-			private boolean isValidSignFacing(
-					ShopObjectData shopObjectData,
-					BlockFace signFacing
-			) throws InvalidDataException {
-				Boolean wallSign = shopObjectData.getOrNullIfMissing(WALL_SIGN); // Can be null
-				if (wallSign == null) return true; // Skip the validation
-				if (wallSign) {
-					return BlockFaceUtils.isWallSignFacing(signFacing);
-				} else {
-					return BlockFaceUtils.isSignPostFacing(signFacing);
-				}
-			}
-		});
-	}
-
 	private final PropertyValue<@NonNull SignType> signTypeProperty = new PropertyValue<>(SIGN_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applySignType)
 			.build(properties);
@@ -165,7 +75,7 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 			.onValueChanged(Unsafe.initialized(this)::applyGlowingText)
 			.build(properties);
 
-	protected SKSignShopObject(
+	protected SKHangingSignShopObject(
 			BaseBlockShops blockShops,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
@@ -174,16 +84,16 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 
 		if (creationData != null) {
 			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
-			if (targetedBlockFace == BlockFace.UP) {
-				// Sign post:
+			if (targetedBlockFace == BlockFace.DOWN) {
+				// Hanging sign:
 				wallSignProperty.setValue(false, Collections.emptySet()); // Not marking dirty
-			} // Else: Wall sign (default).
+			} // Else: Wall hanging sign (default).
 		}
 	}
 
 	@Override
-	public SKSignShopObjectType getType() {
-		return SKDefaultShopObjectTypes.SIGN();
+	public SKHangingSignShopObjectType getType() {
+		return SKDefaultShopObjectTypes.HANGING_SIGN();
 	}
 
 	@Override
@@ -206,10 +116,11 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	// ACTIVATION
 
 	@Override
-	protected boolean isValidBlockType(Material blockType) {
-		return ItemUtils.isSign(blockType);
+	protected boolean isValidBlockType(Material type) {
+		return ItemUtils.isHangingSign(type);
 	}
 
+	// HangingSign extends Sign.
 	public @Nullable Sign getSign() {
 		if (!this.isActive()) return null;
 		Block block = Unsafe.assertNonNull(this.getBlock());
@@ -220,23 +131,30 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	@Override
 	protected BlockData createBlockData() {
 		SignType signType = this.getSignType();
-		assert signType.isSupported();
+		assert signType.isHangingSupported();
 		boolean wallSign = this.isWallSign();
-		Material blockMaterial = Unsafe.assertNonNull(signType.getSignMaterial(wallSign));
+		Material blockMaterial = Unsafe.assertNonNull(signType.getHangingSignMaterial(wallSign));
 		assert this.isValidBlockType(blockMaterial);
 		BlockData blockData;
 		if (wallSign) {
-			// Wall sign:
-			WallSign wallSignData = (WallSign) Bukkit.createBlockData(blockMaterial);
-			wallSignData.setFacing(this.getSignFacing());
-			blockData = wallSignData;
+			// Wall hanging sign:
+			// TODO Use the actual type once we only support MC 1.20 and above.
+			Directional wallHangingSignData = (Directional) Bukkit.createBlockData(blockMaterial);
+			wallHangingSignData.setFacing(this.getSignFacing());
+			blockData = wallHangingSignData;
 		} else {
-			// Sign post:
-			org.bukkit.block.data.type.Sign signPostData = Unsafe.castNonNull(
-					Bukkit.createBlockData(blockMaterial)
-			);
-			signPostData.setRotation(this.getSignFacing());
-			blockData = signPostData;
+			// Hanging sign:
+			// TODO Use the actual type once we only support MC 1.20 and above.
+			Rotatable hangingSignData = (Rotatable) Bukkit.createBlockData(blockMaterial);
+			hangingSignData.setRotation(this.getSignFacing());
+
+			// We always set the 'attached' flag for now, which is usually only used if the block
+			// above has a non-full bottom collision face:
+			// TODO Set the 'attached' flag dynamically based on the block above?
+			Attachable attachable = (Attachable) hangingSignData;
+			attachable.setAttached(true);
+
+			blockData = hangingSignData;
 		}
 		return blockData;
 	}
@@ -263,13 +181,9 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	public @Nullable Location getTickVisualizationParticleLocation() {
 		Location location = this.getLocation();
 		if (location == null) return null;
-		if (this.isWallSign()) {
-			// Location at the block center:
-			return location.add(0.5D, 0.5D, 0.5D);
-		} else {
-			// Location above the sign post:
-			return location.add(0.5D, 1.3D, 0.5D);
-		}
+
+		// Location below the hanging sign:
+		return location.add(0.5D, -0.3D, 0.5D);
 	}
 
 	// EDITOR ACTIONS
@@ -284,7 +198,7 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 		return editorButtons;
 	}
 
-	// WALL SIGN (vs sign post)
+	// WALL SIGN
 
 	// Can be edited by moving the shopkeeper.
 	@Override
@@ -302,7 +216,11 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 
 	@Override
 	public @Nullable BlockFace getAttachedBlockFace() {
-		return this.isWallSign() ? this.getSignFacing() : BlockFace.UP;
+		if (this.isWallSign()) {
+			return BlockFaceUtils.getWallSignFacings().fromYaw(shopkeeper.getYaw());
+		} else {
+			return BlockFace.DOWN;
+		}
 	}
 
 	public boolean isWallSign() {
@@ -313,7 +231,8 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 
 	public BlockFace getSignFacing() {
 		if (this.isWallSign()) {
-			return BlockFaceUtils.getWallSignFacings().fromYaw(shopkeeper.getYaw());
+			// The wall hanging sign facing is the attached block face rotated by 90 degree left:
+			return BlockFaceUtils.getWallSignFacings().fromYaw(shopkeeper.getYaw() - 90);
 		} else {
 			return BlockFaceUtils.getSignPostFacings().fromYaw(shopkeeper.getYaw());
 		}
@@ -347,7 +266,7 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 						SignType.class,
 						this.getSignType(),
 						backwards,
-						SignType.IS_SUPPORTED
+						SignType.IS_HANGING_SUPPORTED
 				)
 		);
 	}

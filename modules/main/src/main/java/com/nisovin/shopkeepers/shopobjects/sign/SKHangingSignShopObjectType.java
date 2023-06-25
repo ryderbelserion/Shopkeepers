@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
+import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObjectType;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -20,25 +20,30 @@ import com.nisovin.shopkeepers.shopobjects.block.base.BaseBlockShops;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
-public final class SKSignShopObjectType
-		extends BaseBlockShopObjectType<@NonNull SKSignShopObject>
-		implements SignShopObjectType<@NonNull SKSignShopObject> {
+public final class SKHangingSignShopObjectType
+		extends BaseBlockShopObjectType<@NonNull SKHangingSignShopObject>
+		implements HangingSignShopObjectType<@NonNull SKHangingSignShopObject> {
 
 	private final BaseBlockShops blockShops;
 
-	public SKSignShopObjectType(BaseBlockShops blockShops) {
-		super("sign", Collections.emptyList(), "shopkeeper.sign", SKSignShopObject.class);
+	public SKHangingSignShopObjectType(BaseBlockShops blockShops) {
+		super(
+				"hanging-sign",
+				Collections.emptyList(),
+				"shopkeeper.hanging-sign",
+				SKHangingSignShopObject.class
+		);
 		this.blockShops = blockShops;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return Settings.enableSignShops;
+		return Settings.enableHangingSignShops;
 	}
 
 	@Override
 	public String getDisplayName() {
-		return Messages.shopObjectTypeSign;
+		return Messages.shopObjectTypeHangingSign;
 	}
 
 	@Override
@@ -67,9 +72,9 @@ public final class SKSignShopObjectType
 			return false;
 		}
 
-		// If sign posts are disabled, only wall sign block faces (or null) are allowed:
-		if (attachedBlockFace == BlockFace.DOWN
-				|| (attachedBlockFace == BlockFace.UP && !Settings.enableSignPostShops)
+		// UP: Hanging sign
+		// Block side: Hanging wall sign
+		if (attachedBlockFace == BlockFace.UP
 				|| (attachedBlockFace != null && !BlockFaceUtils.isBlockSide(attachedBlockFace))) {
 			if (creator != null) {
 				TextUtils.sendMessage(creator, Messages.invalidSpawnBlockFace);
@@ -81,10 +86,10 @@ public final class SKSignShopObjectType
 	}
 
 	@Override
-	public SKSignShopObject createObject(
+	public SKHangingSignShopObject createObject(
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
-		return new SKSignShopObject(blockShops, shopkeeper, creationData);
+		return new SKHangingSignShopObject(blockShops, shopkeeper, creationData);
 	}
 }

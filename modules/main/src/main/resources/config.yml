@@ -388,6 +388,8 @@ delete-invalid-citizen-shopkeepers: false
 enable-sign-shops: true
 # Whether to allow the creation of sign posts (instead of only wall signs).
 enable-sign-post-shops: true
+# Whether to allow the creation of hanging sign shops.
+enable-hanging-sign-shops: true
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Naming

@@ -54,9 +54,9 @@ import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
+import com.nisovin.shopkeepers.shopobjects.block.base.BaseBlockShops;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
-import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelog.TradeLoggers;
@@ -98,12 +98,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	// Shop types and shop object types registry:
 	private final SKShopTypesRegistry shopTypesRegistry = new SKShopTypesRegistry();
 	private final SKShopObjectTypesRegistry shopObjectTypesRegistry = new SKShopObjectTypesRegistry();
-
-	// Default shop and shop object types:
-	private final SKDefaultShopTypes defaultShopTypes = new SKDefaultShopTypes();
-	private final SKDefaultShopObjectTypes defaultShopObjectTypes = new SKDefaultShopObjectTypes(
-			Unsafe.initialized(this)
-	);
 
 	// UI registry:
 	private final SKUIRegistry uiRegistry = new SKUIRegistry(Unsafe.initialized(this));
@@ -151,11 +145,18 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	);
 
 	private final LivingShops livingShops = new LivingShops(Unsafe.initialized(this));
-	private final SignShops signShops = new SignShops(Unsafe.initialized(this));
+	private final BaseBlockShops blockShops = new BaseBlockShops(Unsafe.initialized(this));
 	private final CitizensShops citizensShops = new CitizensShops(Unsafe.initialized(this));
 
 	private final RegularVillagers regularVillagers = new RegularVillagers(
 			Unsafe.initialized(this)
+	);
+
+	// Default shop and shop object types:
+	private final SKDefaultShopTypes defaultShopTypes = new SKDefaultShopTypes();
+	private final SKDefaultShopObjectTypes defaultShopObjectTypes = new SKDefaultShopObjectTypes(
+			Unsafe.initialized(this),
+			blockShops
 	);
 
 	private final PluginMetrics pluginMetrics = new PluginMetrics(Unsafe.initialized(this));
@@ -363,10 +364,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Enable living entity shops:
 		livingShops.onEnable();
 
-		// Enable sign shops:
+		// Enable block shops:
 		// Note: This has to be enabled before the shop creation listener, so that interactions with
-		// sign shops take precedence over interactions with the shop creation item.
-		signShops.onEnable();
+		// block shops take precedence over interactions with the shop creation item.
+		blockShops.onEnable();
 
 		// Enable citizens shops:
 		citizensShops.onEnable();
@@ -457,8 +458,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Disable living entity shops:
 		livingShops.onDisable();
 
-		// Disable sign shops:
-		signShops.onDisable();
+		// Disable block shops:
+		blockShops.onDisable();
 
 		// Disable citizens shops:
 		citizensShops.onDisable();
@@ -609,10 +610,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		return livingShops;
 	}
 
-	// SIGN SHOPS
+	// BLOCK SHOPS
 
-	public SignShops getSignShops() {
-		return signShops;
+	public BaseBlockShops getBlockShops() {
+		return blockShops;
 	}
 
 	// CITIZENS SHOPS

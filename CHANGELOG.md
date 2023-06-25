@@ -7,10 +7,23 @@ Date format: (YYYY-MM-DD)
 * Add support for 1.20.1. MC 1.20 is not supported!
   * Add camel and sniffer to the by default enabled mob types.
   * Add bamboo and cherry sign types.
+  * Add hanging sign shops:
+    * This is a new shop object type similar to sign shops.
+    * Required permission: `shopkeeper.hanging-sign` (default: `true`).
+    * Config option: `enable-hanging-sign-shops` (default: `true`).
+    * Limitation: Ceiling hanging signs always use the 'attached' state for now, instead of choosing this state dynamically based on the shape of the block above.
+  * The sign text is now applied to both sides of shop signs, including sign posts, wall signs, hanging signs, and wall hanging signs.
 * Drop support for MC 1.18.1 and 1.19.1. These versions are only used by a few servers. Removing their support speeds up build times. MC 1.18.2 and 1.19.4 are still supported and can be updated to without issues.
+
+**API changes:**  
+* Add `ShopkeeperRegistry#getShopkeeperByBlock(String worldName, int x, int y, int z)`.
 
 **Internal changes:**  
 * Use the optimized shared block shop object id for block shop lookups in the ShopkeeperRegistry.
+* Various refactors to allow the sign shop spawning logic to be reused for other types of block shop objects, such as the new hanging sign shops.
+
+**Message changes:**  
+* Added `shop-object-type-hanging-sign`.
 
 ## v2.16.5 (2023-03-20)
 ### Supported MC versions: 1.19.4, 1.19.3, 1.19.2, 1.19.1, 1.19, 1.18.2, 1.18.1, 1.17.1, 1.16.5

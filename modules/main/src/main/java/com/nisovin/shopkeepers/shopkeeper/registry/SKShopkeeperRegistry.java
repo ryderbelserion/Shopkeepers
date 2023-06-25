@@ -346,8 +346,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperRemoveEvent(shopkeeper, cause));
 
-		if (!shopkeeper.isValid())
-		{
+		if (!shopkeeper.isValid()) {
 			Log.warning(shopkeeper.getLogPrefix()
 					+ "Aborting removal, because already removed during ShopkeeperRemoveEvent!");
 			return;
@@ -654,7 +653,17 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public @Nullable AbstractShopkeeper getShopkeeperByBlock(Block block) {
 		Validate.notNull(block, "block is null");
-		Object objectId = BlockShopObjectIds.getSharedObjectId(block);
+		return getShopkeeperByBlock(
+				block.getWorld().getName(),
+				block.getX(),
+				block.getY(),
+				block.getZ()
+		);
+	}
+
+	@Override
+	public @Nullable AbstractShopkeeper getShopkeeperByBlock(String worldName, int x, int y, int z) {
+		Object objectId = BlockShopObjectIds.getSharedObjectId(worldName, x, y, z);
 		return shopObjectRegistry.getShopkeeperByObjectId(objectId);
 	}
 
