@@ -1,7 +1,12 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.17.1 (TBA)
+## v2.17.2 (TBA)
+### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
+
+
+
+## v2.17.1 (2022-06-28)
 ### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
 * Change the icons of the sign type editor button of hanging sign shop objects from sign to hanging sign items.
