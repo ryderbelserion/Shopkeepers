@@ -8,6 +8,7 @@ Date format: (YYYY-MM-DD)
   * On those server versions, there is no valid default hanging sign type.
   * Disable the sign type validation on those server versions and adapt all code that previously expected the sign type to always provide valid hanging sign materials.
   * The hanging sign object type is now always disabled on server versions without MC 1.20 features.
+* Fix: Error "Invalid sign block face: DOWN" when trying to move a hanging sign shop object to the bottom of a block.
 
 ## v2.17.0 (2023-06-25)
 ### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

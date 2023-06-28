@@ -211,8 +211,8 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	@Override
 	public void setAttachedBlockFace(BlockFace attachedBlockFace) {
 		super.setAttachedBlockFace(attachedBlockFace);
-		Validate.isTrue(attachedBlockFace != BlockFace.DOWN, "Invalid sign block face: DOWN.");
-		if (attachedBlockFace == BlockFace.UP) {
+		Validate.isTrue(attachedBlockFace != BlockFace.UP, "Invalid hanging sign block face: UP.");
+		if (attachedBlockFace == BlockFace.DOWN) {
 			wallSignProperty.setValue(false);
 		} else {
 			// Update the yaw accordingly:
