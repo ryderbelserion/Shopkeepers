@@ -283,8 +283,8 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	private ItemStack getSignTypeEditorItem() {
 		Material signMaterial = Material.OAK_SIGN; // Default
 		SignType signType = this.getSignType();
-		if (signType.isSupported()) {
-			signMaterial = Unsafe.assertNonNull(signType.getSignMaterial());
+		if (signType.isHangingSupported()) {
+			signMaterial = Unsafe.assertNonNull(signType.getHangingSignMaterial());
 		}
 		ItemStack iconItem = new ItemStack(signMaterial);
 		return ItemUtils.setDisplayNameAndLore(iconItem,

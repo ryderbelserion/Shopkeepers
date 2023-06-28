@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.17.1 (TBA)
 ### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+* Change the icons of the sign type editor button of hanging sign shop objects from sign to hanging sign items.
 * Fix: Plugin not loading on server versions without MC 1.20 hanging sign materials: "The default value for property 'signType' is invalid: Unsupported hanging sign type: 'OAK'."
   * On those server versions, there is no valid default hanging sign type.
   * Disable the sign type validation on those server versions and adapt all code that previously expected the sign type to always provide valid hanging sign materials.
