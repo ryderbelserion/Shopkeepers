@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObject;
 import com.nisovin.shopkeepers.compat.MC_1_17;
+import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -49,7 +50,12 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	public static final Property<@NonNull SignType> SIGN_TYPE = new BasicProperty<@NonNull SignType>()
 			.dataKeyAccessor(DATA_KEY_SIGN_TYPE, EnumSerializers.lenient(SignType.class))
 			.validator(value -> {
-				Validate.isTrue(value.isHangingSupported(),
+				// Only validate on MC 1.20 or above. Otherwise, the default value would already be
+				// considered invalid.
+				// On versions below MC 1.20 (or 1.19 with the MC 1.20 data pack) the sign type is
+				// not validated, but also not expected to be used: It is only used during spawning,
+				// but the spawning of disabled object types is skipped.
+				Validate.isTrue(!MC_1_20.isAvailable() || value.isHangingSupported(),
 						() -> "Unsupported hanging sign type: '" + value.name() + "'.");
 			})
 			.defaultValue(SignType.OAK)
@@ -129,9 +135,10 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	}
 
 	@Override
-	protected BlockData createBlockData() {
+	protected @Nullable BlockData createBlockData() {
 		SignType signType = this.getSignType();
-		assert signType.isHangingSupported();
+		if (!signType.isHangingSupported()) return null;
+
 		boolean wallSign = this.isWallSign();
 		Material blockMaterial = Unsafe.assertNonNull(signType.getHangingSignMaterial(wallSign));
 		assert this.isValidBlockType(blockMaterial);
@@ -256,6 +263,8 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 		// (e.g. sign contents), because they would otherwise be removed when changing the block's
 		// type.
 		BlockData blockData = this.createBlockData();
+		if (blockData == null) return;
+
 		sign.setBlockData(blockData); // Keeps sign data (e.g. text) the same
 		sign.update(true, false); // Force: Material has changed, skip physics update.
 	}
@@ -272,7 +281,11 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	}
 
 	private ItemStack getSignTypeEditorItem() {
-		Material signMaterial = Unsafe.assertNonNull(this.getSignType().getSignMaterial());
+		Material signMaterial = Material.OAK_SIGN; // Default
+		SignType signType = this.getSignType();
+		if (signType.isSupported()) {
+			signMaterial = Unsafe.assertNonNull(signType.getSignMaterial());
+		}
 		ItemStack iconItem = new ItemStack(signMaterial);
 		return ItemUtils.setDisplayNameAndLore(iconItem,
 				Messages.buttonSignVariant,

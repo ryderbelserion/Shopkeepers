@@ -127,7 +127,10 @@ public abstract class BaseBlockShopObject extends AbstractBlockShopObject {
 		// This replaces any currently existing block at that location.
 		Block spawnBlock = spawnLocation.getBlock();
 		BlockData blockData = this.createBlockData();
-		assert blockData != null;
+		if (blockData == null) {
+			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Failed to create block data.");
+			return false;
+		}
 
 		// Cancel block physics for this placed block if needed:
 		blockShops.cancelNextBlockPhysics(spawnBlock);
@@ -159,9 +162,9 @@ public abstract class BaseBlockShopObject extends AbstractBlockShopObject {
 	/**
 	 * Creates the {@link BlockData} to spawn the block with.
 	 * 
-	 * @return the block data, not <code>null</code>
+	 * @return the block data, or <code>null</code> to abort the spawning
 	 */
-	protected abstract BlockData createBlockData();
+	protected abstract @Nullable BlockData createBlockData();
 
 	/**
 	 * Updates the spawned block according to the block shop's current state.

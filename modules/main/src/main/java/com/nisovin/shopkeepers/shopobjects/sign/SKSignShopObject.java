@@ -218,7 +218,7 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	}
 
 	@Override
-	protected BlockData createBlockData() {
+	protected @Nullable BlockData createBlockData() {
 		SignType signType = this.getSignType();
 		assert signType.isSupported();
 		boolean wallSign = this.isWallSign();
@@ -336,7 +336,7 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 		// Note: The different sign types are different materials. We need to capture the sign state
 		// (e.g. sign contents), because they would otherwise be removed when changing the block's
 		// type.
-		BlockData blockData = this.createBlockData();
+		BlockData blockData = Unsafe.assertNonNull(this.createBlockData());
 		sign.setBlockData(blockData); // Keeps sign data (e.g. text) the same
 		sign.update(true, false); // Force: Material has changed, skip physics update.
 	}
