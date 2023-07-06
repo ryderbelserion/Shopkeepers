@@ -70,8 +70,8 @@ public abstract class ShopCreationData {
 	/**
 	 * The creator of the shop.
 	 * 
-	 * @return the creating player, might be <code>null</code> (depending on which type of
-	 *         shopkeeper is created and in which context)
+	 * @return the creating player, can be <code>null</code> depending on the shop type and the
+	 *         context in which it is created
 	 */
 	public @Nullable Player getCreator() {
 		return creator;

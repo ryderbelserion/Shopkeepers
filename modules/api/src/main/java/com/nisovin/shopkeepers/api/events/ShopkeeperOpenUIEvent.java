@@ -7,7 +7,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.ui.UIType;
 
 /**
- * A {@link PlayerOpenUIEvent} which involves a specific {@link Shopkeeper}.
+ * A {@link PlayerOpenUIEvent} that involves a specific {@link Shopkeeper}.
  */
 public class ShopkeeperOpenUIEvent extends PlayerOpenUIEvent {
 

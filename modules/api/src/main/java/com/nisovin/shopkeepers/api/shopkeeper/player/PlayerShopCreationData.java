@@ -175,7 +175,7 @@ public class PlayerShopCreationData extends ShopCreationData {
 	}
 
 	/**
-	 * The container which is backing the player shop.
+	 * The container that is backing the player shop.
 	 * <p>
 	 * Has to be located in the same world the shopkeeper.
 	 * <p>
@@ -191,7 +191,7 @@ public class PlayerShopCreationData extends ShopCreationData {
 	}
 
 	/**
-	 * The container which is backing the player shop.
+	 * The container that is backing the player shop.
 	 * <p>
 	 * Has to be located in the same world the shopkeeper.
 	 * <p>

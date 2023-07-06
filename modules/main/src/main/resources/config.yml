@@ -67,14 +67,14 @@ save-instantly: true
 # and shop containers whenever a player opens a shopkeeper UI (e.g. trading,
 # editor, hiring, etc.) The items are converted to conform to Spigot's internal
 # data format.
-# This setting helps with issues related to items which have been created on
+# This setting helps with issues related to items that have been created on
 # previous Spigot versions or via some Minecraft mechanism (e.g. give command,
 # loot tables, etc.) no longer getting accepted when trading with shopkeepers.
 # In order for the items to get reliably accepted during trades, their data has
-# to match the internal format which Spigot uses when a plugin would create the
+# to match the internal format that Spigot uses when a plugin would create the
 # same items via the Spigot API. Spigot occasionally makes changes to this
 # internal data format. Any previously created items, or newly created items
-# which don't conform to this new format, may cause trading and item stacking
+# that don't conform to this new format, may cause trading and item stacking
 # issues then.
 # This setting is intended to help with the portion of the issue affecting
 # shopkeeper trades. This setting will not reliably help you prevent item
@@ -114,7 +114,7 @@ convert-player-items-exceptions: []
 # setting is enabled, or has been enabled in the past.
 ignore-failed-server-assumption-tests: false
 
-# If enabled, Shopkeepers tries to bypass other plugins which deny mob spawning
+# If enabled, Shopkeepers tries to bypass other plugins that deny mob spawning
 # (e.g. land protection plugins).
 bypass-spawn-blocking: true
 # If enabled, Shopkeepers takes into account whether other plugins deny
@@ -223,9 +223,9 @@ player-shopkeeper-inactive-days: 0
 # Shop (Object) Types
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# A list of mob types which can be used for shopkeepers. Adding new mob types
-# to the defaults here is unsupported, as some mob types might not properly
-# work and can cause all kinds of issues.
+# A list of mob types that can be used for shopkeepers. Adding new mob types to
+# the defaults here is unsupported, as some mob types might not properly work
+# and can cause all kinds of issues.
 enabled-living-shops:
 - VILLAGER
 - ALLAY
@@ -549,8 +549,8 @@ hire-require-creation-permission: true
 # this enabled is recommended.
 prevent-trading-with-own-shop: true
 # With this enabled player shopkeepers don't trade while their owner is online.
-# This might be useful for role-playing servers, which wish to force players to
-# trade with each other directly while being online.
+# This might be useful for role-playing servers that want to force players to
+# trade with each other directly while they are online.
 prevent-trading-while-owner-is-online: false
 # In some situations, Minecraft allows the trading of items even if they do not
 # fully match (e.g. villagers accept items with additional metadata). With this

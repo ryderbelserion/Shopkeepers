@@ -16,7 +16,7 @@ I was **`<able / not able>`** to reproduce my issue on a freshly set up and up-t
 
 ## The issue:
 
-Provide a detailed description of your problem and add as much information as possible which could help to reproduce the issue.
+Provide a detailed description of the issue and information on how to reproduce it.
 
 Include:
 * Description of the issue.

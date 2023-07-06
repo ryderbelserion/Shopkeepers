@@ -18,7 +18,7 @@ public interface LivingShopObjectType<T extends @NonNull LivingShopObject>
 		extends EntityShopObjectType<T> {
 
 	/**
-	 * Gets the {@link EntityType} which is used by the {@link ShopObject ShopObjects} of this
+	 * Gets the {@link EntityType} that is used by the {@link ShopObject ShopObjects} of this
 	 * {@link LivingShopObjectType}.
 	 * 
 	 * @return the used entity type

@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObject;
 public interface LivingShopObject extends EntityShopObject {
 
 	/**
-	 * Gets the {@link EntityType} which is used by this {@link LivingShopObject}.
+	 * Gets the {@link EntityType} that is used by this {@link LivingShopObject}.
 	 * 
 	 * @return the used entity type
 	 */

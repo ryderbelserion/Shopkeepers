@@ -68,7 +68,7 @@ public class PlayerOpenUIEvent extends Event implements Cancellable {
 	 * access is denied due to a missing permission.
 	 * <p>
 	 * Silent UI requests may for example be used if there is a default fallback behavior that is
-	 * supposed to be used for players which do not have access to a specific type of UI.
+	 * supposed to be used for players who do not have access to a specific type of UI.
 	 * 
 	 * @return <code>true</code> if this is a silent UI request
 	 */

@@ -44,7 +44,7 @@ public interface ShopkeeperStorage {
 	/**
 	 * Requests a delayed save of the data of all shopkeepers.
 	 * <p>
-	 * This is useful for saves which are frequently triggered, but don't necessarily need to occur
+	 * This is useful for saves that are frequently triggered, but don't necessarily need to occur
 	 * right away, even with the '{@code save-instantly}' setting enabled.
 	 * <p>
 	 * If the '{@code save-instantly}' setting is disabled, this acts just like {@link #save()}.

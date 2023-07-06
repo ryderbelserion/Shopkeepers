@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  * already been {@link ShopkeepersAPI#isEnabled() enabled}).
  * 
  * @deprecated The Shopkeepers plugin, and thereby also the API, is not yet fully enabled and ready
- *             to be used at this point. This event is only supposed to be used by plugin which need
+ *             to be used at this point. This event is only supposed to be used by plugins that need
  *             to hook into Shopkeepers startup process and know what they are doing.
  */
 @Deprecated
