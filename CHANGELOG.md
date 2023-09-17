@@ -1,12 +1,17 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.17.2 (TBA)
+## v2.17.3 (TBA)
 ### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
 
 
-## v2.17.1 (2022-06-28)
+## v2.17.2 (2023-09-17)
+### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
+
+* Fix: Incompatibility with Paper build 185: Item migrations failing due to new ItemStack#isEmpty method.
+
+## v2.17.1 (2023-06-28)
 ### Supported MC versions: 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
 * Change the icons of the sign type editor button of hanging sign shop objects from sign to hanging sign items.
