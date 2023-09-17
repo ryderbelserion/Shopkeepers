@@ -138,6 +138,15 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 		return delegate.getMaxStackSize();
 	}
 
+	// GH #842: Added in Paper 1.20.1 build 185 (deb92c212951ea5051fe18085f0e11ba70bf2f4b).
+	// We need to override this, because the default implementation references the type and amount
+	// fields directly, instead of via the getters.
+	// @Override // Not possible (we don't depend on Paper), but also not necessary for the
+	// override to have an effect.
+	public boolean isEmpty() {
+		return getType().isAir() || getAmount() <= 0;
+	}
+
 	// The given item stack might also be another unmodifiable item stack.
 	@Override
 	public boolean isSimilar(@ReadOnly @Nullable ItemStack itemStack) {
