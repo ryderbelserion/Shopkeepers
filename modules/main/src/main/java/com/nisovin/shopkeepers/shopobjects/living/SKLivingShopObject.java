@@ -505,7 +505,12 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		if (spawnLocation == null) return false;
 
 		this.lastSpawnLocation = spawnLocation;
-		return entity.teleport(spawnLocation);
+		boolean teleportSuccess = entity.teleport(spawnLocation);
+
+		// Inform the AI system:
+		livingShops.getLivingEntityAI().updateLocation(this);
+
+		return teleportSuccess;
 	}
 
 	// TICKING

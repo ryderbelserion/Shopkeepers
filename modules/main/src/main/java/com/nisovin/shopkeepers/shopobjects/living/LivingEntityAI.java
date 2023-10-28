@@ -40,11 +40,17 @@ import com.nisovin.shopkeepers.util.timer.Timer;
 import com.nisovin.shopkeepers.util.timer.Timings;
 
 /**
- * Handles gravity and look-at-nearby-players behavior.
+ * Handles the gravity and AI behavior, e.g. looking at nearby players, of
+ * {@link SKLivingShopObject}s.
  * <p>
- * It is assumed that entities usually don't change their initial chunk: Their gravity and AI
- * activation depend on whether their initial chunk has players nearby, rather than whether their
- * current chunk has players nearby.
+ * Shop objects must be {@link #addShopObject(SKLivingShopObject) added} when their entity has been
+ * spawned, and {@link #removeShopObject(SKLivingShopObject) removed} again when their entity is
+ * despawned.
+ * <p>
+ * It is assumed that the shop objects / entities don't change their initial location (chunk). If
+ * they do change their location, the AI system must be informed via
+ * {@link #updateLocation(SKLivingShopObject)} in order for their gravity and AI activation to still
+ * function correctly.
  */
 public class LivingEntityAI implements Listener {
 
@@ -301,6 +307,11 @@ public class LivingEntityAI implements Listener {
 		if (chunkData.activeGravity) {
 			activeGravityEntityCount--;
 		}
+	}
+
+	public void updateLocation(SKLivingShopObject<?> shopObject) {
+		this.removeShopObject(shopObject);
+		this.addShopObject(shopObject);
 	}
 
 	// STATISTICS

@@ -7,6 +7,7 @@ Date format: (YYYY-MM-DD)
 * Shulker shopkeepers peek at nearby players now.
   * This behavior can be disabled with the setting `shulker-peek-if-player-nearby` (default: `true`).
   * The setting `shulker-peek-height` (default `0.3`) defines how much the shulker opens when it peeks.
+* Fix: Moving shopkeepers did not update their location in the AI system, breaking gravity and AI activations when being moved out of their original chunk.
 * Internal: Add support for float values inside the config.
 * Internal: Shop objects are notified now whenever their AI is ticked.
 
