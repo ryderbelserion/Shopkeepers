@@ -3,8 +3,10 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.List;
 
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -13,9 +15,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
@@ -23,6 +27,7 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
@@ -104,6 +109,35 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 		// Only adjust the spawn location downwards if the shulker is oriented to stand on top of a
 		// block:
 		return this.getAttachedFace() == BlockFace.DOWN;
+	}
+
+	@Override
+	public void tickAI() {
+		super.tickAI();
+
+		this.peekIfPlayerNearby();
+	}
+
+	private void peekIfPlayerNearby() {
+		Shulker entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+
+		if (!Settings.shulkerPeekIfPlayerNearby) return;
+
+		Location entityLocation = entity.getLocation();
+		Player nearestPlayer = EntityUtils.getNearestPlayer(entityLocation, LivingEntityAI.LOOK_RANGE);
+		if (nearestPlayer != null) {
+			if (entity.getPeek() < 1.0f) {
+				// Vanilla uses 1.0 when the shulker attacks, and 0.3 when it peeks.
+				// The peeking is automatically animated on the client.
+				// This also plays sound effects to nearby players and triggers game events.
+				entity.setPeek(Settings.shulkerPeekHeight);
+			}
+		} else {
+			if (entity.getPeek() > 0.0f) {
+				entity.setPeek(0.0f);
+			}
+		}
 	}
 
 	@Override
@@ -199,6 +233,4 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	private void applyAttachedFace(Shulker entity) {
 		entity.setAttachedFace(this.getAttachedFace());
 	}
-
-	// TODO Open state (Peek)
 }

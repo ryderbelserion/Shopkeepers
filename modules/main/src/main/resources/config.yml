@@ -326,6 +326,12 @@ gravity-chunk-range: 4
 # Values above 3 are clearly noticeable and offer little additional benefit.
 mob-behavior-tick-period: 3
 
+# Whether shulker shopkeepers shall peek when a player is nearby.
+shulker-peek-if-player-nearby: true
+# A value between 0.0 and 1.0 that defines how much the shulker opens when it
+# peeks.
+shulker-peek-height: 0.3
+
 # Whether mob shopkeepers make sounds.
 silence-living-shop-entities: true
 

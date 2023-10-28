@@ -4,7 +4,11 @@ Date format: (YYYY-MM-DD)
 ## v2.18.1 (TBA)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+* Shulker shopkeepers peek at nearby players now.
+  * This behavior can be disabled with the setting `shulker-peek-if-player-nearby` (default: `true`).
+  * The setting `shulker-peek-height` (default `0.3`) defines how much the shulker opens when it peeks.
 * Internal: Add support for float values inside the config.
+* Internal: Shop objects are notified now whenever their AI is ticked.
 
 ## v2.18.0 (2023-10-02)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

@@ -207,6 +207,9 @@ public class Settings extends Config {
 	// period of 3 (maybe due to some interpolation artifact by the client).
 	public static int mobBehaviorTickPeriod = 3;
 
+	public static boolean shulkerPeekIfPlayerNearby = true;
+	public static float shulkerPeekHeight = 0.3F;
+
 	public static boolean silenceLivingShopEntities = true;
 
 	public static boolean showNameplates = true;
@@ -804,6 +807,11 @@ public class Settings extends Config {
 			Log.warning(this.getLogPrefix() + "'mob-behavior-tick-period' has to be positive.");
 			mobBehaviorTickPeriod = 1;
 		}
+		if (shulkerPeekHeight < 0 || shulkerPeekHeight > 1) {
+			Log.warning(this.getLogPrefix() + "'shulker-peek-height' must be between 0.0 and 1.0.");
+			shulkerPeekHeight = (shulkerPeekHeight < 0 ? 0 : 1);
+		}
+
 		// Certain items cannot be of type AIR:
 		if (shopCreationItem.getType() == Material.AIR) {
 			Log.warning(this.getLogPrefix() + "'shop-creation-item' can not be AIR.");

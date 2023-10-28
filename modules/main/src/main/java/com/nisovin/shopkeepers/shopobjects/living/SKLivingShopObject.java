@@ -335,8 +335,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 
 			// Overwrite AI:
 			this.overwriteAI();
-			// Register the entity for our custom AI processing:
-			livingShops.getLivingEntityAI().addEntity(entity);
+			// Register the shop object for our custom AI processing:
+			livingShops.getLivingEntityAI().addShopObject(this);
 
 			// Prevent raider shopkeepers from participating in nearby raids:
 			if (entity instanceof Raider) {
@@ -480,10 +480,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	}
 
 	protected void cleanupAI() {
-		E entity = Unsafe.assertNonNull(this.entity);
-
 		// Disable AI:
-		livingShops.getLivingEntityAI().removeEntity(entity);
+		livingShops.getLivingEntityAI().removeShopObject(this);
 	}
 
 	@Override
@@ -685,6 +683,24 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		lastSpawnLocation.setYaw(entityLoc.getYaw());
 		lastSpawnLocation.setPitch(entityLoc.getPitch());
 		entity.teleport(lastSpawnLocation);
+	}
+
+	// AI
+
+	/**
+	 * This is called whenever the AI of the entity is ticked, while it is in range of players. The
+	 * tick rate is defined by {@link Settings#mobBehaviorTickPeriod}. The AI might not be ticked
+	 * while the entity is currently falling.
+	 */
+	public void tickAI() {
+		LivingEntity entity = this.getEntity();
+		if (entity == null) return; // Unexpected
+
+		// Look at nearby players: Implemented by manually running the vanilla AI goal.
+		// In order to compensate for a reduced tick rate, we invoke the AI multiple times.
+		// Otherwise, the entity would turn its head more slowly and track the player for an
+		// increased duration.
+		NMSManager.getProvider().tickAI(entity, Settings.mobBehaviorTickPeriod);
 	}
 
 	// NAMING

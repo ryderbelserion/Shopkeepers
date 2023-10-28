@@ -68,6 +68,7 @@ import com.nisovin.shopkeepers.util.java.ClassUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 import com.nisovin.shopkeepers.villagers.RegularVillagers;
+import com.nisovin.shopkeepers.world.PlayerMap;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepersPlugin {
 
@@ -113,6 +114,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			Unsafe.initialized(this)
 	);
 
+	private final PlayerMap playerMap = new PlayerMap(Unsafe.initialized(this));
 	private final ItemConversions itemConversions = new ItemConversions(Unsafe.initialized(this));
 	private final Commands commands = new Commands(Unsafe.initialized(this));
 	private final ChatInput chatInput = new ChatInput(Unsafe.initialized(this));
@@ -347,6 +349,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// we register default shop types, etc., during onLoad).
 		Bukkit.getPluginManager().callEvent(new ShopkeepersStartupEvent());
 
+		playerMap.onEnable();
+
 		// Inform UI registry (registers UI event handlers):
 		uiRegistry.onEnable();
 
@@ -509,6 +513,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		shopObjectTypesRegistry.clearAll();
 		uiRegistry.clearAll();
 
+		playerMap.onDisable();
+
 		// Plugin metrics:
 		pluginMetrics.onDisable();
 
@@ -548,6 +554,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	@Override
 	public ApiInternals getApiInternals() {
 		return apiInternals;
+	}
+
+	// UTILITIES
+
+	public PlayerMap getPlayerMap() {
+		return playerMap;
 	}
 
 	// SHOPKEEPER REGISTRY

@@ -131,7 +131,7 @@ public class LivingEntityAI implements Listener {
 
 	private static class EntityData {
 
-		private final LivingEntity entity;
+		private final SKLivingShopObject<?> shopObject;
 		private final ChunkData chunkData;
 		// Initial threshold between [1, FALLING_CHECK_PERIOD_TICKS] for load balancing:
 		public final RateLimiter fallingCheckLimiter = new RateLimiter(
@@ -141,13 +141,13 @@ public class LivingEntityAI implements Listener {
 		public boolean falling = false;
 		public double distanceToGround = 0.0D;
 
-		public EntityData(LivingEntity entity, ChunkData chunkData) {
-			this.entity = entity;
+		public EntityData(SKLivingShopObject<?> shopObject, ChunkData chunkData) {
+			this.shopObject = shopObject;
 			this.chunkData = chunkData;
 		}
 
 		public boolean isAffectedByGravity() {
-			switch (entity.getType()) {
+			switch (shopObject.getEntityType()) {
 			case SHULKER:
 				return false;
 			default:
@@ -172,8 +172,8 @@ public class LivingEntityAI implements Listener {
 	}
 
 	private final Map<@NonNull ChunkCoords, @NonNull ChunkData> chunks = new LinkedHashMap<>();
-	// Index for fast removal: Entity -> EntityData
-	private final Map<@NonNull LivingEntity, @NonNull EntityData> entities = new HashMap<>();
+	// Index for fast removal: Shop object -> EntityData
+	private final Map<@NonNull SKLivingShopObject<?>, @NonNull EntityData> shopObjects = new HashMap<>();
 
 	private @Nullable BukkitTask aiTask = null;
 	private boolean currentlyRunning = false;
@@ -216,18 +216,23 @@ public class LivingEntityAI implements Listener {
 		HandlerList.unregisterAll(this); // Unregister listener
 		this.stopTask();
 		chunks.clear();
-		entities.clear();
+		shopObjects.clear();
 		this.resetStatistics();
 	}
 
-	// ENTITIES
+	// SHOP OBJECTS
 
-	public void addEntity(LivingEntity entity) {
-		Validate.notNull(entity, "entity is null");
-		Validate.isTrue(entity.isValid(), "entity is invalid");
+	public void addShopObject(SKLivingShopObject<?> shopObject) {
+		Validate.notNull(shopObject, "shopObject is null");
 		Validate.State.isTrue(!currentlyRunning,
-				"Cannot add entities while the AI task is running!");
-		Validate.isTrue(!entities.containsKey(entity), "entity is already added");
+				"Cannot add shop objects while the AI task is running!");
+		Validate.isTrue(!shopObjects.containsKey(shopObject), "shopObject is already added");
+
+		// Note: We expect that the shop object is unregistered again when its entity is despawned.
+		LivingEntity entity = shopObject.getEntity();
+		Validate.notNull(entity, "shopObject is not spawned currently!");
+		assert entity != null;
+		Validate.isTrue(entity.isValid(), "entity is invalid");
 
 		// Determine entity chunk (asserts that the entity won't move!):
 		// We assert that the chunk is loaded (checked above by isValid call).
@@ -252,8 +257,8 @@ public class LivingEntityAI implements Listener {
 		}
 
 		// Add entity entry:
-		EntityData entityData = new EntityData(entity, chunkData);
-		entities.put(entity, entityData);
+		EntityData entityData = new EntityData(shopObject, chunkData);
+		shopObjects.put(shopObject, entityData);
 		chunkData.entities.add(entityData);
 
 		// Update entity statistics:
@@ -268,12 +273,12 @@ public class LivingEntityAI implements Listener {
 		this.startTask();
 	}
 
-	public void removeEntity(LivingEntity entity) {
+	public void removeShopObject(SKLivingShopObject<?> shopObject) {
 		Validate.State.isTrue(!currentlyRunning,
 				"Cannot remove entities while the AI task is running!");
-		// Remove entity:
-		EntityData entityData = entities.remove(entity);
-		if (entityData == null) return; // Entity was not contained
+		// Remove shop object:
+		EntityData entityData = shopObjects.remove(shopObject);
+		if (entityData == null) return; // Shop object was not added
 
 		ChunkData chunkData = entityData.chunkData;
 		chunkData.entities.remove(entityData);
@@ -314,7 +319,7 @@ public class LivingEntityAI implements Listener {
 	}
 
 	public int getEntityCount() {
-		return entities.size();
+		return shopObjects.size();
 	}
 
 	public int getActiveAIChunksCount() {
@@ -383,7 +388,7 @@ public class LivingEntityAI implements Listener {
 			// Skip if there are no entities with AI currently:
 			// Note: We keep the task running, because frequently starting and stopping the task
 			// would be associated with a certain overhead as well.
-			if (entities.isEmpty()) {
+			if (shopObjects.isEmpty()) {
 				return;
 			}
 
@@ -560,7 +565,12 @@ public class LivingEntityAI implements Listener {
 
 	private void processEntity(EntityData entityData) {
 		assert entityData != null;
-		LivingEntity entity = entityData.entity;
+		LivingEntity entity = entityData.shopObject.getEntity();
+
+		// Unexpected: The shop object is supposed to unregister itself from the AI system when it
+		// despawns its entity.
+		if (entity == null) return;
+
 		// Note: Checking entity.isValid() is relatively heavy (compared to other operations) due to
 		// a chunk lookup. The entity's entry is already immediately getting removed as reaction to
 		// its chunk being unloaded. So there should be no need to check for that here.
@@ -616,7 +626,7 @@ public class LivingEntityAI implements Listener {
 			// performance-wise, even accessing the chunk / the block's type is already comparable
 			// to the raytrace itself, and that this optimization attempt even adds a small
 			// performance impact on top instead.
-			LivingEntity entity = entityData.entity;
+			LivingEntity entity = Unsafe.assertNonNull(entityData.shopObject.getEntity());
 			Location entityLocation = Unsafe.assertNonNull(entity.getLocation(sharedLocation));
 
 			// The entity may be able to stand on certain types of fluids:
@@ -666,7 +676,8 @@ public class LivingEntityAI implements Listener {
 	// Gets run every behavior update while falling:
 	private void tickFalling(EntityData entityData) {
 		assert entityData.falling && entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD;
-		LivingEntity entity = entityData.entity;
+		LivingEntity entity = Unsafe.assertNonNull(entityData.shopObject.getEntity());
+
 		// Determine falling step size:
 		double fallingStepSize;
 		double remainingDistance = (entityData.distanceToGround - maxFallingDistancePerUpdate);
@@ -689,21 +700,12 @@ public class LivingEntityAI implements Listener {
 
 	// ENTITY AI
 
+	// Gets run every behavior update while in range of players:
 	private void processAI(EntityData entityData) {
 		// Only tick AI if not currently falling:
-		if (!entityData.falling) {
-			LivingEntity entity = entityData.entity;
-			this.tickAI(entity);
-		}
-	}
+		if (entityData.falling) return;
 
-	// Gets run every behavior update while in range of players:
-	private void tickAI(LivingEntity entity) {
-		// Look at nearby players: Implemented by manually running the vanilla AI goal.
-		// In order to compensate for a reduced tick rate, we invoke the AI multiple times.
-		// Otherwise, the entity would turn its head more slowly and track the player for an
-		// increased duration.
-		NMSManager.getProvider().tickAI(entity, Settings.mobBehaviorTickPeriod);
+		entityData.shopObject.tickAI();
 	}
 
 	// EVENT HANDLERS

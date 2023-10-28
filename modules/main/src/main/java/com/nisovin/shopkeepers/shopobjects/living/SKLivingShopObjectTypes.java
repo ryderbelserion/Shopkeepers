@@ -105,7 +105,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * to is broken, or is not a full block face, or when a block in the opposite direction would block
  * it from opening, but this does not apply when the shulker is placed in a non-empty (i.e.
  * passable) block: In that case it considers all orientations invalid and therefore keeps its
- * current orientation, TODO peek state
+ * current orientation.
  * <li>HORSE: okay, TODO Add support for more armor variants (1.20)
  * <li>MULE: okay
  * <li>DONKEY: okay

@@ -24,12 +24,16 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public final class EntityUtils {
+
+	// Temporarily re-used location object:
+	private static final Location SHARED_LOCATION = new Location(null, 0, 0, 0);
 
 	private static final Set<@NonNull Material> LAVA = Collections.singleton(Material.LAVA);
 
@@ -142,6 +146,61 @@ public final class EntityUtils {
 		} else {
 			return (entity) -> acceptedTypes.contains(entity.getType());
 		}
+	}
+
+	public static @Nullable Player getNearestPlayer(Location location, double radius) {
+		return getNearestPlayer(location, radius, PredicateUtils.alwaysTrue());
+	}
+
+	public static @Nullable Player getNearestPlayer(
+			Location location,
+			double radius,
+			Predicate<? super @NonNull Player> filter
+	) {
+		World world = location.getWorld();
+		if (world == null) return null;
+
+		double radiusSq = radius * radius;
+		Player nearestPlayer = null;
+		double nearestDistanceSq = Double.MAX_VALUE;
+		for (Player player : SKShopkeepersPlugin.getInstance().getPlayerMap().getPlayers(world.getName())) {
+			Location playerLocation = Unsafe.assertNonNull(player.getLocation(SHARED_LOCATION));
+			double distanceSq = LocationUtils.getDistanceSquared(playerLocation, location);
+			if (distanceSq <= radiusSq
+					&& distanceSq < nearestDistanceSq
+					&& filter.test(player)) {
+				nearestPlayer = player;
+				nearestDistanceSq = distanceSq;
+			}
+			SHARED_LOCATION.setWorld(null); // Reset
+		}
+		return nearestPlayer;
+	}
+
+	public static List<@NonNull Player> getNearbyPlayers(Location location, double radius) {
+		return getNearbyPlayers(location, radius, PredicateUtils.alwaysTrue());
+	}
+
+	public static List<@NonNull Player> getNearbyPlayers(
+			Location location,
+			double radius,
+			Predicate<? super @NonNull Player> filter
+	) {
+		List<@NonNull Player> players = new ArrayList<>();
+		World world = location.getWorld();
+		if (world == null) return players;
+
+		double radiusSq = radius * radius;
+		SKShopkeepersPlugin.getInstance().getPlayerMap().getPlayers(world.getName()).forEach(player -> {
+			assert player != null;
+			Location playerLocation = Unsafe.assertNonNull(player.getLocation(SHARED_LOCATION));
+			if (LocationUtils.getDistanceSquared(playerLocation, location) <= radiusSq
+					&& filter.test(Unsafe.assertNonNull(player))) {
+				players.add(player);
+			}
+			SHARED_LOCATION.setWorld(null); // Reset
+		});
+		return players;
 	}
 
 	// If searchedTypes is empty, this includes all entity types.
