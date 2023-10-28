@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.18.1 (TBA)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+* Internal: Add support for float values inside the config.
 
 ## v2.18.0 (2023-10-02)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

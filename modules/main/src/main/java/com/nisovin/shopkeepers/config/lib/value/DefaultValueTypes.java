@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.config.lib.value.types.BooleanValue;
 import com.nisovin.shopkeepers.config.lib.value.types.DoubleValue;
 import com.nisovin.shopkeepers.config.lib.value.types.EntityTypeValue;
 import com.nisovin.shopkeepers.config.lib.value.types.EnumValue;
+import com.nisovin.shopkeepers.config.lib.value.types.FloatValue;
 import com.nisovin.shopkeepers.config.lib.value.types.IntegerValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ItemDataValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ListValue;
@@ -42,6 +43,8 @@ public class DefaultValueTypes {
 		registry.register(int.class, IntegerValue.INSTANCE);
 		registry.register(Double.class, DoubleValue.INSTANCE);
 		registry.register(double.class, DoubleValue.INSTANCE);
+		registry.register(Float.class, FloatValue.INSTANCE);
+		registry.register(float.class, FloatValue.INSTANCE);
 		registry.register(Long.class, LongValue.INSTANCE);
 		registry.register(long.class, LongValue.INSTANCE);
 
