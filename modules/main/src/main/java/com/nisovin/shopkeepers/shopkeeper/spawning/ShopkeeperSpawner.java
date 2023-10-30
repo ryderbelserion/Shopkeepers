@@ -380,6 +380,8 @@ public class ShopkeeperSpawner {
 		// Reset the shopkeeper's spawn state:
 		this.updateSpawnState(shopkeeper, State.DESPAWNED);
 
+		// TODO Handle dynamic disabling of shop object types by despawning the corresponding shop
+		// objects.
 		if (!shopObjectType.isEnabled()) {
 			Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
 					+ "Object type '" + shopObjectType.getIdentifier()

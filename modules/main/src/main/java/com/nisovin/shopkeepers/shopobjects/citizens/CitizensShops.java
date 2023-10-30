@@ -114,7 +114,44 @@ public class CitizensShops {
 	 * @return <code>true</code> if currently enabled
 	 */
 	public boolean isEnabled() {
+		this.verifyCitizensAPIAvailable();
 		return citizensShopsEnabled;
+	}
+
+	/**
+	 * Verify that the Citizens API is still available, and otherwise disable the Citizen shops.
+	 * 
+	 * @see CitizensShops#isCitizensAPIAvailable()
+	 */
+	private void verifyCitizensAPIAvailable() {
+		if (!citizensShopsEnabled) return;
+
+		if (!this.isCitizensAPIAvailable()) {
+			Log.debug("No valid Citizens API implementation available."
+					+ " Disabling the Citizen shops.");
+			this.disable();
+			return;
+		}
+	}
+
+	/**
+	 * Check if the Citizens API has a valid implementation set.
+	 * <p>
+	 * This assumes that the caller has already verified that the Citizens plugin is currently
+	 * enabled.
+	 * <p>
+	 * In the past, we encountered situations in which the Citizens plugin reported as "enabled" but
+	 * no CitizensAPI implementation was set. Or if an error occurs during the enabling of Citizens,
+	 * an implementation might be set, but cannot actually be used (e.g.
+	 * {@link CitizensAPI#getNPCRegistry()} might return <code>null</code> then). Or if plugins like
+	 * PlugMan reload the Citizens plugin, the Citizens API might not be properly initialized
+	 * either, maybe due to the plugin's classes being reloaded in a new class loader.
+	 * 
+	 * @return <code>true</code> if a valid Citizens API implementation is available
+	 */
+	private boolean isCitizensAPIAvailable() {
+		assert CitizensDependency.isPluginEnabled();
+		return CitizensAPI.hasImplementation() && CitizensAPI.getNPCRegistry() != null;
 	}
 
 	void enable() {
@@ -128,6 +165,12 @@ public class CitizensShops {
 			Log.debug("Citizen shops enabled, but Citizens plugin not found or disabled.");
 			return;
 		}
+		if (!this.isCitizensAPIAvailable()) {
+			Log.debug("Citizen shops enabled, but Citizens API not available. Did the Citizens "
+					+ "plugin enable correctly? Or did you try to reload the Citizens plugin?");
+			return;
+		}
+
 		Log.info("Citizens found: Enabling NPC shopkeepers.");
 
 		// Register shopkeeper trait:
