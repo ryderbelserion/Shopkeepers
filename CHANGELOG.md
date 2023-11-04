@@ -11,6 +11,7 @@ Date format: (YYYY-MM-DD)
 * Fix: Verify that the Citizens API is still available before we try to use it. This guards against cases in which the Citizens plugin reports as "enabled", but the Citizens API is not in a properly initialized state. Reloading the Citizens plugin via PlugMan also seems to leave the Citizens API in an unusable state.
 * Internal: Add support for float values inside the config.
 * Internal: Shop objects are notified now whenever their AI is ticked.
+* Internal: Minor refactors related to trade merging.
 
 ## v2.18.0 (2023-10-02)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

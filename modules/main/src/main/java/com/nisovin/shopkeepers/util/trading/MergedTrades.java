@@ -102,29 +102,32 @@ public class MergedTrades {
 	}
 
 	/**
-	 * Checks if the given {@link MergedTrades} can be merged with this {@link MergedTrades}.
+	 * Checks if the given trade event can be merged with this {@link MergedTrades}.
 	 * <p>
 	 * I.e. this checks if the trades involve the same player, shopkeeper, and items.
 	 * 
-	 * @param otherTrades
-	 *            the other trades, not <code>null</code>
-	 * @return <code>true</code> if the trades can be merged
+	 * @param tradeEvent
+	 *            the trade event, not <code>null</code>
+	 * @param requireSameClickEvent
+	 *            <code>true</code> to only merge the trades if they were triggered by the same
+	 *            click event
+	 * @return <code>true</code> if the trade event can be merged
 	 */
-	public boolean canMerge(MergedTrades otherTrades) {
-		Validate.notNull(otherTrades, "otherTrades is null");
-		ShopkeeperTradeEvent otherInitialTrade = otherTrades.getInitialTrade();
-		if (initialTrade.getClickEvent() != otherInitialTrade.getClickEvent()) {
-			if (initialTrade.getPlayer() != otherInitialTrade.getPlayer()) return false;
-			if (initialTrade.getShopkeeper() != otherInitialTrade.getShopkeeper()) return false;
+	public boolean canMerge(ShopkeeperTradeEvent tradeEvent, boolean requireSameClickEvent) {
+		Validate.notNull(tradeEvent, "tradeEvent is null");
+		if (initialTrade.getClickEvent() != tradeEvent.getClickEvent()) {
+			if (requireSameClickEvent) return false;
+			if (initialTrade.getPlayer() != tradeEvent.getPlayer()) return false;
+			if (initialTrade.getShopkeeper() != tradeEvent.getShopkeeper()) return false;
 
 			// Note: We do not compare the trading recipes here, because the items offered by the
 			// player might be different to those of the trading recipe, and therefore also among
 			// trades that use the same trading recipe.
 			// Items are compared with equals instead of isSimilar to also take stack sizes into
 			// account:
-			if (!Objects.equals(this.getResultItem(), otherTrades.getResultItem())) return false;
-			if (!Objects.equals(this.getOfferedItem1(), otherTrades.getOfferedItem1())) return false;
-			if (!Objects.equals(this.getOfferedItem2(), otherTrades.getOfferedItem2())) return false;
+			if (!Objects.equals(this.getResultItem(), tradeEvent.getTradingRecipe().getResultItem())) return false;
+			if (!Objects.equals(this.getOfferedItem1(), tradeEvent.getOfferedItem1())) return false;
+			if (!Objects.equals(this.getOfferedItem2(), tradeEvent.getOfferedItem2())) return false;
 		} else {
 			// We assume that the player, shopkeeper, and the involved items (offered items and the
 			// result item) remain the same throughout the same click event (this avoids costly item
@@ -133,15 +136,15 @@ public class MergedTrades {
 			// (i.e. of the offered items and the result items) might have changed. We consider
 			// these to be a separate kinds of trades then.
 			int resultItemAmount = this.getResultItem().getAmount();
-			int otherResultItemAmount = otherTrades.getResultItem().getAmount();
+			int otherResultItemAmount = tradeEvent.getTradingRecipe().getResultItem().getAmount();
 			if (resultItemAmount != otherResultItemAmount) return false;
 
 			int offeredItem1Amount = this.getOfferedItem1().getAmount();
-			int otherOfferedItem1Amount = otherTrades.getOfferedItem1().getAmount();
+			int otherOfferedItem1Amount = tradeEvent.getOfferedItem1().getAmount();
 			if (offeredItem1Amount != otherOfferedItem1Amount) return false;
 
 			int offeredItem2Amount = ItemUtils.getItemStackAmount(this.getOfferedItem2());
-			int otherOfferedItem2Amount = ItemUtils.getItemStackAmount(otherTrades.getOfferedItem2());
+			int otherOfferedItem2Amount = ItemUtils.getItemStackAmount(tradeEvent.getOfferedItem2());
 			if (offeredItem2Amount != otherOfferedItem2Amount) return false;
 		}
 		return true;

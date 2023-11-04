@@ -154,49 +154,27 @@ public class TradeMerger {
 	 */
 	public void mergeTrade(ShopkeeperTradeEvent tradeEvent) {
 		Validate.notNull(tradeEvent, "tradeEvent is null");
-		// In order to check if the trade can be merged with the previous trades, we most likely
-		// need to retrieve item copies from the event. By creating the new MergedTrades right away,
-		// instead of only afterwards when it is actually required, we can cache these item copies
-		// and only need to retrieve them once. This is therefore cheaper most of the time.
-		MergedTrades newMergedTrades = new MergedTrades(tradeEvent);
 		long nowNanos = System.nanoTime();
 		MergedTrades previousTrades = this.previousTrades;
 		if (previousTrades == null) {
 			// There are no previous trades to merge with.
-			this.previousTrades = newMergedTrades;
+			this.previousTrades = new MergedTrades(tradeEvent);
 			mergeEndNanos = nowNanos + mergeDurationNanos;
 			lastMergedTradeNanos = nowNanos;
 			this.startDelayedTasks();
-		} else if (this.tryMergeTrades(previousTrades, newMergedTrades, mergeMode)) {
-			// The trade was merged with the previous trades.
+		} else if (previousTrades.canMerge(tradeEvent, mergeMode == MergeMode.SAME_CLICK_EVENT)) {
+			// Merge the trade with the previous trades:
+			previousTrades.addTrades(1);
 			lastMergedTradeNanos = nowNanos;
 		} else {
 			// The trade could not be merged with the previous trades.
 			this.processPreviousTrades();
 			assert this.previousTrades == null;
-			this.previousTrades = newMergedTrades;
+			this.previousTrades = new MergedTrades(tradeEvent);
 			mergeEndNanos = nowNanos + mergeDurationNanos;
 			lastMergedTradeNanos = nowNanos;
 			this.startDelayedTasks();
 		}
-	}
-
-	private boolean canMergeTrades(MergedTrades target, MergedTrades other, MergeMode mergeMode) {
-		if (mergeMode == MergeMode.SAME_CLICK_EVENT) {
-			if (target.getInitialTrade().getClickEvent() != other.getInitialTrade().getClickEvent()) {
-				return false;
-			}
-		}
-		return target.canMerge(other);
-	}
-
-	private boolean tryMergeTrades(MergedTrades target, MergedTrades other, MergeMode mergeMode) {
-		if (this.canMergeTrades(target, other, mergeMode)) {
-			// Merge trades:
-			target.addTrades(other.getTradeCount());
-			return true;
-		}
-		return false;
 	}
 
 	private void endDelayedTasks() {
