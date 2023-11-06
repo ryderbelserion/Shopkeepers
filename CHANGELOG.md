@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
   * The setting `shulker-peek-height` (default `0.3`) defines how much the shulker opens when it peeks.
 * Fix: Moving shopkeepers did not update their location in the AI system, breaking gravity and AI activations when being moved out of their original chunk.
 * Fix: Verify that the Citizens API is still available before we try to use it. This guards against cases in which the Citizens plugin reports as "enabled", but the Citizens API is not in a properly initialized state. Reloading the Citizens plugin via PlugMan also seems to leave the Citizens API in an unusable state.
+* Fix: The check whether the cursor can hold the traded item was off by one, unnecessarily preventing trades in some cases.
 * Internal: Add support for float values inside the config.
 * Internal: Shop objects are notified now whenever their AI is ticked.
 * Internal: Minor refactors related to trade merging.

@@ -324,7 +324,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		assert slotItem != null;
 		Unsafe.assertNonNull(slotItem);
 		if (!itemStack.isSimilar(slotItem)) return false;
-		return slotItem.getAmount() + itemStack.getAmount() < itemStack.getMaxStackSize();
+		return slotItem.getAmount() + itemStack.getAmount() <= itemStack.getMaxStackSize();
 	}
 
 	// Late processing, so that other plugins can cancel the trading without having to rely on
@@ -359,7 +359,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		if (action == InventoryAction.COLLECT_TO_CURSOR
 				&& ItemUtils.isSimilar(resultItem, cursor)) {
 			// MC-129515: In the past, the behavior of this inventory action was rather weird and
-			// buggy if the clicked item matches the trade result item. We therefore cancle and
+			// buggy if the clicked item matches the trade result item. We therefore cancel and
 			// ignore it if the cursor item matches the result item.
 			// MC-148867: Since MC 1.14, Mojang fully disabled this inventory action inside the
 			// trading UI, so this case should no longer be reached. We still explicitly cancel it,
@@ -482,9 +482,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				// Check if there is enough space in the player's inventory:
 				ItemStack[] newPlayerContents = playerInventory.getStorageContents();
 
-				// Minecraft is adding items in reverse container order (starting with
-				// hotbar slot 9), so we reverse the player contents accordingly before adding
-				// items:
+				// Minecraft is adding items in reverse container order (starting with hotbar slot
+				// 9), so we reverse the player contents accordingly before adding items:
 				// Changes write through to the original array.
 				List<ItemStack> listView = Arrays.asList(newPlayerContents);
 				List<ItemStack> hotbarView = listView.subList(0, 9);
@@ -531,8 +530,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			}
 			this.updateTrades(player);
 		} else {
-			// The inventory action involves the result slot, but does not usually trigger a
-			// trade, or is not supported yet.
+			// The inventory action involves the result slot, but does not usually trigger a trade,
+			// or is not supported yet.
 		}
 	}
 
