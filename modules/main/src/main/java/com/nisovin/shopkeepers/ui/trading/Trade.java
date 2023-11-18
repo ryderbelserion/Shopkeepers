@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.ui.trading;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -7,8 +8,12 @@ import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.KeyValueStore;
 import com.nisovin.shopkeepers.util.java.MapBasedKeyValueStore;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -25,6 +30,9 @@ public final class Trade {
 	private final @Nullable ItemStack offeredItem2;
 	private final boolean swappedItemOrder;
 	private final KeyValueStore metadata = new MapBasedKeyValueStore();
+	private final ShopkeeperTradeEvent tradeEvent;
+
+	private boolean tradeEventCalled = false;
 
 	/**
 	 * Creates a new {@link Trade}.
@@ -61,6 +69,30 @@ public final class Trade {
 		this.offeredItem1 = offeredItem1;
 		this.offeredItem2 = offeredItem2;
 		this.swappedItemOrder = swappedItemOrder;
+
+		// Prepare the offered items for the trade event: Clone and ensure that the stack sizes
+		// match the trading recipe.
+		ItemStack eventOfferedItem1 = ItemUtils.copyWithAmount(
+				offeredItem1,
+				tradingRecipe.getItem1().getAmount()
+		);
+		ItemStack eventOfferedItem2 = ItemUtils.cloneOrNullIfEmpty(offeredItem2);
+		if (eventOfferedItem2 != null) {
+			// Not null: Minecraft disables the trade if there is second offered item but the trade
+			// only expects a single item.
+			UnmodifiableItemStack recipeItem2 = Unsafe.assertNonNull(tradingRecipe.getItem2());
+			eventOfferedItem2.setAmount(recipeItem2.getAmount());
+		}
+
+		this.tradeEvent = new ShopkeeperTradeEvent(
+				tradingContext.getShopkeeper(),
+				tradingContext.getTradingPlayer(),
+				tradingContext.getInventoryClickEvent(),
+				tradingRecipe,
+				UnmodifiableItemStack.ofNonNull(eventOfferedItem1),
+				UnmodifiableItemStack.of(eventOfferedItem2),
+				swappedItemOrder
+		);
 	}
 
 	/**
@@ -204,5 +236,36 @@ public final class Trade {
 	 */
 	public KeyValueStore getMetadata() {
 		return metadata;
+	}
+
+	/**
+	 * Gets the corresponding {@link ShopkeeperTradeEvent}.
+	 * 
+	 * @return the trade event, not <code>null</code>
+	 */
+	public ShopkeeperTradeEvent getTradeEvent() {
+		return tradeEvent;
+	}
+
+	/**
+	 * Calls the {@link #getTradeEvent() trade event}, giving other plugins a chance to cancel or
+	 * alter the trade before it gets applied.
+	 * 
+	 * @return the trade event
+	 */
+	public ShopkeeperTradeEvent callTradeEvent() {
+		tradeEventCalled = true;
+
+		Bukkit.getPluginManager().callEvent(tradeEvent);
+		return tradeEvent;
+	}
+
+	/**
+	 * Whether the {@link #getTradeEvent() trade event} has already been called.
+	 * 
+	 * @return <code>true</code> if the trade event was already called
+	 */
+	public boolean isTradeEventCalled() {
+		return tradeEventCalled;
 	}
 }

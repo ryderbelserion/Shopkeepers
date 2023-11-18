@@ -57,6 +57,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	@Override
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
+
 		AbstractPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = trade.getTradingPlayer();
 
@@ -115,18 +116,13 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		if (containerInventory != null && newContainerContents != null) {
 			containerInventory.setContents(Unsafe.castNonNull(newContainerContents));
 		}
-
-		// Reset trade related state information:
-		this.resetTradeState();
 	}
 
 	@Override
-	protected void onTradeAborted(TradingContext tradingContext, boolean silent) {
-		super.onTradeAborted(tradingContext, silent);
-		this.resetTradeState();
-	}
+	protected void onTradeOver(TradingContext tradingContext) {
+		super.onTradeOver(tradingContext);
 
-	protected void resetTradeState() {
+		// Reset trade related state:
 		containerInventory = null;
 		newContainerContents = null;
 	}

@@ -74,6 +74,8 @@ public class TradeRecord {
 	// These items might not necessarily be equal the items required by the trade (they only have to
 	// 'match' / be accepted). Their amounts match those of the trading recipe.
 	// The order in which the player provided the items in the trading interface is not recorded.
+	// Note: We only record the trade's original trading recipe items currently. If any plugins
+	// modified the received or result items, those changes are not captured by the trade log.
 	private final UnmodifiableItemStack resultItem; // Not null
 	private final UnmodifiableItemStack item1; // Not null
 	private final @Nullable UnmodifiableItemStack item2; // Can be null

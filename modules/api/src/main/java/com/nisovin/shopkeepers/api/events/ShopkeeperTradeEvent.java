@@ -1,30 +1,50 @@
 package com.nisovin.shopkeepers.api.events;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.trading.TradeEffect;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
- * This event is called whenever a player is about to trade with a shopkeeper. Canceling it will
- * cause the trade to not get applied.
+ * This event is called whenever a player is about to trade with a shopkeeper.
  * <p>
- * Depending on the inventory action, a single inventory click of a player might trigger several
- * successive trades (possibly even using different trading recipes). Canceling a trade will also
- * cancel all successive trades.
+ * This event can be used to cancel the trade, or alter the items that the player or the shopkeeper
+ * will receive once the trade is actually applied. When the result item or any of the "received"
+ * items are modified, applying the trade will still remove the trading recipe's original items from
+ * the shop's container and reduce the original items offered by the player, but the shopkeeper and
+ * player will instead receive the modified items specified by this event.
  * <p>
- * All other preconditions regarding the trade have already been checked before this event gets
- * called. So if this event does not get cancelled you can assume that the trade is going to get
- * applied.
+ * Setting the result or any of the "received" items to <code>null</code> or an empty item stack
+ * will cause the trade to be applied like normal, but the trading player or shopkeeper will not
+ * receive the cleared items. This can for example be used to implement items that have a different
+ * effect when being traded, such as a command being executed, or the player or shop owner receiving
+ * some other kind of reward.
+ * <p>
+ * Depending on the inventory action, a single inventory click of a player can trigger several
+ * successive trades. These trades might even use different trading recipes. This event is called
+ * for each of these trades. Canceling a trade will also cancel all successive trades that might
+ * otherwise have been triggered by the same click event.
+ * <p>
+ * This event cannot be used to determine whether the trade will actually take place. For example,
+ * the shopkeeper might abort the trade if the player does not have the necessary inventory space
+ * available to receive the result items. Use {@link #getTradeEffects()} to register effects that
+ * are invoked when the trade is either aborted or applied. Use the
+ * {@link ShopkeeperTradeCompletedEvent} for anything that must only happen once the trade has been
+ * successfully applied, such as logging.
  * <p>
  * DO NOT modify the corresponding {@link InventoryClickEvent}, any affected inventories (player,
- * merchant, shop container, etc.), or any other state which might be affected by the trade during
+ * merchant, shop container, etc.), or any other state that might be affected by the trade during
  * the handling of this event!
  */
 public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable {
@@ -35,6 +55,15 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	private final UnmodifiableItemStack offeredItem1;
 	private final @Nullable UnmodifiableItemStack offeredItem2;
 	private final boolean swappedItemOrder;
+
+	private @Nullable UnmodifiableItemStack receivedItem1;
+	private @Nullable UnmodifiableItemStack receivedItem2;
+	private @Nullable UnmodifiableItemStack resultItem;
+	private boolean receivedItem1Altered = false;
+	private boolean receivedItem2Altered = false;
+	private boolean resultItemAltered = false;
+
+	private List<@NonNull TradeEffect> tradeEffects = new ArrayList<>();
 	private boolean cancelled = false;
 
 	/**
@@ -80,6 +109,10 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 		this.offeredItem1 = offeredItem1;
 		this.offeredItem2 = offeredItem2; // Can be null
 		this.swappedItemOrder = swappedItemOrder;
+
+		this.receivedItem1 = offeredItem1;
+		this.receivedItem2 = offeredItem2;
+		this.resultItem = tradingRecipe.getResultItem();
 	}
 
 	/**
@@ -121,6 +154,9 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 * however can differ, but still be accepted for the trade depending on the item matching rules
 	 * of the used Minecraft version and the shopkeeper settings (i.e. with strict item comparisons
 	 * being disabled).
+	 * <p>
+	 * By default, this also matches the first item that the shopkeeper will receive. But the
+	 * received item can be altered via {@link #setReceivedItem1(UnmodifiableItemStack)}.
 	 * 
 	 * @return an unmodifiable view on the offered item that matches the first required item, not
 	 *         <code>null</code> or empty
@@ -137,6 +173,9 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 * however can differ, but still be accepted for the trade depending on the item matching rules
 	 * of the used Minecraft version and the shopkeeper settings (i.e. with strict item comparisons
 	 * being disabled).
+	 * <p>
+	 * By default, this also matches the second item that the shopkeeper will receive. But the
+	 * received item can be altered via {@link #setReceivedItem2(UnmodifiableItemStack)}.
 	 * 
 	 * @return an unmodifiable view on the offered item that matches the second required item, can
 	 *         be <code>null</code>
@@ -166,6 +205,148 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 */
 	public boolean isItemOrderSwapped() {
 		return swappedItemOrder;
+	}
+
+	/**
+	 * Gets an unmodifiable view on the first item that the shopkeeper will receive, or
+	 * <code>null</code> or empty if the shopkeeper will not receive any item.
+	 * <p>
+	 * By default, this equals the {@link #getOfferedItem1() first offered item}, but the item can
+	 * be altered via {@link #setReceivedItem1(UnmodifiableItemStack)}.
+	 * 
+	 * @return the first item that the shopkeeper will receive, or <code>null</code> or empty
+	 */
+	public @Nullable UnmodifiableItemStack getReceivedItem1() {
+		return receivedItem1;
+	}
+
+	/**
+	 * Sets the first item that the shopkeeper will receive.
+	 * <p>
+	 * Some shopkeepers might ignore modifications to the received items in certain cases. For
+	 * example, when adding or removing currency items to or from a shop's container, shopkeepers
+	 * will usually prefer using the currency items configured inside the config and the currency
+	 * amount specified by the trading offer.
+	 * 
+	 * @param itemStack
+	 *            the item that the shopkeeper will receive, or <code>null</code> or empty for the
+	 *            shopkeeper to not receive any item
+	 */
+	public void setReceivedItem1(@Nullable UnmodifiableItemStack itemStack) {
+		this.receivedItem1Altered = true;
+		this.receivedItem1 = itemStack;
+	}
+
+	/**
+	 * Whether the {@link #getReceivedItem1() first received item} was altered.
+	 * <p>
+	 * For performance reasons, we don't compare the new item with the original item, but only
+	 * detect whether {@link #setReceivedItem1(UnmodifiableItemStack)} has been called.
+	 * 
+	 * @return <code>true</code> if the first received item was altered.
+	 */
+	public boolean isReceivedItem1Altered() {
+		return receivedItem1Altered;
+	}
+
+	/**
+	 * Gets an unmodifiable view on the second item that the shopkeeper will receive, or
+	 * <code>null</code> or empty if the shopkeeper will not receive any item.
+	 * <p>
+	 * By default, this equals the {@link #getOfferedItem2() second offered item}, but the item can
+	 * be altered via {@link #setReceivedItem2(UnmodifiableItemStack)}.
+	 * 
+	 * @return the second item that the shopkeeper will receive, or <code>null</code> or empty
+	 */
+	public @Nullable UnmodifiableItemStack getReceivedItem2() {
+		return receivedItem2;
+	}
+
+	/**
+	 * Sets the second item that the shopkeeper will receive.
+	 * <p>
+	 * Some shopkeepers might ignore modifications to the received items in certain cases. For
+	 * example, when adding or removing currency items to or from a shop's container, shopkeepers
+	 * will usually prefer using the currency items configured inside the config and the currency
+	 * amount specified by the trading offer.
+	 * 
+	 * @param itemStack
+	 *            the item that the shopkeeper will receive, or <code>null</code> or empty for the
+	 *            shopkeeper to not receive any item
+	 */
+	public void setReceivedItem2(@Nullable UnmodifiableItemStack itemStack) {
+		this.receivedItem2Altered = true;
+		this.receivedItem2 = itemStack;
+	}
+
+	/**
+	 * Whether the {@link #getReceivedItem2() second received item} was altered.
+	 * <p>
+	 * For performance reasons, we don't compare the new item with the original item, but only
+	 * detect whether {@link #setReceivedItem2(UnmodifiableItemStack)} has been called.
+	 * 
+	 * @return <code>true</code> if the second received item was altered.
+	 */
+	public boolean isReceivedItem2Altered() {
+		return receivedItem2Altered;
+	}
+
+	/**
+	 * Gets an unmodifiable view on the result item that the player will receive, or
+	 * <code>null</code> or empty if the player will not receive any item.
+	 * <p>
+	 * By default, this equals the {@link TradingRecipe#getResultItem()}, but the item can be
+	 * altered via {@link #setResultItem(UnmodifiableItemStack)}.
+	 * 
+	 * @return the result item that the player will receive, or <code>null</code> or empty
+	 */
+	public @Nullable UnmodifiableItemStack getResultItem() {
+		return resultItem;
+	}
+
+	/**
+	 * Sets the result item that the player will receive.
+	 * <p>
+	 * Some shopkeepers might ignore modifications to the result item in certain cases. For example,
+	 * when removing items from a shop's container, shopkeepers will usually prefer checking for and
+	 * removing the trading recipe's original result item.
+	 * 
+	 * @param itemStack
+	 *            the result item, or <code>null</code> or empty for the player to not receive any
+	 *            item
+	 */
+	public void setResultItem(@Nullable UnmodifiableItemStack itemStack) {
+		this.resultItemAltered = true;
+		this.resultItem = itemStack;
+	}
+
+	/**
+	 * Whether the {@link #getResultItem() result item} was altered.
+	 * <p>
+	 * For performance reasons, we don't compare the new item with the original item, but only
+	 * detect whether {@link #setResultItem(UnmodifiableItemStack)} has been called.
+	 * 
+	 * @return <code>true</code> if the result item was altered.
+	 */
+	public boolean isResultItemAltered() {
+		return resultItemAltered;
+	}
+
+	/**
+	 * Gets a modifiable list of {@link TradeEffect}s that will be invoked once the trade is either
+	 * {@link TradeEffect#onTradeAborted(ShopkeeperTradeEvent) aborted} or
+	 * {@link TradeEffect#onTradeCompleted(ShopkeeperTradeEvent) successfully completed}.
+	 * <p>
+	 * This can for example be used to add custom trade effects, or for the implementation of some
+	 * of the built-in default trade effects. However, it is very likely that this list does not
+	 * represent all effects of the trade. For example, various components, including the shopkeeper
+	 * itself, may apply their own trade effects without those being represented in this list.
+	 * Consequently, clearing this list may not necessarily disable all effects of the trade.
+	 * 
+	 * @return the modifiable list of trade effects, not <code>null</code>
+	 */
+	public List<@NonNull TradeEffect> getTradeEffects() {
+		return tradeEffects;
 	}
 
 	/**

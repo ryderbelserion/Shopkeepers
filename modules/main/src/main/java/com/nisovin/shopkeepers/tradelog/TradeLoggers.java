@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperTradeCompletedEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.tradelog.csv.CsvTradeLogger;
@@ -79,10 +79,10 @@ public class TradeLoggers implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	void onTradeCompleted(ShopkeeperTradeEvent event) {
+	void onTradeCompleted(ShopkeeperTradeCompletedEvent event) {
 		if (loggers.isEmpty()) return; // Nothing to log
 
-		Unsafe.assertNonNull(tradeMerger).mergeTrade(event);
+		Unsafe.assertNonNull(tradeMerger).mergeTrade(event.getCompletedTrade());
 	}
 
 	private void processTrades(MergedTrades trades) {

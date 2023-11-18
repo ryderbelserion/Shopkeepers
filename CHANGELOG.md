@@ -1,7 +1,7 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.18.1 (TBA)
+## v2.19.0 (TBA)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
 * Shulker shopkeepers peek at nearby players now.
@@ -10,6 +10,18 @@ Date format: (YYYY-MM-DD)
 * Fix: Moving shopkeepers did not update their location in the AI system, breaking gravity and AI activations when being moved out of their original chunk.
 * Fix: Verify that the Citizens API is still available before we try to use it. This guards against cases in which the Citizens plugin reports as "enabled", but the Citizens API is not in a properly initialized state. Reloading the Citizens plugin via PlugMan also seems to leave the Citizens API in an unusable state.
 * Fix: The check whether the cursor can hold the traded item was off by one, unnecessarily preventing trades in some cases.
+* API (breaking): Changes to the `ShopkeeperTradeEvent`.
+  * The result item received by the trading player and the items received by the shopkeeper can now be altered via the `ShopkeeperTradeEvent` (`#get/setReceivedItem1/2`, `#get/setResultItem`).
+    * Breaking: Plugins that use this event can no longer assume that the received items equal those of the trading recipe.
+    * It is also possible to clear the received items. This might for example be useful when implementing items that apply alternative effects when traded (e.g. command items, or Vault integration).
+    * Trade logging and trade notifications still log the original items of the trading recipe.
+    * Some shopkeepers ignore changes to the received items in certain cases. For example, when removing items from a shop container or when adding or removing currency items to or from shop containers, the default shopkeepers will ignore any changes to the received items.
+  * Since the received items can now be modified by plugins during the trade event, the event is called earlier now, prior to certain inventory related checks.
+    * Breaking: Plugins can no longer assume that the trade will actually take place even if the trade event remains uncancelled.
+  * Add a non-cancellable `ShopkeeperTradeCompletedEvent` that is called if the trade actually took place, after all trade effects have been applied.
+  * Add `ShopkeeperTradeEvent#getTradeEffects` that allows custom `TradeEffect` instances to be added that are invoked when the trade is either aborted or completed.
+    * This can be useful when implementing custom trade effects that are meant to only be executed once the trade is actually applied.
+    * This might also be used for some of the built-in default trade effects in the future.
 * Internal: Add support for float values inside the config.
 * Internal: Shop objects are notified now whenever their AI is ticked.
 * Internal: Minor refactors related to trade merging.

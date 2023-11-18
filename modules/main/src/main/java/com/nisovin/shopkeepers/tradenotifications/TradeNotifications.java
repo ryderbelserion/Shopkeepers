@@ -15,6 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.ShopkeeperTradeCompletedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -218,8 +219,8 @@ public class TradeNotifications implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	void onTradeCompleted(ShopkeeperTradeEvent event) {
-		tradeMerger.mergeTrade(event);
+	void onTradeCompleted(ShopkeeperTradeCompletedEvent event) {
+		tradeMerger.mergeTrade(event.getCompletedTrade());
 	}
 
 	private void onTradesCompleted(MergedTrades mergedTrades) {

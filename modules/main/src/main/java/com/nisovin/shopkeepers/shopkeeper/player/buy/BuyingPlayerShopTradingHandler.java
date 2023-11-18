@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
@@ -13,13 +14,18 @@ import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.ui.trading.Trade;
+import com.nisovin.shopkeepers.ui.trading.TradingContext;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
+
+	/**
+	 * The offer corresponding to the currently processed trade.
+	 */
+	private @Nullable PriceOffer currentOffer = null;
 
 	protected BuyingPlayerShopTradingHandler(SKBuyingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
@@ -33,6 +39,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	@Override
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
+
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = trade.getTradingPlayer();
 		TradingRecipe tradingRecipe = trade.getTradingRecipe();
@@ -52,7 +59,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		// Validate the found offer:
 		int expectedBoughtItemAmount = offer.getItem().getAmount();
-		if (expectedBoughtItemAmount > boughtItem.getAmount()) {
+		if (expectedBoughtItemAmount != boughtItem.getAmount()) {
 			// Unexpected, because the recipe was created based on this offer.
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 			this.debugPreventedTrade(
@@ -62,9 +69,22 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
+		this.currentOffer = offer;
+
+		return true;
+	}
+
+	@Override
+	protected boolean finalTradePreparation(Trade trade) {
+		if (!super.finalTradePreparation(trade)) return false;
+
+		Player tradingPlayer = trade.getTradingPlayer();
+		PriceOffer offer = Unsafe.assertNonNull(this.currentOffer);
 		@Nullable ItemStack[] newContainerContents = Unsafe.assertNonNull(this.newContainerContents);
 
-		// Remove currency items from container contents:
+		// Remove the currency items from the container contents:
+		// Note: We always use the configured currency items here, ignoring any modifications to the
+		// "result" item during the trade event.
 		int remaining = this.removeCurrency(newContainerContents, offer.getPrice());
 		if (remaining > 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientCurrency);
@@ -82,22 +102,36 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		// Add bought items to container contents:
-		int amountAfterTaxes = this.getAmountAfterTaxes(expectedBoughtItemAmount);
-		if (amountAfterTaxes > 0) {
-			// The item the trading player gave might slightly differ from the required item,
-			// but is still accepted, depending on the used item comparison logic and settings.
-			ItemStack receivedItem = ItemUtils.copyWithAmount(trade.getOfferedItem1(), amountAfterTaxes);
-			if (InventoryUtils.addItems(newContainerContents, receivedItem) != 0) {
-				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
-				this.debugPreventedTrade(
-						tradingPlayer,
-						"The shop's container cannot hold the traded items."
-				);
-				return false;
-			}
+		// Add the bought items to the container contents, taking modifications to the trade event's
+		// "received" items into account:
+		// Note: Even if the received items were not altered by any plugins, depending on the used
+		// item comparison logic and settings, the items that the trading player offered might
+		// slightly differ the required items, but still be accepted.
+		// Note: Event handlers might set a second "received" item even if the original trade only
+		// involved a single item stack.
+		ShopkeeperTradeEvent tradeEvent = Unsafe.assertNonNull(trade.getTradeEvent());
+		UnmodifiableItemStack receivedItem1 = tradeEvent.getReceivedItem1();
+		UnmodifiableItemStack receivedItem2 = tradeEvent.getReceivedItem2();
+
+		if (this.addReceivedItem(newContainerContents, receivedItem1) != 0
+				|| this.addReceivedItem(newContainerContents, receivedItem2) != 0) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container cannot hold the received items."
+			);
+			return false;
 		}
+
 		return true;
+	}
+
+	@Override
+	protected void onTradeOver(TradingContext tradingContext) {
+		super.onTradeOver(tradingContext);
+
+		// Reset trade related state:
+		this.currentOffer = null;
 	}
 
 	// TODO Simplify this? Maybe by separating into different, general utility functions.

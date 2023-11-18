@@ -12,12 +12,10 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.currency.Currencies;
-import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.ui.trading.Trade;
+import com.nisovin.shopkeepers.ui.trading.TradingContext;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
@@ -26,7 +24,13 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-	private static final Predicate<@ReadOnly @Nullable ItemStack> WRITABLE_BOOK_MATCHER = ItemUtils.itemsOfType(Material.WRITABLE_BOOK);
+	private static final Predicate<@ReadOnly @Nullable ItemStack> WRITABLE_BOOK_MATCHER
+			= ItemUtils.itemsOfType(Material.WRITABLE_BOOK);
+
+	/**
+	 * The offer corresponding to the currently processed trade.
+	 */
+	private @Nullable BookOffer currentOffer = null;
 
 	protected BookPlayerShopTradingHandler(SKBookPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
@@ -40,6 +44,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	@Override
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
+
 		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = trade.getTradingPlayer();
 		TradingRecipe tradingRecipe = trade.getTradingRecipe();
@@ -80,6 +85,17 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
+		this.currentOffer = offer;
+
+		return true;
+	}
+
+	@Override
+	protected boolean finalTradePreparation(Trade trade) {
+		if (!super.finalTradePreparation(trade)) return false;
+
+		Player tradingPlayer = trade.getTradingPlayer();
+		BookOffer offer = Unsafe.assertNonNull(this.currentOffer);
 		@Nullable ItemStack[] newContainerContents = Unsafe.assertNonNull(this.newContainerContents);
 
 		// Remove a blank book from the container contents:
@@ -92,31 +108,27 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		// Add earnings to container contents:
+		// Add the earnings to the container contents:
+		// Note: We always use the configured currency items here, ignoring any modifications to the
+		// "received" items during the trade event.
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
-		if (amountAfterTaxes > 0) {
-			int remaining = amountAfterTaxes;
-			if (Currencies.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
-				Currency highCurrency = Currencies.getHigh();
-				int highCurrencyAmount = (remaining / highCurrency.getValue());
-				if (highCurrencyAmount > 0) {
-					ItemStack currencyItems = Currencies.getHigh().getItemData().createItemStack(highCurrencyAmount);
-					int remainingHighCurrency = InventoryUtils.addItems(newContainerContents, currencyItems);
-					remaining -= ((highCurrencyAmount - remainingHighCurrency) * highCurrency.getValue());
-				}
-			}
-			if (remaining > 0) {
-				ItemStack currencyItems = Currencies.getBase().getItemData().createItemStack(remaining);
-				if (InventoryUtils.addItems(newContainerContents, currencyItems) != 0) {
-					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
-					this.debugPreventedTrade(
-							tradingPlayer,
-							"The shop's container cannot hold the traded items."
-					);
-					return false;
-				}
-			}
+		if (this.addCurrencyItems(newContainerContents, amountAfterTaxes) != 0) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
+			this.debugPreventedTrade(
+					tradingPlayer,
+					"The shop's container cannot hold the traded items."
+			);
+			return false;
 		}
+
 		return true;
+	}
+
+	@Override
+	protected void onTradeOver(TradingContext tradingContext) {
+		super.onTradeOver(tradingContext);
+
+		// Reset trade related state:
+		this.currentOffer = null;
 	}
 }
