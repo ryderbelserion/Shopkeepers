@@ -595,7 +595,10 @@ trade-failed-sound:
   pitch: 2.0
   volume: 0.5
 
-# The percentage that should be removed from player shop earnings.
+# The percentage of items (0-100) that are removed from the items that shop
+# owners receive in trades in their shops.
+# Be careful: Depending on the configuration, shop owners may end up not
+# receiving any items!
 tax-rate: 0
 # Whether to round up instead of down when calculating the tax of a player shop
 # transaction.

@@ -968,11 +968,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Callback for subclasses.
 	}
 
-	// TODO Ensure a minimum amount of 1?
 	// Returns a value >= 0 and <= amount.
+	// Note: Depending on the configuration, the amount can end up 0.
 	protected int getAmountAfterTaxes(int amount) {
 		assert amount >= 0;
 		if (Settings.taxRate == 0) return amount;
+
 		int taxes;
 		if (Settings.taxRoundUp) {
 			taxes = (int) Math.ceil(amount * (Settings.taxRate / 100.0D));
