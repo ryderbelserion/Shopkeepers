@@ -96,6 +96,9 @@ permissions:
     shopkeeper.settradeperm:
         description: Set the trade permissions for admin shops
         default: op
+    shopkeeper.settradedcommand:
+        description: Set the traded command for the held item
+        default: op
     shopkeeper.setforhire:
         description: Set a shopkeeper to be for hire
         default: op

@@ -152,6 +152,10 @@ public interface ShopkeepersPlugin extends Plugin {
 	 */
 	public static final String SET_TRADE_PERM_PERMISSION = "shopkeeper.settradeperm";
 	/**
+	 * The <code>shopkeeper.settradedcommand</code> permission.
+	 */
+	public static final String SET_TRADED_COMMAND_PERMISSION = "shopkeeper.settradedcommand";
+	/**
 	 * The <code>shopkeeper.setforhire</code> permission.
 	 */
 	public static final String SET_FOR_HIRE_PERMISSION = "shopkeeper.setforhire";

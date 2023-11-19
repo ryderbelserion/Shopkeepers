@@ -386,6 +386,11 @@ public class Messages extends Config {
 	public static Text tradePermRemoved = Text.parse("&aThe shop's trading permission '&e{perm}&a' has been removed!");
 	public static Text tradePermView = Text.parse("&aThe shop's current trading permission is '&e{perm}&a'.");
 
+	public static Text tradedCommandSet = Text.parse("&aThe item's traded command has been set to '&e{command}&a'!");
+	public static Text tradedCommandRemoved = Text.parse("&aThe item's traded command has been removed!");
+	public static Text tradedCommandView = Text.parse("&aThe item's current traded command is '&e{command}&a'.");
+	public static Text tradedCommandViewUnset = Text.parse("&aThe item has no traded command assigned.");
+
 	public static Text zombieVillagerCuringDisabled = Text.parse("&7Curing of zombie villagers is disabled.");
 	public static Text mustHoldHireItem = Text.parse("&7You have to hold the required hire item in your hand.");
 	public static Text setForHire = Text.parse("&aThis shopkeeper can now be hired.");
@@ -757,6 +762,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
 	public static Text commandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");
 	public static Text commandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
+	public static Text commandDescriptionSettradedcommand = Text.parse("Sets, removes (-) or displays (?) the traded command of the held item.");
 	public static Text commandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
 	public static Text commandDescriptionSnapshotList = Text.parse("Lists the snapshots of a shop.");
 	public static Text commandDescriptionSnapshotCreate = Text.parse("Creates a new shop snapshot.");

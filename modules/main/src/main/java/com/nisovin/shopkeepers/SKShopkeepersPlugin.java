@@ -61,6 +61,7 @@ import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelog.TradeLoggers;
 import com.nisovin.shopkeepers.tradenotifications.TradeNotifications;
+import com.nisovin.shopkeepers.trading.commandtrading.CommandTrading;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
@@ -120,6 +121,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	private final ChatInput chatInput = new ChatInput(Unsafe.initialized(this));
 	private final InteractionInput interactionInput = new InteractionInput(Unsafe.initialized(this));
 
+	private final CommandTrading commandTrading = new CommandTrading(Unsafe.initialized(this));
 	private final TradeLoggers tradeLoggers = new TradeLoggers(Unsafe.initialized(this));
 	private final TradeNotifications tradeNotifications = new TradeNotifications(
 			Unsafe.initialized(this)
@@ -427,6 +429,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Player shops:
 		playerShops.onEnable();
 
+		commandTrading.onEnable();
+
 		// Trade loggers:
 		tradeLoggers.onEnable();
 
@@ -501,6 +505,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Player shops:
 		playerShops.onDisable();
+
+		commandTrading.onDisable();
 
 		// Trade loggers:
 		tradeLoggers.onDisable();

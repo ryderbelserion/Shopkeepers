@@ -7,6 +7,13 @@ Date format: (YYYY-MM-DD)
 * Shulker shopkeepers peek at nearby players now.
   * This behavior can be disabled with the setting `shulker-peek-if-player-nearby` (default: `true`).
   * The setting `shulker-peek-height` (default `0.3`) defines how much the shulker opens when it peeks.
+* Add: Support for setting up items that execute a command when being traded (either sold or bought).
+  * Add: Command `/shopkeeper setTradedCommand <command>` (permission `shopkeeper.settradedcommand`, default `op`): Sets the command to execute when the held item is traded.
+  * The command to execute is stored inside the item's data under the Bukkit key `shopkeepers:traded_command`.
+  * When an item that has a traded command assigned is traded, the item is destroyed and the assigned command is executed as often as there are items in the item stack.
+  * This feature is not meant to replace the requirement for custom third-party plugins or scripts in order to implement complex or custom behaviors. In order to reduce implementation and maintenance effort, only a single command can be assigned to an item and only a very limited set of placeholders is supported: `{player_name}`, `{player_uuid}`, `{player_displayName}`, `{shop_uuid}`.
+    * Simple command sequences can also be defined via command aliases in Bukkit's "commands.yml" (see https://bukkit.fandom.com/wiki/Commands.yml).
+    * If additional context information is required, e.g. about the shopkeeper's location or shop owner, a custom plugin that listens for the `ShopkeeperTradeEvent` might be better suited to implement the intended behavior.
 * Fix: Moving shopkeepers did not update their location in the AI system, breaking gravity and AI activations when being moved out of their original chunk.
 * Fix: Verify that the Citizens API is still available before we try to use it. This guards against cases in which the Citizens plugin reports as "enabled", but the Citizens API is not in a properly initialized state. Reloading the Citizens plugin via PlugMan also seems to leave the Citizens API in an unusable state.
 * Fix: The check whether the cursor can hold the traded item was off by one, unnecessarily preventing trades in some cases.
@@ -25,6 +32,13 @@ Date format: (YYYY-MM-DD)
 * Internal: Add support for float values inside the config.
 * Internal: Shop objects are notified now whenever their AI is ticked.
 * Internal: Minor refactors related to trade merging.
+
+**Message changes:**  
+* Added `traded-command-set`.
+* Added `traded-command-removed`.
+* Added `traded-command-view`.
+* Added `traded-command-view-unset`.
+* Added `command-description-settradedcommand`.
 
 ## v2.18.0 (2023-10-02)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
