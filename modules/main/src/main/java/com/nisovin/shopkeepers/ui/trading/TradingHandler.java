@@ -925,7 +925,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 		// Apply additional trade effects:
 		ShopkeeperTradeEvent tradeEvent = trade.getTradeEvent();
-		tradeEvent.getTradeEffects().forEach(tradeEffect -> tradeEffect.onTradeCompleted(tradeEvent));
+		tradeEvent.getTradeEffects().forEach(tradeEffect -> tradeEffect.onTradeApplied(tradeEvent));
 
 		// Call trade completed event:
 		ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(tradeEvent);
@@ -1068,7 +1068,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	/**
 	 * This is called when a trade is being applied, after any common trade application logic, but
-	 * before any {@link TradeEffect#onTradeCompleted(ShopkeeperTradeEvent)} calls and before the
+	 * before any {@link TradeEffect#onTradeApplied(ShopkeeperTradeEvent)} calls and before the
 	 * {@link ShopkeeperTradeCompletedEvent} is called.
 	 * <p>
 	 * This can be used to apply any shopkeeper-specific trading behavior.

@@ -335,7 +335,7 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	/**
 	 * Gets a modifiable list of {@link TradeEffect}s that will be invoked once the trade is either
 	 * {@link TradeEffect#onTradeAborted(ShopkeeperTradeEvent) aborted} or
-	 * {@link TradeEffect#onTradeCompleted(ShopkeeperTradeEvent) successfully completed}.
+	 * {@link TradeEffect#onTradeApplied(ShopkeeperTradeEvent) applied}.
 	 * <p>
 	 * This can for example be used to add custom trade effects, or for the implementation of some
 	 * of the built-in default trade effects. However, it is very likely that this list does not
