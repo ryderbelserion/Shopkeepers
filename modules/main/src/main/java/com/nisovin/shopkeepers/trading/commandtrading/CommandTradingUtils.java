@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <ul>
  * <li>{player_name}: Replaced with the name of the trading player.</li>
  * <li>{player_uuid}: Replaced with the unique id of the trading player.</li>
- * <li>{player_displayName}: Replaced with the display name of the trading player.</li>
+ * <li>{player_displayname}: Replaced with the display name of the trading player.</li>
  * <li>{shop_uuid}: Replaced with the unique id of the shopkeeper.</li>
  * </ul>
  * <p>
