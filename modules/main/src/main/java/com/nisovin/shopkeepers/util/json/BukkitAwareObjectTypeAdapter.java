@@ -16,7 +16,6 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -62,8 +61,6 @@ public class BukkitAwareObjectTypeAdapter extends YamlLikeObjectTypeAdapter {
 				@Nullable TypeToken<T> type
 		) {
 			assert gson != null && type != null;
-			Unsafe.assertNonNull(gson);
-			Unsafe.assertNonNull(type);
 			Class<?> rawType = type.getRawType();
 			assert rawType != null;
 			// The rawType == Object.class case is not expected to actually occur currently, because

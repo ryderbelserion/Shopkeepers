@@ -245,7 +245,7 @@ public final class BookItems {
 	 * @throws IllegalArgumentException
 	 *             if the given item stack is not a copyable book
 	 */
-	public static @Nullable ItemStack copyBook(@ReadOnly ItemStack bookItem) {
+	public static ItemStack copyBook(@ReadOnly ItemStack bookItem) {
 		Validate.isTrue(isWrittenBook(bookItem), "bookItem is not a written book");
 
 		// Copy the book item, with a stack size of 1:

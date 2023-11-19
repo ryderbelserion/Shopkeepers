@@ -6,6 +6,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -76,7 +77,6 @@ public final class PlaceholderItems {
 	) {
 		if (!isPlaceholderItem(placeholderItem)) return null;
 		assert placeholderItem != null;
-		Unsafe.assertNonNull(placeholderItem);
 
 		// Get the display name:
 		ItemMeta meta = Unsafe.assertNonNull(placeholderItem.getItemMeta());
@@ -139,7 +139,7 @@ public final class PlaceholderItems {
 	 * @return either the substituted item stack, if the given item stack is a valid placeholder, or
 	 *         otherwise the given item stack itself
 	 */
-	public static @Nullable ItemStack replace(@ReadOnly @Nullable ItemStack itemStack) {
+	public static @PolyNull ItemStack replace(@ReadOnly @PolyNull ItemStack itemStack) {
 		ItemStack substitutedItem = getSubstitutedItem(itemStack);
 		return (substitutedItem != null) ? substitutedItem : itemStack;
 	}
@@ -155,8 +155,7 @@ public final class PlaceholderItems {
 	 *         otherwise the given item stack itself
 	 */
 	public static ItemStack replaceNonNull(@ReadOnly ItemStack itemStack) {
-		ItemStack replacement = replace(itemStack);
-		return Unsafe.assertNonNull(replacement);
+		return Unsafe.assertNonNull(replace(itemStack));
 	}
 
 	/**
@@ -169,8 +168,8 @@ public final class PlaceholderItems {
 	 * @return either the substituted item stack, if the given item stack is a valid placeholder, or
 	 *         otherwise the given item stack itself
 	 */
-	public static @Nullable UnmodifiableItemStack replace(
-			@Nullable UnmodifiableItemStack itemStack
+	public static @PolyNull UnmodifiableItemStack replace(
+			@PolyNull UnmodifiableItemStack itemStack
 	) {
 		return UnmodifiableItemStack.of(replace(ItemUtils.asItemStackOrNull(itemStack)));
 	}
@@ -186,8 +185,7 @@ public final class PlaceholderItems {
 	 *         otherwise the given item stack itself
 	 */
 	public static UnmodifiableItemStack replaceNonNull(UnmodifiableItemStack itemStack) {
-		UnmodifiableItemStack replacement = replace(itemStack);
-		return Unsafe.assertNonNull(replacement);
+		return Unsafe.assertNonNull(replace(itemStack));
 	}
 
 	private PlaceholderItems() {

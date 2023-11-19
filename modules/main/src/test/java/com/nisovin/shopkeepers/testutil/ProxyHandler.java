@@ -60,7 +60,7 @@ abstract class ProxyHandler<@NonNull T> implements InvocationHandler {
 			Method method,
 			@Nullable Object @Nullable [] args
 	) {
-		MethodHandler<@NonNull T> handler = methodHandlers.get(Unsafe.assertNonNull(method));
+		MethodHandler<@NonNull T> handler = methodHandlers.get(method);
 		if (handler != null) {
 			return handler.handle(Unsafe.castNonNull(proxy), args);
 		}

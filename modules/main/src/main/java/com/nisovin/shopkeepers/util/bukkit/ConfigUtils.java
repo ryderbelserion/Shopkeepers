@@ -199,7 +199,6 @@ public final class ConfigUtils {
 	public static <T> @Nullable T fromConfigYaml(@Nullable String yamlConfigString, String key) {
 		if (StringUtils.isEmpty(yamlConfigString)) return null;
 		assert yamlConfigString != null;
-		Unsafe.assertNonNull(yamlConfigString);
 		YamlConfiguration yamlConfig = YAML_CONFIG.get();
 		try {
 			yamlConfig.loadFromString(yamlConfigString);

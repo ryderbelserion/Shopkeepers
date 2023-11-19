@@ -192,6 +192,7 @@ subprojects {
 				'org.checkerframework.checker.nullness.NullnessChecker'
 			]
 			extraJavacArgs = [
+				'-AassumeAssertionsAreEnabled'
 				//'-AsuppressWarnings=initialization'
 			]
 		}

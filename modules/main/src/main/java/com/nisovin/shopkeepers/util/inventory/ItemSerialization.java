@@ -23,7 +23,6 @@ public final class ItemSerialization {
 		// Check if ItemMeta is empty (equivalent to ItemStack#hasItemMeta):
 		if (!Bukkit.getItemFactory().equals(itemMeta, null)) {
 			assert itemMeta != null;
-			Unsafe.assertNonNull(itemMeta);
 			return Unsafe.cast(itemMeta.serialize()); // Assert: Not null or empty
 		} else {
 			return null;

@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.internals;
 
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
@@ -25,8 +26,8 @@ public class SKApiInternals implements ApiInternals {
 	// FACTORIES
 
 	@Override
-	public @Nullable UnmodifiableItemStack createUnmodifiableItemStack(
-			@Nullable ItemStack itemStack
+	public @PolyNull UnmodifiableItemStack createUnmodifiableItemStack(
+			@PolyNull ItemStack itemStack
 	) {
 		return SKUnmodifiableItemStack.of(itemStack);
 	}

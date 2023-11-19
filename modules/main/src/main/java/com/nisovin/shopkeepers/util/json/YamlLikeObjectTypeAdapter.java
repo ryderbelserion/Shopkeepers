@@ -64,8 +64,6 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 				@Nullable TypeToken<T> type
 		) {
 			assert gson != null && type != null;
-			Unsafe.assertNonNull(gson);
-			Unsafe.assertNonNull(type);
 			// This is not actually expected to work currently, since Gson doesn't allow its default
 			// Object TypeAdapter to be overridden yet.
 			if (type.getRawType() == Object.class) {
@@ -90,7 +88,6 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 	@Override
 	public @Nullable Object read(@Nullable JsonReader in) throws IOException {
 		assert in != null;
-		Unsafe.assertNonNull(in);
 		JsonToken token = in.peek();
 		switch (token) {
 		case BEGIN_ARRAY:
@@ -150,7 +147,6 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 	@Override
 	public void write(@Nullable JsonWriter out, @Nullable Object value) throws IOException {
 		assert out != null;
-		Unsafe.assertNonNull(out);
 		if (value == null) {
 			out.nullValue();
 			return;

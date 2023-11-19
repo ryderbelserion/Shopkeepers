@@ -32,7 +32,6 @@ public class IsDataFuzzyEqual extends BaseMatcher<@Nullable Object> {
 	@Override
 	public void describeTo(@Nullable Description description) {
 		assert description != null;
-		Unsafe.assertNonNull(description);
 		description.appendValue(Unsafe.nullableAsNonNull(expectedObject));
 	}
 }

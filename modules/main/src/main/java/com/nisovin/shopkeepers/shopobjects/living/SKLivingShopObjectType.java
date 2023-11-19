@@ -118,7 +118,6 @@ public final class SKLivingShopObjectType<T extends @NonNull SKLivingShopObject<
 			return false;
 		}
 		assert spawnLocation != null;
-		Unsafe.assertNonNull(spawnLocation);
 
 		Block spawnBlock = spawnLocation.getBlock();
 		// TODO Require an empty block for shulkers? However, placing a shulker on a non-empty block

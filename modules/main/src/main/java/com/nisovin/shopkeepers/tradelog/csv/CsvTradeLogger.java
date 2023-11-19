@@ -112,9 +112,7 @@ public class CsvTradeLogger implements TradeLogger {
 	public CsvTradeLogger(Plugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
-		this.tradeLogsFolder = Unsafe.assertNonNull(
-				plugin.getDataFolder().toPath().resolve(TRADE_LOGS_FOLDER)
-		);
+		this.tradeLogsFolder = plugin.getDataFolder().toPath().resolve(TRADE_LOGS_FOLDER);
 		this.saveTask = new SaveTask(plugin);
 	}
 
@@ -340,7 +338,7 @@ public class CsvTradeLogger implements TradeLogger {
 	private Path getLogFile(Instant timestamp) {
 		assert timestamp != null;
 		String fileName = FILE_NAME_PREFIX + DATE_FORMAT.format(timestamp) + ".csv";
-		return Unsafe.assertNonNull(tradeLogsFolder.resolve(fileName));
+		return tradeLogsFolder.resolve(fileName);
 	}
 
 	// Note: We log the item metadata in Yaml format. Since this is what Bukkit natively supports

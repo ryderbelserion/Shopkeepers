@@ -232,6 +232,7 @@ public abstract class Config {
 		if (this.customDefaultValueTypes != null) {
 			return; // Already setup.
 		}
+
 		this.customDefaultValueTypes = new ValueTypeRegistry();
 		Class<?> configClass = this.getClass();
 		this.setupCustomDefaultValueTypes(configClass);

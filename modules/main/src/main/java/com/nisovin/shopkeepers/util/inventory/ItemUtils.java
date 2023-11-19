@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -228,9 +229,9 @@ public final class ItemUtils {
 		return new ItemStack(Material.AIR);
 	}
 
-	public static @Nullable UnmodifiableItemStack getFallbackIfNull(
+	public static @PolyNull UnmodifiableItemStack getFallbackIfNull(
 			@Nullable UnmodifiableItemStack item,
-			@Nullable UnmodifiableItemStack fallback
+			@PolyNull UnmodifiableItemStack fallback
 	) {
 		if (item == null) return fallback;
 		return item;
@@ -246,18 +247,20 @@ public final class ItemUtils {
 		return Unsafe.assertNonNull(itemStack).copy();
 	}
 
-	public static @Nullable ItemStack copyOrNull(@Nullable UnmodifiableItemStack itemStack) {
-		return (itemStack != null) ? itemStack.copy() : null;
+	public static @PolyNull ItemStack copyOrNull(@PolyNull UnmodifiableItemStack itemStack) {
+		if (itemStack == null) return null;
+		return itemStack.copy();
 	}
 
-	public static @Nullable UnmodifiableItemStack shallowCopy(
-			@Nullable UnmodifiableItemStack itemStack
+	public static @PolyNull UnmodifiableItemStack shallowCopy(
+			@PolyNull UnmodifiableItemStack itemStack
 	) {
-		return (itemStack != null) ? itemStack.shallowCopy() : null;
+		if (itemStack == null) return null;
+		return itemStack.shallowCopy();
 	}
 
-	public static @Nullable UnmodifiableItemStack unmodifiableCloneIfModifiable(
-			@ReadOnly @Nullable ItemStack itemStack
+	public static @PolyNull UnmodifiableItemStack unmodifiableCloneIfModifiable(
+			@ReadOnly @PolyNull ItemStack itemStack
 	) {
 		if (itemStack == null) return null;
 		if (itemStack instanceof UnmodifiableItemStack) return (UnmodifiableItemStack) itemStack;
@@ -268,8 +271,7 @@ public final class ItemUtils {
 			@ReadOnly ItemStack itemStack
 	) {
 		Validate.notNull(itemStack, "itemStack is null");
-		UnmodifiableItemStack unmodifiableItemStack = unmodifiableCloneIfModifiable(itemStack);
-		return Unsafe.assertNonNull(unmodifiableItemStack);
+		return Unsafe.assertNonNull(unmodifiableCloneIfModifiable(itemStack));
 	}
 
 	public static @Nullable UnmodifiableItemStack unmodifiableOrNullIfEmpty(
@@ -288,8 +290,9 @@ public final class ItemUtils {
 	 * @deprecated See {@link UnmodifiableItemStack#asItemStack()}
 	 */
 	@Deprecated
-	public static @Nullable ItemStack asItemStackOrNull(@Nullable UnmodifiableItemStack itemStack) {
-		return (itemStack != null) ? itemStack.asItemStack() : null;
+	public static @PolyNull ItemStack asItemStackOrNull(@PolyNull UnmodifiableItemStack itemStack) {
+		if (itemStack == null) return null;
+		return itemStack.asItemStack();
 	}
 
 	/**
@@ -370,7 +373,6 @@ public final class ItemUtils {
 	) {
 		if (isEmpty(itemStack)) return null;
 		assert itemStack != null;
-		Unsafe.assertNonNull(itemStack);
 		int newAmount = Math.min(
 				itemStack.getAmount() + amountToIncrease,
 				itemStack.getMaxStackSize()
@@ -605,7 +607,6 @@ public final class ItemUtils {
 		// Checking if the item is damageable is cheap in comparison to retrieving the ItemMeta:
 		if (!isDamageable(itemStack)) return 0; // Also returns 0 if itemStack is null
 		assert itemStack != null;
-		Unsafe.assertNonNull(itemStack);
 
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta instanceof Damageable) { // Also checks for null ItemMeta
@@ -746,7 +747,6 @@ public final class ItemUtils {
 		// Compare display name:
 		if (checkDisplayName) {
 			assert displayName != null;
-			Unsafe.assertNonNull(displayName);
 			if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
 				return false;
 			}
@@ -755,7 +755,6 @@ public final class ItemUtils {
 		// Compare lore:
 		if (checkLore) {
 			assert lore != null;
-			Unsafe.assertNonNull(lore);
 			if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
 				return false;
 			}

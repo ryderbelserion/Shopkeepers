@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
@@ -40,7 +41,7 @@ public class DataValueContainer extends AbstractDataContainer {
 	 * @return the {@link DataValueContainer}, or <code>null</code> if the given {@link DataValue}
 	 *         is <code>null</code>
 	 */
-	public static @Nullable DataContainer of(@Nullable DataValue dataValue) {
+	public static @PolyNull DataContainer of(@PolyNull DataValue dataValue) {
 		if (dataValue == null) return null;
 		return new DataValueContainer(dataValue);
 	}

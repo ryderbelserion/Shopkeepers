@@ -23,7 +23,6 @@ import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 

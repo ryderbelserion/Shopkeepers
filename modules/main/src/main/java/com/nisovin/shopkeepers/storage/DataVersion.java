@@ -134,7 +134,6 @@ public final class DataVersion {
 			return MISSING;
 		}
 		assert dataVersionString != null;
-		Unsafe.assertNonNull(dataVersionString);
 
 		// Check if the data version is a named data version:
 		if (dataVersionString.startsWith(NAMED_START)) {

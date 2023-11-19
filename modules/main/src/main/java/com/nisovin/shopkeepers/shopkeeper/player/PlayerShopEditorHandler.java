@@ -158,6 +158,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		if (ItemUtils.isEmpty(clickedItem) || ItemUtils.equals(emptySlotItem, clickedItem)) {
 			return null;
 		}
+
 		clickedItem = Unsafe.assertNonNull(clickedItem);
 
 		// Get new item amount:
@@ -198,7 +199,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		boolean isCurrencyItem = currency.getItemData().matches(clickedItem);
 		if (isCurrencyItem) {
 			assert clickedItem != null;
-			currentItemAmount = Unsafe.assertNonNull(clickedItem).getAmount();
+			currentItemAmount = clickedItem.getAmount();
 		}
 		int newItemAmount = this.getNewAmountAfterEditorClick(
 				event,
@@ -217,7 +218,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			if (isCurrencyItem) {
 				assert clickedItem != null;
 				// Only update the amount of the already existing currency item:
-				Unsafe.assertNonNull(clickedItem).setAmount(newItemAmount);
+				clickedItem.setAmount(newItemAmount);
 			} else {
 				// Place a new currency item:
 				ItemStack currencyItem = currency.getItemData().createItemStack(newItemAmount);
@@ -273,7 +274,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		Currency currency1 = Currencies.match(item1);
 		if (currency1 != null) {
 			assert item1 != null;
-			price += (currency1.getValue() * Unsafe.assertNonNull(item1).getAmount());
+			price += (currency1.getValue() * item1.getAmount());
 		} else if (!ItemUtils.isEmpty(item1)) {
 			// Unexpected.
 			Log.debug(shopkeeper.getLogPrefix() + "Price item 1 does not match any currency!");
@@ -283,7 +284,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		Currency currency2 = Currencies.match(item2);
 		if (currency2 != null) {
 			assert item2 != null;
-			price += (currency2.getValue() * Unsafe.assertNonNull(item2).getAmount());
+			price += (currency2.getValue() * item2.getAmount());
 		} else if (!ItemUtils.isEmpty(item2)) {
 			// Unexpected.
 			Log.debug(shopkeeper.getLogPrefix() + "Price item 2 does not match any currency!");

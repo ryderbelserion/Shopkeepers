@@ -109,8 +109,6 @@ public final class FailedHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		assert required != null && provided != null;
-		Unsafe.assertNonNull(provided);
-		Unsafe.assertNonNull(required);
 		if (provided.getType() != required.getType()) return false;
 		try {
 			Object nmsProvided = Unsafe.assertNonNull(

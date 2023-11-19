@@ -165,7 +165,7 @@ class CommandList extends Command {
 				assert targetPlayerName != null;
 				boolean ambiguous = PlayerArgumentUtils.handleAmbiguousPlayerName(
 						sender,
-						Unsafe.assertNonNull(targetPlayerName),
+						targetPlayerName,
 						matchingShopOwners.entrySet()
 				);
 				if (ambiguous) {

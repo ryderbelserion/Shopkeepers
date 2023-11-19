@@ -14,7 +14,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.logging.Logger;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.logging.NullLogger;
 
 /**
@@ -261,7 +260,7 @@ public final class FileUtils {
 			}
 		} catch (IOException e) {
 			// Attempt File#renameTo(File):
-			if (!source.toFile().renameTo(Unsafe.assertNonNull(target.toFile()))) {
+			if (!source.toFile().renameTo(target.toFile())) {
 				// Attempt copy and delete:
 				// TODO Turn this into a debug message?
 				logger.warning(() -> "Could not move file '" + source + "' to '" + target + "' ("

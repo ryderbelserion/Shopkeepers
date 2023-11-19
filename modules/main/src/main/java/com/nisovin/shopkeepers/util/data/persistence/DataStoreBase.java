@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.FileUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -32,7 +31,7 @@ public interface DataStoreBase extends DataStore {
 	@Override
 	public default void load(Path path) throws IOException, InvalidDataFormatException {
 		Validate.notNull(path, "path is null");
-		this.load(Unsafe.assertNonNull(Files.newBufferedReader(path, StandardCharsets.UTF_8)));
+		this.load(Files.newBufferedReader(path, StandardCharsets.UTF_8));
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public interface DataStoreBase extends DataStore {
 	public default void save(Path path) throws IOException {
 		Validate.notNull(path, "path is null");
 		FileUtils.createParentDirectories(path);
-		this.save(Unsafe.assertNonNull(Files.newBufferedWriter(path, StandardCharsets.UTF_8)));
+		this.save(Files.newBufferedWriter(path, StandardCharsets.UTF_8));
 	}
 
 	@Override

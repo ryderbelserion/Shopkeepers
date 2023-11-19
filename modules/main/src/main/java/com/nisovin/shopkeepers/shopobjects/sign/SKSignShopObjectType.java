@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
 import com.nisovin.shopkeepers.config.Settings;
@@ -56,7 +55,6 @@ public final class SKSignShopObjectType
 			return false;
 		}
 		assert spawnLocation != null;
-		Unsafe.assertNonNull(spawnLocation);
 
 		// Block has to be empty:
 		Block spawnBlock = spawnLocation.getBlock();

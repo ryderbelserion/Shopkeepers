@@ -148,7 +148,6 @@ public final class StringUtils {
 			return false;
 		}
 		assert string != null;
-		Unsafe.assertNonNull(string);
 
 		int length = string.length();
 		for (int i = 0; i < length; i++) {

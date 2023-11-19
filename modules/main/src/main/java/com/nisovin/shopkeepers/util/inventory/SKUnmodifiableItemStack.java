@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -37,7 +38,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is
 	 *         <code>null</code>
 	 */
-	public static @Nullable UnmodifiableItemStack of(@ReadOnly @Nullable ItemStack itemStack) {
+	public static @PolyNull UnmodifiableItemStack of(@ReadOnly @PolyNull ItemStack itemStack) {
 		if (itemStack == null) return null;
 		if (itemStack instanceof UnmodifiableItemStack) {
 			return (UnmodifiableItemStack) itemStack;

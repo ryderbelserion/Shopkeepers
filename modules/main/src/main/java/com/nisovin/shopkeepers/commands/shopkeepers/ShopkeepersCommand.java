@@ -141,6 +141,7 @@ public class ShopkeepersCommand extends BaseCommand {
 			TextUtils.sendMessage(player, Messages.mustTargetBlock);
 			return;
 		}
+
 		Block targetBlock = Unsafe.assertNonNull(targetBlockInfo.getHitBlock());
 		assert !targetBlock.isEmpty();
 		BlockFace targetBlockFace = Unsafe.assertNonNull(targetBlockInfo.getHitBlockFace());

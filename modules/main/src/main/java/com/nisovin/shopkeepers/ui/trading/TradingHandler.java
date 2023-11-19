@@ -328,7 +328,6 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	private boolean canSlotHoldItemStack(@Nullable ItemStack slotItem, ItemStack itemStack) {
 		if (ItemUtils.isEmpty(slotItem)) return true;
 		assert slotItem != null;
-		Unsafe.assertNonNull(slotItem);
 		if (!itemStack.isSimilar(slotItem)) return false;
 		return slotItem.getAmount() + itemStack.getAmount() <= itemStack.getMaxStackSize();
 	}

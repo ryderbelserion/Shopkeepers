@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.api.internal;
 
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
@@ -42,8 +43,8 @@ public interface ApiInternals {
 	 *         <code>null</code>
 	 * @see UnmodifiableItemStack#of(ItemStack)
 	 */
-	public @Nullable UnmodifiableItemStack createUnmodifiableItemStack(
-			@Nullable ItemStack itemStack
+	public @PolyNull UnmodifiableItemStack createUnmodifiableItemStack(
+			@PolyNull ItemStack itemStack
 	);
 
 	/**

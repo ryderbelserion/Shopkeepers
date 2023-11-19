@@ -109,7 +109,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		// slightly differ the required items, but still be accepted.
 		// Note: Event handlers might set a second "received" item even if the original trade only
 		// involved a single item stack.
-		ShopkeeperTradeEvent tradeEvent = Unsafe.assertNonNull(trade.getTradeEvent());
+		ShopkeeperTradeEvent tradeEvent = trade.getTradeEvent();
 		UnmodifiableItemStack receivedItem1 = tradeEvent.getReceivedItem1();
 		UnmodifiableItemStack receivedItem2 = tradeEvent.getReceivedItem2();
 
@@ -151,7 +151,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
 				if (!baseCurrency.getItemData().matches(itemStack)) continue;
-				itemStack = Unsafe.assertNonNull(itemStack);
+				assert itemStack != null;
 
 				// Second pass, or the ItemStack is a partial one:
 				int itemAmount = itemStack.getAmount();
@@ -195,7 +195,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
 				if (!highCurrency.getItemData().matches(itemStack)) continue;
-				itemStack = Unsafe.assertNonNull(itemStack);
+				assert itemStack != null;
 
 				// Second pass, or the ItemStack is a partial one:
 				int itemAmount = itemStack.getAmount();

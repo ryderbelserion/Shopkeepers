@@ -178,7 +178,6 @@ public class PropertyValue<T> {
 	public final T getValue() {
 		this.validateBuilt();
 		if (requireInitialValue) {
-			Unsafe.assertNonNull(holder);
 			assert holder != null;
 			throw new IllegalStateException(holder.getLogPrefix() + "Value for property '"
 					+ property.getName() + "' has not yet been initialized!");
@@ -225,7 +224,6 @@ public class PropertyValue<T> {
 
 		// Post-value-change actions:
 		if (updateFlags.contains(DefaultUpdateFlag.MARK_DIRTY)) {
-			Unsafe.assertNonNull(holder);
 			assert holder != null;
 			holder.markDirty();
 		}
@@ -329,7 +327,6 @@ public class PropertyValue<T> {
 
 			value = property.getDefaultValue();
 			updateFlags = DEFAULT_UPDATE_FLAGS; // Marks the holder as dirty
-			Unsafe.assertNonNull(holder);
 			assert holder != null;
 			Log.warning(holder.getLogPrefix() + "Missing data for property '" + property.getName()
 					+ "'. Using the default value now: '" + property.toString(value) + "'");

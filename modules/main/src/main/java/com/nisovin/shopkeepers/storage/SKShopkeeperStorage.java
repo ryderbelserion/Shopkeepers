@@ -145,20 +145,20 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	private Path _getDataFolder() {
-		return Unsafe.assertNonNull(this.getPluginDataFolder().resolve(DATA_FOLDER));
+		return this.getPluginDataFolder().resolve(DATA_FOLDER);
 	}
 
 	private Path _getSaveFile() {
-		return Unsafe.assertNonNull(this._getDataFolder().resolve(SAVE_FILE_NAME));
+		return this._getDataFolder().resolve(SAVE_FILE_NAME);
 	}
 
 	private Path _getTempSaveFile() {
-		return Unsafe.assertNonNull(this._getSaveFile().resolveSibling(TEMP_SAVE_FILE_NAME));
+		return this._getSaveFile().resolveSibling(TEMP_SAVE_FILE_NAME);
 	}
 
 	// Gets the path relative to the plugin data folder.
 	private Path pluginDataRelative(Path path) {
-		return Unsafe.assertNonNull(this.getPluginDataFolder().relativize(path));
+		return this.getPluginDataFolder().relativize(path);
 	}
 
 	public void onEnable() {
@@ -347,11 +347,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// the expected location, we check the old save file location and migrate the save file if it is
 	// found.
 	private Path getOldSaveFile() {
-		return Unsafe.assertNonNull(this.getPluginDataFolder().resolve("save.yml"));
+		return this.getPluginDataFolder().resolve("save.yml");
 	}
 
 	private Path getOldTempSaveFile() {
-		return Unsafe.assertNonNull(this.getOldSaveFile().resolveSibling("save.temp"));
+		return this.getOldSaveFile().resolveSibling("save.temp");
 	}
 
 	// Returns false if the migration failed.

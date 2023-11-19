@@ -182,8 +182,6 @@ public final class NMSHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		assert required != null && provided != null;
-		Unsafe.assertNonNull(required);
-		Unsafe.assertNonNull(provided);
 		if (provided.getType() != required.getType()) return false;
 		net.minecraft.server.v1_16_R3.ItemStack nmsProvided = asNMSItemStack(provided);
 		net.minecraft.server.v1_16_R3.ItemStack nmsRequired = asNMSItemStack(required);

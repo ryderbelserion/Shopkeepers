@@ -8,7 +8,6 @@ import java.util.ListIterator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -205,7 +204,7 @@ public class FirstOfArgument
 
 		// Invalid argument for all of them:
 		assert firstParseException != null; // Otherwise we would have parsed something (or null)
-		throw Unsafe.assertNonNull(firstParseException);
+		throw firstParseException;
 	}
 
 	private @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> toPair(

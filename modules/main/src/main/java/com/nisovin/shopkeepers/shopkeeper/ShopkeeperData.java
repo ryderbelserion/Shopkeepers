@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
@@ -29,7 +29,7 @@ public class ShopkeeperData extends DelegateDataContainer {
 	 * @return the shopkeeper data, or <code>null</code> if the given data container is
 	 *         <code>null</code>
 	 */
-	public static @Nullable ShopkeeperData of(@Nullable DataContainer dataContainer) {
+	public static @PolyNull ShopkeeperData of(@PolyNull DataContainer dataContainer) {
 		if (dataContainer == null) return null;
 		if (dataContainer instanceof ShopkeeperData) {
 			return (ShopkeeperData) dataContainer;
@@ -50,8 +50,7 @@ public class ShopkeeperData extends DelegateDataContainer {
 	 */
 	public static ShopkeeperData ofNonNull(DataContainer dataContainer) {
 		Validate.notNull(dataContainer, "dataContainer is null");
-		ShopkeeperData shopkeeperData = of(dataContainer);
-		return Unsafe.assertNonNull(shopkeeperData);
+		return Unsafe.assertNonNull(of(dataContainer));
 	}
 
 	/////

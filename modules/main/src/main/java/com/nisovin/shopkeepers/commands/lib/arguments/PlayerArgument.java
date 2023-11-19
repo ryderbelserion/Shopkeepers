@@ -118,7 +118,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 			ArgumentsReader argsReader
 	) throws ArgumentParseException {
 		// Also handles argument exceptions:
-		return Unsafe.assertNonNull(firstOfArgument.parseValue(input, context, argsReader));
+		return firstOfArgument.parseValue(input, context, argsReader);
 	}
 
 	@Override

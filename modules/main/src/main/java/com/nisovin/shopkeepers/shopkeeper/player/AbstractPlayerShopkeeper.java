@@ -112,7 +112,7 @@ public abstract class AbstractPlayerShopkeeper
 		super.loadFromCreationData(id, shopCreationData);
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 		Player owner = Unsafe.assertNonNull(playerShopCreationData.getCreator());
-		Block container = Unsafe.assertNonNull(playerShopCreationData.getShopContainer());
+		Block container = playerShopCreationData.getShopContainer();
 
 		this._setOwner(owner.getUniqueId(), Unsafe.assertNonNull(owner.getName()));
 		this._setContainer(container.getX(), container.getY(), container.getZ());
@@ -670,7 +670,7 @@ public abstract class AbstractPlayerShopkeeper
 			}
 		}
 		assert item1 != null;
-		return new SKTradingRecipe(itemBeingSold, Unsafe.assertNonNull(item1), item2, outOfStock);
+		return new SKTradingRecipe(itemBeingSold, item1, item2, outOfStock);
 	}
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency

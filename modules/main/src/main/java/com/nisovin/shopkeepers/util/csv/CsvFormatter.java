@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class CsvFormatter {
 
 	private static String quoteReplacement(String replacement) {
-		return Unsafe.assertNonNull(Matcher.quoteReplacement(replacement));
+		return Matcher.quoteReplacement(replacement);
 	}
 
 	private String fieldSeparator = ",";

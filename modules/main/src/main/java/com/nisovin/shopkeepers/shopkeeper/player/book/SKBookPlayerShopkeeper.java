@@ -106,7 +106,7 @@ public class SKBookPlayerShopkeeper
 				assert BookItems.isCopyableBook(bookItem);
 				bookItem = BookItems.copyBook(bookItem);
 			}
-			bookItem = Unsafe.assertNonNull(bookItem);
+			assert bookItem != null;
 			// Assert: bookItem is a copy.
 
 			UnmodifiableItemStack unmodifiableBookItem = UnmodifiableItemStack.ofNonNull(bookItem);

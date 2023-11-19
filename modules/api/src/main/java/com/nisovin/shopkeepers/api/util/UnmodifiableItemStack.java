@@ -8,6 +8,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 
 import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
@@ -67,7 +68,7 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is
 	 *         <code>null</code>
 	 */
-	public static @Nullable UnmodifiableItemStack of(@Nullable ItemStack itemStack) {
+	public static @PolyNull UnmodifiableItemStack of(@PolyNull ItemStack itemStack) {
 		return ApiInternals.getInstance().createUnmodifiableItemStack(itemStack);
 	}
 
@@ -84,8 +85,7 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	 */
 	public static UnmodifiableItemStack ofNonNull(ItemStack itemStack) {
 		Preconditions.checkNotNull(itemStack, "itemStack is null");
-		UnmodifiableItemStack unmodifiableItemStack = of(itemStack);
-		return Unsafe.assertNonNull(unmodifiableItemStack);
+		return Unsafe.assertNonNull(of(itemStack));
 	}
 
 	// ----
