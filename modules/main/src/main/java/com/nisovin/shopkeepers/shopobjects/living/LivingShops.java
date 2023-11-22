@@ -1,9 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -65,7 +63,6 @@ public class LivingShops {
 	);
 	private final LivingEntityAI livingEntityAI;
 	private final LivingEntityShopListener livingEntityShopListener;
-	private final CreatureForceSpawnListener creatureForceSpawnListener = new CreatureForceSpawnListener();
 
 	public LivingShops(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -80,17 +77,10 @@ public class LivingShops {
 	public void onEnable() {
 		livingEntityAI.onEnable();
 		livingEntityShopListener.onEnable();
-		// Register force-creature-spawn event handler:
-		if (Settings.bypassSpawnBlocking) {
-			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, plugin);
-		}
 	}
 
 	public void onDisable() {
 		livingEntityShopListener.onDisable();
-		HandlerList.unregisterAll(creatureForceSpawnListener);
-		// Reset force spawning:
-		creatureForceSpawnListener.forceCreatureSpawn(null, null);
 
 		// Stop living entity AI:
 		livingEntityAI.onDisable();
@@ -104,10 +94,10 @@ public class LivingShops {
 		return livingEntityAI;
 	}
 
-	// Bypassing creature spawn blocking plugins ('region protection' plugins):
+	// Bypassing creature spawn blocking plugins (e.g. region protection plugins):
 	void forceCreatureSpawn(Location location, EntityType entityType) {
 		if (Settings.bypassSpawnBlocking) {
-			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);
+			plugin.getForcingCreatureSpawner().forceCreatureSpawn(location, entityType);
 		}
 	}
 }
