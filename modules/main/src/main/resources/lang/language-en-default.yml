@@ -573,6 +573,13 @@ confirm-remove-all-own-shops: "&cYou are about to irrevocably remove all your sh
 confirm-remove-all-shops-of-player: "&cYou are about to irrevocably remove all shops of player &6{player}&c (&6{shopsCount}&c)!"
 confirm-remove-all-player-shops: "&cYou are about to irrevocably remove all player shops of all players (&6{shopsCount}&c)!"
 
+confirm-replace-all-shops-with-vanilla-villagers: |-
+  &cYou are about to irrevocably delete all shops (&6{shopsCount}&c) and replace them with vanilla villagers without AI!
+  Consider creating a backup of your world and shopkeeper data before you proceed.
+all-shops-replaced-with-vanilla-villagers: |-
+  &e{adminShopsCount}&a admin shops and &e{playerShopsCount}&a player shops have been replaced with vanilla villagers!
+  &e{skippedShopsCount}&a shops have been skipped.
+
 confirmation-required: "&7Please confirm this action by typing &6/shopkeepers confirm"
 confirmation-expired: "&cConfirmation expired."
 nothing-to-confirm: "&cThere is nothing to confirm currently."
@@ -657,3 +664,4 @@ command-description-snapshot-create: "Creates a new shop snapshot."
 command-description-snapshot-remove: "Removes a specific or all snapshots of a shop."
 command-description-snapshot-restore: "Restores a specific shop snapshot."
 command-description-edit-villager: "Opens the editor for the target villager."
+command-description-replace-all-with-vanilla-villagers: "Replaces all shopkeepers with vanilla villagers without AI."

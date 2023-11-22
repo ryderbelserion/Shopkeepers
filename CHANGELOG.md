@@ -14,6 +14,10 @@ Date format: (YYYY-MM-DD)
   * This feature is not meant to replace the requirement for custom third-party plugins or scripts in order to implement complex or custom behaviors. In order to reduce implementation and maintenance effort, only a single command can be assigned to an item and only a very limited set of placeholders is supported: `{player_name}`, `{player_uuid}`, `{player_displayname}`, `{shop_uuid}`.
     * Simple command sequences can also be defined via command aliases in Bukkit's "commands.yml" (see https://bukkit.fandom.com/wiki/Commands.yml).
     * If additional context information is required, e.g. about the shopkeeper's location or shop owner, a custom plugin that listens for the `ShopkeeperTradeEvent` might be better suited to implement the intended behavior.
+* Add: Utility command "/shopkeeper replaceAllWithVanillaVillagers".
+  * This command deletes all shopkeepers and replaces them with corresponding vanilla villagers without AI that are configured very similar to villager shopkeepers.
+  * This might for example be useful when migrating a world to vanilla Minecraft, e.g. when a server closes a world but wants to provide it as download to its players with all the shopkeepers included.
+  * This command requires all of the following permissions: `shopkeeper.debug`, `shopkeeper.remove-all.player`, `shopkeeper.remove-all.admin`.
 * Add: "No shops were found" message to the "removeAll" command.
 * Fix: Moving shopkeepers did not update their location in the AI system, breaking gravity and AI activations when being moved out of their original chunk.
 * Fix: Verify that the Citizens API is still available before we try to use it. This guards against cases in which the Citizens plugin reports as "enabled", but the Citizens API is not in a properly initialized state. Reloading the Citizens plugin via PlugMan also seems to leave the Citizens API in an unusable state.
@@ -42,6 +46,9 @@ Date format: (YYYY-MM-DD)
 * Added `traded-command-view-unset`.
 * Added `command-description-settradedcommand`.
 * Added `no-shops-found`.
+* Added `confirm-replace-all-shops-with-vanilla-villagers`.
+* Added `all-shops-replaced-with-vanilla-villagers`.
+* Added `command-description-replace-all-with-vanilla-villagers`.
 
 ## v2.18.0 (2023-10-02)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

@@ -575,6 +575,13 @@ confirm-remove-all-own-shops: "&cDu bist dabei alle deine Shops (&6{shopsCount}&
 confirm-remove-all-shops-of-player: "&cDu bist dabei alle Shops des Spielers &6{player}&c (&6{shopsCount}&c) unwiderruflich zu entfernen!"
 confirm-remove-all-player-shops: "&cDu bist dabei alle Spieler-Shops sämtlicher Spieler (&6{shopsCount}&c) unwiderruflich zu entfernen!"
 
+confirm-replace-all-shops-with-vanilla-villagers: |-
+  &cDu bist dabei alle Shops (&6{shopsCount}&c) unwiderruflich zu entfernen und mit normalen Dorfbewohnern ohne KI zu ersetzen!
+  Erwäge eine Backup deiner Welt und Shop Daten zu erstellen bevor du fortfährst.
+all-shops-replaced-with-vanilla-villagers: |-
+  &e{adminShopsCount}&a Admin-Shops und &e{playerShopsCount}&a Spieler-Shops wurden mit normalen Dorfbewohnern ersetzt!
+  &e{skippedShopsCount}&a Shops wurden übersprungen.
+
 confirmation-required: "&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"
 confirmation-expired: "&cBestätigung abgelaufen."
 nothing-to-confirm: "&cDerzeit gibt es nichts zu bestätigen."
@@ -659,3 +666,4 @@ command-description-snapshot-create: "Erstellt einen neuen Shop-Snapshot."
 command-description-snapshot-remove: "Löscht einen bestimmten oder alle Snapshots eines Shops."
 command-description-snapshot-restore: "Stellt einen Shop-Snapshot wieder her."
 command-description-edit-villager: "Öffnet den Editor für den ausgewählten Dorfbewohner."
+command-description-replace-all-with-vanilla-villagers: "Ersetzt all Shops mit normalen Dorfbewohnern ohne KI."

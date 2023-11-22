@@ -14,7 +14,6 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
@@ -33,6 +32,7 @@ import com.nisovin.shopkeepers.commands.shopkeepers.snapshot.CommandSnapshot;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopcreation.ShopkeeperPlacement;
+import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -46,7 +46,7 @@ public class ShopkeepersCommand extends BaseCommand {
 	private static final String ARGUMENT_OBJECT_TYPE = "object-type";
 
 	private final SKShopkeepersPlugin plugin;
-	private final ShopkeeperRegistry shopkeeperRegistry;
+	private final SKShopkeeperRegistry shopkeeperRegistry;
 
 	public ShopkeepersCommand(SKShopkeepersPlugin plugin, Confirmations confirmations) {
 		super(plugin, COMMAND_NAME);
@@ -93,6 +93,8 @@ public class ShopkeepersCommand extends BaseCommand {
 		// Hidden commands:
 		childCommands.register(new CommandConfirm(confirmations));
 		// Hidden debugging / utility commands:
+		childCommands.register(new CommandReplaceAllWithVanillaVillagers(plugin, shopkeeperRegistry,
+				confirmations));
 		childCommands.register(new CommandCleanupCitizenShopkeepers());
 		childCommands.register(new CommandCheck(plugin));
 		childCommands.register(new CommandCheckItem());

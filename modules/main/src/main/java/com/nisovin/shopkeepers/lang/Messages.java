@@ -684,6 +684,13 @@ public class Messages extends Config {
 	public static Text confirmRemoveAllShopsOfPlayer = Text.parse("&cYou are about to irrevocably remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
 	public static Text confirmRemoveAllPlayerShops = Text.parse("&cYou are about to irrevocably remove all player shops of all players (&6{shopsCount}&c)!");
 
+	public static Text confirmReplaceAllShopsWithVanillaVillagers = Text.parse(
+			"&cYou are about to irrevocably delete all shops (&6{shopsCount}&c) and replace them with vanilla villagers without AI!\n"
+					+ "Consider creating a backup of your world and shopkeeper data before you proceed.");
+	public static Text allShopsReplacedWithVanillaVillagers = Text.parse(
+			"&e{adminShopsCount}&a admin shops and &e{playerShopsCount}&a player shops have been replaced with vanilla villagers!\n"
+					+ "&e{skippedShopsCount}&a shops have been skipped.");
+
 	public static Text confirmationRequired = Text.parse("&7Please confirm this action by typing &6/shopkeepers confirm");
 	public static Text confirmationExpired = Text.parse("&cConfirmation expired.");
 	public static Text nothingToConfirm = Text.parse("&cThere is nothing to confirm currently.");
@@ -771,6 +778,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionSnapshotRemove = Text.parse("Removes a specific or all snapshots of a shop.");
 	public static Text commandDescriptionSnapshotRestore = Text.parse("Restores a specific shop snapshot.");
 	public static Text commandDescriptionEditVillager = Text.parse("Opens the editor for the target villager.");
+	public static Text commandDescriptionReplaceAllWithVanillaVillagers = Text.parse("Replaces all shopkeepers with vanilla villagers without AI.");
 
 	/////
 
