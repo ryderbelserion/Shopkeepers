@@ -203,6 +203,12 @@ class CommandRemoveAll extends Command {
 		}
 		assert affectedShops != null;
 
+		int shopsCount = affectedShops.size();
+		if (shopsCount == 0) {
+			TextUtils.sendMessage(sender, Messages.noShopsFound);
+			return;
+		}
+
 		UUID finalTargetPlayerUUID = targetPlayerUUID;
 		String finalTargetPlayerName = targetPlayerName;
 		// This is dangerous: Let the sender first confirm this action.
@@ -272,10 +278,7 @@ class CommandRemoveAll extends Command {
 			}
 		});
 
-		// TODO Print 'no shops found' if shop count is 0?
-
 		// Inform the sender about required confirmation:
-		int shopsCount = affectedShops.size();
 		if (allAdmin) {
 			// Removing all admin shops:
 			TextUtils.sendMessage(sender, Messages.confirmRemoveAllAdminShops,
@@ -298,6 +301,7 @@ class CommandRemoveAll extends Command {
 					"shopsCount", shopsCount
 			);
 		}
+
 		// Inform player on how to confirm the action:
 		// TODO Add clickable command suggestion?
 		TextUtils.sendMessage(sender, Messages.confirmationRequired);

@@ -549,6 +549,8 @@ type-new-villager-name: "&aPlease type the villager's name into the chat.\n  &aT
 villager-name-set: "&aThe villager's name has been set!"
 villager-name-invalid: "&aThat name is not valid!"
 
+no-shops-found: "&7No shops were found."
+
 list-admin-shops-header: "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})"
 list-all-shops-header: "&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})"
 list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})"

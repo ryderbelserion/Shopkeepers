@@ -660,6 +660,8 @@ public class Messages extends Config {
 	public static Text villagerNameSet = Text.parse("&aThe villager's name has been set!");
 	public static Text villagerNameInvalid = Text.parse("&aThat name is not valid!");
 
+	public static Text noShopsFound = Text.parse("&7No shops were found.");
+
 	public static Text listAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
 	public static Text listAllShopsHeader = Text.parse("&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})");
 	public static Text listPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
