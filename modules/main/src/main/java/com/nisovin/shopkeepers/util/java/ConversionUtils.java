@@ -15,6 +15,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ConversionUtils {
 
 	public static final Map<? extends @NonNull String, ? extends @NonNull Boolean> BOOLEAN_VALUES;
+	public static final Map<? extends @NonNull String, ? extends @NonNull Trilean> TRILEAN_VALUES;
 
 	static {
 		// Initialize boolean values:
@@ -36,6 +37,20 @@ public final class ConversionUtils {
 		booleanValues.put("disabled", false);
 
 		BOOLEAN_VALUES = Collections.unmodifiableMap(booleanValues);
+
+		// Initialize trilean values:
+		Map<@NonNull String, @NonNull Trilean> trileanValues = new HashMap<>();
+		BOOLEAN_VALUES.entrySet().forEach(entry -> {
+			trileanValues.put(entry.getKey(), Trilean.fromBoolean(entry.getValue()));
+		});
+
+		trileanValues.put("undefined", Trilean.UNDEFINED);
+		trileanValues.put("null", Trilean.UNDEFINED);
+		trileanValues.put("none", Trilean.UNDEFINED);
+		trileanValues.put("unset", Trilean.UNDEFINED);
+		trileanValues.put("default", Trilean.UNDEFINED);
+
+		TRILEAN_VALUES = Collections.unmodifiableMap(trileanValues);
 	}
 
 	public static @Nullable Integer parseInt(@Nullable String string) {
@@ -77,6 +92,11 @@ public final class ConversionUtils {
 	public static @Nullable Boolean parseBoolean(@Nullable String string) {
 		if (string == null) return null;
 		return BOOLEAN_VALUES.get(string.toLowerCase(Locale.ROOT));
+	}
+
+	public static @Nullable Trilean parseTrilean(@Nullable String string) {
+		if (string == null) return null;
+		return TRILEAN_VALUES.get(string.toLowerCase(Locale.ROOT));
 	}
 
 	public static @Nullable UUID parseUUID(@Nullable String string) {
@@ -202,17 +222,24 @@ public final class ConversionUtils {
 	}
 
 	public static @Nullable Boolean toBoolean(@Nullable Object object) {
-		if (object instanceof Boolean) {
-			return (Boolean) object;
+		@Nullable Trilean value = toTrilean(object);
+		return value == null ? null : value.toBoolean();
+	}
+
+	public static @Nullable Trilean toTrilean(@Nullable Object object) {
+		if (object == null || object instanceof Boolean) {
+			// Unlike in parseTrilean, null is considered a valid value here to allow the conversion
+			// from nullable Boolean (instead of indicating a conversion error).
+			return Trilean.fromNullableBoolean((@Nullable Boolean) object);
 		} else if (object instanceof Number) {
 			int i = ((Number) object).intValue();
 			if (i == 1) {
-				return Boolean.TRUE;
+				return Trilean.TRUE;
 			} else if (i == 0) {
-				return Boolean.FALSE;
+				return Trilean.FALSE;
 			}
 		} else if (object instanceof String) {
-			return parseBoolean((String) object);
+			return parseTrilean((String) object);
 		}
 		return null;
 	}
@@ -333,6 +360,18 @@ public final class ConversionUtils {
 			Boolean booleanValue = toBoolean(value);
 			if (booleanValue != null) {
 				result.add(booleanValue);
+			}
+		});
+		return result;
+	}
+
+	public static @Nullable List<@NonNull Trilean> toTrileanList(@Nullable List<?> list) {
+		if (list == null) return null;
+		List<@NonNull Trilean> result = new ArrayList<>(list.size());
+		list.forEach(value -> {
+			Trilean trileanValue = toTrilean(value);
+			if (trileanValue != null) {
+				result.add(trileanValue);
 			}
 		});
 		return result;

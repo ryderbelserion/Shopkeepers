@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.util.data.container.DataContainer;
  * with the {@link WithValueType} and {@link WithDefaultValueType} annotations.
  *
  * @param <T>
- *            the type of value
+ *            The type of value. Only non-nullable types are currently supported.
  */
 public abstract class ValueType<T> {
 
@@ -24,7 +24,7 @@ public abstract class ValueType<T> {
 	// LOAD
 
 	public @Nullable T load(DataContainer dataContainer, String key) throws ValueLoadException {
-		Object configValue = dataContainer.get(key);
+		@Nullable Object configValue = dataContainer.get(key);
 		return this.load(configValue);
 	}
 

@@ -54,6 +54,14 @@ public final class ClassUtils {
 		return false;
 	}
 
+	public static boolean isAssignableFrom(Class<?> to, @Nullable Object value) {
+		if (value != null) {
+			return isAssignableFrom(to, value.getClass());
+		} else {
+			return !to.isPrimitive();
+		}
+	}
+
 	/**
 	 * Casts the given {@link Class} to a class with a more specific type argument.
 	 * <p>

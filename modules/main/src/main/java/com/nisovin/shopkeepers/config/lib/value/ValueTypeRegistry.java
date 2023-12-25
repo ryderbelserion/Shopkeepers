@@ -34,6 +34,12 @@ public class ValueTypeRegistry {
 		return byType.containsKey(type);
 	}
 
+	public void register(TypePattern typePattern, ValueType<?> valueType) {
+		Validate.notNull(typePattern, "typePattern is null");
+		Validate.notNull(valueType, "valueType is null");
+		this.register(ValueTypeProviders.forTypePattern(typePattern, (type) -> valueType));
+	}
+
 	public void register(ValueTypeProvider valueTypeProvider) {
 		Validate.notNull(valueTypeProvider, "valueTypeProvider is null");
 		providers.add(valueTypeProvider);

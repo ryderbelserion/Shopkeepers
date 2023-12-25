@@ -24,9 +24,11 @@ import com.nisovin.shopkeepers.config.lib.value.types.MaterialValue;
 import com.nisovin.shopkeepers.config.lib.value.types.SoundEffectValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.TextValue;
+import com.nisovin.shopkeepers.config.lib.value.types.TrileanValue;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
+import com.nisovin.shopkeepers.util.java.Trilean;
 
 /**
  * Registry of default value types of settings.
@@ -47,6 +49,8 @@ public class DefaultValueTypes {
 		registry.register(float.class, FloatValue.INSTANCE);
 		registry.register(Long.class, LongValue.INSTANCE);
 		registry.register(long.class, LongValue.INSTANCE);
+
+		registry.register(Trilean.class, TrileanValue.INSTANCE);
 
 		registry.register(Text.class, TextValue.INSTANCE);
 		registry.register(Material.class, MaterialValue.INSTANCE);

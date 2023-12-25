@@ -76,12 +76,11 @@ public class FieldSetting<T> implements Setting<T> {
 
 	@Override
 	public void setValue(T value) throws ValueLoadException {
-		if (value != null) {
-			Class<?> fieldType = field.getType();
-			if (!ClassUtils.isAssignableFrom(fieldType, value.getClass())) {
-				throw new ValueLoadException("Value is of wrong type: Got "
-						+ value.getClass().getName() + ", expected " + fieldType.getName());
-			}
+		Class<?> fieldType = field.getType();
+		if (!ClassUtils.isAssignableFrom(fieldType, value)) {
+			throw new ValueLoadException("Value is of wrong type: Got "
+					+ (value != null ? value.getClass().getName() : "null") + ", expected "
+					+ fieldType.getName());
 		}
 
 		try {

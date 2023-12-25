@@ -14,15 +14,16 @@ import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.Trilean;
 
-public class BooleanArgument extends CommandArgument<@NonNull Boolean> {
+public class TrileanArgument extends CommandArgument<@NonNull Trilean> {
 
-	public BooleanArgument(String name) {
+	public TrileanArgument(String name) {
 		super(name);
 	}
 
 	@Override
-	public Boolean parseValue(
+	public Trilean parseValue(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -31,7 +32,7 @@ public class BooleanArgument extends CommandArgument<@NonNull Boolean> {
 			throw this.missingArgumentError();
 		}
 		String argument = argsReader.next();
-		@Nullable Boolean value = ConversionUtils.parseBoolean(argument);
+		@Nullable Trilean value = ConversionUtils.parseTrilean(argument);
 		if (value == null) {
 			throw this.invalidArgumentError(argument);
 		}
@@ -50,7 +51,7 @@ public class BooleanArgument extends CommandArgument<@NonNull Boolean> {
 
 		List<@NonNull String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
-		for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
+		for (String value : ConversionUtils.TRILEAN_VALUES.keySet()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
 			// The keys are already lowercase:
 			if (value.startsWith(partialArg)) {

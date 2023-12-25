@@ -38,6 +38,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Shop objects are notified now whenever their AI is ticked.
 * Internal: Minor refactors related to trade merging.
 * Internal: Refactors related to the creature force spawner to be able to reuse it outside of shopkeeper spawning.
+* Internal: Add support for Trilean type in config (`true`, `false`, `"undefined"`).
 
 **Message changes:**  
 * Added `traded-command-set`.

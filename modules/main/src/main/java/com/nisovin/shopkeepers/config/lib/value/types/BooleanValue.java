@@ -18,7 +18,7 @@ public class BooleanValue extends ValueType<@NonNull Boolean> {
 	@Override
 	public @Nullable Boolean load(@Nullable Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
-		Boolean value = ConversionUtils.toBoolean(configValue);
+		@Nullable Boolean value = ConversionUtils.toBoolean(configValue);
 		if (value == null) {
 			throw new ValueLoadException("Invalid boolean value: " + configValue);
 		}
@@ -32,7 +32,7 @@ public class BooleanValue extends ValueType<@NonNull Boolean> {
 
 	@Override
 	public Boolean parse(String input) throws ValueParseException {
-		Boolean value = ConversionUtils.parseBoolean(input);
+		@Nullable Boolean value = ConversionUtils.parseBoolean(input);
 		if (value == null) {
 			throw new ValueParseException("Invalid boolean value: " + input);
 		}
