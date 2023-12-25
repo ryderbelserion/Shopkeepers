@@ -25,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
@@ -505,6 +506,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		if (spawnLocation == null) return false;
 
 		this.lastSpawnLocation = spawnLocation;
+		SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(entity, spawnLocation);
 		boolean teleportSuccess = entity.teleport(spawnLocation);
 
 		// Inform the AI system:
@@ -666,7 +668,10 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			spawnLocation.setYaw(entityLoc.getYaw());
 			spawnLocation.setPitch(entityLoc.getPitch());
 			this.lastSpawnLocation = spawnLocation;
+
+			SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(entity, spawnLocation);
 			entity.teleport(spawnLocation);
+
 			this.overwriteAI();
 		}
 		sharedLocation.setWorld(null); // Reset
@@ -687,6 +692,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		Location entityLoc = entity.getLocation();
 		lastSpawnLocation.setYaw(entityLoc.getYaw());
 		lastSpawnLocation.setPitch(entityLoc.getPitch());
+
+		SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(entity, lastSpawnLocation);
 		entity.teleport(lastSpawnLocation);
 	}
 

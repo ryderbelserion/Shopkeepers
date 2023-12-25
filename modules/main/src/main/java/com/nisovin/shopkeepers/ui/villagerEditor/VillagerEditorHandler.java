@@ -447,6 +447,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					// TODO: MC-9568: Growing up mobs get moved.
 					Location location = villager.getLocation();
 					villager.setAdult();
+					SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(villager, location);
 					villager.teleport(location);
 				}
 				return true;

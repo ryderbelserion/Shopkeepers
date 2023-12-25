@@ -70,6 +70,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 import com.nisovin.shopkeepers.villagers.RegularVillagers;
 import com.nisovin.shopkeepers.world.ForcingCreatureSpawner;
+import com.nisovin.shopkeepers.world.ForcingEntityTeleporter;
 import com.nisovin.shopkeepers.world.PlayerMap;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepersPlugin {
@@ -117,6 +118,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	);
 
 	private final ForcingCreatureSpawner forcingCreatureSpawner = new ForcingCreatureSpawner(Unsafe.initialized(this));
+	private final ForcingEntityTeleporter forcingEntityTeleporter = new ForcingEntityTeleporter(Unsafe.initialized(this));
 	private final PlayerMap playerMap = new PlayerMap(Unsafe.initialized(this));
 	private final ItemConversions itemConversions = new ItemConversions(Unsafe.initialized(this));
 	private final Commands commands = new Commands(Unsafe.initialized(this));
@@ -354,6 +356,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		Bukkit.getPluginManager().callEvent(new ShopkeepersStartupEvent());
 
 		forcingCreatureSpawner.onEnable();
+		forcingEntityTeleporter.onEnable();
 		playerMap.onEnable();
 
 		// Inform UI registry (registers UI event handlers):
@@ -523,6 +526,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		uiRegistry.clearAll();
 
 		playerMap.onDisable();
+		forcingEntityTeleporter.onDisable();
 		forcingCreatureSpawner.onDisable();
 
 		// Plugin metrics:
@@ -570,6 +574,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	public ForcingCreatureSpawner getForcingCreatureSpawner() {
 		return forcingCreatureSpawner;
+	}
+
+	public ForcingEntityTeleporter getForcingEntityTeleporter() {
+		return forcingEntityTeleporter;
 	}
 
 	public PlayerMap getPlayerMap() {

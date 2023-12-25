@@ -286,6 +286,10 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
+	// This is supposed to cancel all vanilla teleporting.
+	// In Paper, this is also called for plugin invoked teleports, including in cases in which we
+	// try to move the shopkeeper entity. We workaround this issue by forcefully uncanceling the
+	// teleport event again later in the event handling for all our own plugin triggered teleports.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTeleport(EntityTeleportEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {

@@ -25,7 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -112,7 +112,7 @@ public class LivingEntityAI implements Listener {
 	private static final Location sharedLocation = new Location(null, 0, 0, 0);
 	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 	/**
 	 * The MAX_FALLING_DISTANCE_PER_TICK scaled according to the configured tick rate.
 	 */
@@ -199,7 +199,7 @@ public class LivingEntityAI implements Listener {
 	private final Timer gravityTimings = new Timer();
 	private final Timer aiTimings = new Timer();
 
-	public LivingEntityAI(ShopkeepersPlugin plugin) {
+	public LivingEntityAI(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -705,7 +705,10 @@ public class LivingEntityAI implements Listener {
 		// Teleport the entity to its new location:
 		Location newLocation = Unsafe.assertNonNull(entity.getLocation(sharedLocation));
 		newLocation.add(0.0D, -fallingStepSize, 0.0D);
+
+		plugin.getForcingEntityTeleporter().forceEntityTeleport(entity, newLocation);
 		entity.teleport(newLocation);
+
 		sharedLocation.setWorld(null); // Reset
 	}
 
