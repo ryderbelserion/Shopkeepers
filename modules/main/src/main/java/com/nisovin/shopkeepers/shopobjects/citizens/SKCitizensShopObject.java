@@ -44,6 +44,7 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.DespawnReason;
 import net.citizensnpcs.api.event.SpawnReason;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPC.Metadata;
 import net.citizensnpcs.api.trait.trait.MobType;
 import net.citizensnpcs.api.trait.trait.Owner;
 
@@ -275,6 +276,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 		npcHasChanged |= this.applyNpcData(npc);
 		npcHasChanged |= this.updateNpcOwner(npc);
+		npcHasChanged |= this.updateNpcFluidPushable(npc);
 
 		// Update the registered NPC entity:
 		// This also updates the shopkeeper's location if the NPC is spawned and has changed its
@@ -313,6 +315,27 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			Log.debug(() -> shopkeeper.getLogPrefix() + "Citizens NPC owner removed.");
 		}
 		return npcHasChanged;
+	}
+
+	private boolean updateNpcFluidPushable(NPC npc) {
+		switch (Settings.citizenNpcFluidPushable) {
+		case TRUE:
+			if (!npc.isPushableByFluids()) {
+				npc.data().set(Metadata.FLUID_PUSHABLE, true);
+				Log.debug(() -> shopkeeper.getLogPrefix() + "Made Citizens NPC fluid pushable.");
+				return true;
+			}
+			return false;
+		case FALSE:
+			if (npc.isPushableByFluids()) {
+				npc.data().set(Metadata.FLUID_PUSHABLE, false);
+				Log.debug(() -> shopkeeper.getLogPrefix() + "Made Citizens NPC fluid unpushable.");
+				return true;
+			}
+			return false;
+		default:
+			return false;
+		}
 	}
 
 	// NPC DATA

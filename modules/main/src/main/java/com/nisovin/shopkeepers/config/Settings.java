@@ -42,6 +42,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Trilean;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class Settings extends Config {
@@ -218,6 +219,7 @@ public class Settings extends Config {
 	public static boolean enableCitizenShops = true;
 	public static EntityType defaultCitizenNpcType = EntityType.PLAYER;
 	public static boolean setCitizenNpcOwnerOfPlayerShops = false;
+	public static Trilean citizenNpcFluidPushable = Trilean.FALSE;
 	public static boolean cancelCitizenNpcInteractions = true;
 	public static boolean saveCitizenNpcsInstantly = false;
 	public static boolean snapshotsSaveCitizenNpcData = true;

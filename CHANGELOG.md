@@ -4,6 +4,9 @@ Date format: (YYYY-MM-DD)
 ## v2.19.0 (TBA)
 ### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+* Add setting `citizen-npc-fluid-pushable` (default: `false`) to make all shopkeeper Citizens NPCs pushable by fluids (`true`), unpushable by fluids (`false`), or not modify their current behavior (`"undefined"`).
+  * When set to `"undefined"`, the Citizens NPCs are not modified but retain their default or previously set fluid pushable behavior.
+  * Unfortunately, the Citizens plugin has no in-game command yet to toggle the fluid pushable state of individual NPCs. But this is likely to be added in the future.
 * Shulker shopkeepers peek at nearby players now.
   * This behavior can be disabled with the setting `shulker-peek-if-player-nearby` (default: `true`).
   * The setting `shulker-peek-height` (default `0.3`) defines how much the shulker opens when it peeks.

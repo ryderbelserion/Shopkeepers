@@ -353,6 +353,9 @@ default-citizen-npc-type: 'PLAYER'
 # for your players accordingly, you can allow shop owners to use the commands
 # of the Citizens plugin to edit the Citizens NPCs of their NPC shopkeepers.
 set-citizen-npc-owner-of-player-shops: false
+# Whether to make shopkeeper Citizens NPCs pushable by fluids (true), unpushable by fluids (false),
+# or not modify their current behavior ("undefined").
+citizen-npc-fluid-pushable: false
 # Whether to cancel interactions with Citizen shopkeeper NPCs.
 # The default behavior is to cancel all interactions with shopkeeper shop objects (mobs, signs,
 # citizen NPCs, etc.) in order to prevent any usual interaction behaviors to take place (e.g.
