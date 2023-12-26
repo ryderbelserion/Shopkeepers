@@ -506,8 +506,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		if (spawnLocation == null) return false;
 
 		this.lastSpawnLocation = spawnLocation;
-		SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(entity, spawnLocation);
-		boolean teleportSuccess = entity.teleport(spawnLocation);
+		boolean teleportSuccess = SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().teleport(entity, spawnLocation);
 
 		// Inform the AI system:
 		livingShops.getLivingEntityAI().updateLocation(this);
@@ -669,8 +668,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			spawnLocation.setPitch(entityLoc.getPitch());
 			this.lastSpawnLocation = spawnLocation;
 
-			SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(entity, spawnLocation);
-			entity.teleport(spawnLocation);
+			SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().teleport(entity, spawnLocation);
 
 			this.overwriteAI();
 		}
@@ -693,8 +691,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		lastSpawnLocation.setYaw(entityLoc.getYaw());
 		lastSpawnLocation.setPitch(entityLoc.getPitch());
 
-		SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().forceEntityTeleport(entity, lastSpawnLocation);
-		entity.teleport(lastSpawnLocation);
+		SKShopkeepersPlugin.getInstance().getForcingEntityTeleporter().teleport(entity, lastSpawnLocation);
 	}
 
 	// AI

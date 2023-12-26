@@ -69,16 +69,26 @@ public class ForcingEntityTeleporter implements Listener {
 	}
 
 	/**
-	 * Tries to force the subsequent teleport for the given entity.
+	 * Teleports the given entity to the given location, trying to bypass any plugins that cancel or
+	 * modify any corresponding {@link EntityTeleportEvent}.
 	 * 
 	 * @param entity
-	 *            the entity being teleported
+	 *            the entity to teleport
 	 * @param toLocation
-	 *            the destination location to enforce
+	 *            the destination location
+	 * @return the result of the teleport
 	 */
-	public void forceEntityTeleport(Entity entity, Location toLocation) {
+	public boolean teleport(Entity entity, Location toLocation) {
 		this.nextTeleportEntityUuid = entity.getUniqueId();
 		this.toLocation = toLocation;
+
+		boolean result = entity.teleport(toLocation);
+
+		// This reset is required if the teleport did not actually trigger an event (e.g. on Spigot
+		// instead of Paper servers):
+		this.resetForcedEntityTeleport();
+
+		return result;
 	}
 
 	/**

@@ -706,8 +706,7 @@ public class LivingEntityAI implements Listener {
 		Location newLocation = Unsafe.assertNonNull(entity.getLocation(sharedLocation));
 		newLocation.add(0.0D, -fallingStepSize, 0.0D);
 
-		plugin.getForcingEntityTeleporter().forceEntityTeleport(entity, newLocation);
-		entity.teleport(newLocation);
+		plugin.getForcingEntityTeleporter().teleport(entity, newLocation);
 
 		sharedLocation.setWorld(null); // Reset
 	}
