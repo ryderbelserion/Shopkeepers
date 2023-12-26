@@ -1,9 +1,14 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.19.0 (TBA)
-### Supported MC versions: 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
+## v2.19.1 (TBA)
+### Supported MC versions: 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+
+## v2.19.0 (2023-12-26)
+### Supported MC versions: 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
+
+* Add support for MC 1.20.4. MC 1.20.3, which is mostly the same, is not officially supported. No new features or mobs. Experimental MC 1.21 mobs are not yet supported.
 * Add setting `citizen-npc-fluid-pushable` (default: `false`) to make all shopkeeper Citizens NPCs pushable by fluids (`true`), unpushable by fluids (`false`), or not modify their current behavior (`"undefined"`).
   * When set to `"undefined"`, the Citizens NPCs are not modified but retain their default or previously set fluid pushable behavior.
   * Unfortunately, the Citizens plugin has no in-game command yet to toggle the fluid pushable state of individual NPCs. But this is likely to be added in the future.
