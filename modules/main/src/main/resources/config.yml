@@ -32,6 +32,8 @@ debug: false
 # - 'empty-trades': Logs detailed item information for the selected trade and
 #    the items in the input slots whenever a player clicks an empty trading
 #    result slot.
+# - 'text-components': Logs additional debug output whenever component-based
+#    text is sent.
 debug-options: []
 # Whether to report anonymous usage statistics to https://bStats.org
 # All reported information can be found here:

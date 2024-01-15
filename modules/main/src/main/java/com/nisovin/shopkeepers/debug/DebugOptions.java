@@ -37,6 +37,8 @@ public final class DebugOptions {
 	// Logs detailed item information for the selected trade and the items in the input slots
 	// whenever a player clicks an empty trading result slot.
 	public static final String emptyTrades = add("empty-trades");
+	// Logs additional debug output whenever component-based text is sent.
+	public static final String textComponents = add("text-components");
 
 	private static String add(String debugOption) {
 		allOptions.add(debugOption);

@@ -8,6 +8,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+import com.nisovin.shopkeepers.debug.Debug;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.text.ClickEventText;
 import com.nisovin.shopkeepers.text.FormattingText;
@@ -45,8 +47,6 @@ public final class SpigotText {
 		}
 	}
 
-	public static boolean debugging = false;
-
 	// Separate class that gets only accessed if Spigot is present. Avoids class loading issues.
 	private static final class Internal {
 
@@ -55,7 +55,7 @@ public final class SpigotText {
 		public static void sendMessage(CommandSender recipient, Text message) {
 			assert recipient != null && message != null;
 			BaseComponent component = toSpigot(message);
-			if (debugging) {
+			if (Debug.isDebugging(DebugOptions.textComponents)) {
 				Log.info("Text: " + message);
 				Log.info("Plain text: " + message.toPlainText());
 				Log.info("Format: " + message.toFormat());
