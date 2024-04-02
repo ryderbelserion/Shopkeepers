@@ -35,8 +35,7 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Method obcGetHandleMethod;
 
 	public FailedHandler() throws Exception {
-		String cbVersion = ServerUtils.getCraftBukkitVersion();
-		String obcPackageString = "org.bukkit.craftbukkit." + cbVersion + ".";
+		String cbPackage = ServerUtils.getCraftBukkitPackage();
 
 		// Minecraft
 		nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
@@ -58,10 +57,10 @@ public final class FailedHandler implements NMSCallProvider {
 		);
 
 		// CraftBukkit
-		obcCraftItemStackClass = Class.forName(obcPackageString + "inventory.CraftItemStack");
+		obcCraftItemStackClass = Class.forName(cbPackage + ".inventory.CraftItemStack");
 		obcAsNMSCopyMethod = obcCraftItemStackClass.getDeclaredMethod("asNMSCopy", ItemStack.class);
 
-		obcCraftEntityClass = Class.forName(obcPackageString + "entity.CraftEntity");
+		obcCraftEntityClass = Class.forName(cbPackage + ".entity.CraftEntity");
 		obcGetHandleMethod = obcCraftEntityClass.getDeclaredMethod("getHandle");
 	}
 

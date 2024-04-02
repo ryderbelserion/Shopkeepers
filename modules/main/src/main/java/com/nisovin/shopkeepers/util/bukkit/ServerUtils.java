@@ -34,11 +34,9 @@ public final class ServerUtils {
 		return MAPPINGS_VERSION;
 	}
 
-	public static String getCraftBukkitVersion() {
+	public static String getCraftBukkitPackage() {
 		Package pkg = Unsafe.assertNonNull(Bukkit.getServer().getClass().getPackage());
-		String packageName = pkg.getName();
-		String cbVersion = packageName.substring(packageName.lastIndexOf('.') + 1);
-		return cbVersion;
+		return pkg.getName();
 	}
 
 	private ServerUtils() {

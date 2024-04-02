@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.compat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -93,8 +94,7 @@ public final class NMSManager {
 		}
 
 		// Incompatible server version detected:
-		String cbVersion = ServerUtils.getCraftBukkitVersion();
-		Log.warning("Incompatible server version: " + cbVersion + " (mappings: "
+		Log.warning("Incompatible server version: " + Bukkit.getBukkitVersion() + " (mappings: "
 				+ mappingsVersion + ")");
 		Log.warning("Shopkeepers is trying to run in 'compatibility mode'.");
 		Log.info("Check for updates at: " + plugin.getDescription().getWebsite());
