@@ -23,6 +23,8 @@ public interface TradeEffect {
 
 	/**
 	 * This is called when the trade was aborted.
+	 * <p>
+	 * Do not modify the given {@link ShopkeeperTradeEvent} at this point!
 	 * 
 	 * @param tradeEvent
 	 *            the aborted trade
@@ -30,10 +32,12 @@ public interface TradeEffect {
 	public void onTradeAborted(ShopkeeperTradeEvent tradeEvent);
 
 	/**
-	 * This is called when the trade is being applied, before the
-	 * {@link ShopkeeperTradeCompletedEvent}.
+	 * This is called when the trade is being applied, after most of the default trade application,
+	 * but before the {@link ShopkeeperTradeCompletedEvent}.
 	 * <p>
 	 * This can be used to apply additional trade effects.
+	 * <p>
+	 * Do not modify the given {@link ShopkeeperTradeEvent} at this point!
 	 * 
 	 * @param tradeEvent
 	 *            the trade
