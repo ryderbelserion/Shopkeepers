@@ -7,6 +7,10 @@ Date format: (YYYY-MM-DD)
 * Fix: In v2.19.0, we added a workaround for a change in the Paper server to now force teleports of shopkeeper entities. However, on Spigot servers, we need to manually reset the forced teleport request again after the entity teleport, because we don't receive an EntityTeleportEvent there.
 * Debug: Add debug option `text-components` to log additional debug output whenever component-based text is sent.
 * Prepare for Paper's future removal of CraftBukkit's package relocation: Adjust the fallback compatibility mode to no longer try to parse the CraftBukkit version from the package name.
+* Fix: The entity argument for command `editVillager` no longer accepts non-villagers, shopkeepers, or Citizens NPCs.
+
+**Message changes:**  
+* Added `command-entity-argument-no-villager`.
 
 ## v2.19.0 (2023-12-26)
 ### Supported MC versions: 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

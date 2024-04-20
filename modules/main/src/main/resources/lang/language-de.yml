@@ -634,6 +634,7 @@ command-shop-object-type-argument-invalid: "&cUnbekannter Shop-Objekt-Typ '&e{ar
 command-shopkeeper-argument-invalid: "&cEs wurde kein Shop gefunden für '&e{argument}&c'."
 command-shopkeeper-argument-no-admin-shop: "&cShop '&e{argument}&c' ist kein Admin-Shop."
 command-shopkeeper-argument-no-player-shop: "&cShop '&e{argument}&c' ist kein Spieler-Shop."
+command-entity-argument-no-villager: "&cObjekt '&e{argument}&c' ist kein normaler Dorfbewohner."
 
 ambiguous-player-name: "&cEs gibt mehrere Treffer für den Namen '&e{name}&c'!"
 ambiguous-player-name-entry: "&c  - '&e{name}&r&c' (&6{uuid}&c)"
