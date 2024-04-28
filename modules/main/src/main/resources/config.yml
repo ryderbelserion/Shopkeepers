@@ -188,16 +188,10 @@ add-shop-creation-item-tag: true
 # already add the tag to all newly created shop creation items, but separately
 # enable 'identify-shop-creation-item-by-tag' later, once they expect or
 # verified that the old shop creation item is no longer in use.
+# Unfortunately, the Shopkeepers plugin provides no built-in solution to
+# automatically migrate all occurrences of the old shop creation item in the
+# world or plugin data.
 identify-shop-creation-item-by-tag: true
-# Migrates all items in shopkeepers (i.e. in trades, hire cost, etc.) that
-# match the 'shop-creation-item' to include the tag specified by
-# 'add-shop-creation-item-tag'.
-# It is recommended to only enable this setting once, restart the server to
-# apply the migration, and then disable this setting again.
-# Unfortunately, beyond this setting, the Shopkeepers plugin provides no
-# built-in solution to automatically migrate all occurrences of the old shop
-# creation item in other world or plugin data.
-add-tag-to-shop-creation-items-in-shops: false
 
 # Whether to prevent normal usage of the shop creation item. Players with the
 # bypass permission (usually admins) can bypass this.

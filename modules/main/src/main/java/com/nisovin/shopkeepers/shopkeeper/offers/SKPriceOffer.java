@@ -12,9 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
-import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
@@ -263,20 +261,6 @@ public class SKPriceOffer implements PriceOffer {
 				} else {
 					item = Unsafe.assertNonNull(migratedItem);
 					itemsMigrated = true;
-				}
-			}
-
-			if (Settings.addTagToShopCreationItemsInShops
-					&& Settings.shopCreationItem.matches(item)) {
-				ItemStack shopCreationItemWithTag = item.copy();
-				if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
-					item = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
-					itemsMigrated = true;
-
-					final int offerId = i + 1;
-					Log.debug(DebugOptions.itemMigrations,
-							() -> logPrefix + "Tag added to shop creation item in trade offer "
-									+ offerId);
 				}
 			}
 

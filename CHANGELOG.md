@@ -10,9 +10,7 @@ Date format: (YYYY-MM-DD)
   * Setting `add-shop-creation-item-tag` (default: `true`): Whether to add the tag to newly created shop creation items, e.g. when created via the `/shopkeeper give` command.
   * Setting `identify-shop-creation-item-by-tag` (default: `true`): Whether to identify the shop creation item by the tag.
     * This is a separate setting in order to help server owners with the migration process: Server owners can enable `add-shop-creation-item-tag` very early to already add the tag to all newly created shop creation items, but separately enable `identify-shop-creation-item-by-tag` later, once they expect or verified that the old shop creation item is no longer in use.
-  * Setting `add-tag-to-shop-creation-items-in-shops` (default: `false`): Whether to migrate all items in shopkeepers (i.e. in trades, hire cost, etc.) that match the `shop-creation-item` to include the new tag.
-    * It is recommended to only enable this setting once, restart the server to apply the migration, and then disable this setting again.
-    * Unfortunately, beyond this setting, the Shopkeepers plugin provides no built-in solution to automatically migrate all occurrences of the old shop creation item in other world or plugin data.
+    * Unfortunately, the Shopkeepers plugin provides no built-in solution to automatically migrate all occurrences of the old shop creation item in the world or plugin data.
 * Fix: In v2.19.0, we added a workaround for a change in the Paper server to now force teleports of shopkeeper entities. However, on Spigot servers, we need to manually reset the forced teleport request again after the entity teleport, because we don't receive an EntityTeleportEvent there.
 * Debug: Add debug option `text-components` to log additional debug output whenever component-based text is sent.
 * Prepare for Paper's future removal of CraftBukkit's package relocation: Adjust the fallback compatibility mode to no longer try to parse the CraftBukkit version from the package name.

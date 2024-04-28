@@ -100,7 +100,6 @@ public class Settings extends Config {
 
 	public static boolean addShopCreationItemTag = true;
 	public static boolean identifyShopCreationItemByTag = true;
-	public static boolean addTagToShopCreationItemsInShops = false;
 
 	public static boolean preventShopCreationItemRegularUsage = true;
 	public static boolean invertShopTypeAndObjectTypeSelection = false;
@@ -856,12 +855,6 @@ public class Settings extends Config {
 		if (identifyShopCreationItemByTag && !addShopCreationItemTag) {
 			Log.warning(this.getLogPrefix() + "'identify-shop-creation-item-by-tag' enabled, "
 					+ "but 'add-shop-creation-item-tag' is disabled! Intended?");
-		}
-		if (addTagToShopCreationItemsInShops && !addShopCreationItemTag) {
-			Log.warning(this.getLogPrefix() + "'add-tag-to-shop-creation-items-in-shops' cannot be"
-					+ " enabled unless 'add-shop-creation-item-tag' is also enabled!");
-			// Disable to not accidentally apply the migration:
-			addTagToShopCreationItemsInShops = false;
 		}
 
 		if (maxTradesPages < 1) {

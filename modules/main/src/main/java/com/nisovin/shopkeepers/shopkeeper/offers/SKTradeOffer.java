@@ -13,9 +13,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
-import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
@@ -308,47 +306,6 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				} else {
 					item2 = migratedItem2;
 					itemsMigrated = true;
-				}
-			}
-
-			if (Settings.addTagToShopCreationItemsInShops) {
-				if (Settings.shopCreationItem.matches(resultItem)) {
-					ItemStack shopCreationItemWithTag = resultItem.copy();
-					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
-						resultItem = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
-						itemsMigrated = true;
-
-						final int offerId = i + 1;
-						Log.debug(DebugOptions.itemMigrations,
-								() -> logPrefix
-										+ "Tag added to shop creation item in trade offer "
-										+ offerId);
-					}
-				}
-				if (Settings.shopCreationItem.matches(item1)) {
-					ItemStack shopCreationItemWithTag = item1.copy();
-					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
-						item1 = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
-						itemsMigrated = true;
-
-						final int offerId = i + 1;
-						Log.debug(DebugOptions.itemMigrations,
-								() -> logPrefix + "Tag added to shop creation item in trade offer "
-										+ offerId);
-					}
-				}
-				if (Settings.shopCreationItem.matches(item2)) {
-					assert item2 != null;
-					ItemStack shopCreationItemWithTag = item2.copy();
-					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
-						item2 = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
-						itemsMigrated = true;
-
-						final int offerId = i + 1;
-						Log.debug(DebugOptions.itemMigrations,
-								() -> logPrefix + "Tag added to shop creation item in trade offer "
-										+ offerId);
-					}
 				}
 			}
 

@@ -418,19 +418,6 @@ public abstract class AbstractPlayerShopkeeper
 					itemMigrated = true;
 				}
 
-				if (Settings.addTagToShopCreationItemsInShops
-						&& Settings.shopCreationItem.matches(hireCost)) {
-					assert hireCost != null;
-					ItemStack shopCreationItemWithTag = hireCost.copy();
-					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
-						hireCost = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
-						itemMigrated = true;
-
-						Log.debug(DebugOptions.itemMigrations,
-								() -> logPrefix + "Tag added to shop creation item in hire cost.");
-					}
-				}
-
 				if (!itemMigrated) return false; // Nothing migrated.
 
 				// Write back the migrated hire cost item:
