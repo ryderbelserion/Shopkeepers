@@ -172,7 +172,7 @@ shop-creation-item:
 
 # Whether to add a custom NBT tag to newly created shop creation items, e.g.
 # when created via the '/shopkeeper give' command.
-# Tag: "PublicBukkitValues:{'shopkeepers:shop_creation_item':1b}"
+# Tag: 'PublicBukkitValues: {"shopkeepers:shop_creation_item": 1b}'
 # In combination with 'identify-shop-creation-item-by-tag', this provides
 # several benefits, such as being able to change the 'shop-creation-item' in
 # the future without breaking any existing shop creation items in the world
