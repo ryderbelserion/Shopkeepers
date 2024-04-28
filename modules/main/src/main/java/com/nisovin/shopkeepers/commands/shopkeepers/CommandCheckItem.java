@@ -13,9 +13,9 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.currency.Currency;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
@@ -50,7 +50,7 @@ class CommandCheckItem extends PlayerCommand {
 		player.sendMessage("- MC matching off-hand item: "
 				+ toDisplayString(NMSManager.getProvider().matches(mainHandItem, offHandItem)));
 		player.sendMessage("- Is shop creation item: "
-				+ checkItems(mainHandItem, offHandItem, Settings.shopCreationItem::matches));
+				+ checkItems(mainHandItem, offHandItem, ShopCreationItem::isShopCreationItem));
 		for (Currency currency : Currencies.getAll()) {
 			player.sendMessage("- Is currency item '" + currency.getId() + "': "
 					+ checkItems(mainHandItem, offHandItem, currency.getItemData()::matches));

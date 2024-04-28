@@ -11,7 +11,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
@@ -112,7 +111,7 @@ class ShopCreationItemSelectionTask implements Runnable {
 		cleanup(player);
 
 		if (!player.isOnline()) return; // No longer online
-		if (!Settings.shopCreationItem.matches(player.getInventory().getItemInMainHand())) {
+		if (!ShopCreationItem.isShopCreationItem(player.getInventory().getItemInMainHand())) {
 			// No longer holding the shop creation item in hand:
 			return;
 		}

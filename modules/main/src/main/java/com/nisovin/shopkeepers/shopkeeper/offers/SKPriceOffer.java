@@ -12,7 +12,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
@@ -208,9 +210,8 @@ public class SKPriceOffer implements PriceOffer {
 		dataValue.set(offerListData);
 	}
 
-	public static List<? extends @NonNull PriceOffer> loadOffers(
-			DataValue dataValue
-	) throws InvalidDataException {
+	public static List<? extends @NonNull PriceOffer> loadOffers(DataValue dataValue)
+			throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
 		Object offerListData = dataValue.get();
 		if (offerListData == null) {
@@ -221,13 +222,11 @@ public class SKPriceOffer implements PriceOffer {
 	}
 
 	// Returns true if the data has changed due to migrations.
-	public static boolean migrateOffers(
-			DataValue dataValue,
-			String logPrefix
-	) throws InvalidDataException {
+	public static boolean migrateOffers(DataValue dataValue, String logPrefix)
+			throws InvalidDataException {
 		Validate.notNull(logPrefix, "logPrefix is null");
 		List<? extends @NonNull PriceOffer> offers = loadOffers(dataValue);
-		List<? extends @NonNull PriceOffer> migratedOffers = migrateItems(offers);
+		List<? extends @NonNull PriceOffer> migratedOffers = migrateItems(offers, logPrefix);
 		if (offers == migratedOffers) {
 			// No offers were migrated.
 			return false;
@@ -235,14 +234,14 @@ public class SKPriceOffer implements PriceOffer {
 
 		// Write back the migrated offers:
 		saveOffers(dataValue, migratedOffers);
-		Log.debug(DebugOptions.itemMigrations,
-				() -> logPrefix + "Migrated items of trade offers.");
+		Log.debug(DebugOptions.itemMigrations, () -> logPrefix + "Migrated items of trade offers.");
 		return true;
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
 	private static List<? extends @NonNull PriceOffer> migrateItems(
-			@ReadOnly List<? extends @NonNull PriceOffer> offers
+			@ReadOnly List<? extends @NonNull PriceOffer> offers,
+			String logPrefix
 	) throws InvalidDataException {
 		Validate.notNull(offers, "offers is null");
 		assert !CollectionUtils.containsNull(offers);
@@ -264,6 +263,20 @@ public class SKPriceOffer implements PriceOffer {
 				} else {
 					item = Unsafe.assertNonNull(migratedItem);
 					itemsMigrated = true;
+				}
+			}
+
+			if (Settings.addTagToShopCreationItemsInShops
+					&& Settings.shopCreationItem.matches(item)) {
+				ItemStack shopCreationItemWithTag = item.copy();
+				if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
+					item = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
+					itemsMigrated = true;
+
+					final int offerId = i + 1;
+					Log.debug(DebugOptions.itemMigrations,
+							() -> logPrefix + "Tag added to shop creation item in trade offer "
+									+ offerId);
 				}
 			}
 

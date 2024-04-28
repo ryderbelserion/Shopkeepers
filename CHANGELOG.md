@@ -4,6 +4,15 @@ Date format: (YYYY-MM-DD)
 ## v2.19.1 (TBA)
 ### Supported MC versions: 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+* Add settings to identify the shop creation item by a custom NBT tag.
+  * Previously, we identified shop creation items by matching their item data with the data specified in the `shop-creation-item` setting. Adding and identifying the shop creation item by a custom NBT tag instead has several benefits, such as being able to change the `shop-creation-item` in the future without breaking any existing shop creation items in the world (e.g. in chests, player inventories, trades, third-party plugin data, etc.). Also, in the past, we occasionally ran into issues when the server implementation made changes to how it creates the item based on the data specified inside the config.
+  * These new settings are enabled by default for new configurations, but disabled when migrating from a previous Shopkeepers version in order to not break backwards compatibility for existing items.
+  * Setting `add-shop-creation-item-tag` (default: `true`): Whether to add the tag to newly created shop creation items, e.g. when created via the `/shopkeeper give` command.
+  * Setting `identify-shop-creation-item-by-tag` (default: `true`): Whether to identify the shop creation item by the tag.
+    * This is a separate setting in order to help server owners with the migration process: Server owners can enable `add-shop-creation-item-tag` very early to already add the tag to all newly created shop creation items, but separately enable `identify-shop-creation-item-by-tag` later, once they expect or verified that the old shop creation item is no longer in use.
+  * Setting `add-tag-to-shop-creation-items-in-shops` (default: `false`): Whether to migrate all items in shopkeepers (i.e. in trades, hire cost, etc.) that match the `shop-creation-item` to include the new tag.
+    * It is recommended to only enable this setting once, restart the server to apply the migration, and then disable this setting again.
+    * Unfortunately, beyond this setting, the Shopkeepers plugin provides no built-in solution to automatically migrate all occurrences of the old shop creation item in other world or plugin data.
 * Fix: In v2.19.0, we added a workaround for a change in the Paper server to now force teleports of shopkeeper entities. However, on Spigot servers, we need to manually reset the forced teleport request again after the entity teleport, because we don't receive an EntityTeleportEvent there.
 * Debug: Add debug option `text-components` to log additional debug output whenever component-based text is sent.
 * Prepare for Paper's future removal of CraftBukkit's package relocation: Adjust the fallback compatibility mode to no longer try to parse the CraftBukkit version from the package name.

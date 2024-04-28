@@ -6,6 +6,18 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public final class ConfigMigrationHelper {
 
+	// Returns true if the setting was newly added.
+	public static boolean addSetting(DataContainer configData, String key, Object value) {
+		Validate.notNull(configData, "configData is null");
+		Validate.notNull(key, "key is null");
+		if (!configData.contains(key)) {
+			Log.info("  Adding setting '" + key + "' with value: " + value);
+			configData.set(key, value);
+			return true;
+		}
+		return false;
+	}
+
 	// Returns true if there was a value set that got removed.
 	public static boolean removeSetting(DataContainer configData, String key) {
 		Validate.notNull(configData, "configData is null");

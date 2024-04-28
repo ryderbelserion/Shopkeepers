@@ -9,6 +9,9 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.java.Validate;
 
+/**
+ * Handles Minecraft-native item data migrations.
+ */
 public final class ItemMigration {
 
 	private static @Nullable Inventory DUMMY_INVENTORY = null;

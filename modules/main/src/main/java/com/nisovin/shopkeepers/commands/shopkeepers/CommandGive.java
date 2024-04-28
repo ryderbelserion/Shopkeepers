@@ -15,8 +15,8 @@ import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 
@@ -50,8 +50,7 @@ class CommandGive extends Command {
 		int amount = context.get(ARGUMENT_AMOUNT);
 		assert amount >= 1 && amount <= 1024;
 
-		ItemStack item = Settings.shopCreationItem.createItemStack();
-		item.setAmount(amount);
+		ItemStack item = ShopCreationItem.create(amount);
 
 		PlayerInventory inventory = targetPlayer.getInventory();
 		@Nullable ItemStack[] contents = Unsafe.castNonNull(inventory.getStorageContents());

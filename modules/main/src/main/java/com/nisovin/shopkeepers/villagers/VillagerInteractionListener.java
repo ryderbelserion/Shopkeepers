@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -187,7 +188,7 @@ public class VillagerInteractionListener implements Listener {
 		}
 
 		// Give the player the shop creation item:
-		ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
+		ItemStack shopCreationItem = ShopCreationItem.create();
 		Map<Integer, ItemStack> remaining = playerInventory.addItem(shopCreationItem);
 		if (!remaining.isEmpty()) {
 			villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);

@@ -21,7 +21,8 @@ public class ConfigMigrations {
 			new ConfigMigration2(),
 			new ConfigMigration3(),
 			new ConfigMigration4(),
-			new ConfigMigration5()
+			new ConfigMigration5(),
+			new ConfigMigration6()
 	);
 
 	public static int getLatestVersion() {

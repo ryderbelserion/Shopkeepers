@@ -170,6 +170,35 @@ shop-creation-item:
   type: VILLAGER_SPAWN_EGG
   display-name: "&aShopkeeper"
 
+# Whether to add a custom NBT tag to newly created shop creation items, e.g.
+# when created via the '/shopkeeper give' command.
+# Tag: "PublicBukkitValues:{'shopkeepers:shop_creation_item':1b}"
+# In combination with 'identify-shop-creation-item-by-tag', this provides
+# several benefits, such as being able to change the 'shop-creation-item' in
+# the future without breaking any existing shop creation items in the world
+# (e.g. in chests, player inventories, trades, third-party plugin data, etc.).
+# By default, this and 'identify-shop-creation-item-by-tag' are enabled for new
+# configurations, but disabled for backwards compatibility reasons for servers
+# that migrated from a config-version of 5 or lower.
+add-shop-creation-item-tag: true
+# Whether to identify the shop creation item by the custom NBT tag added via
+# 'add-shop-creation-item-tag'.
+# This is a separate setting in order to help server owners with the migration
+# process: Server owners can enable 'add-shop-creation-item-tag' very early to
+# already add the tag to all newly created shop creation items, but separately
+# enable 'identify-shop-creation-item-by-tag' later, once they expect or
+# verified that the old shop creation item is no longer in use.
+identify-shop-creation-item-by-tag: true
+# Migrates all items in shopkeepers (i.e. in trades, hire cost, etc.) that
+# match the 'shop-creation-item' to include the tag specified by
+# 'add-shop-creation-item-tag'.
+# It is recommended to only enable this setting once, restart the server to
+# apply the migration, and then disable this setting again.
+# Unfortunately, beyond this setting, the Shopkeepers plugin provides no
+# built-in solution to automatically migrate all occurrences of the old shop
+# creation item in other world or plugin data.
+add-tag-to-shop-creation-items-in-shops: false
+
 # Whether to prevent normal usage of the shop creation item. Players with the
 # bypass permission (usually admins) can bypass this.
 prevent-shop-creation-item-regular-usage: true

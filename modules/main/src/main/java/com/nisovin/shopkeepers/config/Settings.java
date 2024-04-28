@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -35,6 +36,7 @@ import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
@@ -95,6 +97,10 @@ public class Settings extends Config {
 			c("&aShopkeeper"),
 			null
 	);
+
+	public static boolean addShopCreationItemTag = true;
+	public static boolean identifyShopCreationItemByTag = true;
+	public static boolean addTagToShopCreationItemsInShops = false;
 
 	public static boolean preventShopCreationItemRegularUsage = true;
 	public static boolean invertShopTypeAndObjectTypeSelection = false;
@@ -380,8 +386,8 @@ public class Settings extends Config {
 		public static TradingRecipeDraft bookEmptyTrade = Unsafe.uncheckedNull();
 		public static TradingRecipeDraft bookEmptyTradeSlotItems = Unsafe.uncheckedNull();
 
+		public static ItemData shopCreationItemData = Unsafe.uncheckedNull();
 		public static ItemData placeholderItemData = Unsafe.uncheckedNull();
-
 		public static ItemData namingItemData = Unsafe.uncheckedNull();
 
 		// Button items:
@@ -569,6 +575,17 @@ public class Settings extends Config {
 							Messages.bookShop_emptyItem2Lore
 					) : bookEmptyItem2.createItemStack()
 			);
+
+			// If enabled, add the shop creation item tag:
+			if (addShopCreationItemTag) {
+				ItemStack shopCreationItemStack = shopCreationItem.createItemStack();
+				ShopCreationItem.addTag(shopCreationItemStack);
+				shopCreationItemData = new ItemData(UnmodifiableItemStack.ofNonNull(
+						shopCreationItemStack
+				));
+			} else {
+				shopCreationItemData = shopCreationItem;
+			}
 
 			// Ignore (clear) the display name that is used to specify the substituted item type:
 			placeholderItemData = new ItemData(UnmodifiableItemStack.ofNonNull(
@@ -834,6 +851,19 @@ public class Settings extends Config {
 				nameItem = nameItem.withType(Material.NAME_TAG);
 			}
 		}
+
+		// Warn about potential configuration mistakes regarding the shop creation item tag:
+		if (identifyShopCreationItemByTag && !addShopCreationItemTag) {
+			Log.warning(this.getLogPrefix() + "'identify-shop-creation-item-by-tag' enabled, "
+					+ "but 'add-shop-creation-item-tag' is disabled! Intended?");
+		}
+		if (addTagToShopCreationItemsInShops && !addShopCreationItemTag) {
+			Log.warning(this.getLogPrefix() + "'add-tag-to-shop-creation-items-in-shops' cannot be"
+					+ " enabled unless 'add-shop-creation-item-tag' is also enabled!");
+			// Disable to not accidentally apply the migration:
+			addTagToShopCreationItemsInShops = false;
+		}
+
 		if (maxTradesPages < 1) {
 			Log.warning(this.getLogPrefix() + "'max-trades-pages' can not be less than 1!");
 			maxTradesPages = 1;

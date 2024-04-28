@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 
 public class RemoveShopOnContainerBreak {
 
@@ -56,7 +57,7 @@ public class RemoveShopOnContainerBreak {
 			if (!shopkeeper.isValid()) continue; // Skip if no longer valid
 			// Return the shop creation item for player shopkeepers:
 			if (Settings.deletingPlayerShopReturnsCreationItem) {
-				ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
+				ItemStack shopCreationItem = ShopCreationItem.create();
 				block.getWorld().dropItemNaturally(block.getLocation(), shopCreationItem);
 			}
 			// Note: We do not pass the player responsible for breaking the container here, because

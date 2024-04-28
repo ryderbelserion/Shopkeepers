@@ -13,7 +13,9 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
@@ -230,9 +232,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		dataValue.set(offerListData);
 	}
 
-	public static List<? extends @NonNull TradeOffer> loadOffers(
-			DataValue dataValue
-	) throws InvalidDataException {
+	public static List<? extends @NonNull TradeOffer> loadOffers(DataValue dataValue)
+			throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
 		Object offerListData = dataValue.get();
 		if (offerListData == null) {
@@ -243,13 +244,11 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	}
 
 	// Returns true if the data has changed due to migrations.
-	public static boolean migrateOffers(
-			DataValue dataValue,
-			String logPrefix
-	) throws InvalidDataException {
+	public static boolean migrateOffers(DataValue dataValue, String logPrefix)
+			throws InvalidDataException {
 		Validate.notNull(logPrefix, "logPrefix is null");
 		List<? extends @NonNull TradeOffer> offers = loadOffers(dataValue);
-		List<? extends @NonNull TradeOffer> migratedOffers = migrateItems(offers);
+		List<? extends @NonNull TradeOffer> migratedOffers = migrateItems(offers, logPrefix);
 		if (offers == migratedOffers) {
 			// No offers were migrated.
 			return false;
@@ -263,7 +262,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 
 	// Note: Returns the same list instance if no items were migrated.
 	private static List<? extends @NonNull TradeOffer> migrateItems(
-			@ReadOnly List<? extends @NonNull TradeOffer> offers
+			@ReadOnly List<? extends @NonNull TradeOffer> offers,
+			String logPrefix
 	) throws InvalidDataException {
 		Validate.notNull(offers, "offers is null");
 		assert !CollectionUtils.containsNull(offers);
@@ -308,6 +308,47 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				} else {
 					item2 = migratedItem2;
 					itemsMigrated = true;
+				}
+			}
+
+			if (Settings.addTagToShopCreationItemsInShops) {
+				if (Settings.shopCreationItem.matches(resultItem)) {
+					ItemStack shopCreationItemWithTag = resultItem.copy();
+					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
+						resultItem = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
+						itemsMigrated = true;
+
+						final int offerId = i + 1;
+						Log.debug(DebugOptions.itemMigrations,
+								() -> logPrefix
+										+ "Tag added to shop creation item in trade offer "
+										+ offerId);
+					}
+				}
+				if (Settings.shopCreationItem.matches(item1)) {
+					ItemStack shopCreationItemWithTag = item1.copy();
+					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
+						item1 = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
+						itemsMigrated = true;
+
+						final int offerId = i + 1;
+						Log.debug(DebugOptions.itemMigrations,
+								() -> logPrefix + "Tag added to shop creation item in trade offer "
+										+ offerId);
+					}
+				}
+				if (Settings.shopCreationItem.matches(item2)) {
+					assert item2 != null;
+					ItemStack shopCreationItemWithTag = item2.copy();
+					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
+						item2 = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
+						itemsMigrated = true;
+
+						final int offerId = i + 1;
+						Log.debug(DebugOptions.itemMigrations,
+								() -> logPrefix + "Tag added to shop creation item in trade offer "
+										+ offerId);
+					}
 				}
 			}
 

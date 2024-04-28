@@ -115,7 +115,7 @@ class CreateListener implements Listener {
 
 		Player player = event.getPlayer();
 		ItemStack newItemInHand = player.getInventory().getItem(event.getNewSlot());
-		if (!Settings.shopCreationItem.matches(newItemInHand)) {
+		if (!ShopCreationItem.isShopCreationItem(newItemInHand)) {
 			return;
 		}
 
@@ -157,7 +157,7 @@ class CreateListener implements Listener {
 
 		// Make sure that the used item is the shop creation item:
 		ItemStack itemInHand = event.getItem();
-		if (!Settings.shopCreationItem.matches(itemInHand)) {
+		if (!ShopCreationItem.isShopCreationItem(itemInHand)) {
 			return;
 		}
 
@@ -333,7 +333,7 @@ class CreateListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockDispense(BlockDispenseEvent event) {
 		if (Settings.preventShopCreationItemRegularUsage
-				&& Settings.shopCreationItem.matches(event.getItem())) {
+				&& ShopCreationItem.isShopCreationItem(event.getItem())) {
 			Log.debug(() -> "Preventing dispensing of shop creation item at "
 					+ TextUtils.getLocationString(event.getBlock()));
 			event.setCancelled(true);
@@ -358,7 +358,7 @@ class CreateListener implements Listener {
 		// We check the permission first since this check is fast:
 		if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 		ItemStack itemInHand = InventoryUtils.getItem(player.getInventory(), event.getHand());
-		if (!Settings.shopCreationItem.matches(itemInHand)) return;
+		if (!ShopCreationItem.isShopCreationItem(itemInHand)) return;
 
 		// Prevent the entity interaction:
 		// TODO Only prevent the entity interaction if the item actually has a special entity
@@ -392,8 +392,8 @@ class CreateListener implements Listener {
 		}
 
 		Inventory anvilInventory = event.getInventory();
-		if (!Settings.shopCreationItem.matches(anvilInventory.getItem(0))
-				&& !Settings.shopCreationItem.matches(anvilInventory.getItem(1))) {
+		if (!ShopCreationItem.isShopCreationItem(anvilInventory.getItem(0))
+				&& !ShopCreationItem.isShopCreationItem(anvilInventory.getItem(1))) {
 			// No shop creation item involved.
 			// Note: We only prevent the renaming of the shop creation item, not its creation. I.e.
 			// we do not check the result item here. The shop creation item could intentionally be

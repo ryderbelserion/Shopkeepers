@@ -38,6 +38,7 @@ import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
+import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -164,7 +165,7 @@ public abstract class AbstractPlayerShopkeeper
 	public void delete(@Nullable Player player) {
 		// Return the shop creation item:
 		if (Settings.deletingPlayerShopReturnsCreationItem && player != null && this.isOwner(player)) {
-			ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
+			ItemStack shopCreationItem = ShopCreationItem.create();
 			Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
 			if (!remaining.isEmpty()) {
 				// Inventory is full, drop the item instead:
@@ -405,18 +406,35 @@ public abstract class AbstractPlayerShopkeeper
 				if (hireCost == null) return false; // Nothing to migrate
 
 				assert !ItemUtils.isEmpty(hireCost);
+
+				boolean itemMigrated = false;
 				UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
-				if (ItemUtils.isSimilar(hireCost, migratedHireCost)) {
-					// Nothing migrated.
-					return false;
+				if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
+					if (ItemUtils.isEmpty(migratedHireCost)) {
+						throw new InvalidDataException("Hire cost item migration failed: " + hireCost);
+					}
+
+					hireCost = migratedHireCost;
+					itemMigrated = true;
 				}
 
-				if (ItemUtils.isEmpty(migratedHireCost)) {
-					throw new InvalidDataException("Hire cost item migration failed: " + hireCost);
+				if (Settings.addTagToShopCreationItemsInShops
+						&& Settings.shopCreationItem.matches(hireCost)) {
+					assert hireCost != null;
+					ItemStack shopCreationItemWithTag = hireCost.copy();
+					if (ShopCreationItem.addTag(shopCreationItemWithTag)) {
+						hireCost = UnmodifiableItemStack.ofNonNull(shopCreationItemWithTag);
+						itemMigrated = true;
+
+						Log.debug(DebugOptions.itemMigrations,
+								() -> logPrefix + "Tag added to shop creation item in hire cost.");
+					}
 				}
+
+				if (!itemMigrated) return false; // Nothing migrated.
 
 				// Write back the migrated hire cost item:
-				shopkeeperData.set(HIRE_COST_ITEM, migratedHireCost);
+				shopkeeperData.set(HIRE_COST_ITEM, hireCost);
 				Log.debug(DebugOptions.itemMigrations, () -> logPrefix + "Migrated hire cost item.");
 				return true;
 			}
