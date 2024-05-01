@@ -22,6 +22,14 @@ source installJDK.sh 8
 
 buildSpigotIfMissing 1.16.5
 
+# Optional argument 'minimal': Only builds the api and main projects, which only depend on the
+# lowest supported Spigot version. So we can skip the building of later Spigot versions.
+if [ $# -eq 1 ] && [ "$1" = "minimal" ]; then
+    echo "Minimal build: Skipping build of additional Spigot dependencies."
+    popd
+    exit 0
+fi
+
 # The following versions require JDK 16 to build:
 source installJDK.sh 16
 

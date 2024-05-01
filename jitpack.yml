@@ -2,5 +2,7 @@
 #jdk:
 #- openjdk16
 
+# Jitpack times out if we try to do a full build with all Spigot dependencies. We therefore only
+# build the api and main projects.
 install:
-- ./build.sh
+- ./build.sh minimal

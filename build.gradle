@@ -243,12 +243,20 @@ subprojects {
 }
 
 // Predefined task list aliases:
-
+// Minimal build: Quicker build with fewer dependencies that only builds the api and main projects.
+// For example useful for the deployment of artifacts that third-part plugins might depend on.
 def taskListAliases = [
 	'cleanAssemble' : ['clean', 'assemble'],
 	'cleanBuild' : ['clean', 'build'],
 	'cleanInstall' : ['clean', 'build', 'publishToMavenLocal'],
 	'cleanPublish' : ['clean', 'build', 'publishToMavenLocal', 'publishAllPublicationsToLichtspieleNexusRepository'],
+	'cleanInstallMinimal' : [
+		'clean',
+		':shopkeepers-api:build',
+		':shopkeepers-main:build',
+		':shopkeepers-api:publishToMavenLocal',
+		':shopkeepers-main:publishToMavenLocal'
+	],
 ]
 
 gradle.startParameter.taskNames = gradle.startParameter.taskNames.collect {
