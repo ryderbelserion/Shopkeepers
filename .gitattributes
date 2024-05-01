@@ -1,0 +1,3 @@
+# Use Unix line endings for bash scripts. We run into issues when we try to run bash scripts from
+# within Gradle Exec tasks on Windows.
+*.sh text eol=lf

@@ -243,20 +243,17 @@ subprojects {
 }
 
 // Predefined task list aliases:
-// Minimal build: Quicker build with fewer dependencies that only builds the api and main projects.
-// For example useful for the deployment of artifacts that third-part plugins might depend on.
+// Minimal build: Quicker build that skips building any Spigot dependencies and only builds the API
+// project. For example used for building on Jitpack, because we run into issues if:
+// 1) The build takes too long.
+// 2) We try to build Spigot. For some reason, Jitpack does not find our Shopkeepers artifacts then,
+//    even though they are correctly installed in the local Maven repository.
 def taskListAliases = [
 	'cleanAssemble' : ['clean', 'assemble'],
 	'cleanBuild' : ['clean', 'build'],
 	'cleanInstall' : ['clean', 'build', 'publishToMavenLocal'],
 	'cleanPublish' : ['clean', 'build', 'publishToMavenLocal', 'publishAllPublicationsToLichtspieleNexusRepository'],
-	'cleanInstallMinimal' : [
-		'clean',
-		':shopkeepers-api:build',
-		':shopkeepers-main:build',
-		':shopkeepers-api:publishToMavenLocal',
-		':shopkeepers-main:publishToMavenLocal'
-	],
+	'cleanInstallMinimal' : ['clean', ':shopkeepers-api:publishToMavenLocal']
 ]
 
 gradle.startParameter.taskNames = gradle.startParameter.taskNames.collect {

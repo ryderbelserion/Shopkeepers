@@ -1,11 +1,18 @@
-# Must match or be newer than the JDK version used to build the jar files.
-# Otherwise Jitpack may produce empty jar files.
-jdk:
-- openjdk17
-before_install:
-- sdk install java 17.0.2-open
-- sdk use java 17.0.2-open
-# Jitpack times out if we try to do a full build with all Spigot dependencies. We therefore only
-# build the api and main projects.
+#jdk:
+#- openjdk17
+
+#before_install:
+#- sdk install java 17.0.2-open
+#- sdk use java 17.0.2-open
+#- java -version
+#- ./scripts/installSpigotDependencies.sh minimal
+
+# Jitpack times out if we try to do a full build with all Spigot dependencies. Also, Jitpack fails
+# to find our build artifacts if we build any Spigot dependencies (either in before_install,
+# install, or triggered via a Gradle Exec task). We therefore only build the api project.
+# If we were to build the Spigot dependencies again in the future, we need to manually delete these
+# artifacts again after the build to avoid Jitpack from publishing them.
 install:
+- java -version
 - ./build.sh minimal
+#- ./scripts/deleteSpigotDependencies.sh

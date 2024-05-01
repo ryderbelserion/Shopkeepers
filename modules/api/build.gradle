@@ -19,9 +19,14 @@ dependencies {
 	// Bukkit as one of their own dependencies anyway. If they require a more specific version or
 	// variant of Bukkit, our transitive Bukkit dependency would likely conflict with that and would
 	// then need to be manually ignored.
-	compileOnly libs.bukkit
+	// We depend on the Spigot API here, instead of Bukkit, even though we only actually require
+	// Bukkit, because the Spigot repository does not contain Bukkit for certain versions. And we
+	// also run into issues when we try to build Bukkit/Spigot as part of the Jitpack build.
+	//compileOnly libs.bukkit
+	compileOnly libs.spigot.api
 
-	testImplementation libs.bukkit
+	//testImplementation libs.bukkit
+	testImplementation libs.spigot.api
 	testImplementation libs.junit
 }
 
