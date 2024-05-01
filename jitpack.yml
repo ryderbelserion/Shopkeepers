@@ -1,7 +1,10 @@
-# TODO Jitpack does not support Java 16 yet.
-#jdk:
-#- openjdk16
-
+# Must match or be newer than the JDK version used to build the jar files.
+# Otherwise Jitpack may produce empty jar files.
+jdk:
+- openjdk17
+before_install:
+- sdk install java 17.0.2-open
+- sdk use java 17.0.2-open
 # Jitpack times out if we try to do a full build with all Spigot dependencies. We therefore only
 # build the api and main projects.
 install:
