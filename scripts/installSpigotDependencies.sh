@@ -42,9 +42,6 @@ buildSpigotIfMissing 1.17.1 remapped
 source installJDK.sh 17
 
 buildSpigotIfMissing 1.18.2 remapped
-buildSpigotIfMissing 1.19 remapped
-buildSpigotIfMissing 1.19.2 remapped
-buildSpigotIfMissing 1.19.3 remapped
 buildSpigotIfMissing 1.19.4 remapped
 buildSpigotIfMissing 1.20.1 remapped
 buildSpigotIfMissing 1.20.2 remapped

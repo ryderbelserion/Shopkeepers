@@ -40,9 +40,6 @@ public final class NMSManager {
 		register(new CompatVersion("1_20_R3", "1.20.2", "3478a65bfd04b15b431fe107b3617dfc"));
 		register(new CompatVersion("1_20_R2", "1.20.1", "bcf3dcb22ad42792794079f9443df2c0"));
 		register(new CompatVersion("1_19_R5", "1.19.4", "3009edc0fff87fa34680686663bd59df"));
-		register(new CompatVersion("1_19_R4", "1.19.3", "1afe2ffe8a9d7fc510442a168b3d4338"));
-		register(new CompatVersion("1_19_R3", "1.19.2", "69c84c88aeb92ce9fa9525438b93f4fe"));
-		register(new CompatVersion("1_19_R1", "1.19", "7b9de0da1357e5b251eddde9aa762916"));
 		// Different CB revision:
 		register(new CompatVersion("1_18_R3", "1.18.2", "eaeedbff51b16ead3170906872fda334"));
 		// Different CB revision:

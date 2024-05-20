@@ -11,6 +11,7 @@ Date format: (YYYY-MM-DD)
     * Use Sdkman instead of Jabba, because Jabba does not provide JDK 21. However, we still use Jabba for JDK 16, because it is missing in Sdkman for certain platforms.
     * Updated Gradle and some libraries accordingly.
     * Disabled the checkerframework checks for now, because on the current versions we get a lot of weird casting errors.
+* Drop support for MC 1.19, 1.19.2, and 1.19.3 to speed up build times. MC 1.19.4 is still supported and can be updated to without issues.
 * Add settings to identify the shop creation item by a custom NBT tag.
   * Previously, we identified shop creation items by matching their item data with the data specified in the `shop-creation-item` setting. Adding and identifying the shop creation item by a custom NBT tag instead has several benefits, such as being able to change the `shop-creation-item` in the future without breaking any existing shop creation items in the world (e.g. in chests, player inventories, trades, third-party plugin data, etc.). Also, in the past, we occasionally ran into issues when the server implementation made changes to how it creates the item based on the data specified inside the config.
   * These new settings are enabled by default for new configurations, but disabled when migrating from a previous Shopkeepers version in order to not break backwards compatibility for existing items.
