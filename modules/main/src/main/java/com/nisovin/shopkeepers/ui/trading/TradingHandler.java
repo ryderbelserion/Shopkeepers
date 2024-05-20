@@ -817,7 +817,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	/**
 	 * This is called for every newly created {@link TradingContext} and can be used by sub-classes
-	 * to set up additional metdata that is relevant for processing any subsequent trades.
+	 * to set up additional metadata that is relevant for processing any subsequent trades.
 	 * 
 	 * @param tradingContext
 	 *            the trading context, not <code>null</code>

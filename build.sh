@@ -16,8 +16,8 @@ else
     ./scripts/installSpigotDependencies.sh
 fi
 
-# We require Java 17 to build:
-source scripts/installJDK.sh 17
+# We require Java 21 to build:
+source scripts/installJDK.sh 21
 
 # Build via Gradle:
 if [ "$BUILD_TYPE" = "minimal" ]; then

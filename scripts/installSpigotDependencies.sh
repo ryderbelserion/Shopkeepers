@@ -50,4 +50,9 @@ buildSpigotIfMissing 1.20.1 remapped
 buildSpigotIfMissing 1.20.2 remapped
 buildSpigotIfMissing 1.20.4 remapped
 
+# The following versions require JDK 21 to build:
+source installJDK.sh 21
+
+buildSpigotIfMissing 1.20.6 remapped
+
 popd

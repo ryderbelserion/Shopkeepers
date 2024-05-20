@@ -32,7 +32,9 @@ public final class PotionUtils {
 	// Formatted like the keys of namespaced keys:
 	private static final Map<String, @NonNull PotionType> POTION_TYPE_ALIASES = new HashMap<>();
 	static {
-		POTION_TYPE_ALIASES.put("empty", PotionType.UNCRAFTABLE);
+		// Removed in Bukkit 1.20.5:
+		//POTION_TYPE_ALIASES.put("empty", PotionType.UNCRAFTABLE);
+		// TODO Renamed in Bukkit 1.20.5: https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/8a34e009148cc297bcc9eb5c250fc4f5b071c4a7
 		POTION_TYPE_ALIASES.put("leaping", PotionType.JUMP);
 		POTION_TYPE_ALIASES.put("swiftness", PotionType.SPEED);
 		POTION_TYPE_ALIASES.put("healing", PotionType.INSTANT_HEAL);

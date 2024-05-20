@@ -1,9 +1,16 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.19.1 (TBA)
+## v2.20.0 (TBA)
 ### Supported MC versions: 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5
 
+* Update for MC 1.20.6:
+  * MC 1.20.5 was replaced and is not supported.
+  * Placeholder items: Some potion and echantments have been renamed in Bukkit to now match their Minecraft counterparts. If you used the Bukkit names in placeholder items, they might no longer get recognized and you need to update those items to use the Minecraft names instead. The "empty"/"uncraftable" potion is also no longer supported in placeholder items.
+  * Build: The build requires JDK 21 now.
+    * Use Sdkman instead of Jabba, because Jabba does not provide JDK 21. However, we still use Jabba for JDK 16, because it is missing in Sdkman for certain platforms.
+    * Updated Gradle and some libraries accordingly.
+    * Disabled the checkerframework checks for now, because on the current versions we get a lot of weird casting errors.
 * Add settings to identify the shop creation item by a custom NBT tag.
   * Previously, we identified shop creation items by matching their item data with the data specified in the `shop-creation-item` setting. Adding and identifying the shop creation item by a custom NBT tag instead has several benefits, such as being able to change the `shop-creation-item` in the future without breaking any existing shop creation items in the world (e.g. in chests, player inventories, trades, third-party plugin data, etc.). Also, in the past, we occasionally ran into issues when the server implementation made changes to how it creates the item based on the data specified inside the config.
   * These new settings are enabled by default for new configurations, but disabled when migrating from a previous Shopkeepers version in order to not break backwards compatibility for existing items.

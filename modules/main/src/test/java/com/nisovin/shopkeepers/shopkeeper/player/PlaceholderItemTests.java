@@ -141,6 +141,8 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 	@Test
 	public void testPotions() {
 		for (PotionType potionType : PotionType.values()) {
+			if (potionType == PotionType.UNCRAFTABLE) continue; // Skip. Removed in Bukkit 1.20.5
+
 			testParsing(
 					placeholderItem(potionType.name() + " potion"),
 					potion(new PotionData(potionType, false, false))
@@ -190,10 +192,6 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 		);
 
 		// Aliases:
-		testParsing(
-				placeholderItem("empty"),
-				potion(new PotionData(PotionType.UNCRAFTABLE, false, false))
-		);
 		testParsing(
 				placeholderItem("leaping"),
 				potion(new PotionData(PotionType.JUMP, false, false))

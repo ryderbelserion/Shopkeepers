@@ -6,7 +6,7 @@ buildscript {
 	configurations.create('specialSource')
 
 	dependencies {
-		specialSource 'net.md-5:SpecialSource:1.11.0:shaded'
+		specialSource 'net.md-5:SpecialSource:1.11.4:shaded'
 	}
 }
 
