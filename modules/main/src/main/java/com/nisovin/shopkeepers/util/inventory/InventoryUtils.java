@@ -671,6 +671,7 @@ public final class InventoryUtils {
 
 	// TODO Replace this with the corresponding Bukkit API method added in late 1.15.2. See
 	// https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/da9ef3c55fa3bce91f7fdcd77d50171be7297d7d
+	// Note: MC 1.20.5 added EquipmentSlot.Body. E.g. used for horse armor. Not relevant for PlayerInventory.
 	public static @Nullable ItemStack getItem(PlayerInventory playerInventory, EquipmentSlot slot) {
 		Validate.notNull(playerInventory, "playerInventory is null");
 		Validate.notNull(slot, "slot is null");
