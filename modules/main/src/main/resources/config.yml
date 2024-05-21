@@ -254,6 +254,7 @@ player-shopkeeper-inactive-days: 0
 enabled-living-shops:
 - VILLAGER
 - ALLAY
+- ARMADILLO
 - AXOLOTL
 - BEE
 - BLAZE
