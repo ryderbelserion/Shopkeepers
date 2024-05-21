@@ -392,6 +392,7 @@ public final class InventoryUtils {
 		int remaining = amount;
 
 		// Search for partially fitting item stacks:
+		// Note: We check for similar ItemStacks, so they all share the same max stack size.
 		int maxStackSize = item.getMaxStackSize();
 		int size = contents.length;
 		for (int slot = 0; slot < size; slot++) {

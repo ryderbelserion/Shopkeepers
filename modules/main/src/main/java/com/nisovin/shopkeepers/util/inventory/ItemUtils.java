@@ -345,11 +345,12 @@ public final class ItemUtils {
 		return result;
 	}
 
+	// Trims the amount between 1 and the item stack's max stack size.
 	public static int trimItemAmount(@ReadOnly ItemStack itemStack, int amount) {
-		return trimItemAmount(itemStack.getType(), amount);
+		return MathUtils.trim(amount, 1, itemStack.getMaxStackSize());
 	}
 
-	// Trims the amount between 1 and the item's max-stack-size.
+	// Trims the amount between 1 and the item's default max-stack-size.
 	public static int trimItemAmount(Material itemType, int amount) {
 		return MathUtils.trim(amount, 1, itemType.getMaxStackSize());
 	}

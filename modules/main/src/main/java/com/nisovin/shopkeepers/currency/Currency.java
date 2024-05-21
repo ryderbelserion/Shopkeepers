@@ -80,15 +80,13 @@ public final class Currency {
 		return value;
 	}
 
-	// TODO Make this configurable? E.g. allow forcing a lower than normal stack size that affects
-	// how the currency items are switched between inside the editor.
 	/**
 	 * Gets the maximum stack size of this currency item.
 	 * 
 	 * @return the maximum stack size of this currency item
 	 */
 	public int getMaxStackSize() {
-		return itemData.getType().getMaxStackSize();
+		return itemData.getMaxStackSize();
 	}
 
 	/**

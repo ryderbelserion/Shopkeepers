@@ -388,6 +388,10 @@ public final class ItemData {
 		return dataItem.getType();
 	}
 
+	public int getMaxStackSize() {
+		return dataItem.getMaxStackSize();
+	}
+
 	// Creates a copy of this ItemData, but changes the item type. If the new type matches the
 	// previous type, the current ItemData is returned.
 	// Any incompatible metadata is removed.

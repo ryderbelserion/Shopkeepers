@@ -329,7 +329,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		if (ItemUtils.isEmpty(slotItem)) return true;
 		assert slotItem != null;
 		if (!itemStack.isSimilar(slotItem)) return false;
-		return slotItem.getAmount() + itemStack.getAmount() <= itemStack.getMaxStackSize();
+		return slotItem.getAmount() + itemStack.getAmount() <= slotItem.getMaxStackSize();
 	}
 
 	// Late processing, so that other plugins can cancel the trading without having to rely on
