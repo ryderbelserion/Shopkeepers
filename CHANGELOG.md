@@ -6,7 +6,7 @@ Date format: (YYYY-MM-DD)
 
 * Update for MC 1.20.6:
   * MC 1.20.5 was replaced and is not supported.
-  * Placeholder items: Some potion and echantments have been renamed in Bukkit to now match their Minecraft counterparts. If you used the Bukkit names in placeholder items, they might no longer get recognized and you need to update those items to use the Minecraft names instead. The "empty"/"uncraftable" potion is also no longer supported in placeholder items.
+  * Placeholder items: Some potion and enchantments have been renamed in Bukkit to now match their Minecraft counterparts. If you used the Bukkit names in placeholder items, they might no longer get recognized and you need to update those items to use the Minecraft names instead. The "empty"/"uncraftable" potion is also no longer supported in placeholder items.
   * Build: The build requires JDK 21 now.
     * Use Sdkman instead of Jabba, because Jabba does not provide JDK 21. However, we still use Jabba for JDK 16, because it is missing in Sdkman for certain platforms.
     * Updated Gradle and some libraries accordingly.
@@ -19,6 +19,10 @@ Date format: (YYYY-MM-DD)
   * Setting `identify-shop-creation-item-by-tag` (default: `true`): Whether to identify the shop creation item by the tag.
     * This is a separate setting in order to help server owners with the migration process: Server owners can enable `add-shop-creation-item-tag` very early to already add the tag to all newly created shop creation items, but separately enable `identify-shop-creation-item-by-tag` later, once they expect or verified that the old shop creation item is no longer in use.
     * Unfortunately, the Shopkeepers plugin provides no built-in solution to automatically migrate all occurrences of the old shop creation item in the world or plugin data.
+* Change the default `shop-creation-item` display name to use json-based text.
+  * Since somewhere around MC 1.20.4, display names with `&`-based color codes were no longer converted to a json text representation, but to legacy color codes. This caused some issues with existing shop creation items no longer getting recognized or stacking correctly. On some servers, these legacy color codes are in some circumstances later converted to json-based text, which causes similar issues with these shop-creation items suddenly no longer working after these conversions.
+  * The default display name was changed to the compact `'{"text":"Shopkeeper","italic":false,"color":"green"}'`. This change is not automatically applied to existing configurations, because it could break existing shop creation items.
+  * If you want to use a json-based display name that matches the previous representation on Spigot servers prior to MC 1.20.4, you can change the display name in the config to `display-name: '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"green","text":"Shopkeeper"}],"text":""}'`.
 * Fix: In v2.19.0, we added a workaround for a change in the Paper server to now force teleports of shopkeeper entities. However, on Spigot servers, we need to manually reset the forced teleport request again after the entity teleport, because we don't receive an EntityTeleportEvent there.
 * Debug: Add debug option `text-components` to log additional debug output whenever component-based text is sent.
 * Prepare for Paper's future removal of CraftBukkit's package relocation: Adjust the fallback compatibility mode to no longer try to parse the CraftBukkit version from the package name.

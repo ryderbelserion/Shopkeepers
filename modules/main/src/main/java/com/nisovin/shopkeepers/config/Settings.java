@@ -94,7 +94,7 @@ public class Settings extends Config {
 	 */
 	public static ItemData shopCreationItem = new ItemData(
 			Material.VILLAGER_SPAWN_EGG,
-			c("&aShopkeeper"),
+			"{\"text\":\"Shopkeeper\",\"italic\":false,\"color\":\"green\"}",
 			null
 	);
 

@@ -168,7 +168,7 @@ disable-inventory-verification: false
 # Use the '/shopkeeper give' command to give yourself this item in-game.
 shop-creation-item:
   type: VILLAGER_SPAWN_EGG
-  display-name: "&aShopkeeper"
+  display-name: '{"text":"Shopkeeper","italic":false,"color":"green"}'
 
 # Whether to add a custom NBT tag to newly created shop creation items, e.g.
 # when created via the '/shopkeeper give' command.
