@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.MC_1_20;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
@@ -34,6 +35,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class ItemUtils {
 
+	// TODO MC 1.20.5: The max stack size is now 99, but requires a component on the item stack.
 	public static final int MAX_STACK_SIZE = 64;
 
 	// Material utilities:
@@ -461,6 +463,15 @@ public final class ItemUtils {
 			@Nullable String displayName,
 			@ReadOnly @Nullable List<? extends @NonNull String> lore
 	) {
+		return setItemMeta(itemStack, displayName, lore, null);
+	}
+
+	public static ItemStack setItemMeta(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends @NonNull String> lore,
+			@Nullable Integer maxStackSize
+	) {
 		Validate.notNull(itemStack, "itemStack is null");
 		ItemMeta meta = itemStack.getItemMeta();
 		if (meta != null) {
@@ -469,6 +480,9 @@ public final class ItemUtils {
 			}
 			if (lore != null) {
 				meta.setLore(Unsafe.cast(lore));
+			}
+			if (maxStackSize != null) {
+				NMSManager.getProvider().setMaxStackSize(meta, maxStackSize);
 			}
 			itemStack.setItemMeta(meta);
 		}

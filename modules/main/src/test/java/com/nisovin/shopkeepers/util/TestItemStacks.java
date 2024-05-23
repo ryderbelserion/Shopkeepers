@@ -167,6 +167,8 @@ public class TestItemStacks {
 
 	public static ItemStack createItemStackWritableBook() {
 		ItemStack itemStack = new ItemStack(Material.WRITABLE_BOOK);
+		// TODO MC 1.20.5: Returns WritableBookMeta without the option to set title, author,
+		// generation.
 		BookMeta itemMeta = Unsafe.castNonNull(itemStack.getItemMeta());
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setTitle("Finding Diamonds");

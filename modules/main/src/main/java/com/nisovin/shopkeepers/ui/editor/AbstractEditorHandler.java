@@ -462,9 +462,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.previousPageItem.createItemStack();
+		ItemUtils.setItemMeta(item, itemName, Messages.buttonPreviousPageLore, ItemUtils.MAX_STACK_SIZE);
 		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
-		return ItemUtils.setDisplayNameAndLore(item, itemName, Messages.buttonPreviousPageLore);
+		return item;
 	}
 
 	protected ItemStack createNextPageIcon(int page) {
@@ -480,9 +481,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.nextPageItem.createItemStack();
+		ItemUtils.setItemMeta(item, itemName, Messages.buttonNextPageLore, ItemUtils.MAX_STACK_SIZE);
 		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
-		return ItemUtils.setDisplayNameAndLore(item, itemName, Messages.buttonNextPageLore);
+		return item;
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
@@ -491,9 +493,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.currentPageItem.createItemStack();
+		ItemUtils.setItemMeta(item, itemName, Messages.buttonCurrentPageLore, ItemUtils.MAX_STACK_SIZE);
 		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
-		return ItemUtils.setDisplayNameAndLore(item, itemName, Messages.buttonCurrentPageLore);
+		return item;
 	}
 
 	protected abstract ItemStack createTradeSetupIcon();

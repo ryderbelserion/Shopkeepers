@@ -29,12 +29,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -326,5 +328,12 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setSignBackGlowingText(Sign sign, boolean glowingText) {
 		SignSide signSide = sign.getSide(Side.BACK);
 		signSide.setGlowingText(glowingText);
+	}
+
+	// MC 1.20.5 specific features
+
+	@Override
+	public void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
+		itemMeta.setMaxStackSize(maxStackSize);
 	}
 }
