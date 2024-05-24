@@ -8,8 +8,7 @@ plugins {
 	id 'org.sonarqube' version '5.0.0.4638'
 }
 
-
-sonarqube {
+sonar {
 	properties {
 		property 'sonar.projectKey', 'Shopkeepers_Shopkeepers'
 		property 'sonar.organization', 'shopkeepers'
