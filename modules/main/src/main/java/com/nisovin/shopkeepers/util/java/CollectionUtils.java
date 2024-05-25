@@ -297,6 +297,95 @@ public final class CollectionUtils {
 		return ((Stream<@Nullable T>) stream).findFirst().orElse(null);
 	}
 
+	public static <T> @NonNull T cycleValue(
+			List<@NonNull T> values,
+			@NonNull T current,
+			boolean backwards
+	) {
+		return cycleValue(values, current, backwards, PredicateUtils.alwaysTrue());
+	}
+
+	public static <T> @NonNull T cycleValue(
+			List<@NonNull T> values,
+			@NonNull T current,
+			boolean backwards,
+			Predicate<? super @NonNull T> predicate
+	) {
+		return cycleValue(
+				values,
+				false,
+				current,
+				backwards,
+				predicate
+		);
+	}
+
+	public static <T> @Nullable T cycleValueNullable(
+			List<@NonNull T> values,
+			@Nullable T current,
+			boolean backwards
+	) {
+		return cycleValueNullable(
+				values,
+				current,
+				backwards,
+				PredicateUtils.<@Nullable T>alwaysTrue()
+		);
+	}
+
+	public static <T> @Nullable T cycleValueNullable(
+			List<@NonNull T> values,
+			@Nullable T current,
+			boolean backwards,
+			Predicate<? super @Nullable T> predicate
+	) {
+		return cycleValue(
+				values,
+				true,
+				current,
+				backwards,
+				predicate
+		);
+	}
+
+	// nullable: Uses null as first value.
+	// current==null: nullable has to be true.
+	// Cycled through all values but none got accepted: Returns current value (can be null).
+	public static <T> T cycleValue(
+			List<@NonNull T> values,
+			boolean nullable,
+			T current,
+			boolean backwards,
+			Predicate<? super T> predicate
+	) {
+		Validate.notNull(values, "values is null");
+		Validate.isTrue(current != null || nullable, "Not nullable, but current is null");
+		Validate.notNull(predicate, "predicate is null");
+		assert values != null;
+		int currentId = (current == null ? -1 : values.indexOf(current));
+		int nextId = currentId;
+		while (true) {
+			if (backwards) {
+				nextId -= 1;
+				if (nextId < (nullable ? -1 : 0)) {
+					nextId = (values.size() - 1);
+				}
+			} else {
+				nextId += 1;
+				if (nextId >= values.size()) {
+					nextId = (nullable ? -1 : 0);
+				}
+			}
+			if (nextId == currentId) {
+				return current;
+			}
+			T next = (nextId == -1) ? Unsafe.cast(null) : values.get(nextId);
+			if (predicate.test(next)) {
+				return next;
+			}
+		}
+	}
+
 	private CollectionUtils() {
 	}
 }

@@ -1,8 +1,11 @@
 package com.nisovin.shopkeepers.compat.v1_20_R5;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
@@ -25,6 +28,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Wolf;
+import org.bukkit.entity.Wolf.Variant;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -37,7 +42,9 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -332,8 +339,32 @@ public final class NMSHandler implements NMSCallProvider {
 
 	// MC 1.20.5 specific features
 
+	private List<@NonNull NamespacedKey> WOLF_VARIANT_KEYS = null;
+
+	public @NonNull List<@NonNull NamespacedKey> getWolfVariantKeys() {
+		if (WOLF_VARIANT_KEYS == null) {
+			Registry<Wolf.@NonNull Variant> wolfVariantRegistry = Unsafe.castNonNull(Registry.WOLF_VARIANT);
+			WOLF_VARIANT_KEYS = RegistryUtils.getKeys(wolfVariantRegistry);
+		}
+		assert WOLF_VARIANT_KEYS != null;
+		return WOLF_VARIANT_KEYS;
+	}
+
 	@Override
 	public void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
 		itemMeta.setMaxStackSize(maxStackSize);
+	}
+
+	@Override
+	public NamespacedKey cycleWolfVariant(NamespacedKey variantKey, boolean backwards) {
+		return CollectionUtils.cycleValue(getWolfVariantKeys(), variantKey, backwards);
+	}
+
+	@Override
+	public void setWolfVariant(Wolf wolf, NamespacedKey variantKey) {
+		@Nullable Variant variant = Registry.WOLF_VARIANT.get(variantKey);
+		if (variant == null) return; // Variant not found
+
+		wolf.setVariant(variant);
 	}
 }

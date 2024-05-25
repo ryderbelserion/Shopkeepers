@@ -1,10 +1,12 @@
 package com.nisovin.shopkeepers.compat.api;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -158,6 +160,15 @@ public interface NMSCallProvider {
 	// TODO Remove this once we only support MC 1.20.5 and above.
 
 	public default void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
+		// Not supported by default.
+	}
+
+	public default NamespacedKey cycleWolfVariant(NamespacedKey variantKey, boolean backwards) {
+		// Not supported by default.
+		return variantKey;
+	}
+
+	public default void setWolfVariant(Wolf wolf, NamespacedKey variantKey) {
 		// Not supported by default.
 	}
 }

@@ -2,8 +2,10 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import java.util.List;
 
+import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +14,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.compat.MC_1_20_6;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -20,10 +24,12 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.NamespacedKeySerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -42,11 +48,21 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 			.defaultValue(null)
 			.build();
 
+	// TODO Use correct variant type once we only support Bukkit 1.20.6 upwards. Will then also
+	// validate that the value is a valid wolf variant.
+	public static final Property<@NonNull NamespacedKey> VARIANT = new BasicProperty<@NonNull NamespacedKey>()
+			.dataKeyAccessor("wolfVariant", NamespacedKeySerializers.DEFAULT)
+			.defaultValue(NamespacedKeyUtils.create("minecraft", "pale"))
+			.build();
+
 	private final PropertyValue<@NonNull Boolean> angryProperty = new PropertyValue<>(ANGRY)
 			.onValueChanged(Unsafe.initialized(this)::applyAngry)
 			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
+			.build(properties);
+	private final PropertyValue<@NonNull NamespacedKey> variantProperty = new PropertyValue<>(VARIANT)
+			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
 	public WolfShop(
@@ -63,6 +79,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 		super.load(shopObjectData);
 		angryProperty.load(shopObjectData);
 		collarColorProperty.load(shopObjectData);
+		variantProperty.load(shopObjectData);
 	}
 
 	@Override
@@ -70,6 +87,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 		super.save(shopObjectData, saveAll);
 		angryProperty.save(shopObjectData);
 		collarColorProperty.save(shopObjectData);
+		variantProperty.save(shopObjectData);
 	}
 
 	@Override
@@ -77,6 +95,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 		super.onSpawn();
 		this.applyAngry();
 		this.applyCollarColor();
+		this.applyVariant();
 	}
 
 	@Override
@@ -84,6 +103,9 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
+		if (MC_1_20_6.isAvailable()) {
+			editorButtons.add(this.getVariantEditorButton());
+		}
 		return editorButtons;
 	}
 
@@ -209,6 +231,86 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 			) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleCollarColor(backwards);
+				return true;
+			}
+		};
+	}
+
+	// VARIANT
+
+	public NamespacedKey getVariant() {
+		return variantProperty.getValue();
+	}
+
+	public void setVariant(NamespacedKey variant) {
+		variantProperty.setValue(variant);
+	}
+
+	public void cycleVariant(boolean backwards) {
+		this.setVariant(NMSManager.getProvider().cycleWolfVariant(this.getVariant(), backwards));
+	}
+
+	private void applyVariant() {
+		Wolf entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+
+		NMSManager.getProvider().setWolfVariant(entity, this.getVariant());
+		// entity.setVariant(this.getVariant());
+	}
+
+	private ItemStack getVariantEditorItem() {
+		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
+		switch (this.getVariant().toString()) {
+		case "minecraft:spotted":
+			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
+			break;
+		case "minecraft:snowy":
+			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
+			break;
+		case "minecraft:black":
+			ItemUtils.setLeatherColor(iconItem, DyeColor.BLACK.getColor());
+			break;
+		case "minecraft:ashen":
+			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(140, 144, 167));
+			break;
+		case "minecraft:rusty":
+			// Default brown color.
+			break;
+		case "minecraft:woods":
+			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(88, 68, 34));
+			break;
+		case "minecraft:chestnut":
+			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(159, 119, 115));
+			break;
+		case "minecraft:striped":
+			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(202, 182, 114));
+			break;
+		case "minecraft:pale":
+		default:
+			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(220, 220, 220));
+			break;
+		}
+		ItemUtils.setDisplayNameAndLore(iconItem,
+				Messages.buttonWolfVariant,
+				Messages.buttonWolfVariantLore
+		);
+		return iconItem;
+	}
+
+	private Button getVariantEditorButton() {
+		return new ShopkeeperActionButton() {
+			@Override
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
+				return getVariantEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
+				boolean backwards = clickEvent.isRightClick();
+				cycleVariant(backwards);
 				return true;
 			}
 		};

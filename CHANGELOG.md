@@ -6,6 +6,7 @@ Date format: (YYYY-MM-DD)
 
 * Update for MC 1.20.6:
   * MC 1.20.5 was replaced and is not supported.
+  * Add wolf variants.
   * Placeholder items: Some potion and enchantments have been renamed in Bukkit to now match their Minecraft counterparts. If you used the Bukkit names in placeholder items, they might no longer get recognized and you need to update those items to use the Minecraft names instead. The "empty"/"uncraftable" potion is also no longer supported in placeholder items.
   * Build: The build requires JDK 21 now.
     * Use Sdkman instead of Jabba, because Jabba does not provide JDK 21. However, we still use Jabba for JDK 16, because it is missing in Sdkman for certain platforms.
@@ -31,6 +32,8 @@ Date format: (YYYY-MM-DD)
 
 **Message changes:**  
 * Added `command-entity-argument-no-villager`.
+* Added `button-wolf-variant`.
+* Added `button-wolf-variant-lore`.
 
 ## v2.19.0 (2023-12-26)
 ### Supported MC versions: 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.19, 1.18.2, 1.17.1, 1.16.5

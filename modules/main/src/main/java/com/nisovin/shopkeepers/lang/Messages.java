@@ -307,6 +307,10 @@ public class Messages extends Config {
 	public static List<@NonNull String> buttonFrogVariantLore = c(Arrays.asList(
 			"Changes the frog's look"
 	));
+	public static String buttonWolfVariant = c("&aChoose wolf variant");
+	public static List<@NonNull String> buttonWolfVariantLore = c(Arrays.asList(
+			"Changes the wolf's look"
+	));
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");

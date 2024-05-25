@@ -94,7 +94,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>SQUID: seems okay, slightly weird movement in water
  * <li>WITCH: okay
  * <li>WITHER: experimental: requires NoAI, shows boss bar
- * <li>WOLF: okay
+ * <li>WOLF: okay, variants (1.20.5), armor (1.20.5 TODO)
  * <li>ZOMBIE: okay, spawns randomly as baby
  * <li>RABBIT: okay; the killer rabbit type requires some special handling because Minecraft resets
  * the pathfinder goals and applies a custom name if the entity doesn't have one already

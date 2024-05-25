@@ -40,8 +40,8 @@ public final class NamespacedKeyUtils {
 	 * <p>
 	 * If the namespace is {@link NamespacedKey#MINECRAFT} (either specified or due to default),
 	 * dashes in the key are converted to underscores, because this is what Minecraft uses for its
-	 * keys (see {@link #normalizeMinecraftNamespacedKey(String)}) For any other namespace, they are
-	 * kept as is, because they might be valid keys.
+	 * keys (see {@link #normalizeMinecraftNamespacedKey(String)}). For any other namespace, they
+	 * are kept as is, because they might be valid keys.
 	 *
 	 * @param input
 	 *            the input String

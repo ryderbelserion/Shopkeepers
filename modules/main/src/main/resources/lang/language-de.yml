@@ -237,6 +237,10 @@ button-frog-variant: "&aFrosch-Variante ändern"
 button-frog-variant-lore:
 - "Ändert das Aussehen"
 - "des Frosches"
+button-wolf-variant: "&aWolf-Variante ändern"
+button-wolf-variant-lore:
+- "Ändert das Aussehen"
+- "des Wolfes"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

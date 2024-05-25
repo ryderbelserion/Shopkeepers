@@ -235,6 +235,9 @@ button-puffer-fish-puff-state-lore:
 button-frog-variant: "&aChoose frog variant"
 button-frog-variant-lore:
 - "Changes the frog's look"
+button-wolf-variant: "&aChoose wolf variant"
+button-wolf-variant-lore:
+- "Changes the wolf's look"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

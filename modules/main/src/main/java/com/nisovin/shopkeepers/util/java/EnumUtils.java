@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.java;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
@@ -72,32 +74,9 @@ public final class EnumUtils {
 			Predicate<? super T> predicate
 	) {
 		Validate.notNull(enumClass, "enumClass is null");
-		Validate.isTrue(current != null || nullable, "Not nullable, but current is null");
-		Validate.notNull(predicate, "predicate is null");
 		@NonNull T[] values = Unsafe.assertNonNull(enumClass.getEnumConstants());
-		assert values != null;
-		int currentId = (current == null ? -1 : current.ordinal());
-		int nextId = currentId;
-		while (true) {
-			if (backwards) {
-				nextId -= 1;
-				if (nextId < (nullable ? -1 : 0)) {
-					nextId = (values.length - 1);
-				}
-			} else {
-				nextId += 1;
-				if (nextId >= values.length) {
-					nextId = (nullable ? -1 : 0);
-				}
-			}
-			if (nextId == currentId) {
-				return current;
-			}
-			T next = (nextId == -1) ? Unsafe.cast(null) : values[nextId];
-			if (predicate.test(next)) {
-				return next;
-			}
-		}
+		List<@NonNull T> valuesList = Arrays.asList(values);
+		return CollectionUtils.cycleValue(valuesList, nullable, current, backwards, predicate);
 	}
 
 	public static <E extends @NonNull Enum<E>> @Nullable E valueOf(
