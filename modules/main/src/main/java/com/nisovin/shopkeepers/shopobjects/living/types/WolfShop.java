@@ -87,6 +87,14 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 		return editorButtons;
 	}
 
+	@Override
+	public void onTick() {
+		super.onTick();
+
+		// The angry state gets reset when the AngerTime runs out, so we reset it periodically:
+		this.applyAngry();
+	}
+
 	// ANGRY
 
 	public boolean isAngry() {
@@ -104,6 +112,8 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	private void applyAngry() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+		// Only marks the wolf as angry for a random duration. We therefore apply this state again
+		// every shopkeeper tick.
 		entity.setAngry(this.isAngry());
 	}
 

@@ -24,6 +24,7 @@ Date format: (YYYY-MM-DD)
   * The default display name was changed to the compact `'{"text":"Shopkeeper","italic":false,"color":"green"}'`. This change is not automatically applied to existing configurations, because it could break existing shop creation items.
   * If you want to use a json-based display name that matches the previous representation on Spigot servers prior to MC 1.20.4, you can change the display name in the config to `display-name: '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"green","text":"Shopkeeper"}],"text":""}'`.
 * Fix: In v2.19.0, we added a workaround for a change in the Paper server to now force teleports of shopkeeper entities. However, on Spigot servers, we need to manually reset the forced teleport request again after the entity teleport, because we don't receive an EntityTeleportEvent there.
+* Fix: The angry state of wolves would previously get reset after some time (when the random AngerTime runs out). We now periodically re-apply it.
 * Debug: Add debug option `text-components` to log additional debug output whenever component-based text is sent.
 * Prepare for Paper's future removal of CraftBukkit's package relocation: Adjust the fallback compatibility mode to no longer try to parse the CraftBukkit version from the package name.
 * Fix: The entity argument for command `editVillager` no longer accepts non-villagers, shopkeepers, or Citizens NPCs.
