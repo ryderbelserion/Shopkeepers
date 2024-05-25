@@ -252,6 +252,12 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 		throw unmodifiableException();
 	}
 
+	// TODO Added in Spigot 1.20.4/5
+	/*@Override
+	public boolean removeEnchantments() {
+		throw unmodifiableException();
+	}*/
+
 	@Override
 	public String toString() {
 		return "Unmodifiable" + delegate.toString();
