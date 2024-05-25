@@ -93,8 +93,9 @@ public class ContainerSelection {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
 		UUID playerId = player.getUniqueId();
-		Deque<@NonNull BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerId);
+		@Nullable Deque<@NonNull BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerId);
 		if (recentlyPlaced == null) return false;
+
 		BlockLocation containerLocation = this.getSharedKey(container);
 		return recentlyPlaced.contains(containerLocation);
 	}

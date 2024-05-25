@@ -51,7 +51,7 @@ public class PlayerInactivity {
 	private final class DeleteInactivePlayerShopsTask implements Runnable {
 
 		// ~4 hours (can be noticeably longer if the server lags)
-		private static final long INTERVAL_TICKS = Ticks.PER_SECOND * 60 * 60 * 4;
+		private static final long INTERVAL_TICKS = Ticks.PER_SECOND * 60 * 60 * 4L;
 
 		private final Plugin plugin;
 		private @Nullable BukkitTask task = null;

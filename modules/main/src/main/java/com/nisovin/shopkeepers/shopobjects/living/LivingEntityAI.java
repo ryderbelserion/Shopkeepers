@@ -283,7 +283,7 @@ public class LivingEntityAI implements Listener {
 		Validate.State.isTrue(!currentlyRunning,
 				"Cannot remove entities while the AI task is running!");
 		// Remove shop object:
-		EntityData entityData = shopObjects.remove(shopObject);
+		@Nullable EntityData entityData = shopObjects.remove(shopObject);
 		if (entityData == null) return; // Shop object was not added
 
 		ChunkData chunkData = entityData.chunkData;

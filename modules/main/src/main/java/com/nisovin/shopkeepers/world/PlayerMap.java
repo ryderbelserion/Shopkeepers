@@ -154,7 +154,7 @@ public final class PlayerMap {
 
 	private void removePlayer(World world, Player player) {
 		String worldName = world.getName();
-		WorldData worldData = this.getWorldData(worldName);
+		@Nullable WorldData worldData = this.getWorldData(worldName);
 		if (worldData == null) return;
 
 		worldData.players.remove(player);
@@ -178,7 +178,7 @@ public final class PlayerMap {
 	 * @return an unmodifiable view on the players inside the world, not <code>null</code>
 	 */
 	public List<? extends @NonNull Player> getPlayers(String worldName) {
-		WorldData worldData = this.getWorldData(worldName);
+		@Nullable  WorldData worldData = this.getWorldData(worldName);
 		if (worldData == null) return Collections.emptyList();
 
 		return worldData.playersView;
