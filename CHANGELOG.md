@@ -1,7 +1,10 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.20.1 (TBA)
+## v2.20.2 (TBA)
+### Supported MC versions: 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+## v2.20.1 (2024-05-26)
 ### Supported MC versions: 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
 * Fix: Avoid adding empty item stacks to merchant recipes. This resolves a crash on Paper 1.20.6 servers.
