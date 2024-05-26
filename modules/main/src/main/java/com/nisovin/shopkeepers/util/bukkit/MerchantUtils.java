@@ -79,58 +79,47 @@ public final class MerchantUtils {
 
 	public static MerchantRecipe createMerchantRecipe(TradingRecipe recipe) {
 		Validate.notNull(recipe, "recipe is null");
-		// CraftBukkit always fills both ingredients, possibly with empty ItemStacks. We do the same
-		// in order to be able to more easily compare merchant recipes.
-		// The items are already copied on various occasions (addIngredient, getIngredients, when
-		// converting to a Minecraft recipe, etc.), so we do not need to copy them ourselves here.
-		// The only exception to this is the result item: The MerchantRecipe does not copy it during
-		// construction, nor during getResult. Copying the result item here ensures that we do not
-		// accidentally encounter unmodifiable merchant recipe result items in contexts in which we
-		// do not expect them.
-		ItemStack resultItem = recipe.getResultItem().copy();
-		ItemStack buyItem1 = recipe.getItem1().asItemStack();
-		ItemStack buyItem2 = ItemUtils.getOrEmpty(ItemUtils.asItemStackOrNull(recipe.getItem2()));
-		assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(buyItem1);
-
-		// No max-uses limit:
-		MerchantRecipe merchantRecipe = new MerchantRecipe(resultItem, Integer.MAX_VALUE);
+		MerchantRecipe merchantRecipe = createMerchantRecipe(
+				recipe.getResultItem(),
+				recipe.getItem1(),
+				recipe.getItem2()
+		);
 		if (recipe.isOutOfStock()) {
-			// Except if out of stock:
-			// 'uses' is 0 by default as well, so the trade shows as blocked.
+			// If out of stock: Block the trade by setting 'max-uses' to 0. 'uses' is 0 by default.
 			merchantRecipe.setMaxUses(0);
 		}
-		merchantRecipe.setExperienceReward(false); // No experience rewards
-		merchantRecipe.addIngredient(buyItem1);
-		merchantRecipe.addIngredient(buyItem2);
 		return merchantRecipe;
 	}
 
 	public static MerchantRecipe createMerchantRecipe(TradingRecipeDraft recipe) {
 		Validate.notNull(recipe, "recipe is null");
 		Validate.isTrue(recipe.isValid(), "recipe is not valid");
+		return createMerchantRecipe(
+				Unsafe.assertNonNull(recipe.getResultItem()),
+				Unsafe.assertNonNull(recipe.getRecipeItem1()),
+				recipe.getRecipeItem2()
+		);
+	}
 
-		UnmodifiableItemStack draftResultItem = Unsafe.assertNonNull(recipe.getResultItem());
-		UnmodifiableItemStack draftItem1 = Unsafe.assertNonNull(recipe.getRecipeItem1());
-		UnmodifiableItemStack draftItem2 = recipe.getRecipeItem2();
-
+	public static MerchantRecipe createMerchantRecipe(
+			UnmodifiableItemStack resultItem,
+			UnmodifiableItemStack buyItem1,
+			@Nullable UnmodifiableItemStack buyItem2
+	) {
+		assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(buyItem1);
 		// The items are already copied on various occasions (addIngredient, getIngredients, when
 		// converting to a Minecraft recipe, etc.), so we do not need to copy them ourselves here.
 		// The only exception to this is the result item: The MerchantRecipe does not copy it during
 		// construction, nor during getResult. Copying the result item here ensures that we do not
 		// accidentally encounter unmodifiable merchant recipe result items in contexts in which we
 		// do not expect them.
-		ItemStack resultItem = draftResultItem.copy();
-		ItemStack buyItem1 = draftItem1.asItemStack();
-		// CraftBukkit always fills both ingredients, possibly with empty ItemStacks. We do the same
-		// in order to be able to more easily compare merchant recipes.
-		ItemStack buyItem2 = ItemUtils.getOrEmpty(ItemUtils.asItemStackOrNull(draftItem2));
-		assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(buyItem1);
-
 		// No max-uses limit
-		MerchantRecipe merchantRecipe = new MerchantRecipe(resultItem, Integer.MAX_VALUE);
+		MerchantRecipe merchantRecipe = new MerchantRecipe(resultItem.copy(), Integer.MAX_VALUE);
 		merchantRecipe.setExperienceReward(false); // No experience rewards
-		merchantRecipe.addIngredient(buyItem1);
-		merchantRecipe.addIngredient(buyItem2);
+		merchantRecipe.addIngredient(buyItem1.asItemStack());
+		if (buyItem2 != null) {
+			merchantRecipe.addIngredient(buyItem2.asItemStack());
+		}
 		return merchantRecipe;
 	}
 
@@ -185,7 +174,14 @@ public final class MerchantUtils {
 			if (recipe1 == recipe2) return true;
 			if (recipe1 == null || recipe2 == null) return false;
 			if (!recipe1.getResult().equals(recipe2.getResult())) return false;
-			if (!recipe1.getIngredients().equals(recipe2.getIngredients())) return false;
+
+			List<ItemStack> ingredients1 = recipe1.getIngredients();
+			ingredients1.removeIf(ItemUtils::isEmpty);
+
+			List<ItemStack> ingredients2 = recipe2.getIngredients();
+			ingredients2.removeIf(ItemUtils::isEmpty);
+
+			if (!ingredients1.equals(ingredients2)) return false;
 			return true;
 		}
 	};
@@ -205,7 +201,15 @@ public final class MerchantUtils {
 			if (recipe1.getPriceMultiplier() != recipe2.getPriceMultiplier()) return false;
 			if (recipe1.getVillagerExperience() != recipe2.getVillagerExperience()) return false;
 			if (!recipe1.getResult().equals(recipe2.getResult())) return false;
-			if (!recipe1.getIngredients().equals(recipe2.getIngredients())) return false;
+
+			List<ItemStack> ingredients1 = recipe1.getIngredients();
+			ingredients1.removeIf(ItemUtils::isEmpty);
+
+			List<ItemStack> ingredients2 = recipe2.getIngredients();
+			ingredients2.removeIf(ItemUtils::isEmpty);
+
+			if (!ingredients1.equals(ingredients2)) return false;
+
 			return true;
 		}
 	};
