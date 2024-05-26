@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.20.1 (TBA)
 ### Supported MC versions: 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+* Fix: The default config version is `6`. We previously applied a redundant migration from version 5 to 6 that did nothing.
 
 ## v2.20.0 (2024-05-25)
 ### Supported MC versions: 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
