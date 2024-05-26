@@ -52,7 +52,7 @@ public class Settings extends Config {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 5;
+	public static int configVersion = 6;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
 	public static List<@NonNull String> debugOptions = new ArrayList<>(0);
