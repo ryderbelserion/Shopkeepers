@@ -23,6 +23,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -106,6 +107,38 @@ public class ServerAssumptionsTest {
 	) throws ServerAssumptionFailedException {
 		if (!expression) {
 			throw new ServerAssumptionFailedException(errorMessage);
+		}
+	}
+
+	private static void assumeIsSimilar(
+			ItemStack expected,
+			ItemStack actual,
+			String errorMessage
+	) throws ServerAssumptionFailedException {
+		if (!expected.isSimilar(actual)) {
+			String detailMessage = "";
+			if (Settings.debug) {
+				detailMessage = ": Expected [" + ConfigUtils.toConfigYaml("item", expected)
+						+ "] got [" + ConfigUtils.toConfigYaml("item", actual) + "]";
+			}
+
+			throw new ServerAssumptionFailedException(errorMessage + detailMessage);
+		}
+	}
+
+	private static void assumeEquals(
+			ItemStack expected,
+			ItemStack actual,
+			String errorMessage
+	) throws ServerAssumptionFailedException {
+		if (!expected.equals(actual)) {
+			String detailMessage = "";
+			if (Settings.debug) {
+				detailMessage = ": Expected [" + ConfigUtils.toConfigYaml("item", expected)
+						+ "] got [" + ConfigUtils.toConfigYaml("item", actual) + "]";
+			}
+
+			throw new ServerAssumptionFailedException(errorMessage + detailMessage);
 		}
 	}
 
@@ -221,100 +254,120 @@ public class ServerAssumptionsTest {
 
 	private void testItemStackComparisons() throws ServerAssumptionFailedException {
 		// Item stacks are similar to themselves:
-		assumption(
-				bukkitItemStack.isSimilar(bukkitItemStack),
+		assumeIsSimilar(
+				bukkitItemStack,
+				bukkitItemStack,
 				"Bukkit ItemStack#isSimilar(self)"
 		);
-		assumption(
-				craftItemStack.isSimilar(craftItemStack),
+		assumeIsSimilar(
+				craftItemStack,
+				craftItemStack,
 				"CraftItemStack#isSimilar(self)"
 		);
 
 		// Item stacks are equal to themselves:
-		assumption(
-				bukkitItemStack.equals(bukkitItemStack),
+		assumeEquals(
+				bukkitItemStack,
+				bukkitItemStack,
 				"Bukkit ItemStack#equals(self)"
 		);
-		assumption(
-				craftItemStack.equals(craftItemStack),
+		assumeEquals(
+				craftItemStack,
+				craftItemStack,
 				"CraftItemStack#equals(self)"
 		);
 
 		// Item stacks are similar to each other:
-		assumption(
-				bukkitItemStack.isSimilar(bukkitItemStack2),
+		assumeIsSimilar(
+				bukkitItemStack,
+				bukkitItemStack2,
 				"Bukkit ItemStack#isSimilar(other Bukkit ItemStack)"
 		);
-		assumption(
-				bukkitItemStack.isSimilar(craftItemStack),
+		assumeIsSimilar(
+				bukkitItemStack,
+				craftItemStack,
 				"Bukkit ItemStack#isSimilar(CraftItemStack)"
 		);
-		assumption(
-				craftItemStack.isSimilar(craftItemStack2),
+		assumeIsSimilar(
+				craftItemStack,
+				craftItemStack2,
 				"CraftItemStack#isSimilar(other CraftItemStack)"
 		);
-		assumption(
-				craftItemStack.isSimilar(bukkitItemStack),
+		assumeIsSimilar(
+				craftItemStack,
+				bukkitItemStack,
 				"CraftItemStack#isSimilar(Bukkit ItemStack)"
 		);
 
 		// Item stacks are equal to each other:
-		assumption(
-				bukkitItemStack.equals(bukkitItemStack2),
+		assumeEquals(
+				bukkitItemStack,
+				bukkitItemStack2,
 				"Bukkit ItemStack#equals(other Bukkit ItemStack)"
 		);
-		assumption(
-				bukkitItemStack.equals(craftItemStack),
+		assumeEquals(
+				bukkitItemStack,
+				craftItemStack,
 				"Bukkit ItemStack#equals(CraftItemStack)"
 		);
-		assumption(
-				craftItemStack.equals(craftItemStack2),
+		assumeEquals(
+				craftItemStack,
+				craftItemStack2,
 				"CraftItemStack#equals(other CraftItemStack)"
 		);
-		assumption(
-				craftItemStack.equals(bukkitItemStack),
+		assumeEquals(
+				craftItemStack,
+				bukkitItemStack,
 				"CraftItemStack#equals(Bukkit ItemStack)"
 		);
 	}
 
 	private void testDeserializedItemStackComparisons() throws ServerAssumptionFailedException {
 		// Item stacks are similar to deserialized item stack:
-		assumption(
-				bukkitItemStack.isSimilar(deserializedItemStack),
+		assumeIsSimilar(
+				bukkitItemStack,
+				deserializedItemStack,
 				"Bukkit ItemStack#isSimilar(Deserialized ItemStack)"
 		);
-		assumption(
-				craftItemStack.isSimilar(deserializedItemStack),
+		assumeIsSimilar(
+				craftItemStack,
+				deserializedItemStack,
 				"CraftItemStack#isSimilar(Deserialized ItemStack)"
 		);
 
 		// Item stacks are similar to deserialized CraftItemStack:
-		assumption(
-				bukkitItemStack.isSimilar(deserializedCraftItemStack),
+		assumeIsSimilar(
+				bukkitItemStack,
+				deserializedCraftItemStack,
 				"Bukkit ItemStack#isSimilar(Deserialized CraftItemStack)"
 		);
-		assumption(
-				craftItemStack.isSimilar(deserializedCraftItemStack),
+		assumeIsSimilar(
+				craftItemStack,
+				deserializedCraftItemStack,
 				"CraftItemStack#isSimilar(Deserialized CraftItemStack)"
 		);
 
 		// Deserialized item stack is similar to item stacks:
-		assumption(
-				deserializedItemStack.isSimilar(bukkitItemStack),
+		assumeIsSimilar(
+				deserializedItemStack,
+				bukkitItemStack,
 				"Deserialized ItemStack#isSimilar(Bukkit ItemStack)"
 		);
-		assumption(
-				deserializedItemStack.isSimilar(craftItemStack),
+		assumeIsSimilar(
+				deserializedItemStack,
+				craftItemStack,
 				"Deserialized ItemStack#isSimilar(CraftItemStack)"
 		);
 
 		// Deserialized CraftItemStack is similar to item stacks:
-		assumption(
-				deserializedCraftItemStack.isSimilar(bukkitItemStack),
+		assumeIsSimilar(
+				deserializedCraftItemStack,
+				bukkitItemStack,
 				"Deserialized CraftItemStack#isSimilar(Bukkit ItemStack)"
 		);
-		assumption(
-				deserializedCraftItemStack.isSimilar(craftItemStack),
+		assumeIsSimilar(
+				deserializedCraftItemStack,
+				craftItemStack,
 				"Deserialized CraftItemStack#isSimilar(CraftItemStack)"
 		);
 	}
