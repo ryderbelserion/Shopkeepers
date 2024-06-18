@@ -26,11 +26,11 @@ Maven repository:
 <repositories>
   <repository>
     <id>shopkeepers-repo</id>
-    <url>https://nexus.lichtspiele.org/repository/releases/</url>
+    <url>https://repo.projectshard.dev/repository/releases/</url>
   </repository>
 </repositories>
 ```
-Snapshot repository (development builds): https://nexus.lichtspiele.org/repository/snapshots/  
+Snapshot repository (development builds): https://repo.projectshard.dev/repository/snapshots/  
 
 If the above Maven repository is currently not available, you can also try to use Jitpack: https://jitpack.io/#Shopkeepers/Shopkeepers/  
 Jitpack snapshots: https://jitpack.io/#Shopkeepers/Shopkeepers/master-SNAPSHOT  

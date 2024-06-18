@@ -223,18 +223,18 @@ subprojects {
 
 		publishing {
 			repositories {
-				// Formerly nexus.cube-nation.de
-				// Contact person: d1rty (dbo: d1rtyseven)
+				// Formerly nexus.cube-nation.de, nexus.lichtspiele.org
+				// Contact person: Kronox (Discord); formerly: d1rty (dbo: d1rtyseven)
 				maven {
-					name 'lichtspieleNexus'
+					name 'projectshard'
 					credentials {
-						username findProperty('org.lichtspiele.nexus-username') ?: 'UNSET'
-						password findProperty('org.lichtspiele.nexus-password') ?: 'UNSET'
+						username findProperty('dev.projectshard.repo-username') ?: 'UNSET'
+						password findProperty('dev.projectshard.repo-password') ?: 'UNSET'
 					}
 					if (project.isSnapshot) {
-						url 'https://nexus.lichtspiele.org/repository/snapshots/'
+						url 'https://repo.projectshard.dev/repository/snapshots/'
 					} else {
-						url 'https://nexus.lichtspiele.org/repository/releases/'
+						url 'https://repo.projectshard.dev/repository/releases/'
 					}
 				}
 			}
@@ -252,7 +252,7 @@ def taskListAliases = [
 	'cleanAssemble' : ['clean', 'assemble'],
 	'cleanBuild' : ['clean', 'build'],
 	'cleanInstall' : ['clean', 'build', 'publishToMavenLocal'],
-	'cleanPublish' : ['clean', 'build', 'publishToMavenLocal', 'publishAllPublicationsToLichtspieleNexusRepository'],
+	'cleanPublish' : ['clean', 'build', 'publishToMavenLocal', 'publishAllPublicationsToProjectshardRepository'],
 	'cleanInstallMinimal' : ['clean', ':shopkeepers-api:publishToMavenLocal']
 ]
 

@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.21.1 (TBA)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+* Build: Update Maven repository URL.
 
 ## v2.21.0 (2024-06-18)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
