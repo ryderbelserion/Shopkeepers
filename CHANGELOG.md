@@ -1,9 +1,14 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.20.2 (TBA)
-### Supported MC versions: 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+## v2.21.1 (TBA)
+### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+
+## v2.21.0 (2024-06-18)
+### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+* Update for MC 1.21. Add bogged and breeze to the by default enabled mob types.
 * Debug: Add additional debug output if one of the item related server assumption tests fails.
 
 ## v2.20.1 (2024-05-26)

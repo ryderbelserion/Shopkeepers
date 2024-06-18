@@ -163,6 +163,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>CAMEL: okay TODO support sittable # 1.20
  * <li>SNIFFER: okay
  * <li>ARMADILLO: okay
+ * <li>BOGGED: okay # 1.21
+ * <li>BREEZE: okay
  * </ul>
  **/
 public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {

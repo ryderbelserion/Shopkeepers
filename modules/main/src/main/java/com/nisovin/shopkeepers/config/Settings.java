@@ -199,7 +199,9 @@ public class Settings extends Config {
 					"WARDEN", // MC 1.19
 					"CAMEL", // MC 1.20
 					"SNIFFER", // MC 1.20
-					"ARMADILLO" // MC 1.20.5
+					"ARMADILLO", // MC 1.20.5
+					"BOGGED", // MC 1.21
+					"BREEZE" // MC 1.21
 			), String::compareTo)
 	);
 

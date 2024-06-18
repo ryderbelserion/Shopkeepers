@@ -33,7 +33,7 @@ public final class NMSManager {
 	// remapping.
 	static {
 		// Registered in the order from latest to oldest.
-		// Different CB revision:
+		register(new CompatVersion("1_21_R1", "1.21", "229d7afc75b70a6c388337687ac4da1f"));
 		// Note: MC 1.20.6 completely replaced 1.20.5. We only support 1.20.6.
 		register(new CompatVersion("1_20_R5", "1.20.6", "ee13f98a43b9c5abffdcc0bb24154460"));
 		register(new CompatVersion("1_20_R4", "1.20.4", "60a2bb6bf2684dc61c56b90d7c41bddc"));
