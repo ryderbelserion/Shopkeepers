@@ -261,19 +261,18 @@ public final class ItemUtils {
 		return itemStack.shallowCopy();
 	}
 
-	public static @PolyNull UnmodifiableItemStack unmodifiableCloneIfModifiable(
+	public static @PolyNull UnmodifiableItemStack unmodifiableClone(
 			@ReadOnly @PolyNull ItemStack itemStack
 	) {
 		if (itemStack == null) return null;
-		if (itemStack instanceof UnmodifiableItemStack) return (UnmodifiableItemStack) itemStack;
 		return UnmodifiableItemStack.of(itemStack.clone());
 	}
 
-	public static UnmodifiableItemStack nonNullUnmodifiableCloneIfModifiable(
+	public static UnmodifiableItemStack nonNullUnmodifiableClone(
 			@ReadOnly ItemStack itemStack
 	) {
 		Validate.notNull(itemStack, "itemStack is null");
-		return Unsafe.assertNonNull(unmodifiableCloneIfModifiable(itemStack));
+		return Unsafe.assertNonNull(unmodifiableClone(itemStack));
 	}
 
 	public static @Nullable UnmodifiableItemStack unmodifiableOrNullIfEmpty(
@@ -283,18 +282,36 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Returns an {@link ItemStack} view of the given unmodifiable item stack, or <code>null</code>
-	 * if the given item stack is <code>null</code>.
+	 * Gets the internal {@link ItemStack} of the given unmodifiable item stack, or
+	 * <code>null</code> if the given unmodifiable item stack is <code>null</code>.
+	 * <p>
+	 * The caller is expected to not modify or expose the returned item stack.
 	 * 
 	 * @param itemStack
 	 *            the unmodifiable item stack
-	 * @return the item stack view, or <code>null</code>
-	 * @deprecated See {@link UnmodifiableItemStack#asItemStack()}
+	 * @return the internal item stack, or <code>null</code>
+	 * @deprecated Risky. See {@link SKUnmodifiableItemStack#getInternalItemStack()}
 	 */
 	@Deprecated
 	public static @PolyNull ItemStack asItemStackOrNull(@PolyNull UnmodifiableItemStack itemStack) {
 		if (itemStack == null) return null;
-		return itemStack.asItemStack();
+		return asItemStack(itemStack);
+	}
+
+	/**
+	 * Gets the internal {@link ItemStack} of the given unmodifiable item stack.
+	 * <p>
+	 * The caller is expected to not modify or expose the returned item stack.
+	 * 
+	 * @param itemStack
+	 *            the unmodifiable item stack, not <code>null</code>
+	 * @return the internal item stack, or <code>null</code>
+	 * @deprecated Risky. See {@link SKUnmodifiableItemStack#getInternalItemStack()}
+	 */
+	@Deprecated
+	public static ItemStack asItemStack(UnmodifiableItemStack itemStack) {
+		assert itemStack != null;
+		return ((SKUnmodifiableItemStack) itemStack).getInternalItemStack();
 	}
 
 	/**
@@ -328,23 +345,29 @@ public final class ItemUtils {
 
 	public static ItemStack copyWithAmount(UnmodifiableItemStack itemStack, int amount) {
 		Validate.notNull(itemStack, "itemStack is null");
-		return copyWithAmount(itemStack.asItemStack(), amount);
+		return copyWithAmount(asItemStack(itemStack), amount);
 	}
 
-	// Returns the same item stack if its amount already matches the target amount and the item
-	// stack is already unmodifiable.
+	// Always copies the item stack.
 	public static UnmodifiableItemStack unmodifiableCopyWithAmount(
 			@ReadOnly ItemStack itemStack,
 			int amount
 	) {
 		Validate.notNull(itemStack, "itemStack is null");
-		UnmodifiableItemStack result;
+		return UnmodifiableItemStack.ofNonNull(copyWithAmount(itemStack, amount));
+	}
+
+	// Returns the same item stack if its amount already matches the target amount.
+	public static UnmodifiableItemStack unmodifiableCopyWithAmount(
+			UnmodifiableItemStack itemStack,
+			int amount
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
 		if (itemStack.getAmount() != amount) {
-			result = UnmodifiableItemStack.ofNonNull(copyWithAmount(itemStack, amount));
+			return UnmodifiableItemStack.ofNonNull(copyWithAmount(itemStack, amount));
 		} else {
-			result = nonNullUnmodifiableCloneIfModifiable(itemStack);
+			return itemStack;
 		}
-		return result;
 	}
 
 	// Trims the amount between 1 and the item stack's max stack size.

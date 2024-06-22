@@ -27,6 +27,7 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -157,7 +158,7 @@ public class SKBuyingPlayerShopkeeper
 	@Override
 	public @Nullable PriceOffer getOffer(UnmodifiableItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
-		return this.getOffer(tradedItem.asItemStack());
+		return this.getOffer(ItemUtils.asItemStack(tradedItem));
 	}
 
 	@Override
@@ -177,7 +178,7 @@ public class SKBuyingPlayerShopkeeper
 	@Override
 	public void removeOffer(UnmodifiableItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
-		this.removeOffer(tradedItem.asItemStack());
+		this.removeOffer(ItemUtils.asItemStack(tradedItem));
 	}
 
 	@Override

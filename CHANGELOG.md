@@ -1,9 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.21.1 (TBA)
+## v2.22.0 (TBA)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+* Fix: Avoid extending Bukkit's ItemStack in our implementation of UnmodifiableItemStack. This also resolves a compatibility issue with Paper servers for MC 1.21.
+* API: Add PlayerShopkeeper#setForHire(UnmodifiableItemStack). This might break some add-on plugins, because when passing null, the call is now ambiguous and requires a cast to either ItemStack or UnmodifiableItemStack.
 * Build: Update Maven repository URL.
 
 ## v2.21.0 (2024-06-18)

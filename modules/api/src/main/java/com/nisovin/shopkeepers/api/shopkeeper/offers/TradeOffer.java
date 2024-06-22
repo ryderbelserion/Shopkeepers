@@ -18,9 +18,7 @@ public interface TradeOffer {
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
-	 * and therefore not copied before they are stored by the trade offer. Otherwise, they are first
-	 * copied.
+	 * The given item stacks are copied before they are stored by the trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty

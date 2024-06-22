@@ -21,24 +21,10 @@ public class UnmodifiableItemStackTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testBukkitEqualsUnmodifiable() {
-		this.createTestItemStacks().forEach(itemStack -> {
-			@Nullable UnmodifiableItemStack unmodifiableItemStack = UnmodifiableItemStack.of(itemStack);
-			Assert.assertEquals(
-					Unsafe.nullableAsNonNull(itemStack),
-					Unsafe.nullableAsNonNull(unmodifiableItemStack)
-			);
-		});
-	}
-
-	@Test
 	public void testUnmodifiableEqualsBukkit() {
 		this.createTestItemStacks().forEach(itemStack -> {
 			@Nullable UnmodifiableItemStack unmodifiableItemStack = UnmodifiableItemStack.of(itemStack);
-			Assert.assertEquals(
-					Unsafe.nullableAsNonNull(unmodifiableItemStack),
-					Unsafe.nullableAsNonNull(itemStack)
-			);
+			Assert.assertTrue(ItemUtils.equals(unmodifiableItemStack, itemStack));
 		});
 	}
 

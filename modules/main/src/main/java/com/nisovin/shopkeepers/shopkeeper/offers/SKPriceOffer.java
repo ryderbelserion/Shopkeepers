@@ -40,9 +40,7 @@ public class SKPriceOffer implements PriceOffer {
 	/**
 	 * Creates a new {@link SKPriceOffer}.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
-	 * and therefore not copied before it is stored by the price offer. Otherwise, it is first
-	 * copied.
+	 * The given item stack is copied before it is stored by the price offer.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -50,7 +48,7 @@ public class SKPriceOffer implements PriceOffer {
 	 *            the price, has to be positive
 	 */
 	public SKPriceOffer(ItemStack item, int price) {
-		this(ItemUtils.nonNullUnmodifiableCloneIfModifiable(item), price);
+		this(ItemUtils.nonNullUnmodifiableClone(item), price);
 	}
 
 	/**

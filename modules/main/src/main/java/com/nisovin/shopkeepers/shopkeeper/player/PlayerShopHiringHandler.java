@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.ui.hiring.HiringHandler;
 import com.nisovin.shopkeepers.ui.state.UIState;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -59,7 +60,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 		UnmodifiableItemStack hireCost = shopkeeper.getHireCost();
 		if (hireCost == null) return false;
 		// Inventory#setItem copies the item, so we do not need to copy it ourselves here.
-		inventory.setItem(HIRE_COST, hireCost.asItemStack());
+		inventory.setItem(HIRE_COST, ItemUtils.asItemStack(hireCost));
 
 		return player.openInventory(inventory) != null;
 	}
@@ -152,7 +153,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			// Hire the shopkeeper:
 			// Apply player inventory changes:
 			InventoryUtils.setContents(playerInventory, newPlayerInventoryContents);
-			shopkeeper.setForHire(null);
+			shopkeeper.setForHire((UnmodifiableItemStack)null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();
 			TextUtils.sendMessage(player, Messages.hired);

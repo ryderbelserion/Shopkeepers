@@ -364,8 +364,7 @@ public final class ItemData {
 	/**
 	 * Creates a new {@link ItemData} with the data of the given item stack.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
-	 * and the {@link ItemData} is allowed store it without making a copy of it first.
+	 * The given item stack is copied before it is stored by the {@link ItemData}.
 	 * 
 	 * @param dataItem
 	 *            the data item, not <code>null</code>
@@ -377,7 +376,7 @@ public final class ItemData {
 	// dataItem is assumed to be immutable.
 	public ItemData(UnmodifiableItemStack dataItem) {
 		Validate.notNull(dataItem, "dataItem is null");
-		this.dataItem = ItemUtils.unmodifiableCopyWithAmount(dataItem.asItemStack(), 1);
+		this.dataItem = ItemUtils.unmodifiableCopyWithAmount(dataItem, 1);
 	}
 
 	public UnmodifiableItemStack asUnmodifiableItemStack() {

@@ -313,9 +313,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
-	 * and therefore not copied before it is stored by the price offer. Otherwise, it is first
-	 * copied.
+	 * The given item stack is copied before it is stored by the price offer.
 	 * 
 	 * @param item
 	 *            the item being traded, not <code>null</code> or empty
@@ -350,9 +348,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	/**
 	 * Creates a new {@link TradeOffer}.
 	 * <p>
-	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable
-	 * and therefore not copied before they are stored by the trade offer. Otherwise, they are first
-	 * copied.
+	 * The given item stacks are copied before they are stored by the trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty

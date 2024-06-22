@@ -41,7 +41,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			// With heuristic initial capacity:
 			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
 			offers.forEach(offer -> {
-				ItemStack tradedItem = offer.getItem().asItemStack();
+				ItemStack tradedItem = ItemUtils.asItemStack(offer.getItem());
 				TradingRecipeDraft recipe = createTradingRecipeDraft(tradedItem, offer.getPrice());
 				recipes.add(recipe);
 			});

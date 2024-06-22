@@ -37,6 +37,7 @@ import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -253,7 +254,7 @@ public class SKBookPlayerShopkeeper
 	@Override
 	public @Nullable BookOffer getOffer(UnmodifiableItemStack bookItem) {
 		Validate.notNull(bookItem, "bookItem is null");
-		return this.getOffer(bookItem.asItemStack());
+		return this.getOffer(ItemUtils.asItemStack(bookItem));
 	}
 
 	@Override

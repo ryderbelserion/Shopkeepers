@@ -105,15 +105,25 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	/**
 	 * Sets this shopkeeper for hire using the given hiring cost item.
 	 * <p>
-	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable
-	 * and therefore not copied before it is stored by the shopkeeper. Otherwise, it is first
-	 * copied.
+	 * The given item stack is copied before it is stored by the shopkeeper.
 	 * 
 	 * @param hireCost
 	 *            the hiring cost item, or <code>null</code> or empty to set this shopkeeper not for
 	 *            hire
 	 */
 	public void setForHire(@Nullable ItemStack hireCost);
+
+	/**
+	 * Sets this shopkeeper for hire using the given hiring cost item.
+	 * <p>
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored
+	 * by the shopkeeper.
+	 * 
+	 * @param hireCost
+	 *            the hiring cost item, or <code>null</code> or empty to set this shopkeeper not for
+	 *            hire
+	 */
+	public void setForHire(@Nullable UnmodifiableItemStack hireCost);
 
 	/**
 	 * Gets the hiring cost item of this shopkeeper.

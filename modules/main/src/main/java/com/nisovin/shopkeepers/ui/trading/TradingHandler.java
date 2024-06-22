@@ -325,7 +325,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		}
 	}
 
-	private boolean canSlotHoldItemStack(@Nullable ItemStack slotItem, ItemStack itemStack) {
+	private boolean canSlotHoldItemStack(
+			@ReadOnly @Nullable ItemStack slotItem,
+			@ReadOnly ItemStack itemStack
+	) {
 		if (ItemUtils.isEmpty(slotItem)) return true;
 		assert slotItem != null;
 		if (!itemStack.isSimilar(slotItem)) return false;
@@ -424,7 +427,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				if (!resultItemEmpty) {
 					assert resultItem != null;
 
-					if (!this.canSlotHoldItemStack(cursor, resultItem.asItemStack())) {
+					if (!this.canSlotHoldItemStack(cursor, ItemUtils.asItemStack(resultItem))) {
 						Log.debug(() -> shopkeeper.getLogPrefix()
 								+ "Not handling trade: The cursor cannot hold the result items.");
 						this.onTradeAborted(tradingContext, false);
@@ -446,7 +449,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 					ItemStack resultCursor;
 					if (isCursorEmpty) {
 						// No item copy required here: setItemOnCursor copies the item.
-						resultCursor = resultItem.asItemStack();
+						resultCursor = ItemUtils.asItemStack(resultItem);
 					} else {
 						resultCursor = ItemUtils.increaseItemAmount(cursor, resultItem.getAmount());
 					}
@@ -504,7 +507,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 						// Set the result items to the hotbar slot:
 						// No item copy required here.
-						playerInventory.setItem(hotbarButton, resultItem.asItemStack());
+						playerInventory.setItem(hotbarButton, ItemUtils.asItemStack(resultItem));
 					}
 
 					// Common apply trade:
@@ -1129,7 +1132,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		debugLogItemStack(itemStackName, ItemUtils.asItemStackOrNull(itemStack));
 	}
 
-	private static void debugLogItemStack(String itemStackName, @Nullable ItemStack itemStack) {
+	private static void debugLogItemStack(
+			String itemStackName,
+			@ReadOnly @Nullable ItemStack itemStack
+	) {
 		Object itemStackData = (itemStack != null) ? itemStack : "<empty>";
 		Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline(itemStackName, itemStackData));
 	}

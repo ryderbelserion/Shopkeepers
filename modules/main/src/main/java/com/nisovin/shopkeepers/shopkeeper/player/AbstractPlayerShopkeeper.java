@@ -47,6 +47,7 @@ import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.user.SKUser;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
@@ -430,7 +431,7 @@ public abstract class AbstractPlayerShopkeeper
 
 	private void loadForHire(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		this._setForHire(ItemUtils.asItemStackOrNull(shopkeeperData.get(HIRE_COST_ITEM)));
+		this._setForHire(shopkeeperData.get(HIRE_COST_ITEM));
 	}
 
 	private void saveForHire(ShopkeeperData shopkeeperData) {
@@ -444,12 +445,17 @@ public abstract class AbstractPlayerShopkeeper
 	}
 
 	@Override
-	public void setForHire(@Nullable ItemStack hireCost) {
+	public void setForHire(@ReadOnly @Nullable ItemStack hireCost) {
+		this.setForHire(ItemUtils.unmodifiableClone(hireCost));
+	}
+
+	@Override
+	public void setForHire(@Nullable UnmodifiableItemStack hireCost) {
 		this._setForHire(hireCost);
 		this.markDirty();
 	}
 
-	private void _setForHire(@Nullable ItemStack hireCost) {
+	private void _setForHire(@Nullable UnmodifiableItemStack hireCost) {
 		boolean isForHire = this.isForHire();
 		if (ItemUtils.isEmpty(hireCost)) {
 			// Disable hiring:
@@ -461,7 +467,7 @@ public abstract class AbstractPlayerShopkeeper
 			}
 		} else {
 			// Set for hire:
-			this.hireCost = ItemUtils.nonNullUnmodifiableCloneIfModifiable(Unsafe.assertNonNull(hireCost));
+			this.hireCost = Unsafe.assertNonNull(hireCost);
 			this.setName(Messages.forHireTitle);
 		}
 		// TODO Close any currently open hiring UIs for players.

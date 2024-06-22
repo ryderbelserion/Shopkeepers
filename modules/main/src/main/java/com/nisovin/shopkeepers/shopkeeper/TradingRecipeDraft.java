@@ -162,9 +162,6 @@ public class TradingRecipeDraft {
 			@ReadOnly @Nullable ItemStack item1,
 			@ReadOnly @Nullable ItemStack item2
 	) {
-		// When using Objects#equals, the compiler / tooling complains about UnmodifiableItemStack
-		// being unrelated to ItemStack. This used utility function is aware that we can compare
-		// unmodifiable with normal item stacks.
 		if (!ItemUtils.equals(this.resultItem, resultItem)) return false;
 		if (!ItemUtils.equals(this.item1, item1)) return false;
 		if (!ItemUtils.equals(this.item2, item2)) return false;

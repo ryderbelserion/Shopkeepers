@@ -116,9 +116,9 @@ public final class MerchantUtils {
 		// No max-uses limit
 		MerchantRecipe merchantRecipe = new MerchantRecipe(resultItem.copy(), Integer.MAX_VALUE);
 		merchantRecipe.setExperienceReward(false); // No experience rewards
-		merchantRecipe.addIngredient(buyItem1.asItemStack());
+		merchantRecipe.addIngredient(ItemUtils.asItemStack(buyItem1));
 		if (buyItem2 != null) {
-			merchantRecipe.addIngredient(buyItem2.asItemStack());
+			merchantRecipe.addIngredient(ItemUtils.asItemStack(buyItem2));
 		}
 		return merchantRecipe;
 	}
