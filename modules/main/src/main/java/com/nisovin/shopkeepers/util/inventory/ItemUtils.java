@@ -653,7 +653,7 @@ public final class ItemUtils {
 		return 0;
 	}
 
-	public static @Nullable ItemStack ensureBukkitItemStack(@Nullable ItemStack itemStack) {
+	public static @Nullable ItemStack ensureBukkitItemStack(@ReadOnly @Nullable ItemStack itemStack) {
 		if (itemStack == null) return null;
 		if (itemStack.getClass() == ItemStack.class) return itemStack;
 		// Similar to CraftItemStack#asBukkitCopy:

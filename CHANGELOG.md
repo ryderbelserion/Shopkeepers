@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.22.1 (TBA)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+* Fix: In Shopkeepers v2.22.0, after a server upgrade, some shopkeepers failed to load with an error `Invalid trade offer 1: Failed to load property 'resultItem': Data is not of type ItemStack, but com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack!`.
 
 ## v2.22.0 (2024-06-22)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5

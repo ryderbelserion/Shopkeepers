@@ -28,12 +28,20 @@ public final class ItemStackSerializers {
 		@Override
 		public ItemStack deserialize(Object data) throws InvalidDataException {
 			Validate.notNull(data, "data is null");
-			if (!(data instanceof ItemStack)) {
+			if (data instanceof ItemStack) {
+				return DataUtils.deserializeNonNullItemStack((ItemStack) data);
+			} else if (data instanceof UnmodifiableItemStack) {
+				// We also support UnmodifiableItemStacks here, but return a copy of the item stack,
+				// because we don't know how the returned ItemStack will be used by the caller, i.e.
+				// whether it is expected to be modifiable.
+				// Note: We don't expect the additional ItemStack processing of
+				// DataUtils.deserializeItemStack to be required here, because the item stack is not
+				// freshly deserialized.
+				return ((UnmodifiableItemStack) data).copy();
+			} else {
 				throw new InvalidDataException("Data is not of type ItemStack, but "
 						+ data.getClass().getName() + "!");
 			}
-			ItemStack itemStack = (ItemStack) data;
-			return DataUtils.deserializeNonNullItemStack(itemStack);
 		}
 	};
 
@@ -49,6 +57,15 @@ public final class ItemStackSerializers {
 
 		@Override
 		public UnmodifiableItemStack deserialize(Object data) throws InvalidDataException {
+			if (data instanceof UnmodifiableItemStack) {
+				// If the data is already an UnmodifiableItemStack, return it without the copying
+				// that would be done by DEFAULT.deserialize.
+				// Note: We don't expect the additional ItemStack processing of
+				// DataUtils.deserializeItemStack to be required here, because the item stack is not
+				// freshly deserialized.
+				return (UnmodifiableItemStack) data;
+			}
+			// Else: Try to load it as a normal ItemStack:
 			return UnmodifiableItemStack.ofNonNull(DEFAULT.deserialize(data));
 		}
 	};
