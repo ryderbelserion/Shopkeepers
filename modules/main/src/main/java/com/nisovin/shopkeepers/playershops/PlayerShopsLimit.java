@@ -68,7 +68,7 @@ public class PlayerShopsLimit {
 		// Also, Bukkit doesn't even properly support dynamically unregistering permissions: For
 		// example, there is no way to update the cached default permissions via the API after
 		// having unregistered a permission (however, this isn't really required for our permissions
-		// anyways). And we would have to manually update all players and other Permissibles that
+		// anyway). And we would have to manually update all players and other Permissibles that
 		// might have these permissions attached to them.
 		// However, these permissions are pretty lightweight, so there is no harm caused by keeping
 		// them registered until the server restarts, even if the list of max shops permissions has

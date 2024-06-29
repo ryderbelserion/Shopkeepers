@@ -61,7 +61,7 @@ public final class PlayerArgumentUtils {
 		public static final PlayerNameMatcher EXACT = new AbstractPlayerNameMatcher() {
 			@Override
 			protected boolean checkExactMatchFirst() {
-				// We check for exact matches later anyways, so we can avoid this.
+				// We check for exact matches later anyway, so we can avoid this.
 				return false;
 			}
 

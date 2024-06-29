@@ -378,7 +378,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		// being applied vs the shop object being loaded normally. However, this isn't much of an
 		// issue currently: When we normally reload the shopkeepers from disk (eg. during a reload
 		// of the plugin), we fully recreate the shop objects. So any state in memory is lost
-		// anyways (if it hasn't been saved to disk before).
+		// anyway (if it hasn't been saved to disk before).
 		DataContainer previousNpcData = this.npcData;
 		this.npcData = shopObjectData.get(NPC_DATA);
 		if (npcData == null && previousNpcData != null) {
@@ -760,7 +760,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	// SHOPKEEPER LOCATION
 
 	// TODO Maybe avoid this immediate location update (we cannot reliably catch all location
-	// updates immediately anyways) and instead ensure that we keep all shop objects ticking for as
+	// updates immediately anyway) and instead ensure that we keep all shop objects ticking for as
 	// long as they are still spawned. I.e. tick shopkeepers if either their chunks is active, or
 	// they have been spawned and not despawned yet.
 	// This is called whenever the NPC is about to teleport.

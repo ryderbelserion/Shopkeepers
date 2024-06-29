@@ -75,7 +75,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private static final String DATA_VERSION_KEY = "data-version";
 
 	private static final String HEADER = "This file is not intended to be manually modified! If you"
-			+ " want to manually edit this file anyways, ensure that the server is not running"
+			+ " want to manually edit this file anyway, ensure that the server is not running"
 			+ " currently and that you have prepared a backup of this file.";
 
 	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
@@ -954,7 +954,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// We remember the shopkeeper and keep it marked as dirty, so that the next save of
 				// all shopkeepers attempts to save it again.
 				// However, we won't automatically initiate a new save for this shopkeeper as the
-				// risk is high that saving will fail again anyways.
+				// risk is high that saving will fail again anyway.
 				failedToSave.add(shopkeeper);
 				return;
 			}

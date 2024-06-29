@@ -70,7 +70,7 @@ class ShopCreationItemSelectionTask implements Runnable {
 	 */
 	static void onDisable() {
 		// Note: It is not required to manually cancel the active tasks on plugin disable. They are
-		// cancelled anyways.
+		// cancelled anyway.
 		activeTasks.clear();
 	}
 
@@ -119,7 +119,7 @@ class ShopCreationItemSelectionTask implements Runnable {
 		// Note: We do not check if the player has the permission to create shops here again. We
 		// checked that earlier already, before starting this task. Even if there has been a change
 		// to that in the meantime, there is no major harm caused by sending the selection message
-		// anyways. The task's delay is short enough that this does not matter.
+		// anyway. The task's delay is short enough that this does not matter.
 
 		// Inform the player about the shop creation item's usage:
 		TextUtils.sendMessage(player, Messages.creationItemSelected);

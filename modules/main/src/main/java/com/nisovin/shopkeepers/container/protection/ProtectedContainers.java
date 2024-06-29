@@ -344,7 +344,7 @@ public class ProtectedContainers {
 				Block connectedChest = containerBlock.getRelative(connectedFace);
 				// In case of inconsistency of the block data (i.e. connected chest missing or not
 				// mutually connected), we consider the block to be connected (and by that
-				// protected) anyways, because such inconsistencies might also occur during handling
+				// protected) anyway, because such inconsistencies might also occur during handling
 				// of block placements.
 				// Minecraft determines double chests by these consistency criteria:
 				// Same chest type, same facing, opposite chest type (opposite connected block

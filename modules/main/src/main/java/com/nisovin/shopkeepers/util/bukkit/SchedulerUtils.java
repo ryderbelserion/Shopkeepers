@@ -169,7 +169,7 @@ public final class SchedulerUtils {
 			// Severe, since this can potentially result in data loss, depending on what the tasks
 			// are doing:
 			logger.severe("There are still " + activeAsyncTasks
-					+ " remaining async tasks active! Disabling anyways now.");
+					+ " remaining async tasks active! Disabling anyway now.");
 		}
 		return activeAsyncTasks;
 	}

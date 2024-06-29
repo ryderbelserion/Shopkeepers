@@ -33,9 +33,9 @@ public class ConfigMigration3 implements ConfigMigration {
 		migrateSetting(configData, "chest-item", "container-item");
 		// Note: Most of the following message also had changes to their contents which need to be
 		// applied manually.
-		// We migrate them here anyways, so that any old message settings get removed from the
-		// config and thereby don't cause confusion by there being many no longer used message
-		// settings. Note that this migration is not invoked for custom / separate language files.
+		// We migrate them here anyway, so that any old message settings get removed from the config
+		// and thereby don't cause confusion by there being many no longer used message settings.
+		// Note that this migration is not invoked for custom / separate language files.
 		migrateSetting(configData, "msg-button-chest", "msg-button-container");
 		migrateSetting(configData, "msg-button-chest-lore", "msg-button-container-lore");
 		migrateSetting(configData, "msg-selected-chest", "msg-container-selected");

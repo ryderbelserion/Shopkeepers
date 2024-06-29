@@ -263,7 +263,7 @@ public class TradeMerger {
 		}
 
 		// We avoid starting a new task if the trade merging is expected to end earlier, or roughly
-		// at the same time (by up to NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) as the task anyways:
+		// at the same time (by up to NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) as the task anyway:
 		if (mergeEndNanos <= nowNanos + remainingTimeoutNanos + NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) {
 			return;
 		}

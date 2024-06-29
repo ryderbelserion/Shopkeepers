@@ -92,7 +92,7 @@ public final class SKUISession implements UISession {
 		if (!this.isValid()) return;
 
 		this.deactivateUI();
-		// This fails during plugin disable. However, all UIs will be closed anyways.
+		// This fails during plugin disable. However, all UIs will be closed anyway.
 		SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.getInstance(), () -> {
 			if (!this.isValid()) return;
 			close();
@@ -117,7 +117,7 @@ public final class SKUISession implements UISession {
 		if (!this.isValid()) return;
 
 		this.deactivateUI();
-		// This fails during plugin disable. However, all UIs will be closed anyways.
+		// This fails during plugin disable. However, all UIs will be closed anyway.
 		SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.getInstance(), () -> {
 			if (!this.isValid()) return;
 			abort();

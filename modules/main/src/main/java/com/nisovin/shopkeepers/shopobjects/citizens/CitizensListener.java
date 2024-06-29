@@ -135,7 +135,7 @@ class CitizensListener implements Listener {
 				this.reset();
 				this.handleTrait(trait, player); // Handle with player (can be null though)
 			} else {
-				// The task should get reset before we reach this state. We check for this anyways
+				// The task should get reset before we reach this state. We check for this anyway
 				// just in case.
 				assert pendingTraitTask == null;
 				if (pendingTraitTask == null || Unsafe.assertNonNull(pendingTraitTask).isCancelled()) {

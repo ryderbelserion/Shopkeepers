@@ -61,7 +61,7 @@ public class RemoveShopOnContainerBreak {
 				block.getWorld().dropItemNaturally(block.getLocation(), shopCreationItem);
 			}
 			// Note: We do not pass the player responsible for breaking the container here, because
-			// we cannot determine the player in all situations anyways (e.g. if a player indirectly
+			// we cannot determine the player in all situations anyway (e.g. if a player indirectly
 			// breaks the container by causing an explosion).
 			shopkeeper.delete();
 		}

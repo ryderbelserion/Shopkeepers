@@ -65,7 +65,7 @@ public class LivingEntityAI implements Listener {
 	 * We also separately react to player joins and teleports in order to quickly activate the AI of
 	 * nearby shopkeepers in those cases. Note that this only has an effect if the nearby chunks
 	 * were already loaded and their shopkeepers were already spawned. However, if this is not the
-	 * case, the chunk will be marked as active by default anyways already once the shopkeepers are
+	 * case, the chunk will be marked as active by default anyway already once the shopkeepers are
 	 * spawned (which can happen deferred to chunk loading, due to the deferred chunk activation and
 	 * the spawn queue).
 	 */

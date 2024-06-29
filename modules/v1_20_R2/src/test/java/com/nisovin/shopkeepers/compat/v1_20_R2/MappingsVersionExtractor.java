@@ -16,8 +16,8 @@ import com.nisovin.shopkeepers.util.java.Box;
  * During tests, we cannot instantiate the CraftMagicNumbers class to then retrieve the mappings
  * version like normal, because the static initializers of this class access Minecraft registries,
  * which check whether the server has performed its usual startup routines (which is not the case
- * during tests). If we attempt to access the class anyways, these static initializers will trigger
- * a 'bootstrap exception'.
+ * during tests). If we attempt to access the class anyway, these static initializers will trigger a
+ * 'bootstrap exception'.
  */
 public final class MappingsVersionExtractor {
 

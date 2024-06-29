@@ -589,7 +589,7 @@ Date format: (YYYY-MM-DD)
 * When we are not able to retrieve the server's Minecraft data version, we now abort the initialization of the plugin with an error. Previously, we would have continued with a dummy data version value in this case, which would have bypassed our new version checks.
 * Fixed: The arguments of translatable text components were not getting correctly converted to arguments of the corresponding Spigot-based text components. However, since we don't use any translatable texts with arguments yet, this fix has no noticeable impact.
 * Data: The world, coordinates, and yaw are now omitted from the save data of virtual shopkeepers. However, this has no effect yet, since virtual shopkeepers are not yet properly supported.
-* Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
+* Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyway.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.
 * Refactors related to the removal of shopkeepers of inactive players.
@@ -795,7 +795,7 @@ Added messages:
 * Added a spawn queue for shopkeepers spawned on chunk loads.
   * Spawning lots of shopkeepers at the same time can be quite costly performance-wise. This queue distributes the spawning of shopkeepers over multiple ticks to avoid performance drops.
   * We spawn at most 6 shopkeepers every 3 ticks (roughly 40 shopkeepers per second): These numbers are a balance between keeping the number of shopkeepers spawned per cycle low, while avoiding the general performance overhead associated with higher spawn rates.
-  * In order to avoid players having to wait for shopkeepers to spawn, there are some situations in which we spawn the shopkeepers immediately instead of adding them to the queue. This includes: When a shopkeeper is newly created, when a shopkeeper is loaded (i.e. on plugin reloads), and after world saves. In the latter two cases, a potentially large number of shopkeepers is expected to be spawned at the same time. Due to its limited throughput, the queue would not be able to deal with this sudden peak appropriately. However, since these are situations that are associated with a certain performance impact anyways, we prefer to spawn all the affected shopkeepers immediately, instead of causing confusion among players by having them wait for the shopkeepers to respawn.
+  * In order to avoid players having to wait for shopkeepers to spawn, there are some situations in which we spawn the shopkeepers immediately instead of adding them to the queue. This includes: When a shopkeeper is newly created, when a shopkeeper is loaded (i.e. on plugin reloads), and after world saves. In the latter two cases, a potentially large number of shopkeepers is expected to be spawned at the same time. Due to its limited throughput, the queue would not be able to deal with this sudden peak appropriately. However, since these are situations that are associated with a certain performance impact anyway, we prefer to spawn all the affected shopkeepers immediately, instead of causing confusion among players by having them wait for the shopkeepers to respawn.
 * The check for whether the shopkeeper mob moved and needs to be teleported back reuses the previous spawn location now. Previously, this would freshly calculate the spawn location each time, which also involves a ray trace to find the exact location for the mob to stand on.
   * This change also ensures that shopkeeper mobs no longer start to fall if gravity is disabled and the block below them is broken. However, to account for shopkeepers that have previously been placed above passable or non-full blocks, which might have been broken since then, we still spawn shopkeeper mobs up to one block below their location even if gravity is disabled (e.g. when the chunk or the plugin are reloaded).
   * Another side effect of this change is that if gravity is disabled, it is no longer as easily possible to force the shopkeeper mob to move back to its original location after the block it was previously standing on is broken. The shopkeeper will only check for a new spawn location now when it is being respawned. If the mob is supposed to dynamically move when the block below it is broken, gravity needs to be enabled.
@@ -1587,7 +1587,7 @@ Internal changes:
 * Internal: The command library was updated to use a new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
 
 Other internal changes:  
-* Internal: The save task was using a copy of the save data to protect against concurrent modifications while an async save is in progress. However, since the actual save data did not get modified during ongoing saves anyways, this copy is redundant and was therefore removed.
+* Internal: The save task was using a copy of the save data to protect against concurrent modifications while an async save is in progress. However, since the actual save data did not get modified during ongoing saves anyway, this copy is redundant and was therefore removed.
 * Internal: Made various changes in order to support Minecraft's text features such as hover events, click events, insertions, etc. Most texts are now stored in a new format internally.
 * Internal: Various changes to TextUtils and argument replacement.
   * Arguments can be arbitrary objects now and Suppliers can be used to dynamically look up argument values.
@@ -1689,14 +1689,14 @@ Internal:
 * Internal: Made some small change that resulted in major performance improvements for handling items moving between inventories (hoppers, droppers, etc.).
 * Internal: Slightly improved performance for handling block physics events.
 * Internal: Moved some initialization and config loading into the onLoad phase.
-* Internal: Avoiding ItemStack#hasItemMeta calls before getting an item's ItemMeta, since this might be heavier than simply getting the ItemMeta directly and performing only the relevant checks on that. Internally ItemStack#hasItemMeta checks emptiness for all item attributes and might (for CraftItemStacks) even first copy all the item's data into a new ItemMeta object. And even if the item actually has no data (Bukkit ItemStack with null ItemMeta), ItemStack#getItemMeta will simply create a new empty ItemMeta object without having to copy any data, so this is still a similarly lightweight operation anyways.
+* Internal: Avoiding ItemStack#hasItemMeta calls before getting an item's ItemMeta, since this might be heavier than simply getting the ItemMeta directly and performing only the relevant checks on that. Internally ItemStack#hasItemMeta checks emptiness for all item attributes and might (for CraftItemStacks) even first copy all the item's data into a new ItemMeta object. And even if the item actually has no data (Bukkit ItemStack with null ItemMeta), ItemStack#getItemMeta will simply create a new empty ItemMeta object without having to copy any data, so this is still a similarly lightweight operation anyway.
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.
 * Internal: Moved config migrations into a separate package.
 * Internal: Moved some functions into ConfigUtils.
 * Internal: Slightly changed how the plugin checks whether the high currency is enabled.
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking', 'enable-spawn-verifier' and 'increment-villager-statistics' are used.
-* Internal: Skipping shopkeeper spawning requests for unloaded worlds (should usually not be the case, but we guard against this anyways now).
+* Internal: Skipping shopkeeper spawning requests for unloaded worlds (should usually not be the case, but we guard against this anyway now).
 * Internal: Spigot is stopping the conversion of zombie villagers on its own now if the corresponding transform event gets cancelled.
 * Internal: Added a test to ensure consistency between ShopkeepersPlugin and ShopkeepersAPI.
 * Internal: Added ItemData tests. This requires CraftBukkit as new test dependency due to relying on item serialization.
@@ -2239,7 +2239,7 @@ Due to the various message related changes, you will have to update your message
   * This makes shop entities unpushable (at least on certain MC versions, see below).
 * However:
   * In order to keep the look-at-nearby-players behavior, the plugin now manually triggers the Minecraft logic responsible for that.
-  * In order for the entities to still be affected by gravity, the plugin now manually periodically checks for block collisions below mobs and then teleports them downwards. This doesn't look as smooth as Minecraft's gravity motion, but it should suffice (especially since the shopkeeper mobs are usually not falling far from their initial spawn position anyways).
+  * In order for the entities to still be affected by gravity, the plugin now manually periodically checks for block collisions below mobs and then teleports them downwards. This doesn't look as smooth as Minecraft's gravity motion, but it should suffice (especially since the shopkeeper mobs are usually not falling far from their initial spawn position anyway).
   
 **Impact on performance:**  
 * Shopkeepers only runs the AI and the gravity for mobs that are in range of players (AI: 1 chunk around players, gravity: 4 chunks around players by default).
@@ -2334,11 +2334,11 @@ Implementing the trading ourselves has a few advantages, but also comes with cav
 * Minecraft performs some map initialization when certain map items are created by crafting or via trades: This seems to be responsible for updating the scaling (after crafting a larger map) and enabling tracking (this doesn't seem to be used anywhere inside Minecraft though). Since this is only the case if the map item has some special internal nbt data (which shouldn't be obtainable in vanilla Minecraft), we currently simply ignore this inside Shopkeepers.
 
 **Neutral:**  
-* The usage count of the used trading recipes doesn't get increased anymore. But since these are only temporarily existing and aren't used for anything so far anyways, this shouldn't be an issue.
+* The usage count of the used trading recipes doesn't get increased anymore. But since these are only temporarily existing and aren't used for anything so far anyway, this shouldn't be an issue.
 * The player's item crafting statistic doesn't get increased anymore for items received via shopkeeper trades.
 * The player's traded-with-villager statistic doesn't get increased anymore for shopkeeper trades.
 
-I could manually replicate some of these, but since these are custom trades anyways I don't see the need for it right now. But if there is a justified interest in this, let me know, and I might add a config option for it.
+I could manually replicate some of these, but since these are custom trades anyway I don't see the need for it right now. But if there is a justified interest in this, let me know, and I might add a config option for it.
 
 **Advantages:**  
 * Support for more advanced inventory actions when trading with shopkeepers:

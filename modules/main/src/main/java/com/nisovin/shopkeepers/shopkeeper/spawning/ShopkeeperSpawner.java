@@ -56,7 +56,7 @@ public class ShopkeeperSpawner {
 	// cases, a potentially large number of shopkeepers is expected to be spawned at the same time.
 	// Due to its limited throughput, the queue would not be able to deal with this sudden peak
 	// appropriately.
-	// However, since these situations are associated with a certain performance impact anyways, we
+	// However, since these situations are associated with a certain performance impact anyway, we
 	// prefer to spawn all affected shopkeepers immediately, instead of causing confusion due to
 	// players having to wait for shopkeepers to respawn.
 	private final ShopkeeperSpawnQueue spawnQueue;

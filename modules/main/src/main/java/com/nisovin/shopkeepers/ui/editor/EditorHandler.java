@@ -149,7 +149,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 			}
 			// Else: Cancelled by another plugin.
 			// Note: We don't send a message in this case here, because we expect that the other
-			// plugin sends a more specific message anyways if it wants to inform the player.
+			// plugin sends a more specific message anyway if it wants to inform the player.
 		}, () -> {
 			// Delete cancelled.
 			if (!player.isValid()) return;

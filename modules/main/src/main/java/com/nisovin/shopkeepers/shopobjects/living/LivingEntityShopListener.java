@@ -100,7 +100,7 @@ class LivingEntityShopListener implements Listener {
 	// cancelled by other plugins is not an option, because then these other plugins will already
 	// have handled the event and we have no chance to avoid their side effects (e.g. protection
 	// plugins will already have sent the player their 'interaction denied' message, even though we
-	// open the shop UI afterwards anyways).
+	// open the shop UI afterwards anyway).
 	// In some usecases it may be desired by the server admin that we take into account whether some
 	// other plugin wants to cancel the interaction. For those situations the setting
 	// 'check-shop-interaction-result' can be used to call an additional interaction event that
@@ -127,7 +127,7 @@ class LivingEntityShopListener implements Listener {
 	// other plugins, and it breaks whenever the Shopkeepers plugin is dynamically reloaded, because
 	// that re-registers all event handlers and thereby moves them to the back of the registered
 	// event handlers.
-	// In an attempt to resolve these conflicts with other plugins anyways (for instance,
+	// In an attempt to resolve these conflicts with other plugins anyway (for instance,
 	// GriefPrevention, a popular protection plugin, reacts on LOWEST event priority), we forcefully
 	// move our event handler(s) to the front of the relevant handler list. This ensures that our
 	// event handler(s) are executed first, even if our plugin has been dynamically reloaded.
