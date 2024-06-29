@@ -4,6 +4,11 @@ Date format: (YYYY-MM-DD)
 ## v2.22.1 (TBA)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+* Fix: Since Spigot 1.20.5, snowman and mushroom cow shopkeepers failed to load because these mobs have been renamed to their Minecraft names ('SNOW_GOLEM' and 'MOOSHROOM').
+  * When running on MC 1.20.5 or above, we automatically migrate these shop object types to their new names so that they load again.
+  * Config: When updating to MC 1.20.5 or above, the old mob names in the `enabled-living-shops` setting might still work for now, but it is recommended to update them to their new names. We log a warning now should the old mob names no longer be recognized in the future.
+  * Config: The default config was updated to use the new mob names. When running on an older server version, this results in a warning now, similar to the warnings that are logged for any default enabled mob types that are not supported by the server's Minecraft version.
+  * Adjusted the shop object type aliases so that the `/shopkeeper` command recognizes both the old and new mob names.
 * Fix: In Shopkeepers v2.22.0, after a server upgrade, some shopkeepers failed to load with an error `Invalid trade offer 1: Failed to load property 'resultItem': Data is not of type ItemStack, but com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack!`.
 
 ## v2.22.0 (2024-06-22)

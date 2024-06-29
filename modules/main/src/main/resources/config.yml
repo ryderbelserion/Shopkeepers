@@ -285,8 +285,8 @@ enabled-living-shops:
 - IRON_GOLEM
 - LLAMA
 - MAGMA_CUBE
+- MOOSHROOM
 - MULE
-- MUSHROOM_COW
 - OCELOT
 - PANDA
 - PARROT
@@ -307,7 +307,7 @@ enabled-living-shops:
 - SKELETON_HORSE
 - SLIME
 - SNIFFER
-- SNOWMAN
+- SNOW_GOLEM
 - SPIDER
 - SQUID
 - STRAY

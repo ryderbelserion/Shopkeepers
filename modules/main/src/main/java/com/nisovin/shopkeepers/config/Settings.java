@@ -128,14 +128,14 @@ public class Settings extends Config {
 			new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())),
 			CollectionUtils.sort(Arrays.asList(
 					EntityType.COW.name(),
-					EntityType.MUSHROOM_COW.name(),
+					"MOOSHROOM", // MC 1.20.5: Renamed "MUSHROOM_COW" to "MOOSHROOM"
 					EntityType.SHEEP.name(),
 					EntityType.PIG.name(),
 					EntityType.CHICKEN.name(),
 					EntityType.OCELOT.name(),
 					EntityType.RABBIT.name(),
 					EntityType.WOLF.name(),
-					EntityType.SNOWMAN.name(),
+					"SNOW_GOLEM", // MC 1.20.5: Renamed "SNOWMAN" to "SNOW_GOLEM"
 					EntityType.IRON_GOLEM.name(),
 					EntityType.BLAZE.name(),
 					EntityType.SILVERFISH.name(),
@@ -676,11 +676,27 @@ public class Settings extends Config {
 
 					foundInvalidEntityType = true;
 					if ("PIG_ZOMBIE".equals(entityTypeId)) {
-						// Migration note for MC 1.16 TODO Remove this again at some point?
+						// Migration note for MC 1.16 TODO Remove this again at some point.
 						Log.warning(INSTANCE.getLogPrefix()
 								+ "Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'."
 								+ " This mob no longer exists since MC 1.16."
 								+ " Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
+					} else if ("MUSHROOM_COW".equals(entityTypeId)) {
+						// Migration note for MC 1.20.5 TODO Remove this again at some point.
+						// Note: Not actually triggered currently, because Spigot's backwards
+						// compatibility measures ensure that we can still find the mob type by its
+						// old name currently.
+						Log.warning(INSTANCE.getLogPrefix()
+								+ "Ignoring mob type 'MUSHROOM_COW' in setting 'enabled-living-shops'."
+								+ " This mob was renamed in MC 1.20.5: Consider replacing it with 'MOOSHROOM'.");
+					} else if ("SNOWMAN".equals(entityTypeId)) {
+						// Migration note for MC 1.20.5 TODO Remove this again at some point.
+						// Note: Not actually triggered currently, because Spigot's backwards
+						// compatibility measures ensure that we can still find the mob type by its
+						// old name currently.
+						Log.warning(INSTANCE.getLogPrefix()
+								+ "Ignoring mob type 'SNOWMAN' in setting 'enabled-living-shops'."
+								+ " This mob was renamed in MC 1.20.5: Consider replacing it with 'SNOW_GOLEM'.");
 					} else {
 						Log.warning(INSTANCE.getLogPrefix()
 								+ "Invalid living entity type name in 'enabled-living-shops': "
