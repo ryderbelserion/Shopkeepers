@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
+import com.nisovin.shopkeepers.ui.villager.editor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 
 /**

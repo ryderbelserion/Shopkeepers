@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.state.UIState;
-import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
+import com.nisovin.shopkeepers.ui.villager.editor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.InventoryViewUtils;

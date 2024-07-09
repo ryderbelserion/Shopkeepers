@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.villagerEditor;
+package com.nisovin.shopkeepers.ui.villager.editor;
 
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 

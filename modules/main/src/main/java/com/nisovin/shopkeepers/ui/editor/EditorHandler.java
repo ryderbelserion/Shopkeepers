@@ -56,6 +56,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 			TradingRecipesAdapter tradingRecipesAdapter
 	) {
 		super(uiType, tradingRecipesAdapter);
+
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		this.shopkeeper = shopkeeper;
 	}
