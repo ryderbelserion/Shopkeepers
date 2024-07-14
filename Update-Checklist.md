@@ -42,6 +42,8 @@ To support the latest mappings version:
 	* Test if they can be used for shopkeepers.
 	* Add a note about potential issues in SKLivingShopObjectTypes.
 	* If there are no severe issues, add them to the by default enabled living shop types.
+	* Check which equipment slots are supported and adjust EquipmentUtils and
+	  SKLivingShopObject#getEditableEquipmentSlots.
 
 * New features for new or existing shop objects (mobs, signs, etc.):
 	* If not yet existing: Add a new shop object type and register it inside SKLivingShopObjectTypes.
@@ -54,7 +56,7 @@ To support the latest mappings version:
 	* Also check if the supported containers in ShopContainers require changes.
 
 * New EquipmentSlots:
-	* ItemUtils#getItem(PlayerInventory, EquipmentSlot) may need to be adapted.
+	* EquipmentUtils and ItemUtils#getItem(PlayerInventory, EquipmentSlot) may need to be adapted.
 
 * New enchantments:
 	* Check the aliases inside EnchantmentUtils.
