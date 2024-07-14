@@ -22,9 +22,11 @@ import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
+import com.nisovin.shopkeepers.ui.UIHelpers;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.inventory.InventoryViewUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
@@ -145,19 +147,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		// Clicking in player inventory:
 		if (event.isShiftClick()) return; // Ignoring shift clicks
 
-		ItemStack cursor = event.getCursor();
-		ItemStack current = event.getCurrentItem();
-		if (!ItemUtils.isEmpty(cursor)) {
-			if (ItemUtils.isEmpty(current)) {
-				// Place item from cursor:
-				event.setCurrentItem(cursor);
-				event.getView().setCursor(null); // Requires the event to be cancelled
-			}
-		} else if (!ItemUtils.isEmpty(current)) {
-			// Pick up item to cursor:
-			event.setCurrentItem(null);
-			event.getView().setCursor(current); // Requires the event to be cancelled
-		}
+		UIHelpers.placeOrPickCursor(event.getView(), event.getRawSlot());
 	}
 
 	@Override
@@ -170,14 +160,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (!ItemUtils.isEmpty(cursor)) {
 			// Place item from cursor:
 			ItemStack cursorClone = ItemUtils.copySingleItem(Unsafe.assertNonNull(cursor));
-			// Replace placeholder item, if this is one:
-			ItemStack cursorCloneFinal = PlaceholderItems.replace(cursorClone);
-			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-				inventory.setItem(rawSlot, cursorCloneFinal); // This copies the item internally
-
-				// Update the trade column (replaces empty slot placeholder items if necessary):
-				this.updateTradeColumn(inventory, this.getTradeColumn(rawSlot));
-			});
+			this.placeCursorInTrades(inventory, rawSlot, cursorClone);
 		} else {
 			// Change the stack size of the clicked item, if this column contains a trade:
 			int tradeColumn = this.getTradeColumn(rawSlot);
@@ -204,12 +187,25 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 	}
 
+	private void placeCursorInTrades(Inventory inventory, int rawSlot, ItemStack cursorClone) {
+		assert !ItemUtils.isEmpty(cursorClone);
+		cursorClone.setAmount(1);
+		// Replace placeholder item, if this is one:
+		ItemStack cursorFinal = PlaceholderItems.replace(cursorClone);
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+			inventory.setItem(rawSlot, cursorFinal); // This copies the item internally
+
+			// Update the trade column (replaces empty slot placeholder items if necessary):
+			this.updateTradeColumn(inventory, this.getTradeColumn(rawSlot));
+		});
+	}
+
 	@Override
 	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
 		event.setCancelled(true);
-		ItemStack cursor = event.getOldCursor();
-		// Assert: Cursor item is already a clone.
-		if (ItemUtils.isEmpty(cursor)) return;
+		ItemStack cursorClone = event.getOldCursor(); // Already a copy
+		if (ItemUtils.isEmpty(cursorClone)) return;
+		assert cursorClone != null;
 
 		Set<Integer> rawSlots = event.getRawSlots();
 		if (rawSlots.size() != 1) return;
@@ -218,32 +214,13 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (this.isTradesArea(rawSlot)) {
 			// Place item from cursor:
 			Inventory inventory = event.getInventory();
-			cursor.setAmount(1); // Cursor is already a copy
-			// Replace placeholder item, if this is one:
-			ItemStack cursorFinal = PlaceholderItems.replace(cursor);
-			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-				inventory.setItem(rawSlot, cursorFinal); // This copies the item internally
-
-				// Update the trade column (replaces empty slot placeholder items if necessary):
-				this.updateTradeColumn(inventory, this.getTradeColumn(rawSlot));
-			});
+			this.placeCursorInTrades(inventory, rawSlot, cursorClone);
 		} else {
 			InventoryView view = event.getView();
-			if (this.isPlayerInventory(view, view.getSlotType(rawSlot), rawSlot)) {
+			if (InventoryViewUtils.isPlayerInventory(view, rawSlot)) {
 				// Clicking in player inventory:
 				// The cancelled drag event resets the cursor afterwards, so we need this delay:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-					// Freshly get and check cursor to make sure that players don't abuse this
-					// delay:
-					ItemStack cursorCurrent = view.getCursor();
-					if (ItemUtils.isEmpty(cursorCurrent)) return;
-					ItemStack current = view.getItem(rawSlot);
-					if (ItemUtils.isEmpty(current)) {
-						// Place item from cursor:
-						view.setItem(rawSlot, cursorCurrent);
-						view.setCursor(null);
-					}
-				});
+				UIHelpers.placeOrPickCursorDelayed(view, rawSlot);
 			}
 		}
 	}

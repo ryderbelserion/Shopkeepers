@@ -15,7 +15,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -34,6 +33,7 @@ import com.nisovin.shopkeepers.ui.state.UIState;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
+import com.nisovin.shopkeepers.util.inventory.InventoryViewUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -164,11 +164,6 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	// Depends on the number of buttons rows currently used:
 	protected int getButtonsEnd() {
 		return BUTTONS_START + (this.getButtonRows() * COLUMNS_PER_ROW) - 1;
-	}
-
-	protected boolean isPlayerInventory(InventoryView view, SlotType slotType, int rawSlot) {
-		return rawSlot >= view.getTopInventory().getSize()
-				&& (slotType == SlotType.CONTAINER || slotType == SlotType.QUICKBAR);
 	}
 
 	// TRADES AREA
@@ -823,7 +818,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		for (Integer rawSlotInteger : slots) {
 			int rawSlot = rawSlotInteger;
 			if (this.isTradesArea(rawSlot)) continue;
-			if (this.isPlayerInventory(view, view.getSlotType(rawSlot), rawSlot)) continue;
+			if (InventoryViewUtils.isPlayerInventory(view, rawSlot)) continue;
 
 			event.setCancelled(true);
 			break;
@@ -852,7 +847,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		} else if (this.isButtonArea(rawSlot)) {
 			// Editor buttons:
 			this.handleButtonClick(editorSession, event);
-		} else if (this.isPlayerInventory(event.getView(), event.getSlotType(), rawSlot)) {
+		} else if (InventoryViewUtils.isPlayerInventory(event.getView(), rawSlot)) {
 			// Player inventory:
 			this.handlePlayerInventoryClick(editorSession, event);
 		}
@@ -889,7 +884,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			EditorSession editorSession,
 			InventoryClickEvent event
 	) {
-		assert this.isPlayerInventory(event.getView(), event.getSlotType(), event.getRawSlot());
+		assert InventoryViewUtils.isPlayerInventory(event.getView(), event.getRawSlot());
 	}
 
 	protected int getNewAmountAfterEditorClick(
