@@ -147,7 +147,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		// Clicking in player inventory:
 		if (event.isShiftClick()) return; // Ignoring shift clicks
 
-		UIHelpers.placeOrPickCursor(event.getView(), event.getRawSlot());
+		UIHelpers.swapCursor(event.getView(), event.getRawSlot());
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (!ItemUtils.isEmpty(cursor)) {
 			// Place item from cursor:
 			ItemStack cursorClone = ItemUtils.copySingleItem(Unsafe.assertNonNull(cursor));
-			this.placeCursorInTrades(inventory, rawSlot, cursorClone);
+			this.placeCursorInTrades(event.getView(), rawSlot, cursorClone);
 		} else {
 			// Change the stack size of the clicked item, if this column contains a trade:
 			int tradeColumn = this.getTradeColumn(rawSlot);
@@ -187,12 +187,15 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 	}
 
-	private void placeCursorInTrades(Inventory inventory, int rawSlot, ItemStack cursorClone) {
+	private void placeCursorInTrades(InventoryView view, int rawSlot, ItemStack cursorClone) {
 		assert !ItemUtils.isEmpty(cursorClone);
 		cursorClone.setAmount(1);
 		// Replace placeholder item, if this is one:
 		ItemStack cursorFinal = PlaceholderItems.replace(cursorClone);
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+			if (view.getPlayer().getOpenInventory() != view) return;
+
+			Inventory inventory = view.getTopInventory();
 			inventory.setItem(rawSlot, cursorFinal); // This copies the item internally
 
 			// Update the trade column (replaces empty slot placeholder items if necessary):
@@ -210,17 +213,17 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		Set<Integer> rawSlots = event.getRawSlots();
 		if (rawSlots.size() != 1) return;
 
+		InventoryView view = event.getView();
+
 		int rawSlot = rawSlots.iterator().next();
 		if (this.isTradesArea(rawSlot)) {
 			// Place item from cursor:
-			Inventory inventory = event.getInventory();
-			this.placeCursorInTrades(inventory, rawSlot, cursorClone);
+			this.placeCursorInTrades(view, rawSlot, cursorClone);
 		} else {
-			InventoryView view = event.getView();
 			if (InventoryViewUtils.isPlayerInventory(view, rawSlot)) {
 				// Clicking in player inventory:
 				// The cancelled drag event resets the cursor afterwards, so we need this delay:
-				UIHelpers.placeOrPickCursorDelayed(view, rawSlot);
+				UIHelpers.swapCursorDelayed(view, rawSlot);
 			}
 		}
 	}

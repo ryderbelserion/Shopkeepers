@@ -14,31 +14,24 @@ public final class UIHelpers {
 
 	// The delay is for example required during the handling of inventory drag events, because the
 	// cancelled drag event resets the cursor afterwards.
-	public static void placeOrPickCursorDelayed(InventoryView view, int rawSlot) {
+	public static void swapCursorDelayed(InventoryView view, int rawSlot) {
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 			// Check that the player still has the same view open and then freshly get and check the
 			// involved items to make sure that players don't abuse this delay:
 			if (view.getPlayer().getOpenInventory() != view) return;
 
-			placeOrPickCursor(view, rawSlot);
+			swapCursor(view, rawSlot);
 		});
 	}
 
 	// Assumes that any involved inventory event was cancelled.
-	public static void placeOrPickCursor(InventoryView view, int rawSlot) {
-		ItemStack cursor = view.getCursor();
-		ItemStack current = view.getItem(rawSlot);
-		if (!ItemUtils.isEmpty(cursor)) {
-			if (ItemUtils.isEmpty(current)) {
-				// Place item from cursor:
-				view.setItem(rawSlot, cursor);
-				view.setCursor(null);
-			}
-		} else if (!ItemUtils.isEmpty(current)) {
-			// Pick up item to cursor:
-			view.setItem(rawSlot, null);
-			view.setCursor(current);
-		}
+	public static void swapCursor(InventoryView view, int rawSlot) {
+		ItemStack cursor = ItemUtils.getNullIfEmpty(view.getCursor());
+		ItemStack current = ItemUtils.getNullIfEmpty(view.getItem(rawSlot));
+
+		// Place, pick, or swap the cursor and slot item:
+		view.setItem(rawSlot, cursor);
+		view.setCursor(current);
 	}
 
 	private UIHelpers() {
