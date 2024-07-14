@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util.data.property;
 
+import java.util.function.Supplier;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,6 +38,7 @@ public class BasicProperty<T> implements Property<T> {
 	private boolean nullable = false;
 	// Can be null even if this property does not consider null a valid value.
 	private @Nullable T defaultValue = null;
+	private @Nullable Supplier<@Nullable T> defaultValueSupplier = null;
 	private boolean omitIfDefault = false;
 	private boolean useDefaultIfMissing = false;
 	private @Nullable PropertyValidator<? super @NonNull T> validator = null;
@@ -113,6 +116,8 @@ public class BasicProperty<T> implements Property<T> {
 		this.postConstruct();
 		if (this.hasDefaultValue()) {
 			try {
+				// If a defaultValueSupplier is used: Generate, validate, and then discard one value
+				// to catch errors with the values produced by the supplier early.
 				this.validateValue(this.getDefaultValue());
 			} catch (Exception e) {
 				Validate.State.error("The default value for property '" + this.getName()
@@ -197,18 +202,23 @@ public class BasicProperty<T> implements Property<T> {
 	 */
 	@Override
 	public final boolean hasDefaultValue() {
-		return (defaultValue != null) || this.isNullable();
+		return defaultValue != null || defaultValueSupplier != null || this.isNullable();
 	}
 
 	@Override
 	public final T getDefaultValue() {
 		Validate.State.isTrue(this.hasDefaultValue(),
 				"This property does not have a valid default value!");
+		if (defaultValueSupplier != null) {
+			return Unsafe.cast(defaultValueSupplier.get());
+		}
+
 		return Unsafe.cast(defaultValue);
 	}
 
 	/**
-	 * Sets the default value of this property.
+	 * Sets the default value of this property and clears any previously specified
+	 * {@link #defaultValueSupplier(Supplier)}.
 	 * <p>
 	 * This method can only be called while the property has not yet been {@link #build() built}.
 	 * 
@@ -223,6 +233,38 @@ public class BasicProperty<T> implements Property<T> {
 	public final <P extends BasicProperty<T>> P defaultValue(T defaultValue) {
 		this.validateNotBuilt();
 		this.defaultValue = defaultValue;
+		this.defaultValueSupplier = null;
+		return (P) this;
+	}
+
+	/**
+	 * Sets the default value supplier of this property and clears any previously specified
+	 * {@link #defaultValue(Object)}.
+	 * <p>
+	 * The supplier is expected to return {@link Object#equals(Object) equal} values on each
+	 * invocation, but is allowed to return objects with different object identities. See
+	 * {@link #getDefaultValue()}.
+	 * <p>
+	 * The values returned by the supplier are validated like any other property value:
+	 * <code>null</code> is only allowed if this property is {@link #isNullable() nullable}. The
+	 * supplier is also invoked during {@link #build()} and the returned value is validated to catch
+	 * any errors with the returned values early.
+	 * <p>
+	 * This method can only be called while the property has not yet been {@link #build() built}.
+	 * 
+	 * @param <P>
+	 *            the type of this property
+	 * @param defaultValueSupplier
+	 *            the default value supplier, or <code>null</code> to clear the current supplier
+	 * @return this property
+	 */
+	@SuppressWarnings("unchecked")
+	public final <P extends BasicProperty<T>> P defaultValueSupplier(
+			@Nullable Supplier<@Nullable T> defaultValueSupplier
+	) {
+		this.validateNotBuilt();
+		this.defaultValueSupplier = defaultValueSupplier;
+		this.defaultValue = null;
 		return (P) this;
 	}
 

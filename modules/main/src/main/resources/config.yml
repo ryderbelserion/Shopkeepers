@@ -512,6 +512,17 @@ placeholder-item: PAPER
 # The item used for the set-name button, and the naming item (if enabled).
 name-item: NAME_TAG
 
+# Whether to enable the equipment editor for all mobs and all equipment slots.
+# By default, the equipment can only be edited for mobs and slots that are known, at least for
+# certain items, to visually affect the mob. Enabling this setting can for example be useful for
+# testing purposes, e.g. when new mobs are added to the game, or when existing mobs start to support
+# additional equipment slots.
+# Certain shop objects, such as for example horses (armor) or llamas (carpet), provide dedicated
+# editor buttons to edit certain equipment. This setting also enables the equipment editor for these
+# mobs and slots. Any non-empty equipment specified via the equipment editor overrides the equipment
+# of these dedicated editor buttons.
+enable-all-equipment-editor-slots: false
+
 # Whether to allow shop owners to move their shops.
 enable-moving-of-player-shops: true
 # The item used for the move button.

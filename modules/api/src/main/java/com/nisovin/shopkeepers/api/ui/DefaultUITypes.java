@@ -26,6 +26,13 @@ public interface DefaultUITypes {
 	public UIType getEditorUIType();
 
 	/**
+	 * Gets the default equipment editor {@link UIType}.
+	 * 
+	 * @return the default equipment editor {@link UIType}
+	 */
+	public UIType getEquipmentEditorUIType();
+
+	/**
 	 * Gets the default trading {@link UIType}.
 	 * 
 	 * @return the default trading {@link UIType}
@@ -58,6 +65,16 @@ public interface DefaultUITypes {
 	 */
 	public static UIType EDITOR() {
 		return getInstance().getEditorUIType();
+	}
+
+	/**
+	 * Gets the default equipment editor {@link UIType}.
+	 * 
+	 * @return the default equipment editor {@link UIType}
+	 * @see #getEquipmentEditorUIType()
+	 */
+	public static UIType EQUIPMENT_EDITOR() {
+		return getInstance().getTradingUIType();
 	}
 
 	/**

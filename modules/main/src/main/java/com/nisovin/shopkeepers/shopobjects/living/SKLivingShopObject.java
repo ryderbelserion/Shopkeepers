@@ -2,9 +2,11 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,20 +17,24 @@ import org.bukkit.entity.Breedable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
-import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Steerable;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopEquipment;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -41,12 +47,22 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.ui.equipmentEditor.EquipmentEditorUI;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.EquipmentUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.bukkit.Ticks;
 import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.inventory.PotionUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
@@ -54,6 +70,12 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		extends AbstractEntityShopObject implements LivingShopObject {
+
+	public static final Property<@NonNull LivingShopEquipment> EQUIPMENT = new BasicProperty<@NonNull LivingShopEquipment>()
+			.dataKeyAccessor("equipment", SKLivingShopEquipment.SERIALIZER)
+			.defaultValueSupplier(SKLivingShopEquipment::new)
+			.omitIfDefault()
+			.build();
 
 	/**
 	 * We check from slightly below the top of the spawn block (= offset) in a range of up to one
@@ -78,6 +100,10 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
 
+	private final PropertyValue<@NonNull LivingShopEquipment> equipmentProperty = new PropertyValue<>(EQUIPMENT)
+			.onValueChanged(Unsafe.initialized(this)::onEquipmentPropertyChanged)
+			.build(properties);
+
 	private @Nullable E entity;
 	private @Nullable Location lastSpawnLocation = null;
 	private int respawnAttempts = 0;
@@ -100,6 +126,9 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		super(shopkeeper, creationData);
 		this.livingShops = livingShops;
 		this.livingObjectType = livingObjectType;
+
+		// Setup the equipment changed listener for the initial default value:
+		this.setEquipmentChangedListener();
 	}
 
 	@Override
@@ -115,11 +144,13 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	@Override
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
+		equipmentProperty.load(shopObjectData);
 	}
 
 	@Override
 	public void save(ShopObjectData shopObjectData, boolean saveAll) {
 		super.save(shopObjectData, saveAll);
+		equipmentProperty.save(shopObjectData);
 	}
 
 	// ACTIVATION
@@ -215,16 +246,6 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		// future.
 		if (equipment != null) {
 			equipment.clear();
-
-			// We give entities which would usually burn in sunlight an indestructible item as
-			// helmet. This results in less EntityCombustEvents that need to be processed.
-			if (entity instanceof Zombie || entity instanceof Skeleton) {
-				// Note: Phantoms also burn in sunlight, but setting a helmet has no effect for
-				// them.
-				// Note: Buttons are small enough to not be visible inside the entity's head (even
-				// for their baby variants).
-				equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
-			}
 		}
 
 		// Some entities (e.g. striders) may randomly spawn with a saddle that does not count as
@@ -427,6 +448,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	protected void onSpawn() {
 		assert this.getEntity() != null;
 		this.updatePotionEffects();
+		this.applyEquipment();
 	}
 
 	protected void overwriteAI() {
@@ -797,5 +819,178 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 
 	// EDITOR ACTIONS
 
-	// No default actions.
+	@Override
+	public List<@NonNull Button> createEditorButtons() {
+		List<@NonNull Button> editorButtons = super.createEditorButtons();
+		if (!this.getEditableEquipmentSlots().isEmpty()) {
+			editorButtons.add(this.getEquipmentEditorButton());
+		}
+		return editorButtons;
+	}
+
+	// EQUIPMENT
+
+	/**
+	 * The editable {@link EquipmentSlot}s.
+	 * <p>
+	 * Limits which equipment slots can be edited inside the equipment editor. If empty, the
+	 * equipment editor button is completely omitted from the shopkeeper editor.
+	 * <p>
+	 * This only controls whether users can edit the equipment in the editor. Arbitrary equipment
+	 * can still be applied programmatically via the API.
+	 * <p>
+	 * Can be overridden by sub-types.
+	 * 
+	 * @return An unmodifiable view on the editable equipment slots. Not <code>null</code>, but can
+	 *         be empty. The order of the returned slots defines the order in the editor.
+	 */
+	protected List<? extends @NonNull EquipmentSlot> getEditableEquipmentSlots() {
+		if (Settings.enableAllEquipmentEditorSlots) {
+			return EquipmentUtils.EQUIPMENT_SLOTS;
+		}
+
+		switch (this.getEntityType()) {
+		case LLAMA: // Dedicated button for carpet (armor slot)
+		case TRADER_LLAMA: // Dedicated button for carpet (armor slot)
+		case HORSE: // Dedicated button for horse armor (armor slot)
+			return Collections.emptyList();
+		case VINDICATOR: // The main hand item is only visible during a chase.
+			return EquipmentUtils.EQUIPMENT_SLOTS_HEAD;
+		default:
+			return EquipmentUtils.getSupportedEquipmentSlots(this.getEntityType());
+		}
+	}
+
+	@Override
+	public LivingShopEquipment getEquipment() {
+		return equipmentProperty.getValue();
+	}
+
+	private void onEquipmentPropertyChanged() {
+		this.setEquipmentChangedListener();
+
+		// Apply the new equipment and inform sub-types, but don't forcefully mark the shopkeeper as
+		// dirty here: This is already handled by the equipment property itself, if necessary.
+		this.onEquipmentChanged();
+	}
+
+	private void setEquipmentChangedListener() {
+		((SKLivingShopEquipment) this.getEquipment()).setChangedListener(this::handleEquipmentChanged);
+	}
+
+	private void handleEquipmentChanged() {
+		shopkeeper.markDirty();
+		this.onEquipmentChanged();
+	}
+
+	// Can be overridden in sub-types.
+	protected void onEquipmentChanged() {
+		this.applyEquipment();
+	}
+
+	private void applyEquipment() {
+		@Nullable E entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+
+		@Nullable EntityEquipment entityEquipment = entity.getEquipment();
+		if (entityEquipment == null) return;
+
+		LivingShopEquipment shopEquipment = this.getEquipment();
+
+		// Iterate over all equipment slots, to also clear any no longer equipped slots:
+		for (EquipmentSlot slot : EquipmentUtils.EQUIPMENT_SLOTS) {
+			// No item copy required: Setting the equipment copies the item internally.
+			@Nullable ItemStack item = ItemUtils.asItemStackOrNull(shopEquipment.getItem(slot));
+			this.setEquipment(entityEquipment, slot, item);
+		}
+	}
+
+	// Can be overridden by sub-types to for example enforce specific equipment, or apply default
+	// equipment.
+	protected void setEquipment(
+			EntityEquipment entityEquipment,
+			EquipmentSlot slot,
+			@ReadOnly @Nullable ItemStack item
+	) {
+		assert entityEquipment != null && slot != null;
+
+		@Nullable ItemStack itemToSet = item;
+
+		// We give entities which would usually burn in sunlight an indestructible item as helmet.
+		// This results in less EntityCombustEvents that need to be processed.
+		// Note: The fire resistance potion effect does not avoid the EntityCombustEvent.
+		// Note: Phantoms also burn in sunlight, but setting a helmet has no effect for them.
+		EntityType entityType = this.getEntityType();
+		if (slot == EquipmentSlot.HEAD
+				&& entityType != EntityType.PHANTOM
+				&& EntityUtils.burnsInSunlight(entityType)) {
+			if (ItemUtils.isEmpty(item)) {
+				// Buttons are unbreakable and small enough to not be visible inside the entity's
+				// head (even for their baby variants).
+				itemToSet = new ItemStack(Material.STONE_BUTTON);
+			} else {
+				assert item != null;
+				// Make the given item indestructible.
+				// "Destructible": Has max damage, has damage component, and not unbreakable.
+				itemToSet = ItemUtils.setUnbreakable(item.clone());
+			}
+		}
+
+		// This copies the item internally:
+		entityEquipment.setItem(slot, itemToSet);
+	}
+
+	private ItemStack getEquipmentEditorItem() {
+		return ItemUtils.setDisplayNameAndLore(
+				new ItemStack(Material.ARMOR_STAND),
+				Messages.buttonEquipment,
+				Messages.buttonEquipmentLore
+		);
+	}
+
+	private Button getEquipmentEditorButton() {
+		return new ShopkeeperActionButton() {
+			@Override
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
+				return getEquipmentEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
+					openEquipmentEditor(editorSession.getPlayer(), false);
+				});
+				return true;
+			}
+
+			@Override
+			protected void onActionSuccess(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				// The button only opens the equipment editor: Skip the ShopkeeperEditedEvent and
+				// saving.
+			}
+		};
+	}
+
+	@Override
+	public boolean openEquipmentEditor(Player player, boolean editAllSlots) {
+		return EquipmentEditorUI.request(
+				shopkeeper,
+				player,
+				editAllSlots ? EquipmentUtils.EQUIPMENT_SLOTS : this.getEditableEquipmentSlots(),
+				this.getEquipment().getItems(),
+				(equipmentSlot, item) -> {
+					this.getEquipment().setItem(equipmentSlot, item);
+
+					// Call shopkeeper edited event:
+					Shopkeeper shopkeeper = this.getShopkeeper();
+					Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
+
+					// Save:
+					shopkeeper.save();
+				}
+		);
+	}
 }

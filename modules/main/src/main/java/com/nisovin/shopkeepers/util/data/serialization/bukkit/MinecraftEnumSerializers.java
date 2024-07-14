@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.data.serialization.bukkit;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.EquipmentSlot;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -88,18 +89,18 @@ public final class MinecraftEnumSerializers {
 	public static final class Materials {
 
 		/**
-		 * Gets a {@link DataSerializer} for {@link Material} values.
+		 * A {@link DataSerializer} for {@link Material} values.
 		 * <p>
 		 * This {@link DataSerializer} behaves similar to the lenient data serializers returned by
-		 * {@link #lenient(Class)}. Besides the common enum name formatting, this data serializer
-		 * performs no conversions of the material name during deserialization, but assumes an
-		 * up-to-date material name.
+		 * {@link MinecraftEnumSerializers#lenient(Class)}. Besides the common enum name formatting,
+		 * this data serializer performs no conversions of the material name during deserialization,
+		 * but assumes an up-to-date material name.
 		 * <p>
 		 * If no matching {@link Material} is found during deserialization, this data serializer
 		 * throws an {@link UnknownMaterialException} instead of a normal
 		 * {@link InvalidDataException}.
 		 */
-		public static DataSerializer<@NonNull Material> LENIENT = new LenientMinecraftEnumSerializer<@NonNull Material>(
+		public static final DataSerializer<@NonNull Material> LENIENT = new LenientMinecraftEnumSerializer<@NonNull Material>(
 				Material.class
 		) {
 			@Override
@@ -111,6 +112,17 @@ public final class MinecraftEnumSerializers {
 
 		private Materials() {
 		}
+	}
+
+	/**
+	 * Default {@link DataSerializer}s for {@link EquipmentSlot} {@link Enum} values.
+	 */
+	public static final class EquipmentSlots {
+		/**
+		 * A {@link MinecraftEnumSerializers#lenient(Class) lenient} {@link DataSerializer} for
+		 * {@link EquipmentSlot} values.
+		 */
+		public static final DataSerializer<@NonNull EquipmentSlot> LENIENT = lenient(EquipmentSlot.class);
 	}
 
 	private MinecraftEnumSerializers() {

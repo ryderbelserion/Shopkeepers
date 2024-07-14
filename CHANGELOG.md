@@ -4,8 +4,37 @@ Date format: (YYYY-MM-DD)
 ## v2.22.2 (TBA)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
+* Add: Equipment editor for shopkeeper mobs and normal villagers.
+  * The equipment editor can be opened from the shopkeeper editor, as well as from the editor for normal villagers. There is no equipment editor for Citizens NPC shopkeepers yet.
+  * Players can also use placeholder items to setup the equipment items.
+  * As before, to reduce the amount of entity combust events that we need to handle, we automatically apply a small (invisible) default head item for mobs that usually burn in sunlight. If a custom head item is configured inside the editor, the item from the editor is used instead. If the configured item is destructible, it is automatically made unbreakable to not break when exposed to the sunlight.
+  * By default, the equipment can only be edited for mobs and slots that are known, at least for certain items, to visually affect the mob.
+    * If the mob is not affected by any equipment, the editor option is omitted.
+    * If a mob already provides dedicated editor buttons for certain equipment slots (e.g. horse armor, llama carpet), we omit these slots from the equipment editor.
+    * Vindicators currently don't support the mainhand slot, because they only render the item when chasing a target, which is not the case for shopkeeper mobs.
+  * Config: Add setting `enable-all-equipment-editor-slots` (default: `false`) that enables the equipment editor for all mobs and all equipment slots, regardless of which equipment slots the mob actually supports.
+    * This can for example be useful for testing purposes.
+    * If the mob provides dedicated editor options for certain equipment slots, any non-empty equipment configured in the equipment editor takes precedence.
+  * Command: The `/shopkeeper replaceAllWithVanillaVillagers` command ignores the custom equipment for now, because vanilla villagers can end up dropping the equipped items, e.g. on death, which might not be intended.
+  * API: Add `LivingShopObject#getEquipment()` that provides access to the shop object's equipment. Via the API, one can specify arbitrary equipment, regardless of what the mob actually supports or what can be edited by players in the editor.
+  * API: Add `LivingShopObject#openEquipmentEditor` to open the equipment editor for a player.
+  * API: Add `DefaultUITypes#getEquipmentEditorUIType`.
 * Minor changes related to the trading shop editor. Players can now click a non-empty slot in their inventory to swap the item on the cursor.
 * Internal: Add the option to add default potion effects to living entity shops, for example if certain effects are required for a mob to properly function as a shopkeeper (not yet used).
+* Internal: When opening the UI for a player, we validate now that the player and the involved shopkeeper are still valid.
+
+**Message changes:**  
+* Added `button-equipment`.
+* Added `button-equipment-lore`.
+* Added `equipment-editor-title`.
+* Added `equipment-slot-lore`.
+* Added `equipment-slot-mainhand`.
+* Added `equipment-slot-offhand`.
+* Added `equipment-slot-feet`.
+* Added `equipment-slot-legs`.
+* Added `equipment-slot-chest`.
+* Added `equipment-slot-head`.
+* Added `equipment-slot-body`.
 
 ## v2.22.1 (2024-06-30)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5

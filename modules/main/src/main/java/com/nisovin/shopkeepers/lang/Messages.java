@@ -77,6 +77,12 @@ public class Messages extends Config {
 			"Lets you rename",
 			"your shopkeeper"
 	));
+	public static String buttonEquipment = c("&aEquipment");
+	public static List<@NonNull String> buttonEquipmentLore = c(Arrays.asList(
+			"Assign equipment.",
+			"Note: Not all mobs support",
+			"the same equipment slots."
+	));
 	public static String buttonMove = c("&aMove shopkeeper");
 	public static List<@NonNull String> buttonMoveLore = c(Arrays.asList(
 			"Lets you move",
@@ -311,6 +317,21 @@ public class Messages extends Config {
 	public static List<@NonNull String> buttonWolfVariantLore = c(Arrays.asList(
 			"Changes the wolf's look"
 	));
+
+	public static String equipmentEditorTitle = c("Equipment Editor");
+	public static List<@NonNull String> equipmentSlotLore = c(Arrays.asList(
+			"Place an item to equip it.",
+			"Right-click to clear",
+			"the equipment slot."
+	));
+
+	public static String equipmentSlotMainhand = c("&aMainhand");
+	public static String equipmentSlotOffhand = c("&aOffhand");
+	public static String equipmentSlotFeet = c("&aFeet");
+	public static String equipmentSlotLegs = c("&aLegs");
+	public static String equipmentSlotChest = c("&aChest");
+	public static String equipmentSlotHead = c("&aHead");
+	public static String equipmentSlotBody = c("&aBody");
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");

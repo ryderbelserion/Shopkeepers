@@ -43,6 +43,7 @@ import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.state.UIState;
 import com.nisovin.shopkeepers.ui.villager.VillagerUIHelper;
+import com.nisovin.shopkeepers.ui.villager.equipmentEditor.VillagerEquipmentEditorUI;
 import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -226,6 +227,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		// Note: Players can also use nametags to rename the villager like normal. However, this
 		// option allows to set up colored names more conveniently.
 		this.addButtonOrIgnore(this.createNamingButton());
+		this.addButtonOrIgnore(this.createEquipmentButton());
 		// Note: Wandering traders have an inventory as well, but it is usually always empty.
 		this.addButtonOrIgnore(this.createContainerButton());
 		if (villager instanceof Villager) {
@@ -364,6 +366,40 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	private boolean isValidName(String name) {
 		assert name != null;
 		return name.length() <= MAX_NAME_LENGTH;
+	}
+
+	protected Button createEquipmentButton() {
+		return new ActionButton() {
+			@Override
+			public @Nullable ItemStack getIcon(EditorSession editorSession) {
+				return ItemUtils.setDisplayNameAndLore(
+						new ItemStack(Material.ARMOR_STAND),
+						Messages.buttonEquipment,
+						Messages.buttonEquipmentLore
+				);
+			}
+
+			@Override
+			protected boolean runAction(
+					EditorSession editorSession,
+					InventoryClickEvent clickEvent
+			) {
+				if (!VillagerUIHelper.checkVillagerValid(villager, editorSession.getUISession())) {
+					return false;
+				}
+
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
+					Player player = editorSession.getPlayer();
+					if (!player.isValid()) return;
+					if (!VillagerUIHelper.checkVillagerValid(villager, editorSession.getUISession())) {
+						return;
+					}
+
+					VillagerEquipmentEditorUI.request(villager, player);
+				});
+				return true;
+			}
+		};
 	}
 
 	protected Button createContainerButton() {

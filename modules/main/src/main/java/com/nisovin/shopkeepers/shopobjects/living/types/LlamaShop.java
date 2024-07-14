@@ -13,6 +13,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopEquipment;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -21,6 +23,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.EquipmentUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
@@ -90,6 +93,16 @@ public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getCarpetColorEditorButton());
 		return editorButtons;
+	}
+
+	// EQUIPMENT
+
+	@Override
+	protected void onEquipmentChanged() {
+		super.onEquipmentChanged();
+
+		// If the body slot is now empty, apply the carpet instead:
+		this.applyCarpetColor();
 	}
 
 	// COLOR
@@ -178,13 +191,23 @@ public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
 	private void applyCarpetColor() {
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
+		// The carpet uses the body equipment slot. If a non-empty equipment item is set, e.g. via
+		// the equipment editor, the equipment takes precedence.
+		if (EquipmentUtils.EQUIPMENT_SLOT_BODY.isPresent()) {
+			LivingShopEquipment shopEquipment = this.getEquipment();
+			@Nullable UnmodifiableItemStack bodyItem = shopEquipment.getItem(EquipmentUtils.EQUIPMENT_SLOT_BODY.get());
+			if (!ItemUtils.isEmpty(bodyItem)) {
+				return;
+			}
+		}
+
+		@Nullable ItemStack decor = null;
 		DyeColor carpetColor = this.getCarpetColor();
-		ItemStack decor;
 		if (carpetColor != null) {
 			decor = new ItemStack(ItemUtils.getCarpetType(carpetColor));
-		} else {
-			decor = null;
 		}
+
 		entity.getInventory().setDecor(decor);
 	}
 

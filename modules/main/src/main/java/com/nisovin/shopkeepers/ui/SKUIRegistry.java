@@ -119,14 +119,28 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 	) {
 		Validate.notNull(uiHandler, "uiHandler is null");
 		Validate.notNull(player, "player is null");
+
 		UIType uiType = uiHandler.getUIType();
 		String uiIdentifier = uiType.getIdentifier();
+		String playerName = player.getName();
+
 		AbstractShopkeeper shopkeeper = null; // Can be null
 		if (uiHandler instanceof ShopkeeperUIHandler) {
 			shopkeeper = ((ShopkeeperUIHandler) uiHandler).getShopkeeper();
 		}
 
-		String playerName = player.getName();
+		if (!player.isValid()) {
+			Log.debug(() -> "Player " + playerName + " cannot open UI '" + uiIdentifier
+					+ "': Player not connected.");
+			return false;
+		}
+
+		if (shopkeeper != null && !shopkeeper.isValid()) {
+			Log.debug(() -> "Player " + playerName + " cannot open UI '" + uiIdentifier
+					+ "': Shopkeeper not valid.");
+			return false;
+		}
+
 		if (!uiHandler.canOpen(player, silentRequest)) {
 			Log.debug(() -> "Player " + playerName + " cannot open UI '" + uiIdentifier + "'.");
 			return false;

@@ -87,6 +87,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 					Player player = editorSession.getPlayer();
 					PlayerShopkeeper shopkeeper = getShopkeeper();
 					if (!player.isValid() || !shopkeeper.isValid()) return;
+
 					shopkeeper.openContainerWindow(player);
 				});
 				return true;

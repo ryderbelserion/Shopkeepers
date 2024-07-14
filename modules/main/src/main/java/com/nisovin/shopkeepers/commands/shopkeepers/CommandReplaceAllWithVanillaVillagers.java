@@ -254,6 +254,8 @@ class CommandReplaceAllWithVanillaVillagers extends Command {
 			entity.setVillagerType(villagerShop.getVillagerType());
 			entity.setVillagerLevel(villagerShop.getVillagerLevel());
 			// Note: We ignore the baby state, since baby villagers cannot be traded with.
+			// We also ignore custom entity equipment currently, since the villagers might drop this
+			// equipment, for example on death, which might not be intended.
 		}
 
 		this.applyTradingRecipes(entity, shopkeeper);

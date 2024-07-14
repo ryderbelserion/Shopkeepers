@@ -480,7 +480,6 @@ public final class ItemUtils {
 
 	// The display name and lore are expected to use Minecraft's color codes.
 	// Null arguments keep the previous display name or lore (instead of clearing them).
-	// TODO Change this?
 	public static ItemStack setDisplayNameAndLore(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName,
@@ -512,6 +511,28 @@ public final class ItemUtils {
 		return itemStack;
 	}
 
+	public static ItemStack clearDisplayNameAndLore(@ReadWrite ItemStack itemStack) {
+		Validate.notNull(itemStack, "itemStack is null");
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (itemMeta == null) return itemStack;
+
+		boolean itemMetaModified = false;
+		if (itemMeta.hasDisplayName()) {
+			itemMeta.setDisplayName(null);
+			itemMetaModified = true;
+		}
+		if (itemMeta.hasLore()) {
+			itemMeta.setLore(null);
+			itemMetaModified = true;
+		}
+
+		if (itemMetaModified) {
+			itemStack.setItemMeta(itemMeta);
+		}
+
+		return itemStack;
+	}
+
 	// Null to remove display name.
 	// The display name is expected to use Minecraft's color codes.
 	public static ItemStack setDisplayName(
@@ -526,6 +547,19 @@ public final class ItemUtils {
 		}
 		itemMeta.setDisplayName(displayName); // Null will clear the display name
 		itemStack.setItemMeta(itemMeta);
+		return itemStack;
+	}
+
+	public static ItemStack setUnbreakable(@ReadWrite ItemStack itemStack) {
+		Validate.notNull(itemStack, "itemStack is null");
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (itemMeta == null) return itemStack;
+
+		if (!itemMeta.isUnbreakable()) {
+			itemMeta.setUnbreakable(true);
+			itemStack.setItemMeta(itemMeta);
+		}
+
 		return itemStack;
 	}
 

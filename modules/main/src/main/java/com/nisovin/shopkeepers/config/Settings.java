@@ -283,6 +283,8 @@ public class Settings extends Config {
 
 	public static ItemData nameItem = new ItemData(Material.NAME_TAG);
 
+	public static boolean enableAllEquipmentEditorSlots = false;
+
 	public static boolean enableMovingOfPlayerShops = true;
 	public static ItemData moveItem = new ItemData(Material.ENDER_PEARL);
 

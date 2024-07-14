@@ -54,6 +54,9 @@ public interface Property<T> extends DataAccessor<T> {
 	 * Gets the default value.
 	 * <p>
 	 * Make sure to check {@link #hasDefaultValue()} before trying to access the default value.
+	 * <p>
+	 * The default values returned by subsequent invocations should be {@link Object#equals(Object)
+	 * equal}. However, they do not necessarily share the same object identity.
 	 * 
 	 * @return the default value, can be <code>null</code> if this property is {@link #isNullable()
 	 *         nullable}

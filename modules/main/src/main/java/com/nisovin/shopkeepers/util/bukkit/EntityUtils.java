@@ -19,6 +19,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Zombie;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -59,6 +61,23 @@ public final class EntityUtils {
 		default:
 			return Collections.emptySet();
 		}
+	}
+
+	/**
+	 * Checks whether the given entity type burns in sunlight.
+	 * 
+	 * @param entityType
+	 *            the entity type
+	 * @return <code>true</code> if the entity burns in sunlight
+	 */
+	public static boolean burnsInSunlight(EntityType entityType) {
+		// Husks (a zombie sub-type) is not affected by sunburn.
+		if (entityType == EntityType.HUSK) return false;
+		if (entityType == EntityType.PHANTOM) return true;
+
+		Class<? extends Entity> entityClass = Unsafe.assertNonNull(entityType.getEntityClass());
+		return Zombie.class.isAssignableFrom(entityClass)
+				|| Skeleton.class.isAssignableFrom(entityClass);
 	}
 
 	/**
