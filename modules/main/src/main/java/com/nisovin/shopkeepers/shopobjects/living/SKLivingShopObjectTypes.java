@@ -293,11 +293,6 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	}
 
 	@Override
-	public List<? extends @NonNull String> getAliases(EntityType entityType) {
-		return getAliasesFor(entityType);
-	}
-
-	@Override
 	public Collection<? extends @NonNull SKLivingShopObjectType<?>> getAll() {
 		return orderedObjectTypesView;
 	}
