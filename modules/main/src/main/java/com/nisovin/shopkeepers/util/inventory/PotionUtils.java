@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.inventory;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -28,6 +30,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * Utility functions related to potion items, and other items with potion effects.
  */
 public final class PotionUtils {
+
+	// TODO Use Bukkit's PotionEffect.INFINITE_DURATION once we only support MC 1.19.4+
+	public static final int INFINITE_DURATION = -1;
 
 	// TODO This may need to be updated on Minecraft updates.
 	// Formatted like the keys of namespaced keys:
@@ -219,6 +224,36 @@ public final class PotionUtils {
 			itemStack.setItemMeta(potionMeta);
 		}
 		return itemStack;
+	}
+
+	// TODO Needs to be updated whenever new properties are added to PotionEffect.
+	public static boolean equalsIgnoreDuration(PotionEffect effect1, PotionEffect effect2) {
+		if (effect1 == effect2) return true;
+		return effect1.getType().equals(effect2.getType())
+				&& effect1.isAmbient() == effect2.isAmbient()
+				&& effect1.getAmplifier() == effect2.getAmplifier()
+				&& effect1.hasParticles() == effect2.hasParticles()
+				&& effect1.hasIcon() == effect2.hasIcon();
+	}
+
+	/**
+	 * Checks if the given collection of {@link PotionEffect} contains the given potion effect,
+	 * ignoring the {@link PotionEffect#getDuration()}.
+	 * 
+	 * @param effects
+	 *            the collection to check in
+	 * @param effect
+	 *            the effect to check for
+	 * @return the found matching potion effect, or <code>null</code>
+	 * @see #equalsIgnoreDuration(PotionEffect, PotionEffect)
+	 */
+	public static @Nullable PotionEffect findIgnoreDuration(Collection<? extends @NonNull PotionEffect> effects, PotionEffect effect) {
+		for (PotionEffect collectionEffect : effects) {
+			if (PotionUtils.equalsIgnoreDuration(collectionEffect, effect)) {
+				return collectionEffect;
+			}
+		}
+		return null;
 	}
 
 	private PotionUtils() {

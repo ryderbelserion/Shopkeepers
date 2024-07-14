@@ -48,6 +48,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
@@ -405,9 +406,20 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getAction() != Action.ADDED) return;
-		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
-			event.setCancelled(true);
+
+		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(event.getEntity());
+		if (shopkeeper == null) return;
+
+		// Ignore the default potion effects:
+		ShopObject shopObject = shopkeeper.getShopObject();
+		if (shopObject instanceof SKLivingShopObject<?>) {
+			SKLivingShopObject<?> livingShopObject = (SKLivingShopObject<?>) shopObject;
+			if (livingShopObject.getDefaultPotionEffects().contains(event.getNewEffect())) {
+				return;
+			}
 		}
+
+		event.setCancelled(true);
 	}
 
 	// Prevent shopkeeper entities from getting set on fire (e.g. monsters in daylight).

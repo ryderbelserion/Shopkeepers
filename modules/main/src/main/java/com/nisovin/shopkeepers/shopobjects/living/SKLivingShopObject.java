@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -43,8 +44,10 @@ import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.Ticks;
 import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.inventory.PotionUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -60,6 +63,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	protected static final double SPAWN_LOCATION_RANGE = 2.0D;
 
 	protected static final int CHECK_PERIOD_SECONDS = 10;
+	protected static final int CHECK_PERIOD_TICKS = Ticks.PER_SECOND * CHECK_PERIOD_SECONDS;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(
 			1,
 			CHECK_PERIOD_SECONDS + 1
@@ -73,6 +77,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
+
 	private @Nullable E entity;
 	private @Nullable Location lastSpawnLocation = null;
 	private int respawnAttempts = 0;
@@ -329,11 +334,6 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			// Any version-specific setup:
 			NMSManager.getProvider().setupSpawnedEntity(entity);
 
-			// Remove potion effects:
-			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
-				entity.removePotionEffect(potionEffect.getType());
-			}
-
 			// Overwrite AI:
 			this.overwriteAI();
 			// Register the shop object for our custom AI processing:
@@ -426,7 +426,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	 */
 	protected void onSpawn() {
 		assert this.getEntity() != null;
-		// Nothing to do by default.
+		this.updatePotionEffects();
 	}
 
 	protected void overwriteAI() {
@@ -554,7 +554,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			this.respawnInactiveEntity();
 		} else {
 			this.teleportBackIfMoved();
-			this.removePotionEffects();
+			this.updatePotionEffects();
 		}
 	}
 
@@ -675,13 +675,6 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		sharedLocation.setWorld(null); // Reset
 	}
 
-	private void removePotionEffects() {
-		E entity = Unsafe.assertNonNull(this.entity);
-		for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
-			entity.removePotionEffect(potionEffect.getType());
-		}
-	}
-
 	public void teleportBack() {
 		@Nullable E entity = this.getEntity(); // Null if not spawned
 		if (entity == null) return;
@@ -739,6 +732,67 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		@Nullable E entity = this.entity;
 		if (entity == null) return null;
 		return entity.getCustomName();
+	}
+
+	// POTION EFFECTS
+
+	/**
+	 * The default {@link PotionEffect}s to apply to the spawned entity.
+	 * <p>
+	 * These effects are added to any newly spawned entity, and periodically re-added if missing or
+	 * nearly expired. Any potion effects not included here are prevented from being added to the
+	 * spawned entity, and also periodically removed if detected.
+	 * <p>
+	 * This can for example be used if a certain mob type requires a certain potion effect to
+	 * properly function as a shopkeeper.
+	 * <p>
+	 * This might be called relatively frequently to check if a given effect equals one of the
+	 * default effects. It is therefore recommended that this returns a cached collection, instead
+	 * of creating a new collection on each invocation.
+	 * 
+	 * @return an unmodifiable view on the entity's default potion effects, not <code>null</code>
+	 */
+	protected Collection<? extends @NonNull PotionEffect> getDefaultPotionEffects() {
+		// None by default:
+		return Collections.emptySet();
+	}
+
+	private void updatePotionEffects() {
+		@Nullable E entity = this.getEntity();
+		if (entity == null) return;
+
+		Collection<? extends @NonNull PotionEffect> defaultPotionEffects = this.getDefaultPotionEffects();
+		Collection<@NonNull PotionEffect> activePotionEffects = Unsafe.castNonNull(entity.getActivePotionEffects());
+
+		// Re-add missing and nearly expired default potion effects:
+		defaultPotionEffects.forEach(effect -> {
+			@Nullable PotionEffect activeEffect = PotionUtils.findIgnoreDuration(activePotionEffects, effect);
+			if (activeEffect != null
+					&& (activeEffect.getDuration() == PotionUtils.INFINITE_DURATION
+							|| activeEffect.getDuration() > CHECK_PERIOD_TICKS)) {
+				return;
+			}
+
+			if (activeEffect != null) {
+				// Remove the nearly expired effect:
+				entity.removePotionEffect(effect.getType());
+			}
+
+			entity.addPotionEffect(effect);
+		});
+
+		// Remove non-default potion effects:
+		activePotionEffects.forEach(effect -> {
+			// No duration check here: If the effect matches a default effect and is nearly expired,
+			// we already replaced it above.
+			// Note: Doing these two operations in this order avoids having to refetch or update the
+			// activePotionEffects list for the subsequent 'add-missing-default-effects' operation.
+			if (PotionUtils.findIgnoreDuration(defaultPotionEffects, effect) != null) {
+				return;
+			}
+
+			entity.removePotionEffect(effect.getType());
+		});
 	}
 
 	// EDITOR ACTIONS
