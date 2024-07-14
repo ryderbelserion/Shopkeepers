@@ -2,7 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.22.2 (TBA)
-### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+**Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
 
 * Add: Equipment editor for shopkeeper mobs and normal villagers.
   * The equipment editor can be opened from the shopkeeper editor, as well as from the editor for normal villagers. There is no equipment editor for Citizens NPC shopkeepers yet.
@@ -39,7 +41,9 @@ Date format: (YYYY-MM-DD)
 * Added `equipment-slot-body`.
 
 ## v2.22.1 (2024-06-30)
-### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+**Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
 
 * Fix: Since Spigot 1.20.5, snowman and mushroom cow shopkeepers failed to load because these mobs have been renamed to their Minecraft names ('SNOW_GOLEM' and 'MOOSHROOM').
   * When running on MC 1.20.5 or above, we automatically migrate these shop object types to their new names so that they load again.
@@ -49,14 +53,18 @@ Date format: (YYYY-MM-DD)
 * Fix: In Shopkeepers v2.22.0, after a server upgrade, some shopkeepers failed to load with an error `Invalid trade offer 1: Failed to load property 'resultItem': Data is not of type ItemStack, but com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack!`.
 
 ## v2.22.0 (2024-06-22)
-### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+**Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
 
 * Fix: Avoid extending Bukkit's ItemStack in our implementation of UnmodifiableItemStack. This also resolves a compatibility issue with Paper servers for MC 1.21.
 * API: Add PlayerShopkeeper#setForHire(UnmodifiableItemStack). This might break some add-on plugins, because when passing null, the call is now ambiguous and requires a cast to either ItemStack or UnmodifiableItemStack.
 * Build: Update Maven repository URL.
 
 ## v2.21.0 (2024-06-18)
-### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+**Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
 
 * Update for MC 1.21. Add bogged and breeze to the by default enabled mob types.
 * Debug: Add additional debug output if one of the item related server assumption tests fails.
