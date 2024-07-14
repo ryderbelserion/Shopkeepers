@@ -16,9 +16,11 @@ Date format: (YYYY-MM-DD)
     * This can for example be useful for testing purposes.
     * If the mob provides dedicated editor options for certain equipment slots, any non-empty equipment configured in the equipment editor takes precedence.
   * Command: The `/shopkeeper replaceAllWithVanillaVillagers` command ignores the custom equipment for now, because vanilla villagers can end up dropping the equipped items, e.g. on death, which might not be intended.
+  * Debug: Extend the `/shopkeeper debugCreateShops` command to accept an argument `testEquipment`: When specified, we spawn a shopkeeper for each enabled mob type and apply a default equipment. This can be useful to quickly test which equipment slots the individual mobs support.
   * API: Add `LivingShopObject#getEquipment()` that provides access to the shop object's equipment. Via the API, one can specify arbitrary equipment, regardless of what the mob actually supports or what can be edited by players in the editor.
   * API: Add `LivingShopObject#openEquipmentEditor` to open the equipment editor for a player.
   * API: Add `DefaultUITypes#getEquipmentEditorUIType`.
+* Debug: The command `/shopkeeper debugCreateShops` spawns the shopkeepers now in the direction the player is facing.
 * Minor changes related to the trading shop editor. Players can now click a non-empty slot in their inventory to swap the item on the cursor.
 * Internal: Add the option to add default potion effects to living entity shops, for example if certain effects are required for a mob to properly function as a shopkeeper (not yet used).
 * Internal: When opening the UI for a player, we validate now that the player and the involved shopkeeper are still valid.
