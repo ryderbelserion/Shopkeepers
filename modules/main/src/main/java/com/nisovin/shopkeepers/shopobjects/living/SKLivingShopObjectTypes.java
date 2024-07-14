@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.BabyableShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ChestedHorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.EndermanShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FrogShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.GlowSquidShop;
@@ -73,8 +74,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>ENDER_DRAGON: experimental: requires NoAI, plays no animation without AI (client-sided),
  * shows boss bar on older versions, not clickable! (body parts are server-sided, so the client
  * reports no interactions with them).
- * <li>ENDERMAN: experimental: requires NoAI, still teleports away if hit by projectile, starts
- * starring
+ * <li>ENDERMAN: experimental: requires NoAI; still teleports away if hit by projectile; starts
+ * starring; carried block (edited via the equipment editor; some blocks are not properly rendered,
+ * e.g. player heads)
  * <li>GHAST: seems okay
  * <li>GIANT: seems okay
  * <li>IRON_GOLEM: okay
@@ -366,6 +368,17 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					permission,
 					CatShop.class,
 					CatShop::new
+			);
+			break;
+		case ENDERMAN:
+			objectType = new SKLivingShopObjectType<>(
+					livingShops,
+					entityType,
+					identifier,
+					aliases,
+					permission,
+					EndermanShop.class,
+					EndermanShop::new
 			);
 			break;
 		case RABBIT:

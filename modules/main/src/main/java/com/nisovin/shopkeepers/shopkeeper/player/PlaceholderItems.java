@@ -81,15 +81,15 @@ public final class PlaceholderItems {
 		// Get the display name:
 		ItemMeta meta = Unsafe.assertNonNull(placeholderItem.getItemMeta());
 		String displayName = meta.getDisplayName();
+
 		// Not null, but can be empty:
 		if (displayName.isEmpty()) return null;
 
 		// Basic formatting:
-		displayName = displayName.trim();
-		displayName = Unsafe.assertNonNull(ChatColor.stripColor(displayName));
+		String normalizedDisplayName = normalizeDisplayName(displayName);
 
 		// Check for a specified material:
-		Material material = ItemUtils.parseMaterial(displayName);
+		Material material = ItemUtils.parseMaterial(normalizedDisplayName);
 		if (material != null) {
 			// Validate the material:
 			if (material.isLegacy() || material.isAir() || !material.isItem()) {
@@ -97,11 +97,12 @@ public final class PlaceholderItems {
 			}
 
 			// We preserve the stack size of the placeholder item stack:
+			// TODO Preserve other item data / components?
 			return new ItemStack(material, placeholderItem.getAmount());
 		}
 
 		// Check for a specified enchantment:
-		EnchantmentWithLevel enchantmentWithLevel = EnchantmentUtils.parseEnchantmentWithLevel(displayName);
+		EnchantmentWithLevel enchantmentWithLevel = EnchantmentUtils.parseEnchantmentWithLevel(normalizedDisplayName);
 		if (enchantmentWithLevel != null) {
 			Enchantment enchantment = enchantmentWithLevel.getEnchantment();
 			int level = enchantmentWithLevel.getLevel();
@@ -109,12 +110,61 @@ public final class PlaceholderItems {
 		}
 
 		// Check for a specified potion item:
-		ItemStack potionItem = PotionUtils.parsePotionItem(displayName);
+		ItemStack potionItem = PotionUtils.parsePotionItem(normalizedDisplayName);
 		if (potionItem != null) {
 			return potionItem;
 		}
 
 		return null;
+	}
+
+	/**
+	 * Gets the {@link Material} that is substituted by the given placeholder {@link ItemStack}, if
+	 * it actually is a valid placeholder item.
+	 * <p>
+	 * Only checks for a substituted material. This does not check for other substituted item data,
+	 * such as enchanted books, potions, etc.
+	 * 
+	 * @param placeholderItem
+	 *            the (potential) placeholder item
+	 * @return the substituted material (not necessarily an {@link Material#isItem() item type}), or
+	 *         <code>null</code> if the given item stack is not a valid placeholder
+	 */
+	public static @Nullable Material getSubstitutedMaterial(
+			@ReadOnly @Nullable ItemStack placeholderItem
+	) {
+		if (!isPlaceholderItem(placeholderItem)) return null;
+		assert placeholderItem != null;
+
+		// Get the display name:
+		ItemMeta meta = Unsafe.assertNonNull(placeholderItem.getItemMeta());
+		String displayName = meta.getDisplayName();
+
+		// Not null, but can be empty:
+		if (displayName.isEmpty()) return null;
+
+		// Basic formatting:
+		String normalizedDisplayName = normalizeDisplayName(displayName);
+
+		// Check for a specified material:
+		Material material = ItemUtils.parseMaterial(normalizedDisplayName);
+		if (material != null) {
+			// Validate the material:
+			if (material.isLegacy() || material.isAir()) {
+				return null;
+			}
+
+			return material; // Not necessarily an item type!
+		}
+
+		return null;
+	}
+
+	private static String normalizeDisplayName(String displayName) {
+		// Basic formatting:
+		String normalizedDisplayName = displayName.trim();
+		normalizedDisplayName = Unsafe.assertNonNull(ChatColor.stripColor(normalizedDisplayName));
+		return normalizedDisplayName;
 	}
 
 	/**

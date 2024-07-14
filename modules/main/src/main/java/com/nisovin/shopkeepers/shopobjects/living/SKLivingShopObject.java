@@ -857,6 +857,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 			return Collections.emptyList();
 		case VINDICATOR: // The main hand item is only visible during a chase.
 			return EquipmentUtils.EQUIPMENT_SLOTS_HEAD;
+		case ENDERMAN: // Item in hand is mapped to the carried block
+			return EquipmentUtils.EQUIPMENT_SLOTS_MAINHAND;
 		default:
 			return EquipmentUtils.getSupportedEquipmentSlots(this.getEntityType());
 		}

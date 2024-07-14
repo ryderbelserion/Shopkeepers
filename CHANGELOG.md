@@ -22,6 +22,11 @@ Date format: (YYYY-MM-DD)
   * API: Add `LivingShopObject#getEquipment()` that provides access to the shop object's equipment. Via the API, one can specify arbitrary equipment, regardless of what the mob actually supports or what can be edited by players in the editor.
   * API: Add `LivingShopObject#openEquipmentEditor` to open the equipment editor for a player.
   * API: Add `DefaultUITypes#getEquipmentEditorUIType`.
+* Add: Configure the carried block of endermans by assigning an item to their mainhand in the equipment editor.
+  * Only items with a corresponding block type result in a block to be carried by the enderman.
+  * Players can also use placeholder items to specify the block type. This also allows players to use block types for which there doesn't exist a corresponding item (e.g. potted flowers).
+  * Any block state data contained by the item (`BlockStateTag` / `block_state` component) is applied to the carried block. If the item is a placeholder item, any contained block state data is applied to the substituted block type.
+  * Note: Some blocks do not properly render (e.g. player heads, signs, etc.).
 * Debug: The command `/shopkeeper debugCreateShops` spawns the shopkeepers now in the direction the player is facing.
 * Minor changes related to the trading shop editor. Players can now click a non-empty slot in their inventory to swap the item on the cursor.
 * API: Remove deprecated `LivingShopObjectTypes#getAliases(EntityType)`.
