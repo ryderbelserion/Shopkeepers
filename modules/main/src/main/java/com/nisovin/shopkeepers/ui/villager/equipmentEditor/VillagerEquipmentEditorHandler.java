@@ -5,7 +5,6 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import org.bukkit.entity.AbstractVillager;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -16,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.equipmentEditor.AbstractEquipmentEditorHandler;
@@ -53,8 +51,7 @@ public class VillagerEquipmentEditorHandler extends AbstractEquipmentEditorHandl
 	VillagerEquipmentEditorHandler(AbstractVillager villager) {
 		super(
 				SKDefaultUITypes.VILLAGER_EQUIPMENT_EDITOR(),
-				Settings.enableAllEquipmentEditorSlots ? EquipmentUtils.EQUIPMENT_SLOTS
-						: EquipmentUtils.getSupportedEquipmentSlots(EntityType.VILLAGER),
+				EquipmentUtils.EQUIPMENT_SLOTS,
 				getEquipmentMap(villager),
 				(slot, item) -> {
 				}
