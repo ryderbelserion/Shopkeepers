@@ -22,7 +22,7 @@ buildSpigotIfMissing() {
 
   jarPath=$"$HOME/.m2/repository/org/bukkit/craftbukkit/$1-R0.1-SNAPSHOT/craftbukkit-$1-R0.1-SNAPSHOT${classifier}.jar"
   if [ -f "${jarPath}" ]; then
-    installedImplementationVersion=$(unzip -p "${jarPath}" 'META-INF/MANIFEST.MF' | grep -oP '(?<=^Implementation-Version: ).*')
+    installedImplementationVersion=$(unzip -p "${jarPath}" 'META-INF/MANIFEST.MF' | grep -oP '(?<=^Implementation-Version: )[^\n\r]*')
     installedBuildNumber=$(echo "${installedImplementationVersion}" | grep -oP '^\d+(?=-)')
     echo "Maven repository: Found Spigot $1 (${installedImplementationVersion}) (#${installedBuildNumber})"
 
