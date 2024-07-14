@@ -30,6 +30,7 @@ Date format: (YYYY-MM-DD)
 * Debug: The command `/shopkeeper debugCreateShops` spawns the shopkeepers now in the direction the player is facing.
 * Minor changes related to the trading shop editor. Players can now click a non-empty slot in their inventory to swap the item on the cursor.
 * API: Remove deprecated `LivingShopObjectTypes#getAliases(EntityType)`.
+* Build: Fix issue when building against the latest Spigot version. We now build against a specific Spigot 1.21 version.
 * Internal: Add the option to add default potion effects to living entity shops, for example if certain effects are required for a mob to properly function as a shopkeeper (not yet used).
 * Internal: When opening the UI for a player, we validate now that the player and the involved shopkeeper are still valid.
 

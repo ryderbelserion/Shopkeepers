@@ -2,15 +2,43 @@
 
 pushd "$(dirname "$BASH_SOURCE")"
 
-# $1: Spigot version to build
+# $1: Spigot MC version to build
 # $2: "remapped" to check for a remapped server jar
+# $3: Optional: The specific Spigot build number to build. If unset, we use $1 for this.
 buildSpigotIfMissing() {
+  local buildVersion="$1"
+  local versionString="$1"
   local classifier=""
+  local jarPath=""
+  local installedImplementationVersion=""
+  local installedBuildNumber=""
+  local build="yes"
+
+  if [ -n "$3" ]; then
+    buildVersion="$3"
+    versionString="$1 ($3)"
+  fi
   if [ "$2" = "remapped" ]; then classifier="-remapped-mojang"; fi
-  if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/$1-R0.1-SNAPSHOT/craftbukkit-$1-R0.1-SNAPSHOT${classifier}.jar" ]; then
-    ./installSpigot.sh "$1"
+
+  jarPath=$"$HOME/.m2/repository/org/bukkit/craftbukkit/$1-R0.1-SNAPSHOT/craftbukkit-$1-R0.1-SNAPSHOT${classifier}.jar"
+  if [ -f "${jarPath}" ]; then
+    installedImplementationVersion=$(unzip -p "${jarPath}" 'META-INF/MANIFEST.MF' | grep -oP '(?<=^Implementation-Version: ).*')
+    installedBuildNumber=$(echo "${installedImplementationVersion}" | grep -oP '^\d+(?=-)')
+    echo "Maven repository: Found Spigot $1 (${installedImplementationVersion}) (#${installedBuildNumber})"
+
+    if [ -n "$3" ]; then
+      if [ "${installedBuildNumber}" = "$3" ]; then
+        build="no"
+      fi
+    else
+      build="no"
+    fi
+  fi
+
+  if [ "${build}" = "yes" ]; then
+    ./installSpigot.sh "${buildVersion}"
   else
-    echo "Not building Spigot $1 because it is already in our Maven repo"
+    echo "Not building Spigot ${versionString} because it is already in our Maven repository"
   fi
 }
 
@@ -51,6 +79,7 @@ buildSpigotIfMissing 1.20.4 remapped
 source installJDK.sh 21
 
 buildSpigotIfMissing 1.20.6 remapped
-buildSpigotIfMissing 1.21 remapped
+# A change in Spigot 1.21 (2024-07-06) broke the plugin, so we require a version from before that.
+buildSpigotIfMissing 1.21 remapped 4255
 
 popd
