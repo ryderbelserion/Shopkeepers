@@ -44,6 +44,7 @@ import com.nisovin.shopkeepers.debug.events.DebugListener;
 import com.nisovin.shopkeepers.debug.events.EventDebugListener;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
@@ -916,6 +917,9 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 
 		@Nullable ItemStack itemToSet = item;
 
+		// Replace placeholder item, if this is one:
+		itemToSet = PlaceholderItems.replace(itemToSet);
+
 		// We give entities which would usually burn in sunlight an indestructible item as helmet.
 		// This results in less EntityCombustEvents that need to be processed.
 		// Note: The fire resistance potion effect does not avoid the EntityCombustEvent.
@@ -924,15 +928,15 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		if (slot == EquipmentSlot.HEAD
 				&& entityType != EntityType.PHANTOM
 				&& EntityUtils.burnsInSunlight(entityType)) {
-			if (ItemUtils.isEmpty(item)) {
+			if (ItemUtils.isEmpty(itemToSet)) {
 				// Buttons are unbreakable and small enough to not be visible inside the entity's
 				// head (even for their baby variants).
 				itemToSet = new ItemStack(Material.STONE_BUTTON);
 			} else {
-				assert item != null;
+				assert itemToSet != null;
 				// Make the given item indestructible.
 				// "Destructible": Has max damage, has damage component, and not unbreakable.
-				itemToSet = ItemUtils.setUnbreakable(item.clone());
+				itemToSet = ItemUtils.setUnbreakable(itemToSet.clone());
 			}
 		}
 

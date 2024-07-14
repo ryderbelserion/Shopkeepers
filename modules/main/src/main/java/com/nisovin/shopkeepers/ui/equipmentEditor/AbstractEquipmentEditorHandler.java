@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIHelpers;
 import com.nisovin.shopkeepers.ui.state.UIState;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.inventory.ChestLayout;
 import com.nisovin.shopkeepers.util.inventory.InventoryViewUtils;
@@ -88,27 +89,35 @@ public abstract class AbstractEquipmentEditorHandler extends UIHandler {
 			EquipmentSlot equipmentSlot = supportedSlots.get(slotIndex);
 			if (slotIndex >= inventorySize) break;
 
-			ItemStack equipmentItem = this.getEditorEquipmentItem(equipmentSlot);
-			inventory.setItem(slotIndex, equipmentItem);
+			@Nullable UnmodifiableItemStack equipmentItem = currentEquipment.get(equipmentSlot);
+			ItemStack editorItem = this.toEditorEquipmentItem(equipmentSlot, ItemUtils.asItemStackOrNull(equipmentItem));
+			inventory.setItem(slotIndex, editorItem);
 		}
 
 		return player.openInventory(inventory) != null;
 	}
 
-	private ItemStack getEditorEquipmentItem(EquipmentSlot equipmentSlot) {
-		@Nullable ItemStack item = ItemUtils.copyOrNull(currentEquipment.get(equipmentSlot));
-		if (item != null) {
-			this.setEditorEquipmentItemMeta(item, equipmentSlot);
-			return item;
+	private @Nullable ItemStack toEditorEquipmentItem(EquipmentSlot equipmentSlot, @ReadOnly @Nullable ItemStack item) {
+		ItemStack editorItem;
+
+		if (ItemUtils.isEmpty(item)) {
+			editorItem = new ItemStack(Material.ARMOR_STAND);
+		} else {
+			assert item != null;
+			// Replace placeholder item, if this is one:
+			ItemStack substitutedItem = PlaceholderItems.replaceNonNull(item);
+			if (substitutedItem != item) {
+				editorItem = substitutedItem;
+			} else {
+				editorItem = item.clone();
+			}
 		}
 
-		return this.getEmptyEditorEquipmentItem(equipmentSlot);
-	}
+		assert editorItem != null;
 
-	private ItemStack getEmptyEditorEquipmentItem(EquipmentSlot equipmentSlot) {
-		ItemStack item = new ItemStack(Material.ARMOR_STAND);
-		this.setEditorEquipmentItemMeta(item, equipmentSlot);
-		return item;
+		this.setEditorEquipmentItemMeta(editorItem, equipmentSlot);
+
+		return editorItem;
 	}
 
 	private void setEditorEquipmentItemMeta(@ReadWrite ItemStack item, EquipmentSlot equipmentSlot) {
@@ -207,7 +216,7 @@ public abstract class AbstractEquipmentEditorHandler extends UIHandler {
 			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 				if (view.getPlayer().getOpenInventory() != view) return;
 
-				inventory.setItem(rawSlot, this.getEmptyEditorEquipmentItem(equipmentSlot));
+				inventory.setItem(rawSlot, this.toEditorEquipmentItem(equipmentSlot, null));
 				onEquipmentChanged(uiSession, equipmentSlot, null);
 			});
 			return;
@@ -222,18 +231,18 @@ public abstract class AbstractEquipmentEditorHandler extends UIHandler {
 
 				cursorClone.setAmount(1);
 
-				// Replace placeholder item, if this is one:
-				ItemStack cursorCloneFinal = PlaceholderItems.replaceNonNull(cursorClone);
+				// Note: Placeholder items are not replaced here, but stored as-is and replaced once
+				// they are applied to the mob or displayed inside the editor.
 
 				// Inform about the new equipment item:
-				// Copy, because we modify the item below when we update the item in the editor.
-				onEquipmentChanged(uiSession, equipmentSlot, UnmodifiableItemStack.of(cursorCloneFinal.clone()));
+				// No item copy required: The item is already a copy, and for the item in the editor
+				// we create a separate copy subsequently.
+				onEquipmentChanged(uiSession, equipmentSlot, UnmodifiableItemStack.of(cursorClone));
 
 				// Update the item in the editor:
-				this.setEditorEquipmentItemMeta(cursorCloneFinal, equipmentSlot);
-				// This copies the item internally (but irrelevant, because we already work with a
-				// copy here anyway):
-				inventory.setItem(rawSlot, cursorCloneFinal);
+				// This copies the item internally (but irrelevant, because we already create a copy
+				// before anyway):
+				inventory.setItem(rawSlot, this.toEditorEquipmentItem(equipmentSlot, cursorClone));
 			});
 		}
 	}

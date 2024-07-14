@@ -28,6 +28,8 @@ public interface LivingShopObject extends EntityShopObject {
 	 * equipment items before they are applied to the spawned mob, which might not be reflected by
 	 * the returned {@link LivingShopEquipment}. For example, mobs that would usually burn in
 	 * sunlight might use a default item as helmet when no indestructible head item is configured.
+	 * And similarly, placeholder items are converted to their substituted item when they are
+	 * applied to the mob.
 	 * 
 	 * @return the equipment to apply to the spawned entity
 	 */
