@@ -589,6 +589,10 @@ public final class ItemUtils {
 		return itemMeta.getDisplayName(); // Not null
 	}
 
+	public static boolean hasDisplayName(@ReadOnly @Nullable ItemStack itemStack) {
+		return !getDisplayNameOrEmpty(itemStack).isEmpty();
+	}
+
 	// TODO This can be removed once Bukkit provides a non-deprecated mapping itself.
 	public static Material getWoolType(DyeColor dyeColor) {
 		switch (dyeColor) {

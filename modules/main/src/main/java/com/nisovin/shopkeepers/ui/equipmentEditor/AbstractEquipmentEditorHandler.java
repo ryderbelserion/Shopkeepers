@@ -104,15 +104,8 @@ public abstract class AbstractEquipmentEditorHandler extends UIHandler {
 			editorItem = new ItemStack(Material.ARMOR_STAND);
 		} else {
 			assert item != null;
-			// Replace placeholder item, if this is one:
-			ItemStack substitutedItem = PlaceholderItems.replaceNonNull(item);
-			if (substitutedItem != item) {
-				editorItem = substitutedItem;
-			} else {
-				editorItem = item.clone();
-			}
+			editorItem = item.clone();
 		}
-
 		assert editorItem != null;
 
 		this.setEditorEquipmentItemMeta(editorItem, equipmentSlot);
@@ -231,18 +224,18 @@ public abstract class AbstractEquipmentEditorHandler extends UIHandler {
 
 				cursorClone.setAmount(1);
 
-				// Note: Placeholder items are not replaced here, but stored as-is and replaced once
-				// they are applied to the mob or displayed inside the editor.
+				// Replace placeholder item, if this is one:
+				ItemStack substitutedItem = PlaceholderItems.replaceNonNull(cursorClone);
 
 				// Inform about the new equipment item:
 				// No item copy required: The item is already a copy, and for the item in the editor
 				// we create a separate copy subsequently.
-				onEquipmentChanged(uiSession, equipmentSlot, UnmodifiableItemStack.of(cursorClone));
+				onEquipmentChanged(uiSession, equipmentSlot, UnmodifiableItemStack.of(substitutedItem));
 
 				// Update the item in the editor:
 				// This copies the item internally (but irrelevant, because we already create a copy
-				// before anyway):
-				inventory.setItem(rawSlot, this.toEditorEquipmentItem(equipmentSlot, cursorClone));
+				// for the editor item anyway):
+				inventory.setItem(rawSlot, this.toEditorEquipmentItem(equipmentSlot, substitutedItem));
 			});
 		}
 	}

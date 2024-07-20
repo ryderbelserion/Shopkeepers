@@ -44,7 +44,6 @@ import com.nisovin.shopkeepers.debug.events.DebugListener;
 import com.nisovin.shopkeepers.debug.events.EventDebugListener;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
@@ -918,9 +917,6 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		assert entityEquipment != null && slot != null;
 
 		@Nullable ItemStack itemToSet = item;
-
-		// Replace placeholder item, if this is one:
-		itemToSet = PlaceholderItems.replace(itemToSet);
 
 		// We give entities which would usually burn in sunlight an indestructible item as helmet.
 		// This results in less EntityCombustEvents that need to be processed.

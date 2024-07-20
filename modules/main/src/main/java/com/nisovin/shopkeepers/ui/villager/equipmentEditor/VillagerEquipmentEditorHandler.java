@@ -15,7 +15,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.equipmentEditor.AbstractEquipmentEditorHandler;
 import com.nisovin.shopkeepers.ui.villager.VillagerUIHelper;
@@ -67,11 +66,8 @@ public class VillagerEquipmentEditorHandler extends AbstractEquipmentEditorHandl
 		if (!uiSession.getPlayer().isValid()) return;
 		if (!VillagerUIHelper.checkVillagerValid(villager, uiSession)) return;
 
-		// Replace placeholder item, if this is one:
-		@Nullable ItemStack itemToSet = PlaceholderItems.replace(ItemUtils.asItemStackOrNull(item));
-
 		// This copies the item internally:
-		entityEquipment.setItem(slot, itemToSet);
+		entityEquipment.setItem(slot, ItemUtils.asItemStackOrNull(item));
 
 		super.onEquipmentChanged(uiSession, slot, item);
 	}

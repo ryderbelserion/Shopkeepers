@@ -82,10 +82,9 @@ public class EndermanShop extends SKLivingShopObject<@NonNull Enderman> {
 
 			Material blockType = item.getType();
 
-			// Some blocks have no corresponding item type. We allow players to specify the block
-			// type via a placeholder item.
-			// If the placeholder item contains block state data, we apply it to the substituted
-			// block type.
+			// We allow players to specify the block via a placeholder item. If the block has no
+			// corresponding item type, the placeholder item was not substituted yet and we retrieve
+			// the substituted block type here instead:
 			// We need to check if the item is a placeholder item first, because the placeholder
 			// item might be configured to be a block type itself.
 			@Nullable Material substitutedMaterial = PlaceholderItems.getSubstitutedMaterial(ItemUtils.asItemStack(item));
@@ -94,7 +93,8 @@ public class EndermanShop extends SKLivingShopObject<@NonNull Enderman> {
 			}
 
 			if (blockType.isBlock()) {
-				// If the item contains block data, use it:
+				// If the (possibly placeholder) item, contains block state data, apply it to the
+				// carried block:
 				@Nullable ItemMeta itemMeta = item.getItemMeta();
 				if (itemMeta instanceof BlockDataMeta) {
 					BlockDataMeta blockDataMeta = (BlockDataMeta) itemMeta;
