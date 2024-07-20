@@ -1,7 +1,13 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.22.2 (TBA)
+## v2.22.3 (TBA)
+### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+**Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
+
+
+## v2.22.2 (2024-07-20)
 ### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
 **Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
