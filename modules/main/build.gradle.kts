@@ -5,6 +5,10 @@ plugins {
     `paper-plugin`
 }
 
+base {
+    archivesName.set(rootProject.name)
+}
+
 repositories {
     maven("https://repo.glaremasters.me/repository/towny")
 
