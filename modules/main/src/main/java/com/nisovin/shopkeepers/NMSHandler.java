@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.compat.v1_21_R1;
+package com.nisovin.shopkeepers;
 
 import java.lang.reflect.Field;
 import java.util.List;
