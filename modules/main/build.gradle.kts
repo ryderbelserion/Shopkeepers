@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.paperweight)
     alias(libs.plugins.shadowJar)
+    alias(libs.plugins.runPaper)
 
     `paper-plugin`
 }
@@ -51,6 +52,14 @@ tasks {
         filesMatching("plugin.yml") {
             expand(inputs.properties)
         }
+    }
+
+    runServer {
+        jvmArgs("-Dnet.kyori.ansi.colorLevel=truecolor")
+
+        defaultCharacterEncoding = Charsets.UTF_8.name()
+
+        minecraftVersion(libs.versions.minecraft.get())
     }
 
     assemble {
