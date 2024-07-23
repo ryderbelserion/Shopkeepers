@@ -3,10 +3,7 @@ package com.nisovin.shopkeepers.compat.api;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -17,7 +14,10 @@ import com.nisovin.shopkeepers.compat.CompatVersion;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public interface NMSCallProvider {
@@ -75,7 +75,7 @@ public interface NMSCallProvider {
 	 * This mimics Minecraft's item comparison: This checks if the item stacks are either both
 	 * empty, or of same type and the provided item stack's metadata contains all the contents of
 	 * the required item stack's metadata (with any list metadata being equal).
-	 * 
+	 *
 	 * @param provided
 	 *            the provided item stack
 	 * @param required
@@ -154,6 +154,19 @@ public interface NMSCallProvider {
 
 	public default void setSignBackGlowingText(Sign sign, boolean glowingText) {
 		// Not supported by default.
+	}
+
+	// MC 1.20.3 specific features
+	// TODO Remove this once we only support MC 1.20.3 and above.
+
+	public default DataSerializer<Cat.@NonNull Type> getCatTypeSerializer() {
+		// Not supported by default.
+		return null;
+	}
+
+	public default Cat.Type cycleCatType(Cat.Type type, boolean backwards) {
+		// Not supported by default.
+		return type;
 	}
 
 	// MC 1.20.5 specific features

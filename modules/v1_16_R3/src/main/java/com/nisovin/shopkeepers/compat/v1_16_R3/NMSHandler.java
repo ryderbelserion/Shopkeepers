@@ -13,21 +13,22 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
-import org.bukkit.entity.AbstractVillager;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.minecraft.server.v1_16_R3.Entity;
@@ -257,5 +258,17 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.server.v1_16_R3.Item nmsItem = CraftMagicNumbers.getItem(material);
 		if (nmsItem == null) return null;
 		return nmsItem.getName();
+	}
+
+	// Default implementation for MC 1.16+:
+
+	@Override
+	public DataSerializer<Cat.@NonNull Type> getCatTypeSerializer() {
+		return EnumSerializers.strict(Cat.Type.class);
+	}
+
+	@Override
+	public Cat.Type cycleCatType(Cat.Type type, boolean backwards) {
+		return EnumUtils.cycleEnumConstant(Cat.Type.class, type, backwards);
 	}
 }
