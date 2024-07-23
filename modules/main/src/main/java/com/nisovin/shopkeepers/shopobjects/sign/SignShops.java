@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.block.Sign;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -11,7 +12,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 

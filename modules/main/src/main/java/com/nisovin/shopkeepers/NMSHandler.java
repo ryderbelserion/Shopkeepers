@@ -39,7 +39,6 @@ import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
-
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.nbt.Tag;
@@ -56,15 +55,6 @@ public final class NMSHandler implements NMSCallProvider {
 	public NMSHandler() throws Exception {
 		craftItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
 		craftItemStackHandleField.setAccessible(true);
-	}
-
-	@Override
-	public String getVersionId() {
-		return "1_21_R1";
-	}
-
-	public Class<?> getCraftMagicNumbersClass() {
-		return CraftMagicNumbers.class;
 	}
 
 	@Override

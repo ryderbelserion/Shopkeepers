@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -24,7 +25,6 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.spigot.text.SpigotText;
 import com.nisovin.shopkeepers.text.HoverEventText;
 import com.nisovin.shopkeepers.text.Text;
