@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.compat.v1_21_R1;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -303,11 +304,8 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String cycleFrogVariant(String variantName, boolean backwards) {
-		return EnumUtils.cycleEnumConstant(
-				Frog.Variant.class,
-				Frog.Variant.valueOf(variantName),
-				backwards
-		).name();
+		Frog.Variant currentVariant = Objects.requireNonNull(Registry.FROG_VARIANT.get(NamespacedKey.minecraft(variantName)));
+		return RegistryUtils.cycleKeyedConstant(Registry.FROG_VARIANT, currentVariant, backwards).getKey().getKey();
 	}
 
 	@Override
