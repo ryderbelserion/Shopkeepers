@@ -2,7 +2,7 @@ name: Shopkeepers
 version: '${pluginVersion}'
 description: Custom villager shopkeepers
 authors: [nisovin, blablubbabc]
-website: '${dboUrl}'
+website: '${website}'
 # Loading after world management plugins and soft dependencies:
 softdepend: [Multiverse-Core, MyWorlds, Transporter, Towny, WorldGuard, Citizens, Vault, Gringotts, ChestShop]
 
