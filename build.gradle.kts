@@ -4,8 +4,8 @@ plugins {
 
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
 
-rootProject.version = if (buildNumber != null) "${libs.versions.minecraft.get()}-$buildNumber" else "2.22.2"
+rootProject.version = if (buildNumber != null) "${libs.versions.minecraft.get()}-$buildNumber" else "2.22.3"
 
-subprojects.forEach { _ ->
-    project.version = rootProject.version
+subprojects.forEach {
+    it.project.version = rootProject.version
 }
