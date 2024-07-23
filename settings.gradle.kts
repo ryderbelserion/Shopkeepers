@@ -17,7 +17,8 @@ plugins {
 //include("paper", "api")
 
 listOf(
-    "modules/api"
+    "modules/main",
+    "modules/api",
 ).forEach {
     val (folder, name) = it.split("/")
 
