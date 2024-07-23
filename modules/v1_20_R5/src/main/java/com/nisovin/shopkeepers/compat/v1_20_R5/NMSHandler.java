@@ -18,17 +18,7 @@ import org.bukkit.craftbukkit.v1_20_R4.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_20_R4.util.CraftMagicNumbers;
-import org.bukkit.entity.AbstractVillager;
-import org.bukkit.entity.Axolotl;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Frog;
-import org.bukkit.entity.GlowSquid;
-import org.bukkit.entity.Goat;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Wolf.Variant;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -43,6 +33,8 @@ import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -335,6 +327,18 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setSignBackGlowingText(Sign sign, boolean glowingText) {
 		SignSide signSide = sign.getSide(Side.BACK);
 		signSide.setGlowingText(glowingText);
+	}
+
+	// MC 1.20.3 specific features
+
+	@Override
+	public DataSerializer<Cat.@NonNull Type> getCatTypeSerializer() {
+		return KeyedSerializers.forRegistry(Cat.Type.class, Registry.CAT_VARIANT);
+	}
+
+	@Override
+	public Cat.Type cycleCatType(Cat.Type type, boolean backwards) {
+		return RegistryUtils.cycleKeyedConstant(Registry.CAT_VARIANT, type, backwards);
 	}
 
 	// MC 1.20.5 specific features

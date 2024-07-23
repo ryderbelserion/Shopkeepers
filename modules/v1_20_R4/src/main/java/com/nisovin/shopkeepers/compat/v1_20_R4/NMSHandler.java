@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
@@ -16,16 +17,7 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
-import org.bukkit.entity.AbstractVillager;
-import org.bukkit.entity.Axolotl;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Frog;
-import org.bukkit.entity.GlowSquid;
-import org.bukkit.entity.Goat;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -36,6 +28,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -334,5 +329,17 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setSignBackGlowingText(Sign sign, boolean glowingText) {
 		SignSide signSide = sign.getSide(Side.BACK);
 		signSide.setGlowingText(glowingText);
+	}
+
+	// MC 1.20.3 specific features
+
+	@Override
+	public DataSerializer<Cat.@NonNull Type> getCatTypeSerializer() {
+		return KeyedSerializers.forRegistry(Cat.Type.class, Registry.CAT_VARIANT);
+	}
+
+	@Override
+	public Cat.Type cycleCatType(Cat.Type type, boolean backwards) {
+		return RegistryUtils.cycleKeyedConstant(Registry.CAT_VARIANT, type, backwards);
 	}
 }
