@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,18 +22,18 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class ZombieVillagerShop extends ZombieShop<@NonNull ZombieVillager> {
 
 	public static final Property<@NonNull Profession> PROFESSION = new BasicProperty<@NonNull Profession>()
-			.dataKeyAccessor("profession", EnumSerializers.lenient(Profession.class))
+			.dataKeyAccessor("profession", KeyedSerializers.forRegistry(Profession.class, Registry.VILLAGER_PROFESSION))
 			.defaultValue(Profession.NONE)
 			.build();
 
@@ -86,7 +87,7 @@ public class ZombieVillagerShop extends ZombieShop<@NonNull ZombieVillager> {
 
 	public void cycleProfession(boolean backwards) {
 		this.setProfession(
-				EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards)
+				RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_PROFESSION, this.getProfession(), backwards)
 		);
 	}
 

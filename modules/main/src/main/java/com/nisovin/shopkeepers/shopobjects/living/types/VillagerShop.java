@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,27 +28,27 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 
 public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	private static final String DATA_KEY_PROFESSION = "profession";
 	public static final Property<@NonNull Profession> PROFESSION = new BasicProperty<@NonNull Profession>()
-			.dataKeyAccessor(DATA_KEY_PROFESSION, EnumSerializers.lenient(Profession.class))
+			.dataKeyAccessor(DATA_KEY_PROFESSION, KeyedSerializers.forRegistry(Profession.class, Registry.VILLAGER_PROFESSION))
 			.defaultValue(Profession.NONE)
 			.build();
 
 	public static final Property<Villager.@NonNull Type> VILLAGER_TYPE = new BasicProperty<Villager.@NonNull Type>()
-			.dataKeyAccessor("villagerType", EnumSerializers.lenient(Villager.Type.class))
+			.dataKeyAccessor("villagerType", KeyedSerializers.forRegistry(Villager.Type.class, Registry.VILLAGER_TYPE))
 			.defaultValue(Villager.Type.PLAINS)
 			.build();
 
@@ -163,7 +164,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public void cycleProfession(boolean backwards) {
 		this.setProfession(
-				EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards)
+				RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_PROFESSION, this.getProfession(), backwards)
 		);
 	}
 
@@ -264,7 +265,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public void cycleVillagerType(boolean backwards) {
 		this.setVillagerType(
-				EnumUtils.cycleEnumConstant(Villager.Type.class, this.getVillagerType(), backwards)
+				RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_TYPE, this.getVillagerType(), backwards)
 		);
 	}
 
