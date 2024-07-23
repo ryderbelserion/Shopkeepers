@@ -23,7 +23,7 @@ dependencies {
 
     implementation(project(":Shopkeepers-api"))
 
-    compileOnly(libs.bstats.bukkit) {
+    implementation(libs.bstats.bukkit) {
         exclude("org.bukkit")
     }
 
