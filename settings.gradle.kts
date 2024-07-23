@@ -16,6 +16,8 @@ plugins {
 
 //include("paper", "api")
 
+include("modules")
+
 listOf(
     "modules/main",
     "modules/api",
