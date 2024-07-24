@@ -1,5 +1,7 @@
 High priority:
-* 
+* Commands need to be completely overhauled.
+* Items need to be stored differently in data.yml
+* Run a profiler while interacting with the plugin to find spots to touch up on.
 
 Mid priority:
 * For any commands allowing for a targeted shopkeeper: Print 'Ambiguous shopkeeper. Specify the shopkeeper explicitly instead.' error in case more than one shopkeeper is targeted?
