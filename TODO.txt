@@ -1,6 +1,6 @@
 High priority:
-* Commands need to be completely overhauled.
-* Items need to be stored differently in data.yml
+* Re-work the config.yml/messages.yml internally as to provide easier config options and more message customization!
+* Items need to be stored differently in save.yml
 * Run a profiler while interacting with the plugin to find spots to touch up on.
 
 Mid priority:
