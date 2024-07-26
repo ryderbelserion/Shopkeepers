@@ -8,7 +8,9 @@ Date format: (YYYY-MM-DD)
 ## v2.22.3 (2024-07-27)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
 
-* Fix: Compatibility with the latest versions of Spigot 1.21 (Thanks @DerMistkaefer). Spigot 1.21 builds from before 2024-07-07 are not supported.
+* Fix: Compatibility with the latest versions of Spigot 1.21 (Thanks @DerMistkaefer).
+  * Spigot 1.21 builds from before 2024-07-07 are not supported.
+  * Spigot's `enum-compatibility-mode` is not supported, but also not required for this plugin.
 * Build: Update sonarqube task name and skip for pull request builds.
 
 ## v2.22.2 (2024-07-20)
