@@ -45,6 +45,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-jabba
     - name: Cache SonarCloud packages
+      if: github.event_name != 'pull_request'
       uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
@@ -52,10 +53,11 @@ jobs:
     - name: Build Shopkeepers
       run: ./build.sh
     - name: Run SonarCloud analysis
+      if: github.event_name != 'pull_request'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew sonarqube
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Not available for pull request builds
+      run: ./gradlew sonar
     # Upload workflow artifacts to allow the inspection of build results.
     # These are only retained for a few days.
     - name: Stage artifacts for upload
