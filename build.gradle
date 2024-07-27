@@ -145,7 +145,7 @@ subprojects {
 	// Shared plugin / task configurations:
 	project.plugins.withId('java-library') {
 		java {
-			sourceCompatibility = JavaVersion.VERSION_1_8
+			sourceCompatibility = JavaVersion.VERSION_21
 		}
 
 		// Configure all JavaCompile tasks (compileJava, compileTestJava, etc):

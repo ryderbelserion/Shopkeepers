@@ -1,9 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.22.4 (TBA)
-### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+## v2.23.0 (TBA)
+### Supported MC versions: 1.21, 1.20.6
 
+* Drop support for MC versions below 1.20.6 to update the plugin to use Java 21 and build against a more modern API version.
+  * If you want to run this plugin on an older server version, you need to use an older plugin version.
 
 ## v2.22.3 (2024-07-27)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5

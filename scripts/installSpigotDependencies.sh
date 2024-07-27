@@ -45,10 +45,10 @@ buildSpigotIfMissing() {
 # We only re-build CraftBukkit/Spigot versions that are missing in the Maven cache.
 # Add entries here for every required version of CraftBukkit/Spigot.
 
-# The following versions require JDK 8 to build:
-source installJDK.sh 8
+# The following versions require JDK 21 to build:
+source installJDK.sh 21
 
-buildSpigotIfMissing 1.16.5
+buildSpigotIfMissing 1.20.6 remapped
 
 # Optional argument 'minimal': Only builds the api and main projects, which only depend on the
 # lowest supported Spigot version. So we can skip the building of later Spigot versions.
@@ -61,25 +61,7 @@ buildSpigotIfMissing 1.16.5
 #    exit 0
 #fi
 
-# The following versions require JDK 16 to build:
-source installJDK.sh 16
-
-buildSpigotIfMissing 1.17.1 remapped
-
-# The following versions require JDK 17 to build:
-source installJDK.sh 17
-
-buildSpigotIfMissing 1.18.2 remapped
-buildSpigotIfMissing 1.19.4 remapped
-buildSpigotIfMissing 1.20.1 remapped
-buildSpigotIfMissing 1.20.2 remapped
-buildSpigotIfMissing 1.20.4 remapped
-
-# The following versions require JDK 21 to build:
-source installJDK.sh 21
-
-buildSpigotIfMissing 1.20.6 remapped
-# A change in Spigot 1.21 (2024-07-06) broke the plugin, so we require a version from before that.
-buildSpigotIfMissing 1.21 remapped 4255
+# Note: The plugin does not build with Spigot 1.21 versions before 2024-07-07 (due to enum changes).
+buildSpigotIfMissing 1.21 remapped
 
 popd

@@ -1,11 +1,11 @@
 [versions]
 # Lowest supported Bukkit version.
-bukkit = "1.16.5-R0.1-SNAPSHOT"
+bukkit = "1.20.6-R0.1-SNAPSHOT"
 # Corresponding Spigot version for optional Spigot-specific features.
-spigot = "1.16.5-R0.1-SNAPSHOT"
+spigot = "1.20.6-R0.1-SNAPSHOT"
 # Corresponding CraftBukkit version. Only required for testing.
 # Individual NMS modules can use other CraftBukkit versions.
-craftbukkit = "1.16.5-R0.1-SNAPSHOT"
+craftbukkit = "1.20.6-R0.1-SNAPSHOT"
 
 checkerframework = "3.43.0"
 

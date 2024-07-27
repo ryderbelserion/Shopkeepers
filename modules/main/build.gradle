@@ -45,7 +45,11 @@ dependencies {
 	testImplementation libs.spigot.api
 	testImplementation libs.junit
 	testImplementation libs.hamcrest
-	testImplementation libs.craftbukkit
+	(testImplementation libs.craftbukkit) {
+		artifact {
+			classifier = 'remapped-mojang'
+		}
+	}
 }
 
 test {
