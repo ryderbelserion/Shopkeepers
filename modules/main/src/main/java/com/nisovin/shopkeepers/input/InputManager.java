@@ -58,7 +58,7 @@ public abstract class InputManager<@NonNull T> {
 	protected final Plugin plugin;
 
 	private final Listener playerQuitListener = new PlayerQuitListener();
-	private final Map<@NonNull UUID, @NonNull InputRequest<@NonNull T>> pendingRequests;
+	private final Map<UUID, InputRequest<@NonNull T>> pendingRequests;
 
 	public InputManager(Plugin plugin) {
 		this(plugin, false);
@@ -206,7 +206,7 @@ public abstract class InputManager<@NonNull T> {
 	 */
 	protected final @Nullable InputRequest<@NonNull T> removeRequestIf(
 			Player player,
-			Predicate<? super @NonNull InputRequest<@NonNull T>> predicate
+			Predicate<? super InputRequest<@NonNull T>> predicate
 	) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(predicate, "predicate is null");

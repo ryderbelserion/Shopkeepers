@@ -1,0 +1,4 @@
+class org/bukkit/Translatable
+getTranslationKey
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

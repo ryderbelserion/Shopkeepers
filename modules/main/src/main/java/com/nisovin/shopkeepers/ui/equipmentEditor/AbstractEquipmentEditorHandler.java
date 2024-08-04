@@ -18,7 +18,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -42,15 +41,15 @@ public abstract class AbstractEquipmentEditorHandler extends UIHandler {
 
 	// Assumption: These collections do not get externally modified while the editor is in-use!
 	// Element order matches order in the editor.
-	private final List<? extends @NonNull EquipmentSlot> supportedSlots;
-	private final Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> currentEquipment;
-	private final BiConsumer<@NonNull EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged;
+	private final List<? extends EquipmentSlot> supportedSlots;
+	private final Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> currentEquipment;
+	private final BiConsumer<EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged;
 
 	protected AbstractEquipmentEditorHandler(
 			AbstractUIType uiType,
-			List<? extends @NonNull EquipmentSlot> supportedSlots,
-			Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> currentEquipment,
-			BiConsumer<@NonNull EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged
+			List<? extends EquipmentSlot> supportedSlots,
+			Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> currentEquipment,
+			BiConsumer<EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged
 	) {
 		super(uiType);
 

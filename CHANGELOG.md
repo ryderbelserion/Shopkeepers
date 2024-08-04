@@ -6,6 +6,10 @@ Date format: (YYYY-MM-DD)
 
 * Drop support for MC versions below 1.20.6 to update the plugin to use Java 21 and build against a more modern API version.
   * If you want to run this plugin on an older server version, you need to use an older plugin version.
+* Build: Use the Eclipse compiler for null analysis.
+  * Include the Eclipse JDT preference files for use by the ECJ compiler.
+  * Use the JDT `NonNullByDefault` annotation which ECJ interprets as non-null-by-default in more contexts (e.g. for type parameters). Remove various now redundant null annotations.
+  * Add `external-annotations` module for external ECJ null annotations. This reduces the need for various `assertNonNull` calls.
 
 ## v2.22.3 (2024-07-27)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5

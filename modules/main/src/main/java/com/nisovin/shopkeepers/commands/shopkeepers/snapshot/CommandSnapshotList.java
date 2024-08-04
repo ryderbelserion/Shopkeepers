@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
@@ -51,7 +50,7 @@ class CommandSnapshotList extends Command {
 		AbstractShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		int page = context.get(ARGUMENT_PAGE);
 
-		List<? extends @NonNull ShopkeeperSnapshot> snapshots = shopkeeper.getSnapshots();
+		List<? extends ShopkeeperSnapshot> snapshots = shopkeeper.getSnapshots();
 		int snapshotsCount = snapshots.size();
 		int maxPage = Math.max(1, (int) Math.ceil((double) snapshotsCount / ENTRIES_PER_PAGE));
 		page = Math.max(1, Math.min(page, maxPage));

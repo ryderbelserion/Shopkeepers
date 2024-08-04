@@ -4,12 +4,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 public final class DebugOptions {
 
-	private static final Set<@NonNull String> allOptions = new LinkedHashSet<>();
-	private static final Set<? extends @NonNull String> allOptionsView = Collections.unmodifiableSet(allOptions);
+	private static final Set<String> allOptions = new LinkedHashSet<>();
+	private static final Set<? extends String> allOptionsView = Collections.unmodifiableSet(allOptions);
 
 	// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get
 	// combined into a single logging entry to slightly reduce spam.
@@ -45,7 +43,7 @@ public final class DebugOptions {
 		return debugOption;
 	}
 
-	public static Set<? extends @NonNull String> getAll() {
+	public static Set<? extends String> getAll() {
 		return allOptionsView;
 	}
 

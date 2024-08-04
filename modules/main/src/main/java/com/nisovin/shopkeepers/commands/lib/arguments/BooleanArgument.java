@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -15,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
-public class BooleanArgument extends CommandArgument<@NonNull Boolean> {
+public class BooleanArgument extends CommandArgument<Boolean> {
 
 	public BooleanArgument(String name) {
 		super(name);
@@ -39,7 +38,7 @@ public class BooleanArgument extends CommandArgument<@NonNull Boolean> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -48,7 +47,7 @@ public class BooleanArgument extends CommandArgument<@NonNull Boolean> {
 			return Collections.emptyList();
 		}
 
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;

@@ -191,17 +191,17 @@ public class DataValueContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<? extends @NonNull String> getKeys() {
+	public Set<? extends String> getKeys() {
 		return this.getDataContainerOrEmpty().getKeys();
 	}
 
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getValues() {
+	public Map<? extends String, @NonNull ?> getValues() {
 		return this.getDataContainerOrEmpty().getValues();
 	}
 
 	@Override
-	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
+	public Map<String, Object> getValuesCopy() {
 		return this.getDataContainerOrEmpty().getValuesCopy();
 	}
 

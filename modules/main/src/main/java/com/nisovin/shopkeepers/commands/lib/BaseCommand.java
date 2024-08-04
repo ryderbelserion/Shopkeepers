@@ -31,7 +31,7 @@ public abstract class BaseCommand extends Command implements CommandExecutor, Ta
 		);
 	}
 
-	private static List<@NonNull String> getAliases(PluginCommand bukkitCommand) {
+	private static List<String> getAliases(PluginCommand bukkitCommand) {
 		List<String> aliases = bukkitCommand.getAliases();
 		Validate.noNullElements(aliases, "bukkitCommand contains null aliases");
 		return new ArrayList<>(Unsafe.cast(aliases));

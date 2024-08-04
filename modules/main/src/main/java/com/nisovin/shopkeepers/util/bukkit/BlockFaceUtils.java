@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -21,7 +20,7 @@ public final class BlockFaceUtils {
 	public enum BlockFaceDirections {
 		// Order matters for operations like yaw to BlockFace.
 		BLOCK_SIDES(
-				Arrays.<@NonNull BlockFace>asList(
+				Arrays.asList(
 						BlockFace.SOUTH,
 						BlockFace.WEST,
 						BlockFace.NORTH,
@@ -30,14 +29,14 @@ public final class BlockFaceUtils {
 						BlockFace.DOWN
 				)),
 		CARDINAL(
-				Arrays.<@NonNull BlockFace>asList(
+				Arrays.asList(
 						BlockFace.SOUTH,
 						BlockFace.WEST,
 						BlockFace.NORTH,
 						BlockFace.EAST
 				)),
 		INTERCARDINAL(
-				Arrays.<@NonNull BlockFace>asList(
+				Arrays.asList(
 						BlockFace.SOUTH,
 						BlockFace.SOUTH_WEST,
 						BlockFace.WEST,
@@ -48,7 +47,7 @@ public final class BlockFaceUtils {
 						BlockFace.SOUTH_EAST
 				)),
 		SECONDARY_INTERCARDINAL(
-				Arrays.<@NonNull BlockFace>asList(
+				Arrays.asList(
 						BlockFace.SOUTH,
 						BlockFace.SOUTH_SOUTH_WEST,
 						BlockFace.SOUTH_WEST,
@@ -67,9 +66,9 @@ public final class BlockFaceUtils {
 						BlockFace.SOUTH_SOUTH_EAST
 				));
 
-		private final List<? extends @NonNull BlockFace> blockFaces;
+		private final List<? extends BlockFace> blockFaces;
 
-		private BlockFaceDirections(List<? extends @NonNull BlockFace> blockFaces) {
+		private BlockFaceDirections(List<? extends BlockFace> blockFaces) {
 			this.blockFaces = Collections.unmodifiableList(blockFaces);
 		}
 
@@ -78,7 +77,7 @@ public final class BlockFaceUtils {
 		 * 
 		 * @return the block faces
 		 */
-		public final List<? extends @NonNull BlockFace> getBlockFaces() {
+		public final List<? extends BlockFace> getBlockFaces() {
 			return blockFaces;
 		}
 
@@ -121,7 +120,7 @@ public final class BlockFaceUtils {
 	 * 
 	 * @return the block faces that correspond to the sides of a block
 	 */
-	public static List<? extends @NonNull BlockFace> getBlockSides() {
+	public static List<? extends BlockFace> getBlockSides() {
 		return BlockFaceDirections.BLOCK_SIDES.getBlockFaces();
 	}
 
@@ -145,7 +144,8 @@ public final class BlockFaceUtils {
 	 */
 	public static float getYaw(BlockFace blockFace) {
 		Validate.notNull(blockFace, "blockFace is null");
-		List<? extends @NonNull BlockFace> horizontalBlockFaces = BlockFaceDirections.SECONDARY_INTERCARDINAL.getBlockFaces();
+		List<? extends BlockFace> horizontalBlockFaces = BlockFaceDirections.SECONDARY_INTERCARDINAL
+				.getBlockFaces();
 		int blockFaceIndex = horizontalBlockFaces.indexOf(blockFace);
 		Validate.isTrue(blockFaceIndex != -1, "blockFace is not horizontal: " + blockFace);
 

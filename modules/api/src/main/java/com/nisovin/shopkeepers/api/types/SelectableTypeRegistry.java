@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.api.types;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -11,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <T>
  *            the type of {@link SelectableType} that is managed by this registry
  */
-public interface SelectableTypeRegistry<T extends @NonNull SelectableType> extends TypeRegistry<T> {
+public interface SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
 	// SELECTION MANAGEMENT
 

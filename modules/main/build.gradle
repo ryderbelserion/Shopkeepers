@@ -3,6 +3,7 @@ plugins {
 	id 'org.checkerframework'
 	id 'maven-publish'
 	id 'com.github.johnrengelman.shadow'
+	id 'eclipse'
 }
 
 repositories {
@@ -19,6 +20,8 @@ repositories {
 }
 
 configurations {
+	// Separate configuration for the shaded dependencies to not also include the '*.eea' files.
+	shaded
 	implementation {
 		// Removed from Bukkit in newer versions:
 		exclude group: 'commons-lang', module: 'commons-lang'
@@ -41,6 +44,8 @@ dependencies {
 	(compileOnly libs.citizens.main) { transitive = false }
 	compileOnly libs.vault.api
 	compileOnly libs.bstats.bukkit
+
+	shaded libs.bstats.bukkit
 
 	testImplementation libs.spigot.api
 	testImplementation libs.junit
@@ -92,10 +97,11 @@ shadowJar {
 	configureJarTaskWithMavenMetadata(project, it)
 	// No classifier: Replaces the normal classifier-less jar file (if there is one).
 	archiveClassifier = ''
-	configurations = [project.configurations.compileClasspath]
+	configurations = [project.configurations.shaded]
+	/*configurations = [project.configurations.compileClasspath]
 	dependencies {
 		include(dependency(libs.bstats.bukkit.get()))
-	}
+	}*/
 	relocate 'org.bstats.bukkit', "${project.group}.libs.bstats"
 }
 

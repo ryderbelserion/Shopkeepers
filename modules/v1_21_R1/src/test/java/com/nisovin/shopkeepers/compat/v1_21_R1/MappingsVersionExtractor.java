@@ -27,18 +27,17 @@ public final class MappingsVersionExtractor {
 		Box<@Nullable String> result = new Box<>();
 		ClassReader reader = new ClassReader(craftMagicNumbersClass.getName());
 		reader.accept(new ClassVisitor(Opcodes.ASM9) {
-			@SuppressWarnings("override.return")
 			@Override
 			public @Nullable MethodVisitor visitMethod(
 					int access,
-					String name,
-					String desc, String signature,
-					String[] exceptions
+					@Nullable String name,
+					@Nullable String desc, @Nullable String signature,
+					String @Nullable [] exceptions
 			) {
-				if (name.equals("getMappingsVersion")) {
+				if (name != null && name.equals("getMappingsVersion")) {
 					return new MethodVisitor(api) {
 						@Override
-						public void visitLdcInsn(final Object value) {
+						public void visitLdcInsn(final @Nullable Object value) {
 							result.setValue((String) value);
 						}
 					};

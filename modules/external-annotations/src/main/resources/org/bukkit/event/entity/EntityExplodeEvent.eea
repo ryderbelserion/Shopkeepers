@@ -1,0 +1,10 @@
+class org/bukkit/event/entity/EntityExplodeEvent
+blockList
+ ()Ljava/util/List<Lorg/bukkit/block/Block;>;
+ ()L1java/util/List<L1org/bukkit/block/Block;>;
+getHandlerList
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;
+getLocation
+ ()Lorg/bukkit/Location;
+ ()L1org/bukkit/Location;

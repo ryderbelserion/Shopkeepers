@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -35,7 +34,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 	private static class InactivePlayerData {
 
 		private final int lastSeenDaysAgo;
-		private final List<@NonNull PlayerShopkeeper> shopkeepers = new ArrayList<>();
+		private final List<PlayerShopkeeper> shopkeepers = new ArrayList<>();
 
 		InactivePlayerData(int lastSeenDaysAgo) {
 			this.lastSeenDaysAgo = lastSeenDaysAgo;
@@ -45,7 +44,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 			return lastSeenDaysAgo;
 		}
 
-		List<@NonNull PlayerShopkeeper> getShopkeepers() {
+		List<PlayerShopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 	}
@@ -57,7 +56,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 	private boolean started = false;
 	// Retrieved once and then reused for all inactivity checks of this procedure:
 	private final long currentTimeMillis = System.currentTimeMillis();
-	private final Map<@NonNull User, @Nullable InactivePlayerData> inactivePlayers = new HashMap<>();
+	private final Map<User, @Nullable InactivePlayerData> inactivePlayers = new HashMap<>();
 
 	public DeleteShopsOfInactivePlayersProcedure(SKShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -124,9 +123,9 @@ class DeleteShopsOfInactivePlayersProcedure {
 	// Sets up the data for all inactive shop owners, and removes all shop owners that are not
 	// inactive.
 	private void setUpInactiveShopOwners() {
-		Iterator<@NonNull Entry<@NonNull User, @Nullable InactivePlayerData>> iterator = inactivePlayers.entrySet().iterator();
+		Iterator<Entry<User, @Nullable InactivePlayerData>> iterator = inactivePlayers.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<@NonNull User, @Nullable InactivePlayerData> entry = iterator.next();
+			Entry<User, @Nullable InactivePlayerData> entry = iterator.next();
 			User user = entry.getKey();
 			InactivePlayerData data = this.setUpIfInactive(user);
 			if (data == null) {
@@ -184,7 +183,7 @@ class DeleteShopsOfInactivePlayersProcedure {
 	private void deleteShopsOfInactivePlayers() {
 		inactivePlayers.forEach((user, nullableInactivePlayerData) -> {
 			InactivePlayerData inactivePlayerData = Unsafe.assertNonNull(nullableInactivePlayerData);
-			List<? extends @NonNull PlayerShopkeeper> shopkeepers = inactivePlayerData.getShopkeepers();
+			List<? extends PlayerShopkeeper> shopkeepers = inactivePlayerData.getShopkeepers();
 			if (shopkeepers.isEmpty()) {
 				// We initially found this shop owner and identified them as inactive, but were then
 				// subsequently no longer able to find any shopkeepers that are still owned by them.

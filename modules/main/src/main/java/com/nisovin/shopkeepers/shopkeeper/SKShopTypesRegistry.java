@@ -1,15 +1,13 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopTypesRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
 
-public class SKShopTypesRegistry
-		extends AbstractSelectableTypeRegistry<@NonNull AbstractShopType<?>>
-		implements ShopTypesRegistry<@NonNull AbstractShopType<?>> {
+public class SKShopTypesRegistry extends AbstractSelectableTypeRegistry<AbstractShopType<?>>
+		implements ShopTypesRegistry<AbstractShopType<?>> {
 
 	@Override
 	protected String getTypeName() {

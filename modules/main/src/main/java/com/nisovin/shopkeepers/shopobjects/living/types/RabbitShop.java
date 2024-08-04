@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -28,20 +27,20 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class RabbitShop extends BabyableShop<@NonNull Rabbit> {
+public class RabbitShop extends BabyableShop<Rabbit> {
 
-	public static final Property<Rabbit.@NonNull Type> RABBIT_TYPE = new BasicProperty<Rabbit.@NonNull Type>()
+	public static final Property<Rabbit.Type> RABBIT_TYPE = new BasicProperty<Rabbit.Type>()
 			.dataKeyAccessor("rabbitType", EnumSerializers.lenient(Rabbit.Type.class))
 			.defaultValue(Rabbit.Type.BROWN)
 			.build();
 
-	private final PropertyValue<Rabbit.@NonNull Type> rabbitTypeProperty = new PropertyValue<>(RABBIT_TYPE)
+	private final PropertyValue<Rabbit.Type> rabbitTypeProperty = new PropertyValue<>(RABBIT_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applyRabbitType)
 			.build(properties);
 
 	public RabbitShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull RabbitShop> livingObjectType,
+			SKLivingShopObjectType<RabbitShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -67,8 +66,8 @@ public class RabbitShop extends BabyableShop<@NonNull Rabbit> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getRabbitTypeEditorButton());
 		return editorButtons;
 	}
@@ -92,6 +91,7 @@ public class RabbitShop extends BabyableShop<@NonNull Rabbit> {
 	private void applyRabbitType() {
 		Rabbit entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		Rabbit.Type rabbitType = this.getRabbitType();
 		if (rabbitType == Rabbit.Type.THE_KILLER_BUNNY) {
 			// Special handling if the rabbit type is the killer rabbit:

@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.virtual;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -105,7 +104,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	// EDITOR ACTIONS
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
+	public List<Button> createEditorButtons() {
 		return super.createEditorButtons();
 	}
 }

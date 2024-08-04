@@ -21,7 +21,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -55,7 +54,7 @@ public class Settings extends Config {
 	public static int configVersion = 6;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
-	public static List<@NonNull String> debugOptions = new ArrayList<>(0);
+	public static List<String> debugOptions = new ArrayList<>(0);
 	public static boolean enableMetrics = true;
 
 	/*
@@ -71,7 +70,7 @@ public class Settings extends Config {
 
 	public static boolean convertPlayerItems = false;
 	public static boolean convertAllPlayerItems = true;
-	public static List<@NonNull ItemData> convertPlayerItemsExceptions = new ArrayList<>();
+	public static List<ItemData> convertPlayerItemsExceptions = new ArrayList<>();
 
 	/*
 	 * Plugin Compatibility
@@ -124,7 +123,7 @@ public class Settings extends Config {
 	// Villager is the default and therefore first. The other entity types are alphabetically
 	// sorted.
 	// TODO Generate the default enabled mobs list based on the server's version.
-	public static List<@NonNull String> enabledLivingShops = CollectionUtils.addAll(
+	public static List<String> enabledLivingShops = CollectionUtils.addAll(
 			new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())),
 			CollectionUtils.sort(Arrays.asList(
 					EntityType.COW.name(),
@@ -408,9 +407,9 @@ public class Settings extends Config {
 		public static Pattern shopNamePattern = Unsafe.uncheckedNull();
 
 		// Sorted in descending order:
-		public static final List<@NonNull MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
+		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
 
-		public static final Set<@NonNull EntityType> enabledLivingShops = new LinkedHashSet<>();
+		public static final Set<EntityType> enabledLivingShops = new LinkedHashSet<>();
 
 		static {
 			// Initial setup of default values:
@@ -729,7 +728,7 @@ public class Settings extends Config {
 		}
 
 		public final boolean debug;
-		public final List<? extends @NonNull String> debugOptions;
+		public final List<? extends String> debugOptions;
 		public final Charset fileCharset;
 
 		private AsyncSettings() {

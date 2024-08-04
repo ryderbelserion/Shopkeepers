@@ -1,0 +1,28 @@
+class org/bukkit/configuration/serialization/ConfigurationSerialization
+deserialize
+ (Ljava/util/Map<Ljava/lang/String;*>;)Lorg/bukkit/configuration/serialization/ConfigurationSerializable;
+ (L1java/util/Map<L1java/lang/String;*1>;)L0org/bukkit/configuration/serialization/ConfigurationSerializable;
+deserializeObject
+ (Ljava/util/Map<Ljava/lang/String;*>;)Lorg/bukkit/configuration/serialization/ConfigurationSerializable;
+ (L1java/util/Map<L1java/lang/String;*1>;)L0org/bukkit/configuration/serialization/ConfigurationSerializable;
+deserializeObject
+ (Ljava/util/Map<Ljava/lang/String;*>;Ljava/lang/Class<+Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>;)Lorg/bukkit/configuration/serialization/ConfigurationSerializable;
+ (L1java/util/Map<L1java/lang/String;*1>;L1java/lang/Class<+L1org/bukkit/configuration/serialization/ConfigurationSerializable;>;)L0org/bukkit/configuration/serialization/ConfigurationSerializable;
+getAlias
+ (Ljava/lang/Class<+Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>;)Ljava/lang/String;
+ (L1java/lang/Class<+L1org/bukkit/configuration/serialization/ConfigurationSerializable;>;)L1java/lang/String;
+getClassByAlias
+ (Ljava/lang/String;)Ljava/lang/Class<+Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>;
+ (L1java/lang/String;)L0java/lang/Class<+L1org/bukkit/configuration/serialization/ConfigurationSerializable;>;
+registerClass
+ (Ljava/lang/Class<+Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>;)V
+ (L1java/lang/Class<+L1org/bukkit/configuration/serialization/ConfigurationSerializable;>;)V
+registerClass
+ (Ljava/lang/Class<+Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>;Ljava/lang/String;)V
+ (L1java/lang/Class<+L1org/bukkit/configuration/serialization/ConfigurationSerializable;>;L1java/lang/String;)V
+unregisterClass
+ (Ljava/lang/Class<+Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>;)V
+ (L1java/lang/Class<+L1org/bukkit/configuration/serialization/ConfigurationSerializable;>;)V
+unregisterClass
+ (Ljava/lang/String;)V
+ (L1java/lang/String;)V

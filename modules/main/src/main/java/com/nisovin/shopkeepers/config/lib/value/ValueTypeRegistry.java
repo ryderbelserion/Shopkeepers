@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -16,9 +15,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class ValueTypeRegistry {
 
-	private final Map<@NonNull Type, @NonNull ValueType<?>> byType = new HashMap<>();
+	private final Map<Type, ValueType<?>> byType = new HashMap<>();
 	// Ordered: The first successful provider is used.
-	private final List<@NonNull ValueTypeProvider> providers = new ArrayList<>();
+	private final List<ValueTypeProvider> providers = new ArrayList<>();
 
 	public ValueTypeRegistry() {
 	}

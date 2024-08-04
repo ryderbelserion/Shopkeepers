@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.living.types.villager;
 import org.bukkit.Sound;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
@@ -14,9 +13,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
  */
 public class WanderingTraderSounds extends VillagerSounds {
 
-	public WanderingTraderSounds(
-			SKLivingShopObject<? extends @NonNull WanderingTrader> shopObject
-	) {
+	public WanderingTraderSounds(SKLivingShopObject<? extends WanderingTrader> shopObject) {
 		super(shopObject);
 	}
 

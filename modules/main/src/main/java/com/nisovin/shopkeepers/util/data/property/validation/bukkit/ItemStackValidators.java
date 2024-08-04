@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util.data.property.validation.bukkit;
 
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.data.property.validation.PropertyValidator;
@@ -22,7 +21,7 @@ public final class ItemStackValidators {
 		 * A {@link PropertyValidator} that ensures that the validated {@link UnmodifiableItemStack}
 		 * is not {@link ItemUtils#isEmpty(UnmodifiableItemStack) empty}.
 		 */
-		public static final PropertyValidator<@NonNull UnmodifiableItemStack> NON_EMPTY = (value) -> {
+		public static final PropertyValidator<UnmodifiableItemStack> NON_EMPTY = (value) -> {
 			Validate.isTrue(!ItemUtils.isEmpty(value), "Item stack is empty!");
 		};
 
@@ -34,7 +33,7 @@ public final class ItemStackValidators {
 	 * A {@link PropertyValidator} that ensures that the validated {@link ItemStack} is not
 	 * {@link ItemUtils#isEmpty(ItemStack) empty}.
 	 */
-	public static final PropertyValidator<@NonNull ItemStack> NON_EMPTY = (value) -> {
+	public static final PropertyValidator<ItemStack> NON_EMPTY = (value) -> {
 		Validate.isTrue(!ItemUtils.isEmpty(value), "Item stack is empty!");
 	};
 

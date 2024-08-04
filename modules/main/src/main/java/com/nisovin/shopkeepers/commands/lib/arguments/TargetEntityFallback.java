@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgument;
@@ -14,14 +13,14 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * If the sender is not a player, the parsing exception of the original argument is thrown (the
  * original argument might get reevaluated is some parsing context has changed).
  */
-public class TargetEntityFallback extends TypedFallbackArgument<@NonNull Entity> {
+public class TargetEntityFallback extends TypedFallbackArgument<Entity> {
 
-	public TargetEntityFallback(CommandArgument<@NonNull Entity> argument) {
+	public TargetEntityFallback(CommandArgument<Entity> argument) {
 		this(argument, TargetEntityFilter.ANY);
 	}
 
 	public TargetEntityFallback(
-			CommandArgument<@NonNull Entity> argument,
+			CommandArgument<Entity> argument,
 			TargetEntityFilter filter
 	) {
 		super(

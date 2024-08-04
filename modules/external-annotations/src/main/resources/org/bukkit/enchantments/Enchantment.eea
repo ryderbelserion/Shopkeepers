@@ -1,0 +1,127 @@
+class org/bukkit/enchantments/Enchantment
+AQUA_AFFINITY
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+BANE_OF_ARTHROPODS
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+BINDING_CURSE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+BLAST_PROTECTION
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+BREACH
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+CHANNELING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+DENSITY
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+DEPTH_STRIDER
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+EFFICIENCY
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+FEATHER_FALLING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+FIRE_ASPECT
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+FIRE_PROTECTION
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+FLAME
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+FORTUNE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+FROST_WALKER
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+IMPALING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+INFINITY
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+KNOCKBACK
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+LOOTING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+LOYALTY
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+LUCK_OF_THE_SEA
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+LURE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+MENDING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+MULTISHOT
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+PIERCING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+POWER
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+PROJECTILE_PROTECTION
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+PROTECTION
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+PUNCH
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+QUICK_CHARGE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+RESPIRATION
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+RIPTIDE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+SHARPNESS
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+SILK_TOUCH
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+SMITE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+SOUL_SPEED
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+SWEEPING_EDGE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+SWIFT_SNEAK
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+THORNS
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+UNBREAKING
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+VANISHING_CURSE
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;
+WIND_BURST
+ Lorg/bukkit/enchantments/Enchantment;
+ L1org/bukkit/enchantments/Enchantment;

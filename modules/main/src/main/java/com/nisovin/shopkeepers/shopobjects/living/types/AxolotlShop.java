@@ -6,7 +6,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.Animals;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -30,23 +29,23 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual Axolotl type once we only support Bukkit 1.17 upwards
 // TODO Editor option to play dead?
-public class AxolotlShop extends BabyableShop<@NonNull Animals> {
+public class AxolotlShop extends BabyableShop<Animals> {
 
 	// TODO Use correct enum type once we only support Bukkit 1.17 upwards
-	public static final Property<@NonNull String> VARIANT = new BasicProperty<@NonNull String>()
+	public static final Property<String> VARIANT = new BasicProperty<String>()
 			.dataKeyAccessor("axolotlVariant", StringSerializers.STRICT)
 			// TODO Validate that the value is a valid axolotl type
 			.validator(StringValidators.NON_EMPTY)
 			.defaultValue("LUCY")
 			.build();
 
-	private final PropertyValue<@NonNull String> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<String> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
 	public AxolotlShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull AxolotlShop> livingObjectType,
+			SKLivingShopObjectType<AxolotlShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -72,8 +71,8 @@ public class AxolotlShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
@@ -97,6 +96,7 @@ public class AxolotlShop extends BabyableShop<@NonNull Animals> {
 	private void applyVariant() {
 		Animals entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		NMSManager.getProvider().setAxolotlVariant(entity, this.getVariant());
 		// entity.setVariant(this.getVariant());
 	}

@@ -207,18 +207,18 @@ public class ServerAssumptionsTest {
 		PersistentDataContainer customTags = itemMeta.getPersistentDataContainer();
 		customTags.set(
 				NamespacedKeyUtils.create("some_plugin", "some-key"),
-				Unsafe.assertNonNull(PersistentDataType.STRING),
+				PersistentDataType.STRING,
 				"some value"
 		);
 		PersistentDataContainer customContainer = customTags.getAdapterContext().newPersistentDataContainer();
 		customContainer.set(
 				NamespacedKeyUtils.create("inner_plugin", "inner-key"),
-				Unsafe.assertNonNull(PersistentDataType.FLOAT),
+				PersistentDataType.FLOAT,
 				0.3F
 		);
 		customTags.set(
 				NamespacedKeyUtils.create("some_plugin", "some-other-key"),
-				Unsafe.assertNonNull(PersistentDataType.TAG_CONTAINER),
+				PersistentDataType.TAG_CONTAINER,
 				customContainer
 		);
 		itemStack.setItemMeta(itemMeta);

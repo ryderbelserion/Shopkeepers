@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.lib.argument;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -15,7 +14,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class ArgumentsReader {
 
 	// Directly references to the underlying (unmodifiable) input arguments:
-	private final List<? extends @NonNull String> args;
+	private final List<? extends String> args;
 	private int cursor = -1; // 0 points to the first argument
 
 	public ArgumentsReader(CommandInput commandInput) {
@@ -26,7 +25,7 @@ public class ArgumentsReader {
 		this.args = commandInput.getArguments();
 	}
 
-	protected ArgumentsReader(List<? extends @NonNull String> args) {
+	protected ArgumentsReader(List<? extends String> args) {
 		this.args = args;
 	}
 
@@ -35,7 +34,7 @@ public class ArgumentsReader {
 	 * 
 	 * @return an unmodifiable view on all arguments
 	 */
-	public List<? extends @NonNull String> getArgs() {
+	public List<? extends String> getArgs() {
 		return args;
 	}
 

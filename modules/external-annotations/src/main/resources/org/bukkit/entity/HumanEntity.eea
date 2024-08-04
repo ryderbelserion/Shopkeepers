@@ -1,0 +1,91 @@
+class org/bukkit/entity/HumanEntity
+discoverRecipe
+ (Lorg/bukkit/NamespacedKey;)Z
+ (L1org/bukkit/NamespacedKey;)Z
+discoverRecipes
+ (Ljava/util/Collection<Lorg/bukkit/NamespacedKey;>;)I
+ (L1java/util/Collection<L1org/bukkit/NamespacedKey;>;)I
+fireworkBoost
+ (Lorg/bukkit/inventory/ItemStack;)Lorg/bukkit/entity/Firework;
+ (L1org/bukkit/inventory/ItemStack;)L0org/bukkit/entity/Firework;
+getBedLocation
+ ()Lorg/bukkit/Location;
+ ()L1org/bukkit/Location;
+getCooldown
+ (Lorg/bukkit/Material;)I
+ (L1org/bukkit/Material;)I
+getDiscoveredRecipes
+ ()Ljava/util/Set<Lorg/bukkit/NamespacedKey;>;
+ ()L1java/util/Set<L1org/bukkit/NamespacedKey;>;
+getEnderChest
+ ()Lorg/bukkit/inventory/Inventory;
+ ()L1org/bukkit/inventory/Inventory;
+getGameMode
+ ()Lorg/bukkit/GameMode;
+ ()L1org/bukkit/GameMode;
+getInventory
+ ()Lorg/bukkit/inventory/PlayerInventory;
+ ()L1org/bukkit/inventory/PlayerInventory;
+getItemOnCursor
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L1org/bukkit/inventory/ItemStack;
+getLastDeathLocation
+ ()Lorg/bukkit/Location;
+ ()L0org/bukkit/Location;
+getMainHand
+ ()Lorg/bukkit/inventory/MainHand;
+ ()L1org/bukkit/inventory/MainHand;
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getOpenInventory
+ ()Lorg/bukkit/inventory/InventoryView;
+ ()L1org/bukkit/inventory/InventoryView;
+hasCooldown
+ (Lorg/bukkit/Material;)Z
+ (L1org/bukkit/Material;)Z
+hasDiscoveredRecipe
+ (Lorg/bukkit/NamespacedKey;)Z
+ (L1org/bukkit/NamespacedKey;)Z
+openEnchanting
+ (Lorg/bukkit/Location;Z)Lorg/bukkit/inventory/InventoryView;
+ (L0org/bukkit/Location;Z)L0org/bukkit/inventory/InventoryView;
+openInventory
+ (Lorg/bukkit/inventory/Inventory;)Lorg/bukkit/inventory/InventoryView;
+ (L1org/bukkit/inventory/Inventory;)L0org/bukkit/inventory/InventoryView;
+openInventory
+ (Lorg/bukkit/inventory/InventoryView;)V
+ (L1org/bukkit/inventory/InventoryView;)V
+openMerchant
+ (Lorg/bukkit/entity/Villager;Z)Lorg/bukkit/inventory/InventoryView;
+ (L1org/bukkit/entity/Villager;Z)L0org/bukkit/inventory/InventoryView;
+openMerchant
+ (Lorg/bukkit/inventory/Merchant;Z)Lorg/bukkit/inventory/InventoryView;
+ (L1org/bukkit/inventory/Merchant;Z)L0org/bukkit/inventory/InventoryView;
+openWorkbench
+ (Lorg/bukkit/Location;Z)Lorg/bukkit/inventory/InventoryView;
+ (L0org/bukkit/Location;Z)L0org/bukkit/inventory/InventoryView;
+setCooldown
+ (Lorg/bukkit/Material;I)V
+ (L1org/bukkit/Material;I)V
+setGameMode
+ (Lorg/bukkit/GameMode;)V
+ (L1org/bukkit/GameMode;)V
+setItemOnCursor
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L0org/bukkit/inventory/ItemStack;)V
+setLastDeathLocation
+ (Lorg/bukkit/Location;)V
+ (L0org/bukkit/Location;)V
+setWindowProperty
+ (Lorg/bukkit/inventory/InventoryView$Property;I)Z
+ (L1org/bukkit/inventory/InventoryView$Property;I)Z
+sleep
+ (Lorg/bukkit/Location;Z)Z
+ (L1org/bukkit/Location;Z)Z
+undiscoverRecipe
+ (Lorg/bukkit/NamespacedKey;)Z
+ (L1org/bukkit/NamespacedKey;)Z
+undiscoverRecipes
+ (Ljava/util/Collection<Lorg/bukkit/NamespacedKey;>;)I
+ (L1java/util/Collection<L1org/bukkit/NamespacedKey;>;)I

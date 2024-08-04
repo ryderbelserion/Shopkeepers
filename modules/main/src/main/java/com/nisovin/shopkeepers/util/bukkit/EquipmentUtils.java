@@ -9,7 +9,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.EquipmentSlot;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -40,19 +39,19 @@ public class EquipmentUtils {
 	}
 
 	// TODO Added in Bukkit 1.20.5
-	public static final Optional<@NonNull EquipmentSlot> EQUIPMENT_SLOT_BODY;
+	public static final Optional<EquipmentSlot> EQUIPMENT_SLOT_BODY;
 
 	// Common supported equipment slot combinations:
 	// Lists for fast iteration and lookup by index. No duplicate or null elements.
 	// Element order consistent with EquipmentSlot enum.
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_HANDS_AND_ARMOR;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_HANDS_AND_HEAD;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_MAINHAND_AND_HEAD;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_HANDS;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_MAINHAND;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_HEAD;
-	public static final List<? extends @NonNull EquipmentSlot> EQUIPMENT_SLOTS_BODY;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_HANDS_AND_ARMOR;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_HANDS_AND_HEAD;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_MAINHAND_AND_HEAD;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_HANDS;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_MAINHAND;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_HEAD;
+	public static final List<? extends EquipmentSlot> EQUIPMENT_SLOTS_BODY;
 
 	static {
 		@Nullable EquipmentSlot bodySlot = EnumUtils.valueOf(EquipmentSlot.class, "BODY");
@@ -103,7 +102,7 @@ public class EquipmentUtils {
 	 * @return an unmodifiable view on the supported equipment slots, not <code>null</code>, can be
 	 *         empty
 	 */
-	public static List<? extends @NonNull EquipmentSlot> getSupportedEquipmentSlots(EntityType entityType) {
+	public static List<? extends EquipmentSlot> getSupportedEquipmentSlots(EntityType entityType) {
 		switch (entityType.name()) {
 		case "PLAYER":
 		case "ARMOR_STAND":

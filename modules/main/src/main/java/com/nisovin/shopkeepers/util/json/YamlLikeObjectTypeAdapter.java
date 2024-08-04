@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
@@ -57,7 +56,6 @@ import com.nisovin.shopkeepers.util.yaml.YamlUtils;
 public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 
 	public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-		@SuppressWarnings("override.return")
 		@Override
 		public <T> @Nullable TypeAdapter<T> create(
 				@Nullable Gson gson,
@@ -84,7 +82,6 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 		this.gson = gson;
 	}
 
-	@SuppressWarnings("override.return")
 	@Override
 	public @Nullable Object read(@Nullable JsonReader in) throws IOException {
 		assert in != null;
@@ -101,7 +98,7 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 			return list;
 		case BEGIN_OBJECT:
 			// We use a LinkedHashMap instead of Gson's LinkedTreeMap:
-			Map<@NonNull String, @Nullable Object> map = new LinkedHashMap<>();
+			Map<String, @Nullable Object> map = new LinkedHashMap<>();
 			in.beginObject();
 			while (in.hasNext()) {
 				// This recursively uses this custom Object TypeAdapter:

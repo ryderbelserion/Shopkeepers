@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Squid;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -30,20 +29,20 @@ import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
-public class GlowSquidShop extends SKLivingShopObject<@NonNull Squid> {
+public class GlowSquidShop extends SKLivingShopObject<Squid> {
 
-	public static final Property<@NonNull Boolean> DARK = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> DARK = new BasicProperty<Boolean>()
 			.dataKeyAccessor("darkGlowSquid", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> darkGlowSquidProperty = new PropertyValue<>(DARK)
+	private final PropertyValue<Boolean> darkGlowSquidProperty = new PropertyValue<>(DARK)
 			.onValueChanged(Unsafe.initialized(this)::applyDark)
 			.build(properties);
 
 	public GlowSquidShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull GlowSquidShop> livingObjectType,
+			SKLivingShopObjectType<GlowSquidShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -69,8 +68,8 @@ public class GlowSquidShop extends SKLivingShopObject<@NonNull Squid> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getDarkEditorButton());
 		return editorButtons;
 	}
@@ -92,6 +91,7 @@ public class GlowSquidShop extends SKLivingShopObject<@NonNull Squid> {
 	private void applyDark() {
 		Squid entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		NMSManager.getProvider().setGlowSquidDark(entity, this.isDark());
 	}
 

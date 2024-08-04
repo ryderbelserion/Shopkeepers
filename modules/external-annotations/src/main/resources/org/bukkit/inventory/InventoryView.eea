@@ -1,0 +1,43 @@
+class org/bukkit/inventory/InventoryView
+getBottomInventory
+ ()Lorg/bukkit/inventory/Inventory;
+ ()L1org/bukkit/inventory/Inventory;
+getCursor
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L0org/bukkit/inventory/ItemStack;
+getInventory
+ (I)Lorg/bukkit/inventory/Inventory;
+ (I)L0org/bukkit/inventory/Inventory;
+getItem
+ (I)Lorg/bukkit/inventory/ItemStack;
+ (I)L0org/bukkit/inventory/ItemStack;
+getOriginalTitle
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getPlayer
+ ()Lorg/bukkit/entity/HumanEntity;
+ ()L1org/bukkit/entity/HumanEntity;
+getSlotType
+ (I)Lorg/bukkit/event/inventory/InventoryType$SlotType;
+ (I)L1org/bukkit/event/inventory/InventoryType$SlotType;
+getTitle
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getTopInventory
+ ()Lorg/bukkit/inventory/Inventory;
+ ()L1org/bukkit/inventory/Inventory;
+getType
+ ()Lorg/bukkit/event/inventory/InventoryType;
+ ()L1org/bukkit/event/inventory/InventoryType;
+setCursor
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L0org/bukkit/inventory/ItemStack;)V
+setItem
+ (ILorg/bukkit/inventory/ItemStack;)V
+ (IL0org/bukkit/inventory/ItemStack;)V
+setProperty
+ (Lorg/bukkit/inventory/InventoryView$Property;I)Z
+ (L1org/bukkit/inventory/InventoryView$Property;I)Z
+setTitle
+ (Ljava/lang/String;)V
+ (L1java/lang/String;)V

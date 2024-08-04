@@ -19,7 +19,6 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -181,10 +180,10 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	// ALIASES
 
 	// Deeply unmodifiable:
-	private static final Map<? extends @NonNull EntityType, ? extends @NonNull List<? extends @NonNull String>> ALIASES;
+	private static final Map<? extends EntityType, ? extends List<? extends String>> ALIASES;
 
 	static {
-		Map<@NonNull EntityType, @NonNull List<? extends @NonNull String>> aliases = new HashMap<>();
+		Map<EntityType, List<? extends String>> aliases = new HashMap<>();
 		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList(
 				"mooshroom",
 				"mushroom-cow"
@@ -196,15 +195,15 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		ALIASES = Collections.unmodifiableMap(aliases);
 	}
 
-	private static List<? extends @NonNull String> prepareAliases(
-			List<? extends @NonNull String> aliases
+	private static List<? extends String> prepareAliases(
+			List<? extends String> aliases
 	) {
 		return Collections.unmodifiableList(StringUtils.normalize(aliases));
 	}
 
-	private static List<? extends @NonNull String> getAliasesFor(EntityType entityType) {
+	private static List<? extends String> getAliasesFor(EntityType entityType) {
 		Validate.notNull(entityType, "entityType is null");
-		List<? extends @NonNull String> aliases = ALIASES.get(entityType);
+		List<? extends String> aliases = ALIASES.get(entityType);
 		if (aliases != null) return aliases;
 		return Collections.emptyList();
 	}
@@ -238,20 +237,20 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	// ----
 
 	// Unordered, unmodifiable:
-	private final Map<? extends @NonNull EntityType, ? extends @NonNull SKLivingShopObjectType<?>> objectTypes;
+	private final Map<? extends EntityType, ? extends SKLivingShopObjectType<?>> objectTypes;
 
 	// Order is specified by the 'enabled-living-shops' config setting:
-	private final List<@NonNull SKLivingShopObjectType<?>> orderedObjectTypes = new ArrayList<>();
-	private final List<? extends @NonNull SKLivingShopObjectType<?>> orderedObjectTypesView = Collections.unmodifiableList(orderedObjectTypes);
+	private final List<SKLivingShopObjectType<?>> orderedObjectTypes = new ArrayList<>();
+	private final List<? extends SKLivingShopObjectType<?>> orderedObjectTypesView = Collections.unmodifiableList(orderedObjectTypes);
 
 	SKLivingShopObjectTypes(LivingShops livingShops) {
 		this.objectTypes = createShopObjectTypes(livingShops);
 	}
 
-	private static Map<? extends @NonNull EntityType, ? extends @NonNull SKLivingShopObjectType<?>> createShopObjectTypes(
+	private static Map<? extends EntityType, ? extends SKLivingShopObjectType<?>> createShopObjectTypes(
 			LivingShops livingShops
 	) {
-		Map<@NonNull EntityType, @NonNull SKLivingShopObjectType<?>> objectTypes = new HashMap<>();
+		Map<EntityType, SKLivingShopObjectType<?>> objectTypes = new HashMap<>();
 		for (EntityType entityType : EntityType.values()) {
 			if (entityType.isAlive() && entityType.isSpawnable()) {
 				objectTypes.put(entityType, createLivingShopObjectType(livingShops, entityType));
@@ -295,7 +294,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	}
 
 	@Override
-	public Collection<? extends @NonNull SKLivingShopObjectType<?>> getAll() {
+	public Collection<? extends SKLivingShopObjectType<?>> getAll() {
 		return orderedObjectTypesView;
 	}
 
@@ -310,7 +309,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	) {
 		assert entityType.isAlive() && entityType.isSpawnable();
 		String identifier = getIdentifier(entityType);
-		List<? extends @NonNull String> aliases = getAliasesFor(entityType);
+		List<? extends String> aliases = getAliasesFor(entityType);
 		String permission = getPermission(entityType);
 
 		SKLivingShopObjectType<?> objectType = null;
@@ -404,7 +403,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			);
 			break;
 		case ZOMBIE:
-			objectType = new SKLivingShopObjectType<@NonNull ZombieShop<@NonNull Zombie>>(
+			objectType = new SKLivingShopObjectType<ZombieShop<Zombie>>(
 					livingShops,
 					entityType,
 					identifier,
@@ -470,7 +469,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			);
 			break;
 		case LLAMA:
-			objectType = new SKLivingShopObjectType<@NonNull LlamaShop<@NonNull Llama>>(
+			objectType = new SKLivingShopObjectType<LlamaShop<Llama>>(
 					livingShops,
 					entityType,
 					identifier,
@@ -481,7 +480,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			);
 			break;
 		case TRADER_LLAMA:
-			objectType = new SKLivingShopObjectType<@NonNull LlamaShop<@NonNull TraderLlama>>(
+			objectType = new SKLivingShopObjectType<LlamaShop<TraderLlama>>(
 					livingShops,
 					entityType,
 					identifier,
@@ -633,7 +632,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		if (objectType == null) {
 			Class<? extends Entity> entityClass = Unsafe.assertNonNull(entityType.getEntityClass());
 			if (ChestedHorse.class.isAssignableFrom(entityClass)) {
-				objectType = new SKLivingShopObjectType<@NonNull ChestedHorseShop<@NonNull ChestedHorse>>(
+				objectType = new SKLivingShopObjectType<ChestedHorseShop<ChestedHorse>>(
 						livingShops,
 						entityType,
 						identifier,
@@ -643,7 +642,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 						ChestedHorseShop::new
 				);
 			} else if (Zombie.class.isAssignableFrom(entityClass)) {
-				objectType = new SKLivingShopObjectType<@NonNull ZombieShop<@NonNull Zombie>>(
+				objectType = new SKLivingShopObjectType<ZombieShop<Zombie>>(
 						livingShops,
 						entityType,
 						identifier,
@@ -653,7 +652,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 						ZombieShop::new
 				);
 			} else if (Ageable.class.isAssignableFrom(entityClass)) {
-				objectType = new SKLivingShopObjectType<@NonNull BabyableShop<@NonNull Ageable>>(
+				objectType = new SKLivingShopObjectType<BabyableShop<Ageable>>(
 						livingShops,
 						entityType,
 						identifier,

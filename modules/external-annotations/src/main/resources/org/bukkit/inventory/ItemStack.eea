@@ -1,0 +1,58 @@
+class org/bukkit/inventory/ItemStack
+<init>
+ (Lorg/bukkit/Material;)V
+ (L1org/bukkit/Material;)V
+<init>
+ (Lorg/bukkit/Material;I)V
+ (L1org/bukkit/Material;I)V
+<init>
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L1org/bukkit/inventory/ItemStack;)V
+addEnchantment
+ (Lorg/bukkit/enchantments/Enchantment;I)V
+ (L1org/bukkit/enchantments/Enchantment;I)V
+addEnchantments
+ (Ljava/util/Map<Lorg/bukkit/enchantments/Enchantment;Ljava/lang/Integer;>;)V
+ (L1java/util/Map<L1org/bukkit/enchantments/Enchantment;L1java/lang/Integer;>;)V
+addUnsafeEnchantment
+ (Lorg/bukkit/enchantments/Enchantment;I)V
+ (L1org/bukkit/enchantments/Enchantment;I)V
+addUnsafeEnchantments
+ (Ljava/util/Map<Lorg/bukkit/enchantments/Enchantment;Ljava/lang/Integer;>;)V
+ (L1java/util/Map<L1org/bukkit/enchantments/Enchantment;L1java/lang/Integer;>;)V
+clone
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L1org/bukkit/inventory/ItemStack;
+containsEnchantment
+ (Lorg/bukkit/enchantments/Enchantment;)Z
+ (L1org/bukkit/enchantments/Enchantment;)Z
+deserialize
+ (Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lorg/bukkit/inventory/ItemStack;
+ (L1java/util/Map<L1java/lang/String;L1java/lang/Object;>;)L1org/bukkit/inventory/ItemStack;
+getEnchantmentLevel
+ (Lorg/bukkit/enchantments/Enchantment;)I
+ (L1org/bukkit/enchantments/Enchantment;)I
+getEnchantments
+ ()Ljava/util/Map<Lorg/bukkit/enchantments/Enchantment;Ljava/lang/Integer;>;
+ ()L1java/util/Map<L1org/bukkit/enchantments/Enchantment;L1java/lang/Integer;>;
+getItemMeta
+ ()Lorg/bukkit/inventory/meta/ItemMeta;
+ ()L0org/bukkit/inventory/meta/ItemMeta;
+getType
+ ()Lorg/bukkit/Material;
+ ()L1org/bukkit/Material;
+isSimilar
+ (Lorg/bukkit/inventory/ItemStack;)Z
+ (L0org/bukkit/inventory/ItemStack;)Z
+removeEnchantment
+ (Lorg/bukkit/enchantments/Enchantment;)I
+ (L1org/bukkit/enchantments/Enchantment;)I
+serialize
+ ()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;
+ ()Ljava/util/Map<L1java/lang/String;L1java/lang/Object;>;
+setItemMeta
+ (Lorg/bukkit/inventory/meta/ItemMeta;)Z
+ (L0org/bukkit/inventory/meta/ItemMeta;)Z
+setType
+ (Lorg/bukkit/Material;)V
+ (L1org/bukkit/Material;)V

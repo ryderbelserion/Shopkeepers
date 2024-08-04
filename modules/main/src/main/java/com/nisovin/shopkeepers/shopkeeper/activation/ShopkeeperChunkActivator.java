@@ -17,7 +17,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -57,8 +56,8 @@ public class ShopkeeperChunkActivator {
 	 */
 	private static final int IMMEDIATE_CHUNK_ACTIVATION_RADIUS = 2;
 
-	private static final Predicate<@NonNull AbstractShopkeeper> SHOPKEEPER_IS_ACTIVE = AbstractShopkeeper::isActive;
-	private static final Predicate<@NonNull AbstractShopkeeper> SHOPKEEPER_IS_INACTIVE = Unsafe.assertNonNull(SHOPKEEPER_IS_ACTIVE.negate());
+	private static final Predicate<AbstractShopkeeper> SHOPKEEPER_IS_ACTIVE = AbstractShopkeeper::isActive;
+	private static final Predicate<AbstractShopkeeper> SHOPKEEPER_IS_INACTIVE = Unsafe.assertNonNull(SHOPKEEPER_IS_ACTIVE.negate());
 
 	private static final Location sharedLocation = new Location(null, 0, 0, 0);
 	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
@@ -69,14 +68,14 @@ public class ShopkeeperChunkActivator {
 	private final ShopkeeperSpawner shopkeeperSpawner;
 	private final ChunkActivationListener listener = new ChunkActivationListener(Unsafe.initialized(this));
 
-	private final Map<@NonNull ChunkCoords, @NonNull ChunkData> chunks = new HashMap<>();
+	private final Map<ChunkCoords, ChunkData> chunks = new HashMap<>();
 
 	private boolean chunkActivationInProgress = false;
 	// This does not consider pending delayed chunk activation tasks, but only tracks actual
 	// activation requests while another chunk activation is in progress. The queue is expected to
 	// usually not contain many elements, so removing elements from the middle of the ArrayDeque
 	// should be sufficiently fast.
-	private final Queue<@NonNull ChunkData> deferredChunkActivations = new ArrayDeque<>();
+	private final Queue<ChunkData> deferredChunkActivations = new ArrayDeque<>();
 
 	private final Timer chunkActivationTimings = new Timer();
 	private int immediateChunkActivationRadius;
@@ -441,7 +440,7 @@ public class ShopkeeperChunkActivator {
 		chunkActivationTimings.start();
 
 		// Get the chunk shopkeepers:
-		Collection<? extends @NonNull AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
+		Collection<? extends AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
 
 		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Activating " + shopkeepers.size() + " shopkeepers in chunk "
@@ -538,7 +537,7 @@ public class ShopkeeperChunkActivator {
 		chunkData.setActive(false);
 
 		// Get the chunk shopkeepers:
-		Collection<? extends @NonNull AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
+		Collection<? extends AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
 
 		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Deactivating " + shopkeepers.size() + " shopkeepers in chunk "
@@ -593,7 +592,7 @@ public class ShopkeeperChunkActivator {
 	// method?
 	public void activateShopkeepersInAllWorlds() {
 		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
-		List<? extends @NonNull World> worlds = Unsafe.castNonNull(Bukkit.getWorlds());
+		List<? extends World> worlds = Unsafe.castNonNull(Bukkit.getWorlds());
 		worlds.forEach(this::activateChunks);
 	}
 
@@ -615,7 +614,7 @@ public class ShopkeeperChunkActivator {
 
 		// We need to iterate over a snapshot of these chunks, because the chunk map can change
 		// during iteration.
-		List<? extends @NonNull ChunkCoords> chunks = new ArrayList<>(
+		List<? extends ChunkCoords> chunks = new ArrayList<>(
 				shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet()
 		);
 
@@ -645,7 +644,7 @@ public class ShopkeeperChunkActivator {
 	// Called by SKShopkeepersPlugin during disable, before the shopkeepers are unloaded.
 	public void deactivateShopkeepersInAllWorlds() {
 		// Deactivate (despawn) shopkeepers in all loaded worlds:
-		List<? extends @NonNull World> worlds = Unsafe.castNonNull(Bukkit.getWorlds());
+		List<? extends World> worlds = Unsafe.castNonNull(Bukkit.getWorlds());
 		worlds.forEach(this::deactivateChunks);
 	}
 
@@ -666,7 +665,7 @@ public class ShopkeeperChunkActivator {
 
 		// We need to iterate over a snapshot of these chunks, because the chunk map can change
 		// during iteration.
-		List<? extends @NonNull ChunkCoords> chunks = new ArrayList<>(
+		List<? extends ChunkCoords> chunks = new ArrayList<>(
 				shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet()
 		);
 

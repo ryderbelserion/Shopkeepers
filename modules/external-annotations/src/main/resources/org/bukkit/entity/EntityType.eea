@@ -1,0 +1,4 @@
+class org/bukkit/entity/EntityType
+getEntityClass
+ ()Ljava/lang/Class<+Lorg/bukkit/entity/Entity;>;
+ ()L0java/lang/Class<+L1org/bukkit/entity/Entity;>;

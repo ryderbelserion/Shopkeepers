@@ -3,8 +3,6 @@ package com.nisovin.shopkeepers.commands.arguments.snapshot;
 import java.util.Arrays;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -13,23 +11,23 @@ import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 
-public class ShopkeeperSnapshotIndexArgument extends CommandArgument<@NonNull Integer> {
+public class ShopkeeperSnapshotIndexArgument extends CommandArgument<Integer> {
 
 	private final ShopkeeperSnapshotIndexByIdArgument snapshotIdArgument;
 	private final ShopkeeperSnapshotIndexByNameArgument snapshotNameArgument;
-	private final TypedFirstOfArgument<@NonNull Integer> firstOfArgument;
+	private final TypedFirstOfArgument<Integer> firstOfArgument;
 	private final boolean inflateFormat;
 
 	public ShopkeeperSnapshotIndexArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument
 	) {
 		this(name, shopkeeperArgument, false);
 	}
 
 	public ShopkeeperSnapshotIndexArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument,
 			boolean joinRemainingArgs
 	) {
 		this(name, shopkeeperArgument, joinRemainingArgs, false);
@@ -37,7 +35,7 @@ public class ShopkeeperSnapshotIndexArgument extends CommandArgument<@NonNull In
 
 	public ShopkeeperSnapshotIndexArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument,
 			boolean joinRemainingArgs,
 			boolean inflateFormat
 	) {
@@ -53,7 +51,7 @@ public class ShopkeeperSnapshotIndexArgument extends CommandArgument<@NonNull In
 
 	public ShopkeeperSnapshotIndexArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument,
 			boolean joinRemainingArgs,
 			boolean inflateFormat,
 			int minimumIdCompletionInput,
@@ -100,7 +98,7 @@ public class ShopkeeperSnapshotIndexArgument extends CommandArgument<@NonNull In
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

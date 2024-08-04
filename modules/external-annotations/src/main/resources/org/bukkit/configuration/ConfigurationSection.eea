@@ -1,0 +1,208 @@
+class org/bukkit/configuration/ConfigurationSection
+addDefault
+ (Ljava/lang/String;Ljava/lang/Object;)V
+ (L1java/lang/String;L0java/lang/Object;)V
+contains
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+contains
+ (Ljava/lang/String;Z)Z
+ (L1java/lang/String;Z)Z
+createSection
+ (Ljava/lang/String;)Lorg/bukkit/configuration/ConfigurationSection;
+ (L1java/lang/String;)L1org/bukkit/configuration/ConfigurationSection;
+createSection
+ (Ljava/lang/String;Ljava/util/Map<**>;)Lorg/bukkit/configuration/ConfigurationSection;
+ (L1java/lang/String;L1java/util/Map<**>;)L1org/bukkit/configuration/ConfigurationSection;
+get
+ (Ljava/lang/String;)Ljava/lang/Object;
+ (L1java/lang/String;)L0java/lang/Object;
+get
+ (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+ (L1java/lang/String;L0java/lang/Object;)L0java/lang/Object;
+getBoolean
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+getBoolean
+ (Ljava/lang/String;Z)Z
+ (L1java/lang/String;Z)Z
+getBooleanList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Boolean;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Boolean;>;
+getByteList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Byte;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Byte;>;
+getCharacterList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Character;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Character;>;
+getColor
+ (Ljava/lang/String;)Lorg/bukkit/Color;
+ (L1java/lang/String;)L0org/bukkit/Color;
+getColor
+ (Ljava/lang/String;Lorg/bukkit/Color;)Lorg/bukkit/Color;
+ (L1java/lang/String;L0org/bukkit/Color;)L0org/bukkit/Color;
+getComments
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;
+ (L1java/lang/String;)L1java/util/List<L0java/lang/String;>;
+getConfigurationSection
+ (Ljava/lang/String;)Lorg/bukkit/configuration/ConfigurationSection;
+ (L1java/lang/String;)L0org/bukkit/configuration/ConfigurationSection;
+getCurrentPath
+ ()Ljava/lang/String;
+ ()L0java/lang/String;
+getDefaultSection
+ ()Lorg/bukkit/configuration/ConfigurationSection;
+ ()L0org/bukkit/configuration/ConfigurationSection;
+getDouble
+ (Ljava/lang/String;)D
+ (L1java/lang/String;)D
+getDouble
+ (Ljava/lang/String;D)D
+ (L1java/lang/String;D)D
+getDoubleList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Double;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Double;>;
+getFloatList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Float;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Float;>;
+getInlineComments
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;
+ (L1java/lang/String;)L1java/util/List<L0java/lang/String;>;
+getInt
+ (Ljava/lang/String;)I
+ (L1java/lang/String;)I
+getInt
+ (Ljava/lang/String;I)I
+ (L1java/lang/String;I)I
+getIntegerList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Integer;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Integer;>;
+getItemStack
+ (Ljava/lang/String;)Lorg/bukkit/inventory/ItemStack;
+ (L1java/lang/String;)L0org/bukkit/inventory/ItemStack;
+getItemStack
+ (Ljava/lang/String;Lorg/bukkit/inventory/ItemStack;)Lorg/bukkit/inventory/ItemStack;
+ (L1java/lang/String;L0org/bukkit/inventory/ItemStack;)L0org/bukkit/inventory/ItemStack;
+getKeys
+ (Z)Ljava/util/Set<Ljava/lang/String;>;
+ (Z)L1java/util/Set<L1java/lang/String;>;
+getList
+ (Ljava/lang/String;)Ljava/util/List<*>;
+ (L1java/lang/String;)L0java/util/List<*>;
+getList
+ (Ljava/lang/String;Ljava/util/List<*>;)Ljava/util/List<*>;
+ (L1java/lang/String;L0java/util/List<*>;)L0java/util/List<*>;
+getLocation
+ (Ljava/lang/String;)Lorg/bukkit/Location;
+ (L1java/lang/String;)L0org/bukkit/Location;
+getLocation
+ (Ljava/lang/String;Lorg/bukkit/Location;)Lorg/bukkit/Location;
+ (L1java/lang/String;L0org/bukkit/Location;)L0org/bukkit/Location;
+getLong
+ (Ljava/lang/String;)J
+ (L1java/lang/String;)J
+getLong
+ (Ljava/lang/String;J)J
+ (L1java/lang/String;J)J
+getLongList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Long;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Long;>;
+getMapList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/util/Map<**>;>;
+ (L1java/lang/String;)L1java/util/List<L1java/util/Map<**>;>;
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getObject
+ <T:Ljava/lang/Object;>(Ljava/lang/String;Ljava/lang/Class<TT;>;)TT;
+ <T:Ljava/lang/Object;>(L1java/lang/String;L1java/lang/Class<TT;>;)T0T;
+getObject
+ <T:Ljava/lang/Object;>(Ljava/lang/String;Ljava/lang/Class<TT;>;TT;)TT;
+ <T:Ljava/lang/Object;>(L1java/lang/String;L1java/lang/Class<TT;>;T0T;)T0T;
+getOfflinePlayer
+ (Ljava/lang/String;)Lorg/bukkit/OfflinePlayer;
+ (L1java/lang/String;)L0org/bukkit/OfflinePlayer;
+getOfflinePlayer
+ (Ljava/lang/String;Lorg/bukkit/OfflinePlayer;)Lorg/bukkit/OfflinePlayer;
+ (L1java/lang/String;L0org/bukkit/OfflinePlayer;)L0org/bukkit/OfflinePlayer;
+getParent
+ ()Lorg/bukkit/configuration/ConfigurationSection;
+ ()L0org/bukkit/configuration/ConfigurationSection;
+getRoot
+ ()Lorg/bukkit/configuration/Configuration;
+ ()L0org/bukkit/configuration/Configuration;
+getSerializable
+ <T::Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>(Ljava/lang/String;Ljava/lang/Class<TT;>;)TT;
+ <T::Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>(L1java/lang/String;L1java/lang/Class<TT;>;)T0T;
+getSerializable
+ <T::Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>(Ljava/lang/String;Ljava/lang/Class<TT;>;TT;)TT;
+ <T::Lorg/bukkit/configuration/serialization/ConfigurationSerializable;>(L1java/lang/String;L1java/lang/Class<TT;>;T0T;)T0T;
+getShortList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/Short;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/Short;>;
+getString
+ (Ljava/lang/String;)Ljava/lang/String;
+ (L1java/lang/String;)L0java/lang/String;
+getString
+ (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ (L1java/lang/String;L0java/lang/String;)L0java/lang/String;
+getStringList
+ (Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;
+ (L1java/lang/String;)L1java/util/List<L1java/lang/String;>;
+getValues
+ (Z)Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;
+ (Z)L1java/util/Map<L1java/lang/String;L1java/lang/Object;>;
+getVector
+ (Ljava/lang/String;)Lorg/bukkit/util/Vector;
+ (L1java/lang/String;)L0org/bukkit/util/Vector;
+getVector
+ (Ljava/lang/String;Lorg/bukkit/util/Vector;)Lorg/bukkit/util/Vector;
+ (L1java/lang/String;L0org/bukkit/util/Vector;)L0org/bukkit/util/Vector;
+isBoolean
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isColor
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isConfigurationSection
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isDouble
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isInt
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isItemStack
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isList
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isLocation
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isLong
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isOfflinePlayer
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isSet
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isString
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isVector
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+set
+ (Ljava/lang/String;Ljava/lang/Object;)V
+ (L1java/lang/String;L0java/lang/Object;)V
+setComments
+ (Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;)V
+ (L1java/lang/String;L0java/util/List<L0java/lang/String;>;)V
+setInlineComments
+ (Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;)V
+ (L1java/lang/String;L0java/util/List<L0java/lang/String;>;)V

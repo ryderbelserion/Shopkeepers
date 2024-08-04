@@ -27,7 +27,7 @@ public final class Log {
 		getLogger().info(message);
 	}
 
-	public static void info(Supplier<String> msgSupplier) {
+	public static void info(Supplier<@Nullable String> msgSupplier) {
 		getLogger().info(msgSupplier);
 	}
 
@@ -35,7 +35,7 @@ public final class Log {
 		getLogger().log(Level.INFO, message, throwable);
 	}
 
-	public static void info(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
+	public static void info(@Nullable Throwable throwable, Supplier<@Nullable String> msgSupplier) {
 		getLogger().log(Level.INFO, throwable, msgSupplier);
 	}
 
@@ -43,7 +43,7 @@ public final class Log {
 		debug(null, message);
 	}
 
-	public static void debug(Supplier<String> msgSupplier) {
+	public static void debug(Supplier<@Nullable String> msgSupplier) {
 		debug((String) null, msgSupplier);
 	}
 
@@ -51,7 +51,7 @@ public final class Log {
 		debug(null, message, throwable);
 	}
 
-	public static void debug(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
+	public static void debug(@Nullable Throwable throwable, Supplier<@Nullable String> msgSupplier) {
 		debug(null, throwable, msgSupplier);
 	}
 
@@ -61,7 +61,7 @@ public final class Log {
 		}
 	}
 
-	public static void debug(@Nullable String debugOption, Supplier<String> msgSupplier) {
+	public static void debug(@Nullable String debugOption, Supplier<@Nullable String> msgSupplier) {
 		if (Debug.isDebugging(debugOption)) {
 			info(msgSupplier);
 		}
@@ -80,7 +80,7 @@ public final class Log {
 	public static void debug(
 			@Nullable String debugOption,
 			@Nullable Throwable throwable,
-			Supplier<String> msgSupplier
+			Supplier<@Nullable String> msgSupplier
 	) {
 		if (Debug.isDebugging(debugOption)) {
 			info(throwable, msgSupplier);
@@ -91,7 +91,7 @@ public final class Log {
 		getLogger().warning(message);
 	}
 
-	public static void warning(Supplier<String> msgSupplier) {
+	public static void warning(Supplier<@Nullable String> msgSupplier) {
 		getLogger().warning(msgSupplier);
 	}
 
@@ -99,7 +99,7 @@ public final class Log {
 		getLogger().log(Level.WARNING, message, throwable);
 	}
 
-	public static void warning(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
+	public static void warning(@Nullable Throwable throwable, Supplier<@Nullable String> msgSupplier) {
 		getLogger().log(Level.WARNING, throwable, msgSupplier);
 	}
 
@@ -107,7 +107,7 @@ public final class Log {
 		getLogger().severe(message);
 	}
 
-	public static void severe(Supplier<String> msgSupplier) {
+	public static void severe(Supplier<@Nullable String> msgSupplier) {
 		getLogger().severe(msgSupplier);
 	}
 
@@ -115,7 +115,7 @@ public final class Log {
 		getLogger().log(Level.SEVERE, message, throwable);
 	}
 
-	public static void severe(@Nullable Throwable throwable, Supplier<String> msgSupplier) {
+	public static void severe(@Nullable Throwable throwable, Supplier<@Nullable String> msgSupplier) {
 		getLogger().log(Level.SEVERE, throwable, msgSupplier);
 	}
 

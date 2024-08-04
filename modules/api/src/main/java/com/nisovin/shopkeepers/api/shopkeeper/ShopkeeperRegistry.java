@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -32,9 +31,8 @@ public interface ShopkeeperRegistry {
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be created
 	 */
-	public Shopkeeper createShopkeeper(
-			ShopCreationData creationData
-	) throws ShopkeeperCreateException;
+	public Shopkeeper createShopkeeper(ShopCreationData creationData)
+			throws ShopkeeperCreateException;
 
 	// QUERYING
 
@@ -43,14 +41,14 @@ public interface ShopkeeperRegistry {
 	 * 
 	 * @return an unmodifiable view on all shopkeepers
 	 */
-	public Collection<? extends @NonNull Shopkeeper> getAllShopkeepers();
+	public Collection<? extends Shopkeeper> getAllShopkeepers();
 
 	/**
 	 * Gets all {@link Shopkeeper#isVirtual() virtual} shopkeepers.
 	 * 
 	 * @return an unmodifiable view on the virtual shopkeepers
 	 */
-	public Collection<? extends @NonNull Shopkeeper> getVirtualShopkeepers();
+	public Collection<? extends Shopkeeper> getVirtualShopkeepers();
 
 	/**
 	 * Gets the shopkeeper by its {@link Shopkeeper#getUniqueId() unique id}.
@@ -77,7 +75,7 @@ public interface ShopkeeperRegistry {
 	 * 
 	 * @return an unmodifiable view on all shopkeepers
 	 */
-	public Collection<? extends @NonNull PlayerShopkeeper> getAllPlayerShopkeepers();
+	public Collection<? extends PlayerShopkeeper> getAllPlayerShopkeepers();
 
 	/**
 	 * Gets the player shopkeepers owned by the specified player.
@@ -86,9 +84,7 @@ public interface ShopkeeperRegistry {
 	 *            the owner uuid
 	 * @return an unmodifiable view on the player shopkeepers
 	 */
-	public Collection<? extends @NonNull PlayerShopkeeper> getPlayerShopkeepersByOwner(
-			UUID ownerUUID
-	);
+	public Collection<? extends PlayerShopkeeper> getPlayerShopkeepersByOwner(UUID ownerUUID);
 
 	// BY NAME
 
@@ -106,7 +102,7 @@ public interface ShopkeeperRegistry {
 	 *            the shop name
 	 * @return a stream over the matching shopkeepers
 	 */
-	public Stream<? extends @NonNull Shopkeeper> getShopkeepersByName(String shopName);
+	public Stream<? extends Shopkeeper> getShopkeepersByName(String shopName);
 
 	/**
 	 * Searches for shopkeepers whose names start with the specified prefix.
@@ -122,7 +118,7 @@ public interface ShopkeeperRegistry {
 	 *            the shop name prefix
 	 * @return a stream over the matching shopkeepers
 	 */
-	public Stream<? extends @NonNull Shopkeeper> getShopkeepersByNamePrefix(String shopNamePrefix);
+	public Stream<? extends Shopkeeper> getShopkeepersByNamePrefix(String shopNamePrefix);
 
 	// BY WORLD
 
@@ -131,7 +127,7 @@ public interface ShopkeeperRegistry {
 	 * 
 	 * @return an unmodifiable view on the world names
 	 */
-	public Collection<? extends @NonNull String> getWorldsWithShopkeepers();
+	public Collection<? extends String> getWorldsWithShopkeepers();
 
 	/**
 	 * Gets all shopkeepers in the specified world.
@@ -140,7 +136,7 @@ public interface ShopkeeperRegistry {
 	 *            the world name
 	 * @return an unmodifiable view on the shopkeepers, may be empty
 	 */
-	public Collection<? extends @NonNull Shopkeeper> getShopkeepersInWorld(String worldName);
+	public Collection<? extends Shopkeeper> getShopkeepersInWorld(String worldName);
 
 	/**
 	 * Gets all shopkeepers in the specified world grouped by the chunks they are in.
@@ -149,7 +145,7 @@ public interface ShopkeeperRegistry {
 	 *            the world name
 	 * @return an unmodifiable view on the shopkeepers grouped by chunks
 	 */
-	public Map<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> getShopkeepersByChunks(
+	public Map<? extends ChunkCoords, ? extends Collection<? extends Shopkeeper>> getShopkeepersByChunks(
 			String worldName
 	);
 
@@ -169,7 +165,7 @@ public interface ShopkeeperRegistry {
 	 *            the world name
 	 * @return an unmodifiable view on the active chunks
 	 */
-	public Collection<? extends @NonNull ChunkCoords> getActiveChunks(String worldName);
+	public Collection<? extends ChunkCoords> getActiveChunks(String worldName);
 
 	/**
 	 * Checks if the specified chunk is active.
@@ -198,7 +194,7 @@ public interface ShopkeeperRegistry {
 	 * 
 	 * @return an unmodifiable view on the active shopkeepers
 	 */
-	public Collection<? extends @NonNull Shopkeeper> getActiveShopkeepers();
+	public Collection<? extends Shopkeeper> getActiveShopkeepers();
 
 	/**
 	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks} in the
@@ -220,7 +216,7 @@ public interface ShopkeeperRegistry {
 	 *            the world name
 	 * @return an unmodifiable view on the active shopkeepers
 	 */
-	public Collection<? extends @NonNull Shopkeeper> getActiveShopkeepers(String worldName);
+	public Collection<? extends Shopkeeper> getActiveShopkeepers(String worldName);
 
 	// BY CHUNK
 
@@ -231,7 +227,7 @@ public interface ShopkeeperRegistry {
 	 *            the chunk
 	 * @return an unmodifiable view on the shopkeepers, may be empty
 	 */
-	public Collection<? extends @NonNull Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
+	public Collection<? extends Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
 
 	// BY LOCATION
 
@@ -244,7 +240,7 @@ public interface ShopkeeperRegistry {
 	 */
 	// TODO Replace with getShopkeeperAtLocation? We already prevent players from creating more than
 	// a single shopkeeper at the same location.
-	public Collection<? extends @NonNull Shopkeeper> getShopkeepersAtLocation(Location location);
+	public Collection<? extends Shopkeeper> getShopkeepersAtLocation(Location location);
 
 	// BY SHOP OBJECT
 

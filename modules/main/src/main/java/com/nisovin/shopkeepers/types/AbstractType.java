@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.types.Type;
@@ -27,7 +26,7 @@ public abstract class AbstractType implements Type {
 	 */
 	protected final String identifier; // Not null or empty
 	// Unmodifiable, not null, can be empty, normalized:
-	protected final List<? extends @NonNull String> aliases;
+	protected final List<? extends String> aliases;
 	protected final @Nullable String permission; // Can be null
 
 	protected AbstractType(String identifier, @Nullable String permission) {
@@ -36,7 +35,7 @@ public abstract class AbstractType implements Type {
 
 	protected AbstractType(
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			@Nullable String permission
 	) {
 		this.identifier = StringUtils.normalize(identifier);
@@ -45,7 +44,7 @@ public abstract class AbstractType implements Type {
 		if (aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
-			List<@NonNull String> normalizedAliases = new ArrayList<>(aliases.size());
+			List<String> normalizedAliases = new ArrayList<>(aliases.size());
 			for (String alias : aliases) {
 				Validate.notEmpty(alias, "aliases contains null or empty alias");
 				normalizedAliases.add(StringUtils.normalize(alias));
@@ -61,7 +60,7 @@ public abstract class AbstractType implements Type {
 	}
 
 	@Override
-	public Collection<? extends @NonNull String> getAliases() {
+	public Collection<? extends String> getAliases() {
 		return aliases;
 	}
 

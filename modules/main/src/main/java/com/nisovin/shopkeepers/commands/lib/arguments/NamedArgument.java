@@ -3,9 +3,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -99,7 +96,7 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 
 		// Strip the naming prefix from the input argument:
 		String namelessArg = arg.substring(argPrefix.length());
-		List<@NonNull String> adjustedArgs = new ArrayList<>(input.getArguments());
+		List<String> adjustedArgs = new ArrayList<>(input.getArguments());
 		for (int i = 0; i < adjustedArgs.size(); ++i) {
 			if (adjustedArgs.get(i).equals(arg)) {
 				adjustedArgs.set(i, namelessArg);
@@ -148,7 +145,7 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -162,15 +159,15 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 		// Prefix might be partially given:
 		String prefix = (argPrefix.startsWith(arg) ? arg : argPrefix);
 		try {
-			List<? extends @NonNull String> suggestions = this.<List<? extends @NonNull String>>parseNamedArgument(
+			List<? extends String> suggestions = this.<List<? extends String>>parseNamedArgument(
 					input, argsReader, prefix,
 					(adjustedInput, adjustedArgsReader) -> {
 						return argument.complete(adjustedInput, context, adjustedArgsReader);
 					}
 			);
 			return suggestions.stream()
-					.<@NonNull String>map(suggestion -> argPrefix + suggestion)
-					.collect(Collectors.toList());
+					.<String>map(suggestion -> argPrefix + suggestion)
+					.toList();
 		} catch (ArgumentParseException e) {
 			return Collections.emptyList();
 		}

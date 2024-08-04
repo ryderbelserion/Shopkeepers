@@ -5,7 +5,6 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -14,9 +13,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 
 // TODO Not yet used.
-public final class SKVirtualShopObjectType
-		extends AbstractShopObjectType<@NonNull SKVirtualShopObject>
-		implements VirtualShopObjectType<@NonNull SKVirtualShopObject> {
+public final class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirtualShopObject>
+		implements VirtualShopObjectType<SKVirtualShopObject> {
 
 	private final VirtualShops virtualShops;
 

@@ -22,7 +22,7 @@ public class TranslatableText extends TextBuilder {
 	private final String translationKey; // Not null or empty
 	// Only contains already built Texts.
 	// Not null, can be empty, unmodifiable view.
-	private List<? extends @NonNull Text> translationArguments = Collections.emptyList();
+	private List<? extends Text> translationArguments = Collections.emptyList();
 
 	TranslatableText(String translationKey) {
 		Validate.notEmpty(translationKey, "translationKey is null or empty");
@@ -46,7 +46,7 @@ public class TranslatableText extends TextBuilder {
 	 * @return an unmodifiable view on the translation arguments, not <code>null</code>, can be
 	 *         empty
 	 */
-	public List<? extends @NonNull Text> getTranslationArguments() {
+	public List<? extends Text> getTranslationArguments() {
 		return translationArguments;
 	}
 
@@ -69,7 +69,7 @@ public class TranslatableText extends TextBuilder {
 		if (translationArguments.isEmpty()) {
 			this.translationArguments = Collections.emptyList(); // Resetting is always allowed
 		} else {
-			List<@NonNull Text> translationTextArguments = new ArrayList<>(translationArguments.size());
+			List<Text> translationTextArguments = new ArrayList<>(translationArguments.size());
 			translationArguments.forEach(argument -> {
 				Validate.notNull(argument, "translationArguments contains null");
 				Validate.isTrue(argument != this, "translationArguments contains this Text itself");
@@ -122,15 +122,13 @@ public class TranslatableText extends TextBuilder {
 		}
 	}
 
-	private static List<? extends @NonNull Text> copyAll(
-			Collection<? extends @NonNull Text> toCopy
-	) {
+	private static List<? extends Text> copyAll(Collection<? extends Text> toCopy) {
 		assert toCopy != null;
 		if (toCopy.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		List<@NonNull Text> copies = new ArrayList<>(toCopy.size());
+		List<Text> copies = new ArrayList<>(toCopy.size());
 		toCopy.forEach(text -> {
 			copies.add(text.copy());
 		});

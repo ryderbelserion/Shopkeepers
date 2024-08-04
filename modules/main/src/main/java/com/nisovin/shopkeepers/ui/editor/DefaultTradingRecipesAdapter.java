@@ -35,7 +35,7 @@ public abstract class DefaultTradingRecipesAdapter<@NonNull O> implements Tradin
 	 * offers returned by {@link #getOffers()}.
 	 */
 	@Override
-	public abstract List<@NonNull TradingRecipeDraft> getTradingRecipes();
+	public abstract List<TradingRecipeDraft> getTradingRecipes();
 
 	// TODO Maybe keep track of which TradingRecipeDrafts have actually been edited (i.e. clicked at
 	// in the editor or marked as 'dirty' by some other mean), and then avoid creating offers and
@@ -50,10 +50,7 @@ public abstract class DefaultTradingRecipesAdapter<@NonNull O> implements Tradin
 	 * are then ignored.
 	 */
 	@Override
-	public int updateTradingRecipes(
-			Player player,
-			List<? extends @NonNull TradingRecipeDraft> recipes
-	) {
+	public int updateTradingRecipes(Player player, List<? extends TradingRecipeDraft> recipes) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(recipes, "recipes is null");
 		assert this.getOffers() != null && !CollectionUtils.containsNull(this.getOffers());

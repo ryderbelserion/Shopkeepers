@@ -1,0 +1,7 @@
+class org/bukkit/event/Event
+getEventName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getHandlers
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;

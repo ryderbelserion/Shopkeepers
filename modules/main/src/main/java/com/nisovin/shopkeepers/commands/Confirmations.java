@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.lang.Messages;
@@ -41,7 +40,7 @@ public class Confirmations {
 	private final Plugin plugin;
 	// The type of key that is used to track pending confirmations depends on the type of
 	// CommandSender.
-	private final Map<@NonNull Object, @NonNull PendingConfirmation> pendingConfirmations = new HashMap<>();
+	private final Map<Object, PendingConfirmation> pendingConfirmations = new HashMap<>();
 
 	public Confirmations(Plugin plugin) {
 		this.plugin = plugin;

@@ -3,8 +3,6 @@ package com.nisovin.shopkeepers.commands.lib.commands;
 import java.util.Collections;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -23,7 +21,7 @@ public class HelpCommand extends Command {
 		this(name, Collections.emptyList(), helpSource);
 	}
 
-	public HelpCommand(String name, List<@NonNull String> aliases, Command helpSource) {
+	public HelpCommand(String name, List<String> aliases, Command helpSource) {
 		super(name, aliases);
 		Validate.notNull(helpSource, "helpSource is null");
 		this.helpSource = helpSource;

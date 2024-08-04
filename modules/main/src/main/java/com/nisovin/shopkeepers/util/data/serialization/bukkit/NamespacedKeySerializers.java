@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util.data.serialization.bukkit;
 
 import org.bukkit.NamespacedKey;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
@@ -15,7 +14,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class NamespacedKeySerializers {
 
-	private static abstract class NamespacedKeySerializer implements DataSerializer<@NonNull NamespacedKey> {
+	private static abstract class NamespacedKeySerializer implements DataSerializer<NamespacedKey> {
 
 		@Override
 		public @Nullable Object serialize(NamespacedKey value) {
@@ -27,7 +26,7 @@ public final class NamespacedKeySerializers {
 	/**
 	 * A {@link DataSerializer} for {@link NamespacedKey} values.
 	 */
-	public static final DataSerializer<@NonNull NamespacedKey> DEFAULT = new NamespacedKeySerializer() {
+	public static final DataSerializer<NamespacedKey> DEFAULT = new NamespacedKeySerializer() {
 		@Override
 		public NamespacedKey deserialize(Object data) throws InvalidDataException {
 			String keyString = StringSerializers.STRICT.deserialize(data);

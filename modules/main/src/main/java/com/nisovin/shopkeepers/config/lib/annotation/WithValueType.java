@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 
 /**
@@ -18,5 +16,5 @@ import com.nisovin.shopkeepers.config.lib.value.ValueType;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface WithValueType {
 
-	Class<? extends @NonNull ValueType<?>> value();
+	Class<? extends ValueType<?>> value();
 }

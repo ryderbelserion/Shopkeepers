@@ -16,7 +16,6 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -114,18 +113,18 @@ class ContainerProtectionListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		List<Block> blockList = event.blockList();
 		this.removeProtectedChests(blockList);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		List<Block> blockList = event.blockList();
 		this.removeProtectedChests(blockList);
 	}
 
 	// Block list has to be modifiable.
-	private void removeProtectedChests(List<? extends @NonNull Block> blockList) {
+	private void removeProtectedChests(List<? extends Block> blockList) {
 		blockList.removeIf(protectedContainers::isProtectedContainer);
 	}
 }

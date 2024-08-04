@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -16,7 +15,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class SKUser implements User {
 
-	private static final Map<@NonNull UUID, @NonNull User> cache = new LRUCache<>(100);
+	private static final Map<UUID, User> cache = new LRUCache<>(100);
 
 	/**
 	 * Gets a {@link User} with the specified unique id and last known name.

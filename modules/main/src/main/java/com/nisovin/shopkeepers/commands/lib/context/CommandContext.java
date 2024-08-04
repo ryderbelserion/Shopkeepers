@@ -91,7 +91,7 @@ public interface CommandContext {
 	 * 
 	 * @return an unmodifiable map view on the contents of this command context
 	 */
-	public Map<? extends @NonNull String, @NonNull ?> getMapView();
+	public Map<? extends String, @NonNull ?> getMapView();
 
 	/**
 	 * Gets an unmodifiable view on this command context.

@@ -25,7 +25,7 @@ abstract class ProxyHandler<@NonNull T> implements InvocationHandler {
 		Object handle(@NonNull T proxy, @Nullable Object @Nullable [] args);
 	}
 
-	private final Map<@NonNull Method, @NonNull MethodHandler<@NonNull T>> methodHandlers = new HashMap<>();
+	private final Map<Method, MethodHandler<@NonNull T>> methodHandlers = new HashMap<>();
 	private final Class<@NonNull T> proxiedInterface;
 
 	public ProxyHandler(Class<@NonNull T> proxiedInterface) {
@@ -53,7 +53,6 @@ abstract class ProxyHandler<@NonNull T> implements InvocationHandler {
 		));
 	}
 
-	@SuppressWarnings("override.return")
 	@Override
 	public final @Nullable Object invoke(
 			Object proxy,

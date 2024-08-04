@@ -1,0 +1,13 @@
+class org/bukkit/command/CommandSender$Spigot
+sendMessage
+ (Ljava/util/UUID;Lnet/md_5/bungee/api/chat/BaseComponent;)V
+ (L0java/util/UUID;L1net/md_5/bungee/api/chat/BaseComponent;)V
+sendMessage
+ (Ljava/util/UUID;[Lnet/md_5/bungee/api/chat/BaseComponent;)V
+ (L0java/util/UUID;[L1net/md_5/bungee/api/chat/BaseComponent;)V
+sendMessage
+ (Lnet/md_5/bungee/api/chat/BaseComponent;)V
+ (L1net/md_5/bungee/api/chat/BaseComponent;)V
+sendMessage
+ ([Lnet/md_5/bungee/api/chat/BaseComponent;)V
+ ([L1net/md_5/bungee/api/chat/BaseComponent;)V

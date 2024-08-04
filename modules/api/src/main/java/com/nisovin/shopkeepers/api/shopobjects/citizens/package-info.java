@@ -1,5 +1,5 @@
 /**
  * Classes related to Citizens NPC-based shop objects.
  */
-@com.nisovin.shopkeepers.api.internal.util.annotations.NonNullByDefault
+@org.eclipse.jdt.annotation.NonNullByDefault
 package com.nisovin.shopkeepers.api.shopobjects.citizens;

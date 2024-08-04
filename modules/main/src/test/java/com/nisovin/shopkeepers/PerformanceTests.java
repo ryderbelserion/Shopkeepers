@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -168,7 +167,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		Material type = itemStack.getType();
 		ItemMeta itemMeta = Unsafe.assertNonNull(itemStack.getItemMeta());
 		String displayName = itemMeta.getDisplayName();
-		List<? extends @NonNull String> lore = Unsafe.castNonNull(itemMeta.getLore());
+		List<? extends String> lore = Unsafe.castNonNull(itemMeta.getLore());
 		CraftItemStack craftItemStack = CraftItemStack.asCraftCopy(itemStack);
 		NBTTagCompound tag = Unsafe.assertNonNull(CraftItemStack.asNMSCopy(itemStack).getTag());
 		NBTTagCompound tagCopy = tag.clone();

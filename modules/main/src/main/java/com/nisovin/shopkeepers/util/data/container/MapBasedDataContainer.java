@@ -20,9 +20,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class MapBasedDataContainer extends AbstractDataContainer {
 
-	private final Map<@NonNull String, @NonNull Object> dataMap;
-	private @Nullable Set<? extends @NonNull String> keysView = null; // Lazily set up
-	private @Nullable Map<? extends @NonNull String, @NonNull ?> mapView = null; // Lazily set up
+	private final Map<String, Object> dataMap;
+	private @Nullable Set<? extends String> keysView = null; // Lazily set up
+	private @Nullable Map<? extends String, @NonNull ?> mapView = null; // Lazily set up
 
 	/**
 	 * Creates a new {@link MapBasedDataContainer}.
@@ -40,7 +40,7 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	 * @param dataMap
 	 *            the underlying data map, not <code>null</code>
 	 */
-	public MapBasedDataContainer(Map<@NonNull String, @NonNull Object> dataMap) {
+	public MapBasedDataContainer(Map<String, Object> dataMap) {
 		Validate.notNull(dataMap, "dataMap is null");
 		this.dataMap = dataMap;
 	}
@@ -78,7 +78,7 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<? extends @NonNull String> getKeys() {
+	public Set<? extends String> getKeys() {
 		if (keysView == null) {
 			keysView = Collections.unmodifiableSet(dataMap.keySet());
 		}
@@ -87,7 +87,7 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getValues() {
+	public Map<? extends String, @NonNull ?> getValues() {
 		if (mapView == null) {
 			mapView = Collections.unmodifiableMap(dataMap);
 		}
@@ -96,7 +96,7 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
+	public Map<String, Object> getValuesCopy() {
 		return new LinkedHashMap<>(dataMap);
 	}
 

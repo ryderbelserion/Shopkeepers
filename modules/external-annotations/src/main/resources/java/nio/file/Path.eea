@@ -1,0 +1,19 @@
+class java/nio/file/Path
+relativize
+ (Ljava/nio/file/Path;)Ljava/nio/file/Path;
+ (L1java/nio/file/Path;)L1java/nio/file/Path;
+resolve
+ (Ljava/lang/String;)Ljava/nio/file/Path;
+ (L1java/lang/String;)L1java/nio/file/Path;
+resolve
+ (Ljava/nio/file/Path;)Ljava/nio/file/Path;
+ (L1java/nio/file/Path;)L1java/nio/file/Path;
+resolveSibling
+ (Ljava/lang/String;)Ljava/nio/file/Path;
+ (L1java/lang/String;)L1java/nio/file/Path;
+resolveSibling
+ (Ljava/nio/file/Path;)Ljava/nio/file/Path;
+ (L1java/nio/file/Path;)L1java/nio/file/Path;
+toFile
+ ()Ljava/io/File;
+ ()L1java/io/File;

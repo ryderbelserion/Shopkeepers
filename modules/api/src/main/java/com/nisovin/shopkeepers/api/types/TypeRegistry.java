@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <T>
  *            the type of {@link Type} that is managed by this registry
  */
-public interface TypeRegistry<T extends @NonNull Type> {
+public interface TypeRegistry<T extends Type> {
 
 	/**
 	 * Registers the given {@link Type}.

@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util.yaml;
 
 import org.bukkit.configuration.file.YamlConstructor;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
@@ -15,8 +14,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class YamlUtils {
 
 	// Compact (single line) Yaml formatting:
-	@SuppressWarnings("nullness:type.argument")
-	private static final ThreadLocal<@NonNull Yaml> YAML_COMPACT = ThreadLocal.withInitial(() -> {
+	private static final ThreadLocal<Yaml> YAML_COMPACT = ThreadLocal.withInitial(() -> {
 		DumperOptions yamlDumperOptions = new DumperOptions();
 		yamlDumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
 		yamlDumperOptions.setDefaultScalarStyle(ScalarStyle.PLAIN);

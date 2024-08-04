@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -27,20 +26,20 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class MooshroomShop extends BabyableShop<@NonNull MushroomCow> {
+public class MooshroomShop extends BabyableShop<MushroomCow> {
 
-	public static final Property<MushroomCow.@NonNull Variant> VARIANT = new BasicProperty<MushroomCow.@NonNull Variant>()
+	public static final Property<MushroomCow.Variant> VARIANT = new BasicProperty<MushroomCow.Variant>()
 			.dataKeyAccessor("variant", EnumSerializers.lenient(MushroomCow.Variant.class))
 			.defaultValue(MushroomCow.Variant.RED)
 			.build();
 
-	private final PropertyValue<MushroomCow.@NonNull Variant> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<MushroomCow.Variant> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
 	public MooshroomShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull MooshroomShop> livingObjectType,
+			SKLivingShopObjectType<MooshroomShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -66,8 +65,8 @@ public class MooshroomShop extends BabyableShop<@NonNull MushroomCow> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
@@ -91,6 +90,7 @@ public class MooshroomShop extends BabyableShop<@NonNull MushroomCow> {
 	private void applyVariant() {
 		MushroomCow entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setVariant(this.getVariant());
 	}
 

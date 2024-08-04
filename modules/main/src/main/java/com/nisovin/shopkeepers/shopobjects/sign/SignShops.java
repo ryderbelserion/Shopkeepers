@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.block.Sign;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -36,7 +35,7 @@ final class SignShops {
 	private static void updatePlayerShopSign(Sign sign, PlayerShopkeeper shop) {
 		ShopObject shopObject = shop.getShopObject();
 
-		Map<@NonNull String, @NonNull Object> arguments = new HashMap<>();
+		Map<String, Object> arguments = new HashMap<>();
 		// Not null, can be empty:
 		arguments.put("shopName", Unsafe.assertNonNull(shopObject.prepareName(shop.getName())));
 		arguments.put("owner", shop.getOwnerName());  // Not null, can be empty
@@ -53,7 +52,7 @@ final class SignShops {
 	private static void updateAdminShopSign(Sign sign, AdminShopkeeper shop) {
 		ShopObject shopObject = shop.getShopObject();
 
-		Map<@NonNull String, @NonNull Object> arguments = new HashMap<>();
+		Map<String, Object> arguments = new HashMap<>();
 		// Not null, can be empty:
 		arguments.put("shopName", Unsafe.assertNonNull(shopObject.prepareName(shop.getName())));
 

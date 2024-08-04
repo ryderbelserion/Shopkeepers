@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -146,7 +145,7 @@ public class ShopkeeperMoving {
 
 	public void abortMoving(Player player) {
 		Validate.notNull(player, "player is null");
-		InputRequest<@NonNull Event> request = interactionInput.getRequest(player);
+		InputRequest<Event> request = interactionInput.getRequest(player);
 		if (request instanceof ShopkeeperLocationRequest) {
 			interactionInput.abortRequest(player, request);
 		}

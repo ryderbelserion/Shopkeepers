@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -23,7 +22,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 class WorldSaveDespawner {
 
-	private static final Predicate<@NonNull AbstractShopkeeper> IS_DESPAWNED_DURING_WORLD_SAVE = (shopkeeper) -> {
+	private static final Predicate<AbstractShopkeeper> IS_DESPAWNED_DURING_WORLD_SAVE = (shopkeeper) -> {
 		AbstractShopObjectType<?> objectType = shopkeeper.getShopObject().getType();
 		return objectType.mustDespawnDuringWorldSave();
 	};

@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.testutil;
 
 import java.util.logging.Logger;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
@@ -14,7 +12,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
 /**
  * Mocks the Shopkeepers plugin functionality that is required during tests.
  */
-class ShopkeepersPluginMock extends ProxyHandler<@NonNull InternalShopkeepersPlugin> {
+class ShopkeepersPluginMock extends ProxyHandler<InternalShopkeepersPlugin> {
 
 	// Static initializer: Ensures that this is only setup once across all tests.
 	static {

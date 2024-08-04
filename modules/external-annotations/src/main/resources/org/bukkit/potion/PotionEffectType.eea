@@ -1,0 +1,127 @@
+class org/bukkit/potion/PotionEffectType
+ABSORPTION
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+BAD_OMEN
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+BLINDNESS
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+CONDUIT_POWER
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+DARKNESS
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+DOLPHINS_GRACE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+FIRE_RESISTANCE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+GLOWING
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+HASTE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+HEALTH_BOOST
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+HERO_OF_THE_VILLAGE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+HUNGER
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+INFESTED
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+INSTANT_DAMAGE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+INSTANT_HEALTH
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+INVISIBILITY
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+JUMP_BOOST
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+LEVITATION
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+LUCK
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+MINING_FATIGUE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+NAUSEA
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+NIGHT_VISION
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+OOZING
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+POISON
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+RAID_OMEN
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+REGENERATION
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+RESISTANCE
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+SATURATION
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+SLOWNESS
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+SLOW_FALLING
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+SPEED
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+STRENGTH
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+TRIAL_OMEN
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+UNLUCK
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+WATER_BREATHING
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+WEAKNESS
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+WEAVING
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+WIND_CHARGED
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+WITHER
+ Lorg/bukkit/potion/PotionEffectType;
+ L1org/bukkit/potion/PotionEffectType;
+createEffect
+ (II)Lorg/bukkit/potion/PotionEffect;
+ (II)L1org/bukkit/potion/PotionEffect;
+getCategory
+ ()Lorg/bukkit/potion/PotionEffectTypeCategory;
+ ()L1org/bukkit/potion/PotionEffectTypeCategory;
+getColor
+ ()Lorg/bukkit/Color;
+ ()L1org/bukkit/Color;

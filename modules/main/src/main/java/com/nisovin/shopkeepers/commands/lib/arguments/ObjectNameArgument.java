@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -13,7 +11,7 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
  * {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} to provide
  * completions for partial inputs.
  */
-public abstract class ObjectNameArgument extends ObjectIdArgument<@NonNull String> {
+public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 0;
 
@@ -21,14 +19,14 @@ public abstract class ObjectNameArgument extends ObjectIdArgument<@NonNull Strin
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ObjectNameArgument(String name, ArgumentFilter<? super @NonNull String> filter) {
+	public ObjectNameArgument(String name, ArgumentFilter<? super String> filter) {
 		this(name, false, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ObjectNameArgument(
 			String name,
 			boolean joinRemainingArgs,
-			ArgumentFilter<? super @NonNull String> filter,
+			ArgumentFilter<? super String> filter,
 			int minimumCompletionInput
 	) {
 		super(

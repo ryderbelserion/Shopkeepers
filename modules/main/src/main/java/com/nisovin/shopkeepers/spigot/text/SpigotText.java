@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -203,7 +202,7 @@ public final class SpigotText {
 				assert translationKey != null;
 
 				// Convert translation arguments:
-				List<? extends @NonNull Text> translationArgs = translatableText.getTranslationArguments();
+				List<? extends Text> translationArgs = translatableText.getTranslationArguments();
 				assert translationArgs != null;
 				Object[] spigotTranslationArgs = new Object[translationArgs.size()];
 				for (int i = 0; i < translationArgs.size(); ++i) {
@@ -252,7 +251,7 @@ public final class SpigotText {
 
 		private static boolean hasExtra(BaseComponent component) {
 			assert component != null;
-			List<BaseComponent> extra = component.getExtra();
+			@Nullable List<BaseComponent> extra = Unsafe.cast(component.getExtra());
 			return (extra != null && !extra.isEmpty());
 		}
 

@@ -1,0 +1,31 @@
+class org/bukkit/inventory/MerchantRecipe
+<init>
+ (Lorg/bukkit/inventory/ItemStack;I)V
+ (L1org/bukkit/inventory/ItemStack;I)V
+<init>
+ (Lorg/bukkit/inventory/ItemStack;IIZ)V
+ (L1org/bukkit/inventory/ItemStack;IIZ)V
+<init>
+ (Lorg/bukkit/inventory/ItemStack;IIZIF)V
+ (L1org/bukkit/inventory/ItemStack;IIZIF)V
+<init>
+ (Lorg/bukkit/inventory/ItemStack;IIZIFII)V
+ (L1org/bukkit/inventory/ItemStack;IIZIFII)V
+addIngredient
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L1org/bukkit/inventory/ItemStack;)V
+adjust
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L0org/bukkit/inventory/ItemStack;)V
+getAdjustedIngredient1
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L0org/bukkit/inventory/ItemStack;
+getIngredients
+ ()Ljava/util/List<Lorg/bukkit/inventory/ItemStack;>;
+ ()L1java/util/List<L1org/bukkit/inventory/ItemStack;>;
+getResult
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L1org/bukkit/inventory/ItemStack;
+setIngredients
+ (Ljava/util/List<Lorg/bukkit/inventory/ItemStack;>;)V
+ (L1java/util/List<L1org/bukkit/inventory/ItemStack;>;)V

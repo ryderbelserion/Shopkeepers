@@ -1,0 +1,4 @@
+class org/bukkit/attribute/Attributable
+getAttribute
+ (Lorg/bukkit/attribute/Attribute;)Lorg/bukkit/attribute/AttributeInstance;
+ (L1org/bukkit/attribute/Attribute;)L0org/bukkit/attribute/AttributeInstance;

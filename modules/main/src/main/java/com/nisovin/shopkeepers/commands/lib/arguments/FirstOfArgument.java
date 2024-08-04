@@ -35,17 +35,17 @@ public class FirstOfArgument
 
 	public static final String FORMAT_DELIMITER = "|";
 
-	private final List<@NonNull CommandArgument<?>> arguments;
+	private final List<CommandArgument<?>> arguments;
 	// Null if the default (parent) reduced format shall be used:
 	private final @Nullable String reducedFormat;
 
-	public FirstOfArgument(String name, List<? extends @NonNull CommandArgument<?>> arguments) {
+	public FirstOfArgument(String name, List<? extends CommandArgument<?>> arguments) {
 		this(name, arguments, true, false);
 	}
 
 	public FirstOfArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<?>> arguments,
+			List<? extends CommandArgument<?>> arguments,
 			boolean joinFormats
 	) {
 		this(name, arguments, joinFormats, false);
@@ -53,7 +53,7 @@ public class FirstOfArgument
 
 	public FirstOfArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<?>> arguments,
+			List<? extends CommandArgument<?>> arguments,
 			boolean joinFormats,
 			boolean reverseFormat
 	) {
@@ -62,7 +62,7 @@ public class FirstOfArgument
 		// Arguments:
 		Validate.notNull(arguments, "arguments is null");
 		Validate.isTrue(!arguments.isEmpty(), "arguments is empty");
-		List<@NonNull CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
+		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
 			Validate.notNull(argument, "arguments contains null");
@@ -75,7 +75,7 @@ public class FirstOfArgument
 		if (joinFormats) {
 			String delimiter = FORMAT_DELIMITER;
 			StringBuilder format = new StringBuilder();
-			ListIterator<? extends @NonNull CommandArgument<?>> iterator = this.arguments.listIterator(reverseFormat ? this.arguments.size() : 0);
+			ListIterator<? extends CommandArgument<?>> iterator = this.arguments.listIterator(reverseFormat ? this.arguments.size() : 0);
 			while (reverseFormat ? iterator.hasPrevious() : iterator.hasNext()) {
 				@Nullable CommandArgument<?> argument = (reverseFormat ? iterator.previous() : iterator.next());
 				assert argument != null;
@@ -118,13 +118,13 @@ public class FirstOfArgument
 
 	@FunctionalInterface
 	private static interface Parser<@NonNull I> {
-		public @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> parse(
+		public @Nullable Pair<? extends CommandArgument<?>, @NonNull ?> parse(
 				@NonNull I input
 		) throws ArgumentParseException;
 	}
 
 	// Returns a pair with the argument and the parsed value, or null if nothing was parsed.
-	private <@NonNull I> @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> parseFirstOf(
+	private <@NonNull I> @Nullable Pair<? extends CommandArgument<?>, @NonNull ?> parseFirstOf(
 			Iterable<? extends @NonNull I> inputs,
 			Parser<@NonNull I> parser,
 			ArgumentsReader argsReader,
@@ -132,7 +132,7 @@ public class FirstOfArgument
 	) throws ArgumentParseException {
 		// try one after the other:
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
-		List<@NonNull FallbackArgumentException> fallbacks;
+		List<FallbackArgumentException> fallbacks;
 		if (!parsingFallbacks) {
 			fallbacks = new ArrayList<>();
 		} else {
@@ -207,7 +207,7 @@ public class FirstOfArgument
 		throw firstParseException;
 	}
 
-	private @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> toPair(
+	private @Nullable Pair<? extends CommandArgument<?>, @NonNull ?> toPair(
 			CommandArgument<?> argument,
 			@Nullable Object value
 	) {
@@ -217,13 +217,13 @@ public class FirstOfArgument
 	}
 
 	@Override
-	public @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> parse(
+	public @Nullable Pair<? extends CommandArgument<?>, @NonNull ?> parse(
 			CommandInput input,
 			CommandContext context,
 			ArgumentsReader argsReader
 	) throws ArgumentParseException {
 		// With modifiable context, so that the child argument can store its value(s):
-		Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> result = this.parseFirstOf(
+		Pair<? extends CommandArgument<?>, @NonNull ?> result = this.parseFirstOf(
 				arguments,
 				(argument) -> {
 					return this.toPair(argument, argument.parse(input, context, argsReader));
@@ -240,7 +240,7 @@ public class FirstOfArgument
 	}
 
 	@Override
-	public @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> parseValue(
+	public @Nullable Pair<? extends CommandArgument<?>, @NonNull ?> parseValue(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -252,12 +252,12 @@ public class FirstOfArgument
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
 	) {
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		for (CommandArgument<?> argument : arguments) {
 			int limit = (MAX_SUGGESTIONS - suggestions.size());
@@ -266,7 +266,7 @@ public class FirstOfArgument
 			// Reset args so that every argument has a chance to provide completions:
 			argsReader.setState(argsReaderState);
 
-			List<? extends @NonNull String> argumentSuggestions = argument.complete(
+			List<? extends String> argumentSuggestions = argument.complete(
 					input,
 					context,
 					argsReader
@@ -285,24 +285,24 @@ public class FirstOfArgument
 
 		private static final long serialVersionUID = -1177782345537954263L;
 
-		private final List<? extends @NonNull FallbackArgumentException> originalFallbacks;
+		private final List<? extends FallbackArgumentException> originalFallbacks;
 
 		public FirstOfFallbackException(
 				FirstOfArgument firstOfArgument,
-				List<? extends @NonNull FallbackArgumentException> originalFallbacks
+				List<? extends FallbackArgumentException> originalFallbacks
 		) {
 			super(firstOfArgument, originalFallbacks.get(0));
 			assert originalFallbacks != null && !originalFallbacks.isEmpty();
 			this.originalFallbacks = originalFallbacks;
 		}
 
-		public List<? extends @NonNull FallbackArgumentException> getOriginalFallbacks() {
+		public List<? extends FallbackArgumentException> getOriginalFallbacks() {
 			return originalFallbacks;
 		}
 	}
 
 	@Override
-	public @Nullable Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> parseFallback(
+	public @Nullable Pair<? extends CommandArgument<?>, @NonNull ?> parseFallback(
 			CommandInput input,
 			CommandContext context,
 			ArgumentsReader argsReader,
@@ -312,9 +312,9 @@ public class FirstOfArgument
 		// Delegate the fallback parsing to the child arguments that threw the original
 		// FallbackArgumentExceptions:
 		FirstOfFallbackException firstOfFallback = (FirstOfFallbackException) fallbackException;
-		List<? extends @NonNull FallbackArgumentException> originalFallbacks = firstOfFallback.getOriginalFallbacks();
+		List<? extends FallbackArgumentException> originalFallbacks = firstOfFallback.getOriginalFallbacks();
 
-		Pair<? extends @NonNull CommandArgument<?>, @NonNull ?> result = this.parseFirstOf(
+		Pair<? extends CommandArgument<?>, @NonNull ?> result = this.parseFirstOf(
 				originalFallbacks,
 				(fallback) -> {
 					FallbackArgument<?> argument = fallback.getArgument();

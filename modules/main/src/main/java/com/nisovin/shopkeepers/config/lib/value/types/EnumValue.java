@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class EnumValue<E extends @NonNull Enum<E>> extends ValueType<E> {
+public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 
 	private static final StringValue STRING_VALUE = new StringValue();
 

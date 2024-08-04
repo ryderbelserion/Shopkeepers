@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.text;
 
 import java.util.function.Supplier;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -160,7 +159,7 @@ public class PlaceholderText extends TextBuilder {
 	}
 
 	@Override
-	public <T extends @NonNull Text> T child(T child) {
+	public <T extends Text> T child(T child) {
 		throw unsupportedPlaceholderOperation();
 	}
 

@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.util.data.property.Property;
  * @param <T>
  *            the type of values that are being serialized
  */
-public interface DataSerializer<T extends @NonNull Object> {
+public interface DataSerializer<@NonNull T> {
 
 	/**
 	 * Converts the given value to a representation that can be serialized as described by

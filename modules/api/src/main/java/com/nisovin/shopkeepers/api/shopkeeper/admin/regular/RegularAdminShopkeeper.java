@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.api.shopkeeper.admin.regular;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 
@@ -21,7 +19,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<? extends @NonNull TradeOffer> getOffers();
+	public List<? extends TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -36,7 +34,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<? extends @NonNull TradeOffer> offers);
+	public void setOffers(List<? extends TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -58,5 +56,5 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<? extends @NonNull TradeOffer> offers);
+	public void addOffers(List<? extends TradeOffer> offers);
 }

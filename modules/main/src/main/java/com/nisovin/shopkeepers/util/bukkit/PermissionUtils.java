@@ -8,7 +8,6 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -51,7 +50,7 @@ public final class PermissionUtils {
 	 */
 	public static boolean registerPermission(
 			String permissionNode,
-			Function<@NonNull String, @NonNull Permission> permissionProvider
+			Function<String, Permission> permissionProvider
 	) {
 		Validate.notEmpty(permissionNode, "permissionNode is null or empty");
 		Validate.notNull(permissionProvider, "permissionProvider is null");

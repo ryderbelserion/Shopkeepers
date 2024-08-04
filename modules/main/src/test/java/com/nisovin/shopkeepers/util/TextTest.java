@@ -13,10 +13,8 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.text.Text;
@@ -98,7 +96,7 @@ public class TextTest extends AbstractBukkitTest {
 			config = YamlConfiguration.loadConfiguration(reader);
 		}
 
-		Set<@NonNull String> configKeys = Unsafe.castNonNull(config.getKeys(false));
+		Set<String> configKeys = config.getKeys(false);
 		int tested = 0;
 		for (String key : configKeys) {
 			Object value = config.get(key);

@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.util.data.property.validation.java;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.util.data.property.validation.PropertyValidator;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -14,7 +12,7 @@ public final class IntegerValidators {
 	 * A {@link PropertyValidator} that ensures that the validated integer is within specific
 	 * bounds.
 	 */
-	private static class BoundedIntegerValidator implements PropertyValidator<@NonNull Integer> {
+	private static class BoundedIntegerValidator implements PropertyValidator<Integer> {
 
 		private final int minValue;
 		private final int maxValue;
@@ -60,7 +58,7 @@ public final class IntegerValidators {
 	/**
 	 * A {@link PropertyValidator} that ensures that the validated integer is positive.
 	 */
-	public static final PropertyValidator<@NonNull Integer> POSITIVE = new BoundedIntegerValidator(
+	public static final PropertyValidator<Integer> POSITIVE = new BoundedIntegerValidator(
 			1,
 			Integer.MAX_VALUE
 	) {
@@ -73,7 +71,7 @@ public final class IntegerValidators {
 	/**
 	 * A {@link PropertyValidator} that ensures that the validated integer is not negative.
 	 */
-	public static final PropertyValidator<@NonNull Integer> NON_NEGATIVE = new BoundedIntegerValidator(
+	public static final PropertyValidator<Integer> NON_NEGATIVE = new BoundedIntegerValidator(
 			0,
 			Integer.MAX_VALUE
 	) {
@@ -93,7 +91,7 @@ public final class IntegerValidators {
 	 *            the maximum value
 	 * @return the property validator
 	 */
-	public static PropertyValidator<@NonNull Integer> bounded(int minValue, int maxValue) {
+	public static PropertyValidator<Integer> bounded(int minValue, int maxValue) {
 		return new BoundedIntegerValidator(minValue, maxValue);
 	}
 

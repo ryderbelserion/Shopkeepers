@@ -14,12 +14,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ConversionUtils {
 
-	public static final Map<? extends @NonNull String, ? extends @NonNull Boolean> BOOLEAN_VALUES;
-	public static final Map<? extends @NonNull String, ? extends @NonNull Trilean> TRILEAN_VALUES;
+	public static final Map<? extends String, ? extends Boolean> BOOLEAN_VALUES;
+	public static final Map<? extends String, ? extends Trilean> TRILEAN_VALUES;
 
 	static {
 		// Initialize boolean values:
-		Map<@NonNull String, @NonNull Boolean> booleanValues = new HashMap<>();
+		Map<String, Boolean> booleanValues = new HashMap<>();
 		booleanValues.put("true", true);
 		booleanValues.put("t", true);
 		booleanValues.put("1", true);
@@ -39,7 +39,7 @@ public final class ConversionUtils {
 		BOOLEAN_VALUES = Collections.unmodifiableMap(booleanValues);
 
 		// Initialize trilean values:
-		Map<@NonNull String, @NonNull Trilean> trileanValues = new HashMap<>();
+		Map<String, Trilean> trileanValues = new HashMap<>();
 		BOOLEAN_VALUES.entrySet().forEach(entry -> {
 			trileanValues.put(entry.getKey(), Trilean.fromBoolean(entry.getValue()));
 		});
@@ -124,7 +124,7 @@ public final class ConversionUtils {
 		return null;
 	}
 
-	public static <E extends @NonNull Enum<E>> @Nullable E parseEnum(
+	public static <E extends Enum<E>> @Nullable E parseEnum(
 			Class<@NonNull E> enumType,
 			@Nullable String enumName
 	) {
@@ -143,11 +143,11 @@ public final class ConversionUtils {
 
 	// PARSE LISTS:
 
-	public static List<@NonNull Integer> parseIntList(
+	public static List<Integer> parseIntList(
 			Collection<? extends @Nullable String> strings
 	) {
 		Validate.notNull(strings, "strings is null");
-		List<@NonNull Integer> result = new ArrayList<>(strings.size());
+		List<Integer> result = new ArrayList<>(strings.size());
 		strings.forEach(string -> {
 			Integer value = parseInt(string);
 			if (value != null) {
@@ -157,11 +157,11 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static List<@NonNull Long> parseLongList(
+	public static List<Long> parseLongList(
 			Collection<? extends @Nullable String> strings
 	) {
 		Validate.notNull(strings, "strings is null");
-		List<@NonNull Long> result = new ArrayList<>(strings.size());
+		List<Long> result = new ArrayList<>(strings.size());
 		strings.forEach(string -> {
 			Long value = parseLong(string);
 			if (value != null) {
@@ -171,11 +171,11 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static List<@NonNull Double> parseDoubleList(
+	public static List<Double> parseDoubleList(
 			Collection<? extends @Nullable String> strings
 	) {
 		Validate.notNull(strings, "strings is null");
-		List<@NonNull Double> result = new ArrayList<>(strings.size());
+		List<Double> result = new ArrayList<>(strings.size());
 		strings.forEach(string -> {
 			Double value = parseDouble(string);
 			if (value != null) {
@@ -185,11 +185,11 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static List<@NonNull Float> parseFloatList(
+	public static List<Float> parseFloatList(
 			Collection<? extends @Nullable String> strings
 	) {
 		Validate.notNull(strings, "strings is null");
-		List<@NonNull Float> result = new ArrayList<>(strings.size());
+		List<Float> result = new ArrayList<>(strings.size());
 		strings.forEach(string -> {
 			Float value = parseFloat(string);
 			if (value != null) {
@@ -199,7 +199,7 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static <E extends @NonNull Enum<E>> List<@NonNull E> parseEnumList(
+	public static <E extends Enum<E>> List<@NonNull E> parseEnumList(
 			Class<@NonNull E> enumType,
 			Collection<? extends @Nullable String> strings
 	) {
@@ -289,7 +289,7 @@ public final class ConversionUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <E extends @NonNull Enum<E>> @Nullable E toEnum(
+	public static <E extends Enum<E>> @Nullable E toEnum(
 			Class<@NonNull E> enumType,
 			@Nullable Object object
 	) {
@@ -305,9 +305,9 @@ public final class ConversionUtils {
 
 	// CONVERT LISTS OF OBJECTS:
 
-	public static @Nullable List<@NonNull Integer> toIntegerList(@Nullable List<?> list) {
+	public static @Nullable List<Integer> toIntegerList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull Integer> result = new ArrayList<>(list.size());
+		List<Integer> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			Integer integerValue = toInteger(value);
 			if (integerValue != null) {
@@ -317,9 +317,9 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static @Nullable List<@NonNull Double> toDoubleList(@Nullable List<?> list) {
+	public static @Nullable List<Double> toDoubleList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull Double> result = new ArrayList<>(list.size());
+		List<Double> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			Double doubleValue = toDouble(value);
 			if (doubleValue != null) {
@@ -329,9 +329,9 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static @Nullable List<@NonNull Float> toFloatList(@Nullable List<?> list) {
+	public static @Nullable List<Float> toFloatList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull Float> result = new ArrayList<>(list.size());
+		List<Float> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			Float floatValue = toFloat(value);
 			if (floatValue != null) {
@@ -341,9 +341,9 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static @Nullable List<@NonNull Long> toLongList(@Nullable List<?> list) {
+	public static @Nullable List<Long> toLongList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull Long> result = new ArrayList<>(list.size());
+		List<Long> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			Long longValue = toLong(value);
 			if (longValue != null) {
@@ -353,9 +353,9 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static @Nullable List<@NonNull Boolean> toBooleanList(@Nullable List<?> list) {
+	public static @Nullable List<Boolean> toBooleanList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull Boolean> result = new ArrayList<>(list.size());
+		List<Boolean> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			Boolean booleanValue = toBoolean(value);
 			if (booleanValue != null) {
@@ -365,9 +365,9 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static @Nullable List<@NonNull Trilean> toTrileanList(@Nullable List<?> list) {
+	public static @Nullable List<Trilean> toTrileanList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull Trilean> result = new ArrayList<>(list.size());
+		List<Trilean> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			Trilean trileanValue = toTrilean(value);
 			if (trileanValue != null) {
@@ -377,9 +377,9 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static @Nullable List<@NonNull String> toStringList(@Nullable List<?> list) {
+	public static @Nullable List<String> toStringList(@Nullable List<?> list) {
 		if (list == null) return null;
-		List<@NonNull String> result = new ArrayList<>(list.size());
+		List<String> result = new ArrayList<>(list.size());
 		list.forEach(value -> {
 			String stringValue = toString(value);
 			if (stringValue != null) {
@@ -389,7 +389,7 @@ public final class ConversionUtils {
 		return result;
 	}
 
-	public static <E extends @NonNull Enum<E>> @Nullable List<@NonNull E> toEnumList(
+	public static <E extends Enum<E>> @Nullable List<@NonNull E> toEnumList(
 			Class<@NonNull E> enumType,
 			@Nullable List<?> list
 	) {

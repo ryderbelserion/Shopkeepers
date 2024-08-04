@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.base.Preconditions;
@@ -63,7 +62,7 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	private boolean receivedItem2Altered = false;
 	private boolean resultItemAltered = false;
 
-	private List<@NonNull TradeEffect> tradeEffects = new ArrayList<>();
+	private List<TradeEffect> tradeEffects = new ArrayList<>();
 	private boolean cancelled = false;
 
 	/**
@@ -345,7 +344,7 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 * 
 	 * @return the modifiable list of trade effects, not <code>null</code>
 	 */
-	public List<@NonNull TradeEffect> getTradeEffects() {
+	public List<TradeEffect> getTradeEffects() {
 		return tradeEffects;
 	}
 

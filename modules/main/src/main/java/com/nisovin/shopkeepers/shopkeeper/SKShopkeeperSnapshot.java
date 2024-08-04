@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -76,21 +75,21 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 				() -> "name contains color code character '§': " + name);
 	}
 
-	private static final Property<@NonNull String> NAME = new BasicProperty<@NonNull String>()
+	private static final Property<String> NAME = new BasicProperty<String>()
 			.dataKeyAccessor("name", StringSerializers.SCALAR)
 			.validator(SKShopkeeperSnapshot::validateName)
 			.build();
-	private static final Property<@NonNull Instant> TIMESTAMP = new BasicProperty<@NonNull Instant>()
+	private static final Property<Instant> TIMESTAMP = new BasicProperty<Instant>()
 			.dataKeyAccessor("timestamp", InstantSerializers.ISO)
 			.build();
-	private static final Property<@NonNull DataContainer> DATA = new BasicProperty<@NonNull DataContainer>()
+	private static final Property<DataContainer> DATA = new BasicProperty<DataContainer>()
 			.dataKeyAccessor("data", DataContainerSerializers.DEFAULT)
 			.build();
 
 	/**
 	 * A {@link DataSerializer} for {@link SKShopkeeperSnapshot} values.
 	 */
-	public static final DataSerializer<@NonNull SKShopkeeperSnapshot> SERIALIZER = new DataSerializer<@NonNull SKShopkeeperSnapshot>() {
+	public static final DataSerializer<SKShopkeeperSnapshot> SERIALIZER = new DataSerializer<SKShopkeeperSnapshot>() {
 		@Override
 		public @Nullable Object serialize(SKShopkeeperSnapshot value) {
 			Validate.notNull(value, "value is null");
@@ -120,10 +119,10 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 	 * <p>
 	 * All contained elements are expected to not be <code>null</code>.
 	 */
-	public static final DataSerializer<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>> LIST_SERIALIZER = new DataSerializer<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>>() {
+	public static final DataSerializer<List<? extends SKShopkeeperSnapshot>> LIST_SERIALIZER = new DataSerializer<List<? extends SKShopkeeperSnapshot>>() {
 		@Override
 		public @Nullable Object serialize(
-				@ReadOnly List<? extends @NonNull SKShopkeeperSnapshot> value
+				@ReadOnly List<? extends SKShopkeeperSnapshot> value
 		) {
 			Validate.notNull(value, "value is null");
 			List<Object> snapshotListData = new ArrayList<>(value.size());
@@ -135,7 +134,7 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 		}
 
 		@Override
-		public List<? extends @NonNull SKShopkeeperSnapshot> deserialize(
+		public List<? extends SKShopkeeperSnapshot> deserialize(
 				Object data
 		) throws InvalidDataException {
 			Validate.notNull(data, "data is null");
@@ -144,7 +143,7 @@ public final class SKShopkeeperSnapshot implements ShopkeeperSnapshot {
 						+ data.getClass().getName() + "!");
 			}
 			List<?> snapshotListData = (List<?>) data;
-			List<@NonNull SKShopkeeperSnapshot> snapshots = new ArrayList<>(snapshotListData.size());
+			List<SKShopkeeperSnapshot> snapshots = new ArrayList<>(snapshotListData.size());
 			for (Object snapshotData : snapshotListData) {
 				try {
 					if (snapshotData == null) {

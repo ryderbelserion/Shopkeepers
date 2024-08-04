@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Panda;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -28,20 +27,20 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 // TODO Pose (laying, sitting, eating, worried).
-public class PandaShop extends BabyableShop<@NonNull Panda> {
+public class PandaShop extends BabyableShop<Panda> {
 
-	public static final Property<Panda.@NonNull Gene> GENE = new BasicProperty<Panda.@NonNull Gene>()
+	public static final Property<Panda.Gene> GENE = new BasicProperty<Panda.Gene>()
 			.dataKeyAccessor("gene", EnumSerializers.lenient(Panda.Gene.class))
 			.defaultValue(Panda.Gene.NORMAL)
 			.build();
 
-	private final PropertyValue<Panda.@NonNull Gene> geneProperty = new PropertyValue<>(GENE)
+	private final PropertyValue<Panda.Gene> geneProperty = new PropertyValue<>(GENE)
 			.onValueChanged(Unsafe.initialized(this)::applyGene)
 			.build(properties);
 
 	public PandaShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull PandaShop> livingObjectType,
+			SKLivingShopObjectType<PandaShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -67,8 +66,8 @@ public class PandaShop extends BabyableShop<@NonNull Panda> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getGeneEditorButton());
 		return editorButtons;
 	}
@@ -90,6 +89,7 @@ public class PandaShop extends BabyableShop<@NonNull Panda> {
 	private void applyGene() {
 		Panda entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		Panda.Gene gene = this.getGene();
 		entity.setMainGene(gene);
 		entity.setHiddenGene(gene);

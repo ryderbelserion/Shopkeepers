@@ -147,7 +147,7 @@ public abstract class ObjectByIdArgument<@NonNull I, @NonNull O>
 	);
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

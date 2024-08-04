@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -24,7 +23,7 @@ public class ShopObjectRegistry {
 	// has been activated.
 	// Since some types of shop objects may handle their spawning themselves, shop objects might
 	// already be spawned before their chunk is activated.
-	private final Map<@NonNull Object, @NonNull AbstractShopkeeper> shopkeepersByObjectId = new HashMap<>();
+	private final Map<Object, AbstractShopkeeper> shopkeepersByObjectId = new HashMap<>();
 
 	ShopObjectRegistry() {
 	}

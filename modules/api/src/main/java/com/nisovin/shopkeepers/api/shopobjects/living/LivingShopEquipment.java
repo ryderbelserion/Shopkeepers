@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.api.shopobjects.living;
 import java.util.Map;
 
 import org.bukkit.inventory.EquipmentSlot;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -18,7 +17,7 @@ public interface LivingShopEquipment {
 	 * 
 	 * @return an unmodifiable view on the equipped items
 	 */
-	public Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> getItems();
+	public Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> getItems();
 
 	/**
 	 * Gets the equipped item for the specified {@link EquipmentSlot}.

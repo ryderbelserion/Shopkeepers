@@ -93,7 +93,7 @@ public abstract class ObjectIdArgument<@NonNull I> extends CommandArgument<@NonN
 	protected abstract String toString(@NonNull I id);
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -116,7 +116,7 @@ public abstract class ObjectIdArgument<@NonNull I> extends CommandArgument<@NonN
 		}
 
 		// Determine id prefix and args count:
-		List<? extends @NonNull String> args = argsReader.getArgs();
+		List<? extends String> args = argsReader.getArgs();
 		int endIndex = args.size(); // exclusive
 		// The partial id input may consist of multiple joined input arguments:
 		int argsCount = (endIndex - startIndex);
@@ -135,7 +135,7 @@ public abstract class ObjectIdArgument<@NonNull I> extends CommandArgument<@NonN
 	}
 
 	// argsCount: The number of arguments the id prefix consist of (>= 1).
-	protected List<? extends @NonNull String> complete(
+	protected List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix,
@@ -144,7 +144,7 @@ public abstract class ObjectIdArgument<@NonNull I> extends CommandArgument<@NonN
 		// Note: We don't check the minimumCompletionInput here but let getCompletionSuggestions
 		// handle it, because the argument may want to ignore the minimumCompletionInput for some of
 		// its suggestions.
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		for (I id : this.getCompletionSuggestions(input, context, idPrefix)) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
 			if (!filter.test(id)) continue; // Skip rejected ids

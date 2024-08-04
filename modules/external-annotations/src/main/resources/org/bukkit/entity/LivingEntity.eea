@@ -1,0 +1,91 @@
+class org/bukkit/entity/LivingEntity
+addPotionEffect
+ (Lorg/bukkit/potion/PotionEffect;)Z
+ (L1org/bukkit/potion/PotionEffect;)Z
+addPotionEffects
+ (Ljava/util/Collection<Lorg/bukkit/potion/PotionEffect;>;)Z
+ (L1java/util/Collection<L1org/bukkit/potion/PotionEffect;>;)Z
+attack
+ (Lorg/bukkit/entity/Entity;)V
+ (L1org/bukkit/entity/Entity;)V
+getActivePotionEffects
+ ()Ljava/util/Collection<Lorg/bukkit/potion/PotionEffect;>;
+ ()L1java/util/Collection<L1org/bukkit/potion/PotionEffect;>;
+getCollidableExemptions
+ ()Ljava/util/Set<Ljava/util/UUID;>;
+ ()L1java/util/Set<L1java/util/UUID;>;
+getDeathSound
+ ()Lorg/bukkit/Sound;
+ ()L0org/bukkit/Sound;
+getDrinkingSound
+ (Lorg/bukkit/inventory/ItemStack;)Lorg/bukkit/Sound;
+ (L1org/bukkit/inventory/ItemStack;)L1org/bukkit/Sound;
+getEatingSound
+ (Lorg/bukkit/inventory/ItemStack;)Lorg/bukkit/Sound;
+ (L1org/bukkit/inventory/ItemStack;)L1org/bukkit/Sound;
+getEquipment
+ ()Lorg/bukkit/inventory/EntityEquipment;
+ ()L0org/bukkit/inventory/EntityEquipment;
+getEyeLocation
+ ()Lorg/bukkit/Location;
+ ()L1org/bukkit/Location;
+getFallDamageSound
+ (I)Lorg/bukkit/Sound;
+ (I)L1org/bukkit/Sound;
+getFallDamageSoundBig
+ ()Lorg/bukkit/Sound;
+ ()L1org/bukkit/Sound;
+getFallDamageSoundSmall
+ ()Lorg/bukkit/Sound;
+ ()L1org/bukkit/Sound;
+getHurtSound
+ ()Lorg/bukkit/Sound;
+ ()L0org/bukkit/Sound;
+getItemInUse
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L0org/bukkit/inventory/ItemStack;
+getKiller
+ ()Lorg/bukkit/entity/Player;
+ ()L0org/bukkit/entity/Player;
+getLastTwoTargetBlocks
+ (Ljava/util/Set<Lorg/bukkit/Material;>;I)Ljava/util/List<Lorg/bukkit/block/Block;>;
+ (L0java/util/Set<L1org/bukkit/Material;>;I)L1java/util/List<L1org/bukkit/block/Block;>;
+getLeashHolder
+ ()Lorg/bukkit/entity/Entity;
+ ()L1org/bukkit/entity/Entity;
+getLineOfSight
+ (Ljava/util/Set<Lorg/bukkit/Material;>;I)Ljava/util/List<Lorg/bukkit/block/Block;>;
+ (L0java/util/Set<L1org/bukkit/Material;>;I)L1java/util/List<L1org/bukkit/block/Block;>;
+getMemory
+ <T:Ljava/lang/Object;>(Lorg/bukkit/entity/memory/MemoryKey<TT;>;)TT;
+ <T:Ljava/lang/Object;>(L1org/bukkit/entity/memory/MemoryKey<TT;>;)T0T;
+getPotionEffect
+ (Lorg/bukkit/potion/PotionEffectType;)Lorg/bukkit/potion/PotionEffect;
+ (L1org/bukkit/potion/PotionEffectType;)L0org/bukkit/potion/PotionEffect;
+getTargetBlock
+ (Ljava/util/Set<Lorg/bukkit/Material;>;I)Lorg/bukkit/block/Block;
+ (L0java/util/Set<L1org/bukkit/Material;>;I)L1org/bukkit/block/Block;
+getTargetBlockExact
+ (I)Lorg/bukkit/block/Block;
+ (I)L0org/bukkit/block/Block;
+getTargetBlockExact
+ (ILorg/bukkit/FluidCollisionMode;)Lorg/bukkit/block/Block;
+ (IL1org/bukkit/FluidCollisionMode;)L0org/bukkit/block/Block;
+hasLineOfSight
+ (Lorg/bukkit/entity/Entity;)Z
+ (L1org/bukkit/entity/Entity;)Z
+hasPotionEffect
+ (Lorg/bukkit/potion/PotionEffectType;)Z
+ (L1org/bukkit/potion/PotionEffectType;)Z
+rayTraceBlocks
+ (D)Lorg/bukkit/util/RayTraceResult;
+ (D)L0org/bukkit/util/RayTraceResult;
+removePotionEffect
+ (Lorg/bukkit/potion/PotionEffectType;)V
+ (L1org/bukkit/potion/PotionEffectType;)V
+setLeashHolder
+ (Lorg/bukkit/entity/Entity;)Z
+ (L0org/bukkit/entity/Entity;)Z
+setMemory
+ <T:Ljava/lang/Object;>(Lorg/bukkit/entity/memory/MemoryKey<TT;>;TT;)V
+ <T:Ljava/lang/Object;>(L1org/bukkit/entity/memory/MemoryKey<TT;>;T0T;)V

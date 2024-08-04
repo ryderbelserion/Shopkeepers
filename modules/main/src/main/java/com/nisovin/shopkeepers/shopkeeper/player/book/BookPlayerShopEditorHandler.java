@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
@@ -26,8 +25,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	private static class TradingRecipesAdapter
-			extends DefaultTradingRecipesAdapter<@NonNull BookOffer> {
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<BookOffer> {
 
 		private final SKBookPlayerShopkeeper shopkeeper;
 
@@ -37,14 +35,14 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
+		public List<TradingRecipeDraft> getTradingRecipes() {
 			// We only add one recipe per book title:
-			Set<@NonNull String> bookTitles = new HashSet<>();
+			Set<String> bookTitles = new HashSet<>();
 
 			// Add the shopkeeper's offers:
-			Map<? extends @NonNull String, ? extends @NonNull ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
-			List<? extends @NonNull BookOffer> offers = shopkeeper.getOffers();
-			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(Math.max(
+			Map<? extends String, ? extends ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
+			List<? extends BookOffer> offers = shopkeeper.getOffers();
+			List<TradingRecipeDraft> recipes = new ArrayList<>(Math.max(
 					offers.size(),
 					containerBooksByTitle.size()
 			));
@@ -78,12 +76,12 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		protected List<? extends @NonNull BookOffer> getOffers() {
+		protected List<? extends BookOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<? extends @NonNull BookOffer> newOffers) {
+		protected void setOffers(List<? extends BookOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 

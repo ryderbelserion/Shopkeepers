@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.InventoryView;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -223,7 +222,7 @@ public abstract class UIHandler {
 	 * 
 	 * @return the additionally requested inventory event types, not <code>null</code>
 	 */
-	protected Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> getAdditionalInventoryEvents() {
+	protected Set<? extends Class<? extends InventoryEvent>> getAdditionalInventoryEvents() {
 		return Collections.emptySet();
 	}
 

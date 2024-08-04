@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.config.lib.value.types;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.value.TypePattern;
@@ -12,7 +11,7 @@ import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.config.lib.value.ValueTypeProvider;
 import com.nisovin.shopkeepers.config.lib.value.ValueTypeProviders;
 
-public class ColoredStringListValue extends ListValue<@NonNull String> {
+public class ColoredStringListValue extends ListValue<String> {
 
 	public static final ColoredStringListValue INSTANCE = new ColoredStringListValue();
 	public static final TypePattern TYPE_PATTERN = TypePatterns.parameterized(List.class, String.class);

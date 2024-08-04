@@ -178,7 +178,7 @@ public final class NMSHandler implements NMSCallProvider {
 				Log.severe("Failed to retrieve the underlying Minecraft ItemStack!", e);
 			}
 		}
-		return CraftItemStack.asNMSCopy(itemStack);
+		return Unsafe.assertNonNull(CraftItemStack.asNMSCopy(itemStack));
 	}
 
 	@Override
@@ -251,6 +251,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public @Nullable String getItemSNBT(@Nullable ItemStack itemStack) {
 		Validate.notNull(itemStack, "itemStack is null");
+		assert itemStack != null;
 		net.minecraft.world.item.ItemStack nmsItem = asNMSItemStack(itemStack);
 		Tag itemNBT = nmsItem.saveOptional(MinecraftServer.getDefaultRegistryAccess());
 		return itemNBT.toString();
@@ -360,12 +361,11 @@ public final class NMSHandler implements NMSCallProvider {
 
 	// MC 1.20.5 specific features
 
-	private List<@NonNull NamespacedKey> WOLF_VARIANT_KEYS = null;
+	private @Nullable List<NamespacedKey> WOLF_VARIANT_KEYS = null;
 
-	public @NonNull List<@NonNull NamespacedKey> getWolfVariantKeys() {
+	public List<NamespacedKey> getWolfVariantKeys() {
 		if (WOLF_VARIANT_KEYS == null) {
-			Registry<Wolf.@NonNull Variant> wolfVariantRegistry = Unsafe.castNonNull(Registry.WOLF_VARIANT);
-			WOLF_VARIANT_KEYS = RegistryUtils.getKeys(wolfVariantRegistry);
+			WOLF_VARIANT_KEYS = RegistryUtils.getKeys(Registry.WOLF_VARIANT);
 		}
 		assert WOLF_VARIANT_KEYS != null;
 		return WOLF_VARIANT_KEYS;

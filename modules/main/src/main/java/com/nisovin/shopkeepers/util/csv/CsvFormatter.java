@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -349,9 +348,7 @@ public class CsvFormatter {
 		String escaped = nonNullField;
 
 		// Note: This also checks the nullField for newlines.
-		Lazy<@NonNull Boolean> containsNewline = new Lazy<>(
-				() -> StringUtils.containsNewline(nonNullField)
-		);
+		Lazy<Boolean> containsNewline = new Lazy<>(() -> StringUtils.containsNewline(nonNullField));
 		if (warnOnNewlines && containsNewline.get()) {
 			Log.warning("CSV field contains a newline character! " + escaped);
 		}

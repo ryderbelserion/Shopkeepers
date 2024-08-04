@@ -1,0 +1,4 @@
+class org/bukkit/configuration/file/FileConfigurationOptions
+setHeader
+ (Ljava/util/List<Ljava/lang/String;>;)Lorg/bukkit/configuration/file/FileConfigurationOptions;
+ (L0java/util/List<L0java/lang/String;>;)L1org/bukkit/configuration/file/FileConfigurationOptions;

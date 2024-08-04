@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
@@ -76,7 +75,7 @@ import com.nisovin.shopkeepers.world.PlayerMap;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepersPlugin {
 
-	private static final Set<? extends @NonNull String> SKIP_PRELOADING_CLASSES = Collections.unmodifiableSet(
+	private static final Set<? extends String> SKIP_PRELOADING_CLASSES = Collections.unmodifiableSet(
 			new HashSet<>(Arrays.asList(
 					// Skip classes that interact with optional dependencies:
 					"com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency$Internal",

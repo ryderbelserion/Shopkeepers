@@ -1,0 +1,34 @@
+class org/bukkit/inventory/EquipmentSlotGroup
+ANY
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+ARMOR
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+CHEST
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+FEET
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+HAND
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+HEAD
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+LEGS
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+MAINHAND
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+OFFHAND
+ Lorg/bukkit/inventory/EquipmentSlotGroup;
+ L1org/bukkit/inventory/EquipmentSlotGroup;
+getByName
+ (Ljava/lang/String;)Lorg/bukkit/inventory/EquipmentSlotGroup;
+ (L1java/lang/String;)L0org/bukkit/inventory/EquipmentSlotGroup;
+test
+ (Lorg/bukkit/inventory/EquipmentSlot;)Z
+ (L1org/bukkit/inventory/EquipmentSlot;)Z

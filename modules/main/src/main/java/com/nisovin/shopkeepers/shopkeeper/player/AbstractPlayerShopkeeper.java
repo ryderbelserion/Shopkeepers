@@ -190,9 +190,7 @@ public abstract class AbstractPlayerShopkeeper
 	}
 
 	@Override
-	protected void populateMessageArguments(
-			Map<@NonNull String, @NonNull Supplier<@NonNull ?>> messageArguments
-	) {
+	protected void populateMessageArguments(Map<String, Supplier<@NonNull ?>> messageArguments) {
 		super.populateMessageArguments(messageArguments);
 		messageArguments.put("owner_name", this::getOwnerName);
 		messageArguments.put("owner_uuid", this::getOwnerUUID);
@@ -251,16 +249,16 @@ public abstract class AbstractPlayerShopkeeper
 
 	// OWNER
 
-	public static final Property<@NonNull UUID> OWNER_UNIQUE_ID = new BasicProperty<@NonNull UUID>()
+	public static final Property<UUID> OWNER_UNIQUE_ID = new BasicProperty<UUID>()
 			.dataKeyAccessor("owner uuid", UUIDSerializers.LENIENT)
 			.build();
-	public static final Property<@NonNull String> OWNER_NAME = new BasicProperty<@NonNull String>()
+	public static final Property<String> OWNER_NAME = new BasicProperty<String>()
 			.dataKeyAccessor("owner", StringSerializers.SCALAR)
 			.validator(StringValidators.NON_EMPTY)
 			.build();
-	public static final Property<@NonNull User> OWNER = new BasicProperty<@NonNull User>()
+	public static final Property<User> OWNER = new BasicProperty<User>()
 			.name("owner")
-			.dataAccessor(new DataAccessor<@NonNull User>() {
+			.dataAccessor(new DataAccessor<User>() {
 				@Override
 				public void save(DataContainer dataContainer, @Nullable User value) {
 					if (value != null) {
@@ -351,7 +349,7 @@ public abstract class AbstractPlayerShopkeeper
 
 	// TRADE NOTIFICATIONS
 
-	public static final Property<@NonNull Boolean> NOTIFY_ON_TRADES = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> NOTIFY_ON_TRADES = new BasicProperty<Boolean>()
 			.dataKeyAccessor("notifyOnTrades", BooleanSerializers.LENIENT)
 			.defaultValue(true)
 			.omitIfDefault()
@@ -403,13 +401,12 @@ public abstract class AbstractPlayerShopkeeper
 					ShopkeeperData shopkeeperData,
 					String logPrefix
 			) throws InvalidDataException {
-				UnmodifiableItemStack hireCost = shopkeeperData.get(HIRE_COST_ITEM);
+				@Nullable UnmodifiableItemStack hireCost = shopkeeperData.get(HIRE_COST_ITEM);
 				if (hireCost == null) return false; // Nothing to migrate
-
 				assert !ItemUtils.isEmpty(hireCost);
 
 				boolean itemMigrated = false;
-				UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
+				@Nullable UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
 				if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
 					if (ItemUtils.isEmpty(migratedHireCost)) {
 						throw new InvalidDataException("Hire cost item migration failed: " + hireCost);
@@ -483,18 +480,18 @@ public abstract class AbstractPlayerShopkeeper
 	// TODO Rename the storage keys to containerx/y/z?
 	// TODO Change to a list of containers?
 	// TODO Store container world independently of shopkeeper world?
-	public static final Property<@NonNull Integer> CONTAINER_X = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> CONTAINER_X = new BasicProperty<Integer>()
 			.dataKeyAccessor("chestx", NumberSerializers.INTEGER)
 			.build();
-	public static final Property<@NonNull Integer> CONTAINER_Y = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> CONTAINER_Y = new BasicProperty<Integer>()
 			.dataKeyAccessor("chesty", NumberSerializers.INTEGER)
 			.build();
-	public static final Property<@NonNull Integer> CONTAINER_Z = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> CONTAINER_Z = new BasicProperty<Integer>()
 			.dataKeyAccessor("chestz", NumberSerializers.INTEGER)
 			.build();
-	public static final Property<@NonNull BlockLocation> CONTAINER = new BasicProperty<@NonNull BlockLocation>()
+	public static final Property<BlockLocation> CONTAINER = new BasicProperty<BlockLocation>()
 			.name("container")
-			.dataAccessor(new DataAccessor<@NonNull BlockLocation>() {
+			.dataAccessor(new DataAccessor<BlockLocation>() {
 				@Override
 				public void save(DataContainer dataContainer, @Nullable BlockLocation value) {
 					if (value != null) {

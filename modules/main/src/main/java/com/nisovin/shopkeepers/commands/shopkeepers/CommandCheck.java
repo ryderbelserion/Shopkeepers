@@ -14,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -82,8 +81,7 @@ class CommandCheck extends Command {
 		LivingEntityAI livingEntityAI = plugin.getLivingShops().getLivingEntityAI();
 
 		int totalChunksWithShopkeepers = shopkeeperRegistry.getWorldsWithShopkeepers().stream()
-				// TODO Explicit type: Workaround for a limitation of CheckerFramework
-				.<@NonNull Map<?, ?>>map(worldName -> shopkeeperRegistry.getShopkeepersByChunks(worldName))
+				.map(worldName -> shopkeeperRegistry.getShopkeepersByChunks(worldName))
 				.mapToInt(byChunk -> byChunk.size())
 				.sum();
 
@@ -170,8 +168,8 @@ class CommandCheck extends Command {
 			int worldLoadedChunksWithShopkeepers = 0;
 			int worldShopkeepersInLoadedChunks = 0;
 
-			Map<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> shopkeepersByChunks = shopkeeperRegistry.getShopkeepersByChunks(worldName);
-			for (Entry<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
+			Map<? extends ChunkCoords, ? extends Collection<? extends Shopkeeper>> shopkeepersByChunks = shopkeeperRegistry.getShopkeepersByChunks(worldName);
+			for (Entry<? extends ChunkCoords, ? extends Collection<? extends Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
 				ChunkCoords chunkCoords = chunkEntry.getKey();
 				Collection<? extends Shopkeeper> chunkShopkeepers = chunkEntry.getValue();
 
@@ -201,7 +199,7 @@ class CommandCheck extends Command {
 			if (isConsole && listChunks && worldTotalShopkeepers > 0) {
 				sender.sendMessage("  Listing of all chunks with shopkeepers:");
 				int line = 0;
-				for (Entry<? extends @NonNull ChunkCoords, ? extends @NonNull Collection<? extends @NonNull Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
+				for (Entry<? extends ChunkCoords, ? extends Collection<? extends Shopkeeper>> chunkEntry : shopkeepersByChunks.entrySet()) {
 					ChunkCoords chunkCoords = chunkEntry.getKey();
 					Collection<? extends Shopkeeper> chunkShopkeepers = chunkEntry.getValue();
 

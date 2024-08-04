@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -205,7 +204,7 @@ public class AnyFallbackArgument extends FallbackArgument<@Nullable Object> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -213,20 +212,20 @@ public class AnyFallbackArgument extends FallbackArgument<@Nullable Object> {
 		// Combine suggestions of the original and the fallback argument:
 		// Keep track of the initial state:
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
-		List<? extends @NonNull String> argumentSuggestions = argument.complete(
+		List<? extends String> argumentSuggestions = argument.complete(
 				input,
 				context,
 				argsReader
 		);
 		if (argumentSuggestions.size() >= MAX_SUGGESTIONS) return argumentSuggestions;
 
-		List<@NonNull String> suggestions = new ArrayList<>(argumentSuggestions);
+		List<String> suggestions = new ArrayList<>(argumentSuggestions);
 		int limit = (MAX_SUGGESTIONS - suggestions.size());
 		assert limit > 0;
 
 		// Reset args so that the fallback argument has a chance to provide different completions:
 		argsReader.setState(argsReaderState);
-		List<? extends @NonNull String> fallbackSuggestions = fallbackArgument.complete(
+		List<? extends String> fallbackSuggestions = fallbackArgument.complete(
 				input,
 				context,
 				argsReader

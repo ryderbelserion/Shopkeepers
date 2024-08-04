@@ -22,7 +22,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -166,7 +165,7 @@ public class LivingEntityAI implements Listener {
 
 		private final ChunkCoords chunkCoords;
 		// We don't expect there to be many entities within a single chunk, so using a list is okay:
-		private final List<@NonNull EntityData> entities = new ArrayList<>();
+		private final List<EntityData> entities = new ArrayList<>();
 		// Active by default for fast initial reactions in case players are nearby:
 		public boolean activeGravity;
 		public boolean activeAI = true;
@@ -177,9 +176,9 @@ public class LivingEntityAI implements Listener {
 		}
 	}
 
-	private final Map<@NonNull ChunkCoords, @NonNull ChunkData> chunks = new LinkedHashMap<>();
+	private final Map<ChunkCoords, ChunkData> chunks = new LinkedHashMap<>();
 	// Index for fast removal: Shop object -> EntityData
-	private final Map<@NonNull SKLivingShopObject<?>, @NonNull EntityData> shopObjects = new HashMap<>();
+	private final Map<SKLivingShopObject<?>, EntityData> shopObjects = new HashMap<>();
 
 	private @Nullable BukkitTask aiTask = null;
 	private boolean currentlyRunning = false;
@@ -641,7 +640,7 @@ public class LivingEntityAI implements Listener {
 			Location entityLocation = Unsafe.assertNonNull(entity.getLocation(sharedLocation));
 
 			// The entity may be able to stand on certain types of fluids:
-			Set<? extends @NonNull Material> collidableFluids = EntityUtils.getCollidableFluids(
+			Set<? extends Material> collidableFluids = EntityUtils.getCollidableFluids(
 					entity.getType()
 			);
 			// However, if the entity is inside a fluid (i.e. if it is spawned underwater or inside

@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class EnumSerializers {
 
-	public static abstract class EnumSerializer<E extends @NonNull Enum<E>>
+	public static abstract class EnumSerializer<E extends Enum<E>>
 			implements DataSerializer<@NonNull E> {
 
 		protected final Class<@NonNull E> enumType;
@@ -60,7 +60,7 @@ public final class EnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> strict(
+	public static <E extends Enum<E>> DataSerializer<@NonNull E> strict(
 			Class<@NonNull E> enumType
 	) {
 		return new EnumSerializer<@NonNull E>(enumType) {
@@ -92,7 +92,7 @@ public final class EnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> lenient(
+	public static <E extends Enum<E>> DataSerializer<@NonNull E> lenient(
 			Class<@NonNull E> enumType
 	) {
 		return new EnumSerializer<@NonNull E>(enumType) {

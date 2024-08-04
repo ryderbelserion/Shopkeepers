@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -29,28 +28,28 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class SheepShop extends BabyableShop<@NonNull Sheep> {
+public class SheepShop extends BabyableShop<Sheep> {
 
-	public static final Property<@NonNull DyeColor> COLOR = new BasicProperty<@NonNull DyeColor>()
+	public static final Property<DyeColor> COLOR = new BasicProperty<DyeColor>()
 			.dataKeyAccessor("color", EnumSerializers.lenient(DyeColor.class))
 			.defaultValue(DyeColor.WHITE)
 			.build();
 
-	public static final Property<@NonNull Boolean> SHEARED = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> SHEARED = new BasicProperty<Boolean>()
 			.dataKeyAccessor("sheared", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull DyeColor> colorProperty = new PropertyValue<>(COLOR)
+	private final PropertyValue<DyeColor> colorProperty = new PropertyValue<>(COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyColor)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> shearedProperty = new PropertyValue<>(SHEARED)
+	private final PropertyValue<Boolean> shearedProperty = new PropertyValue<>(SHEARED)
 			.onValueChanged(Unsafe.initialized(this)::applySheared)
 			.build(properties);
 
 	public SheepShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull SheepShop> livingObjectType,
+			SKLivingShopObjectType<SheepShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -79,8 +78,8 @@ public class SheepShop extends BabyableShop<@NonNull Sheep> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getShearedEditorButton());
 		return editorButtons;
@@ -103,6 +102,7 @@ public class SheepShop extends BabyableShop<@NonNull Sheep> {
 	private void applyColor() {
 		Sheep entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setColor(this.getColor());
 	}
 
@@ -152,6 +152,7 @@ public class SheepShop extends BabyableShop<@NonNull Sheep> {
 	private void applySheared() {
 		Sheep entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setSheared(this.isSheared());
 	}
 

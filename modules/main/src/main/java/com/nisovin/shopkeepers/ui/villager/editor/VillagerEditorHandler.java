@@ -22,7 +22,6 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -60,11 +59,6 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 public final class VillagerEditorHandler extends AbstractEditorHandler {
 
-	private static final Registry<Villager.@NonNull Profession> REGISTRY_VILLAGER_PROFESSION
-			= Unsafe.castNonNull(Registry.VILLAGER_PROFESSION);
-	private static final Registry<Villager.@NonNull Type> REGISTRY_VILLAGER_TYPE
-			= Unsafe.castNonNull(Registry.VILLAGER_TYPE);
-
 	// We compare the recipes from the editor with the original recipes and keep the original
 	// recipes with their original internal data if the items have not changed.
 	// TODO Somehow support changing/persisting: max-uses, uses, exp reward, villager xp reward,
@@ -72,7 +66,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	// TODO The trades may change during the editor session, in which case the comparison between
 	// new and old recipes no longer works (trades may get reverted to the editor state).
 	private static class TradingRecipesAdapter
-			extends DefaultTradingRecipesAdapter<@NonNull MerchantRecipe> {
+			extends DefaultTradingRecipesAdapter<MerchantRecipe> {
 
 		private final AbstractVillager villager;
 
@@ -82,23 +76,21 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		}
 
 		@Override
-		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
+		public List<TradingRecipeDraft> getTradingRecipes() {
 			assert villager.isValid();
-			@NonNull List<@NonNull MerchantRecipe> merchantRecipes = Unsafe.cast(villager.getRecipes());
-			List<@NonNull TradingRecipeDraft> recipes = MerchantUtils.createTradingRecipeDrafts(
-					merchantRecipes
-			);
+			List<MerchantRecipe> merchantRecipes = villager.getRecipes();
+			var recipes = MerchantUtils.createTradingRecipeDrafts(merchantRecipes);
 			return recipes;
 		}
 
 		@Override
-		protected List<? extends @NonNull MerchantRecipe> getOffers() {
+		protected List<? extends MerchantRecipe> getOffers() {
 			assert villager.isValid();
-			return Unsafe.cast(villager.getRecipes());
+			return villager.getRecipes();
 		}
 
 		@Override
-		protected void setOffers(List<? extends @NonNull MerchantRecipe> newOffers) {
+		protected void setOffers(List<? extends MerchantRecipe> newOffers) {
 			assert villager.isValid();
 
 			// Stop any current trading with the villager:
@@ -110,7 +102,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			// Apply the new trading recipes:
-			villager.setRecipes(Unsafe.cast(newOffers));
+			villager.setRecipes(Unsafe.castNonNull(newOffers));
 		}
 
 		@Override
@@ -134,7 +126,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		}
 
 		@Override
-		public @Nullable List<? extends @NonNull String> getConfirmationLore() {
+		public @Nullable List<? extends String> getConfirmationLore() {
 			return Messages.confirmationUiDeleteVillagerConfirmLore;
 		}
 	};
@@ -572,7 +564,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				// the old trades with their original data:
 				List<MerchantRecipe> previousRecipes = villager.getRecipes();
 				profession = RegistryUtils.cycleKeyed(
-						REGISTRY_VILLAGER_PROFESSION,
+						Registry.VILLAGER_PROFESSION,
 						profession,
 						backwards
 				);
@@ -644,7 +636,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 				boolean backwards = clickEvent.isRightClick();
 				villagerType = RegistryUtils.cycleKeyed(
-						REGISTRY_VILLAGER_TYPE,
+						Registry.VILLAGER_TYPE,
 						villagerType,
 						backwards
 				);
@@ -799,7 +791,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		String itemName = StringUtils.replaceArguments(Messages.villagerEditorDescriptionHeader,
 				"villagerName", villagerName
 		);
-		List<? extends @NonNull String> itemLore = Messages.villagerEditorDescription;
+		List<? extends String> itemLore = Messages.villagerEditorDescription;
 		return ItemUtils.setDisplayNameAndLore(
 				Settings.tradeSetupItem.createItemStack(),
 				itemName,

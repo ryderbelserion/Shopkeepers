@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -31,17 +30,16 @@ import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
-		implements UIRegistry<@NonNull AbstractUIType> {
+public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType>
+		implements UIRegistry<AbstractUIType> {
 
 	private final ShopkeepersPlugin plugin;
 	private final UIListener uiListener;
 
 	// Player id -> UI session
-	private final Map<@NonNull UUID, @NonNull SKUISession> uiSessions = new HashMap<>();
-	private final Collection<? extends @NonNull SKUISession> uiSessionsView = Collections.unmodifiableCollection(
-			uiSessions.values()
-	);
+	private final Map<UUID, SKUISession> uiSessions = new HashMap<>();
+	private final Collection<? extends SKUISession> uiSessionsView
+			= Collections.unmodifiableCollection(uiSessions.values());
 
 	public SKUIRegistry(ShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -180,7 +178,8 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 		assert this.getUISession(player) == null;
 
 		// Register event handlers for any not yet handled types of inventory events:
-		Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> additionalInventoryEvents = uiHandler.getAdditionalInventoryEvents();
+		Set<? extends Class<? extends InventoryEvent>> additionalInventoryEvents
+				= uiHandler.getAdditionalInventoryEvents();
 		assert additionalInventoryEvents != null;
 		additionalInventoryEvents.forEach(uiListener::registerEventType);
 
@@ -201,14 +200,14 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 	}
 
 	@Override
-	public Collection<? extends @NonNull SKUISession> getUISessions() {
+	public Collection<? extends SKUISession> getUISessions() {
 		return uiSessionsView;
 	}
 
 	@Override
-	public Collection<? extends @NonNull SKUISession> getUISessions(Shopkeeper shopkeeper) {
+	public Collection<? extends SKUISession> getUISessions(Shopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		List<@NonNull SKUISession> sessions = new ArrayList<>();
+		List<SKUISession> sessions = new ArrayList<>();
 		uiSessionsView.forEach(uiSession -> {
 			if (uiSession.getShopkeeper() == shopkeeper) {
 				sessions.add(uiSession);
@@ -218,13 +217,13 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 	}
 
 	@Override
-	public Collection<? extends @NonNull SKUISession> getUISessions(
+	public Collection<? extends SKUISession> getUISessions(
 			Shopkeeper shopkeeper,
 			UIType uiType
 	) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		Validate.notNull(uiType, "uiType is null");
-		List<@NonNull SKUISession> sessions = new ArrayList<>();
+		List<SKUISession> sessions = new ArrayList<>();
 		uiSessionsView.forEach(uiSession -> {
 			if (uiSession.getShopkeeper() == shopkeeper && uiSession.getUIType() == uiType) {
 				sessions.add(uiSession);
@@ -234,9 +233,9 @@ public class SKUIRegistry extends AbstractTypeRegistry<@NonNull AbstractUIType>
 	}
 
 	@Override
-	public Collection<? extends @NonNull UISession> getUISessions(UIType uiType) {
+	public Collection<? extends UISession> getUISessions(UIType uiType) {
 		Validate.notNull(uiType, "uiType is null");
-		List<@NonNull SKUISession> sessions = new ArrayList<>();
+		List<SKUISession> sessions = new ArrayList<>();
 		uiSessionsView.forEach(uiSession -> {
 			if (uiSession.getUIType() == uiType) {
 				sessions.add(uiSession);

@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.config.migration;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
@@ -134,8 +133,8 @@ public class ConfigMigration2 implements ConfigMigration {
 				displayName = TextUtils.colorize(displayName);
 			}
 		}
-		// lore:
-		List<@NonNull String> lore = null;
+		// Lore:
+		List<String> lore = null;
 		if (loreKey != null) {
 			lore = ConversionUtils.toStringList(configData.getList(loreKey));
 			if (lore == null || lore.isEmpty()) {

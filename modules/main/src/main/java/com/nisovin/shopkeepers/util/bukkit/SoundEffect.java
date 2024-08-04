@@ -7,7 +7,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -55,7 +54,7 @@ public final class SoundEffect {
 	 */
 	public static final SoundEffect EMPTY = new SoundEffect("");
 
-	private static final Property<@NonNull String> SOUND_NAME = new BasicProperty<@NonNull String>()
+	private static final Property<String> SOUND_NAME = new BasicProperty<String>()
 			.dataKeyAccessor("sound", StringSerializers.SCALAR)
 			.build();
 	private static final Property<@Nullable SoundCategory> CATEGORY = new BasicProperty<@Nullable SoundCategory>()
@@ -80,7 +79,7 @@ public final class SoundEffect {
 	/**
 	 * A {@link DataSerializer} for values of type {@link SoundEffect}.
 	 */
-	public static final DataSerializer<@NonNull SoundEffect> SERIALIZER = new DataSerializer<@NonNull SoundEffect>() {
+	public static final DataSerializer<SoundEffect> SERIALIZER = new DataSerializer<SoundEffect>() {
 		@Override
 		public @Nullable Object serialize(SoundEffect value) {
 			Validate.notNull(value, "value is null");

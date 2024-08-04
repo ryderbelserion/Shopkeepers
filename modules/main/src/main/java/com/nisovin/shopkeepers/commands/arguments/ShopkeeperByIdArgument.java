@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -18,27 +17,26 @@ import com.nisovin.shopkeepers.text.Text;
 /**
  * Determines a shopkeeper by the given id input.
  */
-public class ShopkeeperByIdArgument
-		extends ObjectByIdArgument<@NonNull Integer, @NonNull Shopkeeper> {
+public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeeper> {
 
 	public ShopkeeperByIdArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperByIdArgument(String name, ArgumentFilter<? super @NonNull Shopkeeper> filter) {
+	public ShopkeeperByIdArgument(String name, ArgumentFilter<? super Shopkeeper> filter) {
 		this(name, filter, ShopkeeperIdArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperByIdArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter,
+			ArgumentFilter<? super Shopkeeper> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull Integer> createIdArgument(
+	protected ObjectIdArgument<Integer> createIdArgument(
 			@UnknownInitialization ShopkeeperByIdArgument this,
 			String name,
 			IdArgumentArgs args
@@ -49,7 +47,7 @@ public class ShopkeeperByIdArgument
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+			protected Iterable<? extends Integer> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -79,7 +77,7 @@ public class ShopkeeperByIdArgument
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+	protected Iterable<? extends Integer> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

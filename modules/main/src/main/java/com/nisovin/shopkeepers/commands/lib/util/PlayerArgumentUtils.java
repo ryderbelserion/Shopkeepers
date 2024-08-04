@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -27,10 +26,10 @@ public final class PlayerArgumentUtils {
 	 * - Names don't include color codes.
 	 * - Display names may include whitespace, color codes, arbitrary characters and may not be unique.
 	 */
-	public interface PlayerNameMatcher extends ObjectMatcher<@NonNull Player> {
+	public interface PlayerNameMatcher extends ObjectMatcher<Player> {
 
 		@Override
-		public Stream<@NonNull Player> match(String input);
+		public Stream<Player> match(String input);
 
 		/**
 		 * Whether this {@link PlayerNameMatcher} matches display names.
@@ -43,7 +42,7 @@ public final class PlayerArgumentUtils {
 
 		public static final PlayerNameMatcher NAME_EXACT = new PlayerNameMatcher() {
 			@Override
-			public Stream<@NonNull Player> match(String input) {
+			public Stream<Player> match(String input) {
 				if (StringUtils.isEmpty(input)) return Stream.empty();
 				// Note: This is case-insensitive.
 				// Assumption: Player names are unique regardless of case.
@@ -93,7 +92,7 @@ public final class PlayerArgumentUtils {
 	private static abstract class AbstractPlayerNameMatcher implements PlayerNameMatcher {
 
 		@Override
-		public Stream<@NonNull Player> match(String input) {
+		public Stream<Player> match(String input) {
 			if (StringUtils.isEmpty(input)) return Stream.empty();
 
 			// Check for an exact match first:
@@ -103,7 +102,7 @@ public final class PlayerArgumentUtils {
 			}
 
 			String normalizedInput = StringUtils.normalize(input);
-			List<@NonNull Player> matchingPlayers = new ArrayList<>();
+			List<Player> matchingPlayers = new ArrayList<>();
 			boolean[] onlyPerfectMatches = new boolean[] { false };
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				assert player != null;
@@ -153,7 +152,7 @@ public final class PlayerArgumentUtils {
 				String normalizedInput,
 				Player player,
 				String normalizedName,
-				List<@NonNull Player> matchingPlayers,
+				List<Player> matchingPlayers,
 				boolean[] onlyPerfectMatches
 		) {
 			if (this.matches(normalizedInput, normalizedName)) {
@@ -186,7 +185,7 @@ public final class PlayerArgumentUtils {
 	public static boolean handleAmbiguousPlayerName(
 			CommandSender sender,
 			String name,
-			Iterable<? extends @NonNull Entry<? extends @NonNull UUID, ? extends @NonNull String>> matches
+			Iterable<? extends Entry<? extends UUID, ? extends String>> matches
 	) {
 		return handleAmbiguousPlayerName(
 				sender,
@@ -201,7 +200,7 @@ public final class PlayerArgumentUtils {
 	public static boolean handleAmbiguousPlayerName(
 			CommandSender sender,
 			String name,
-			Iterable<? extends @NonNull Entry<? extends @NonNull UUID, ? extends @NonNull String>> matches,
+			Iterable<? extends Entry<? extends UUID, ? extends String>> matches,
 			int maxEntries
 	) {
 		return CommandArgumentUtils.handleAmbiguousInput(sender, name, matches, maxEntries,

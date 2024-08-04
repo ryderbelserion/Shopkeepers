@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.util.data.serialization.bukkit;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -16,11 +15,11 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class ColoredStringSerializers {
 
-	private static final class ColoredStringSerializer implements DataSerializer<@NonNull String> {
+	private static final class ColoredStringSerializer implements DataSerializer<String> {
 
-		private final DataSerializer<@NonNull String> stringSerializer;
+		private final DataSerializer<String> stringSerializer;
 
-		private ColoredStringSerializer(DataSerializer<@NonNull String> stringSerializer) {
+		private ColoredStringSerializer(DataSerializer<String> stringSerializer) {
 			Validate.notNull(stringSerializer, "stringSerializer is null");
 			this.stringSerializer = stringSerializer;
 		}
@@ -45,7 +44,7 @@ public final class ColoredStringSerializers {
 	 * This {@link DataSerializer} behaves like {@link StringSerializers#STRICT}, but converts color
 	 * codes.
 	 */
-	public static final DataSerializer<@NonNull String> STRICT = new ColoredStringSerializer(
+	public static final DataSerializer<String> STRICT = new ColoredStringSerializer(
 			StringSerializers.STRICT
 	);
 
@@ -55,7 +54,7 @@ public final class ColoredStringSerializers {
 	 * This {@link DataSerializer} behaves like {@link StringSerializers#STRICT_NON_EMPTY}, but
 	 * converts color codes.
 	 */
-	public static final DataSerializer<@NonNull String> STRICT_NON_EMPTY = new ColoredStringSerializer(
+	public static final DataSerializer<String> STRICT_NON_EMPTY = new ColoredStringSerializer(
 			StringSerializers.STRICT_NON_EMPTY
 	);
 
@@ -65,7 +64,7 @@ public final class ColoredStringSerializers {
 	 * This {@link DataSerializer} behaves like {@link StringSerializers#SCALAR}, but converts color
 	 * codes.
 	 */
-	public static final DataSerializer<@NonNull String> SCALAR = new ColoredStringSerializer(
+	public static final DataSerializer<String> SCALAR = new ColoredStringSerializer(
 			StringSerializers.SCALAR
 	);
 
@@ -75,7 +74,7 @@ public final class ColoredStringSerializers {
 	 * This {@link DataSerializer} behaves like {@link StringSerializers#SCALAR_NON_EMPTY}, but
 	 * converts color codes.
 	 */
-	public static final DataSerializer<@NonNull String> SCALAR_NON_EMPTY = new ColoredStringSerializer(
+	public static final DataSerializer<String> SCALAR_NON_EMPTY = new ColoredStringSerializer(
 			StringSerializers.SCALAR_NON_EMPTY
 	);
 
@@ -85,7 +84,7 @@ public final class ColoredStringSerializers {
 	 * This {@link DataSerializer} behaves like {@link StringSerializers#LENIENT}, but converts
 	 * color codes.
 	 */
-	public static final DataSerializer<@NonNull String> LENIENT = new ColoredStringSerializer(
+	public static final DataSerializer<String> LENIENT = new ColoredStringSerializer(
 			StringSerializers.LENIENT
 	);
 
@@ -95,7 +94,7 @@ public final class ColoredStringSerializers {
 	 * This {@link DataSerializer} behaves like {@link StringSerializers#LENIENT_NON_EMPTY}, but
 	 * converts color codes.
 	 */
-	public static final DataSerializer<@NonNull String> LENIENT_NON_EMPTY = new ColoredStringSerializer(
+	public static final DataSerializer<String> LENIENT_NON_EMPTY = new ColoredStringSerializer(
 			StringSerializers.LENIENT_NON_EMPTY
 	);
 

@@ -147,14 +147,75 @@ subprojects {
 
 	// Shared plugin / task configurations:
 	project.plugins.withId('java-library') {
+		configurations {
+			ecj
+		}
+
+		dependencies {
+			// ECJ compiler for null analysis
+			ecj 'org.eclipse.jdt:ecj:3.38.0'
+		}
+
 		java {
 			sourceCompatibility = JavaVersion.VERSION_21
+		}
+
+		// Null analysis with the Eclipse compiler:
+		// https://help.eclipse.org/latest/index.jsp?topic=/org.eclipse.jdt.doc.user/tasks/task-using_batch_compiler.htm
+		// Custom compilers with Gradle 8+: https://github.com/gradle/gradle/issues/23990
+		// See also https://github.com/TheMrMilchmann/gradle-ecj
+		task ecjAnalysis(type: JavaCompile) {
+			source = sourceSets.main.java
+			classpath = sourceSets.main.compileClasspath
+			destinationDirectory = file(sourceSets.main.java.destinationDirectory.asFile.get().absolutePath.replace("classes", "classes-ecj"))
+			//println(destinationDirectory.get())
+
+			// The Java version required to run ECJ:
+			def ECJ_REQUIRED_JAVA_VERSION = 11
+
+			// The Java version to request the toolchain for if the project's toolchain is not
+			// compatible with the ECJ requirements:
+			def ECJ_PREFERRED_JAVA_VERSION = 21
+
+			def defaultJavaCompiler = provider {
+				def javaCompiler = javaToolchains.compilerFor(java.toolchain).get()
+				if (javaCompiler.metadata.languageVersion.canCompileOrRun(ECJ_REQUIRED_JAVA_VERSION)) {
+					javaCompiler
+				} else {
+					javaToolchains.compilerFor {
+						languageVersion.set(JavaLanguageVersion.of(ECJ_PREFERRED_JAVA_VERSION))
+					}.get()
+				}
+			}
+
+			javaCompiler = defaultJavaCompiler
+
+			// ECJ does not support generating JNI headers. Make sure the property is not used.
+			options.headerOutputDirectory.set(provider { null })
+
+			options.fork = true
+			options.forkOptions.jvmArgs += [
+				'-classpath', project.configurations.ecj.asPath,
+				'org.eclipse.jdt.internal.compiler.batch.Main',
+				'-properties', '.settings/org.eclipse.jdt.core.prefs',
+				'-warn:-deprecation,unused',
+				'-info:-warningToken',
+				'-annotationpath', 'CLASSPATH'
+			]
+
+			doFirst {
+				//println(classpath.getAsPath())
+				def javacExecutable = javaCompiler.get().executablePath.asFile
+				def javaExecutableName = javacExecutable.name.replace("javac", "java")
+				def javaExecutablePath = javacExecutable.parentFile.toPath().resolve(javaExecutableName).toAbsolutePath()
+				options.forkOptions.executable = javaExecutablePath
+			}
 		}
 
 		// Configure all JavaCompile tasks (compileJava, compileTestJava, etc):
 		tasks.withType(JavaCompile) {
 			options.encoding = 'UTF-8'
-			options.compilerArgs += ['-Xmaxerrs', '10000', '-Xmaxwarns', '10000']
+			//options.compilerArgs += ['-Xmaxerrs', '10000', '-Xmaxwarns', '10000']
 		}
 
 		processResources {
@@ -177,11 +238,41 @@ subprojects {
 		}
 
 		test {
+			// Run the ECJ analysis whenever we also run tests:
+			dependsOn ecjAnalysis
+
 			systemProperty 'file.encoding', 'UTF-8'
 			workingDir project.file("${project.buildDir}/test-work/")
 			// Gradle complains when this folder does not yet exist.
 			doFirst {
 				workingDir.mkdirs()
+			}
+		}
+	}
+
+	project.plugins.withId('eclipse') {
+		// "annotationpath" attribute: Needed for annotating external libraries from within Eclipse,
+		// but breaks the resolution of null annotations from other packages (e.g for the JDK).
+		// Compromise: Only set the annotation path for the Gradle dependencies container, but omit
+		// it from the JRE container.
+		afterEvaluate {
+			eclipse {
+				classpath {
+					// Link the External Eclipse Annotations (used for null analysis):
+					// This Gradle container might not exist yet when whenMerged is run. But we can
+					// manually add it, and it also retains our added attribute.
+					containers "org.eclipse.buildship.core.gradleclasspathcontainer"
+					file {
+						whenMerged { classpath ->
+							classpath.entries.forEach { entry ->
+								//if (entry.kind == 'con') {
+								if (entry.path == 'org.eclipse.buildship.core.gradleclasspathcontainer') {
+									entry.entryAttributes.put("annotationpath", "/shopkeepers-external-annotations/src/main/resources")
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

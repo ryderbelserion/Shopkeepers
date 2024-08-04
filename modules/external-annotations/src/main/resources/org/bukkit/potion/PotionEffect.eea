@@ -1,0 +1,28 @@
+class org/bukkit/potion/PotionEffect
+<init>
+ (Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V
+ (L1java/util/Map<L1java/lang/String;L1java/lang/Object;>;)V
+<init>
+ (Lorg/bukkit/potion/PotionEffectType;II)V
+ (L1org/bukkit/potion/PotionEffectType;II)V
+<init>
+ (Lorg/bukkit/potion/PotionEffectType;IIZ)V
+ (L1org/bukkit/potion/PotionEffectType;IIZ)V
+<init>
+ (Lorg/bukkit/potion/PotionEffectType;IIZZ)V
+ (L1org/bukkit/potion/PotionEffectType;IIZZ)V
+<init>
+ (Lorg/bukkit/potion/PotionEffectType;IIZZZ)V
+ (L1org/bukkit/potion/PotionEffectType;IIZZZ)V
+apply
+ (Lorg/bukkit/entity/LivingEntity;)Z
+ (L1org/bukkit/entity/LivingEntity;)Z
+getType
+ ()Lorg/bukkit/potion/PotionEffectType;
+ ()L1org/bukkit/potion/PotionEffectType;
+isShorterThan
+ (Lorg/bukkit/potion/PotionEffect;)Z
+ (L1org/bukkit/potion/PotionEffect;)Z
+serialize
+ ()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;
+ ()L1java/util/Map<L1java/lang/String;L1java/lang/Object;>;

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -13,8 +11,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public abstract class AbstractPropertyValuesHolder implements PropertyValuesHolder {
 
-	private final List<@NonNull PropertyValue<?>> propertyValues = new ArrayList<>();
-	private final List<? extends @NonNull PropertyValue<?>> propertyValuesView = Collections.unmodifiableList(
+	private final List<PropertyValue<?>> propertyValues = new ArrayList<>();
+	private final List<? extends PropertyValue<?>> propertyValuesView = Collections.unmodifiableList(
 			propertyValues
 	);
 
@@ -50,7 +48,7 @@ public abstract class AbstractPropertyValuesHolder implements PropertyValuesHold
 	}
 
 	@Override
-	public final List<? extends @NonNull PropertyValue<?>> getPropertyValues() {
+	public final List<? extends PropertyValue<?>> getPropertyValues() {
 		return propertyValuesView;
 	}
 

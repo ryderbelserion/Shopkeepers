@@ -1,0 +1,94 @@
+class org/bukkit/entity/Entity
+addPassenger
+ (Lorg/bukkit/entity/Entity;)Z
+ (L1org/bukkit/entity/Entity;)Z
+addScoreboardTag
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+getBoundingBox
+ ()Lorg/bukkit/util/BoundingBox;
+ ()L1org/bukkit/util/BoundingBox;
+getFacing
+ ()Lorg/bukkit/block/BlockFace;
+ ()L1org/bukkit/block/BlockFace;
+getLastDamageCause
+ ()Lorg/bukkit/event/entity/EntityDamageEvent;
+ ()L0org/bukkit/event/entity/EntityDamageEvent;
+getLocation
+ ()Lorg/bukkit/Location;
+ ()L1org/bukkit/Location;
+getLocation
+ (Lorg/bukkit/Location;)Lorg/bukkit/Location;
+ (L1org/bukkit/Location;)L1org/bukkit/Location;
+getNearbyEntities
+ (DDD)Ljava/util/List<Lorg/bukkit/entity/Entity;>;
+ (DDD)L1java/util/List<L1org/bukkit/entity/Entity;>;
+getPassengers
+ ()Ljava/util/List<Lorg/bukkit/entity/Entity;>;
+ ()L1java/util/List<L1org/bukkit/entity/Entity;>;
+getPistonMoveReaction
+ ()Lorg/bukkit/block/PistonMoveReaction;
+ ()L1org/bukkit/block/PistonMoveReaction;
+getPose
+ ()Lorg/bukkit/entity/Pose;
+ ()L1org/bukkit/entity/Pose;
+getScoreboardTags
+ ()Ljava/util/Set<Ljava/lang/String;>;
+ ()L1java/util/Set<L1java/lang/String;>;
+getServer
+ ()Lorg/bukkit/Server;
+ ()L1org/bukkit/Server;
+getSpawnCategory
+ ()Lorg/bukkit/entity/SpawnCategory;
+ ()L1org/bukkit/entity/SpawnCategory;
+getSwimHighSpeedSplashSound
+ ()Lorg/bukkit/Sound;
+ ()L1org/bukkit/Sound;
+getSwimSound
+ ()Lorg/bukkit/Sound;
+ ()L1org/bukkit/Sound;
+getSwimSplashSound
+ ()Lorg/bukkit/Sound;
+ ()L1org/bukkit/Sound;
+getTrackedBy
+ ()Ljava/util/Set<Lorg/bukkit/entity/Player;>;
+ ()L1java/util/Set<L1org/bukkit/entity/Player;>;
+getType
+ ()Lorg/bukkit/entity/EntityType;
+ ()L1org/bukkit/entity/EntityType;
+getUniqueId
+ ()Ljava/util/UUID;
+ ()L1java/util/UUID;
+getVehicle
+ ()Lorg/bukkit/entity/Entity;
+ ()L0org/bukkit/entity/Entity;
+getVelocity
+ ()Lorg/bukkit/util/Vector;
+ ()L1org/bukkit/util/Vector;
+getWorld
+ ()Lorg/bukkit/World;
+ ()L1org/bukkit/World;
+removePassenger
+ (Lorg/bukkit/entity/Entity;)Z
+ (L1org/bukkit/entity/Entity;)Z
+removeScoreboardTag
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+setVelocity
+ (Lorg/bukkit/util/Vector;)V
+ (L1org/bukkit/util/Vector;)V
+spigot
+ ()Lorg/bukkit/entity/Entity$Spigot;
+ ()L1org/bukkit/entity/Entity$Spigot;
+teleport
+ (Lorg/bukkit/Location;)Z
+ (L1org/bukkit/Location;)Z
+teleport
+ (Lorg/bukkit/Location;Lorg/bukkit/event/player/PlayerTeleportEvent$TeleportCause;)Z
+ (L1org/bukkit/Location;L1org/bukkit/event/player/PlayerTeleportEvent$TeleportCause;)Z
+teleport
+ (Lorg/bukkit/entity/Entity;)Z
+ (L1org/bukkit/entity/Entity;)Z
+teleport
+ (Lorg/bukkit/entity/Entity;Lorg/bukkit/event/player/PlayerTeleportEvent$TeleportCause;)Z
+ (L1org/bukkit/entity/Entity;L1org/bukkit/event/player/PlayerTeleportEvent$TeleportCause;)Z

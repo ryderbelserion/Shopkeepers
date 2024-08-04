@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 
 public final class EnumUtils {
 
-	public static <T extends @NonNull Enum<T>> @NonNull T cycleEnumConstant(
+	public static <T extends Enum<T>> @NonNull T cycleEnumConstant(
 			Class<? extends @NonNull T> enumClass,
 			@NonNull T current,
 			boolean backwards
@@ -20,7 +20,7 @@ public final class EnumUtils {
 		return cycleEnumConstant(enumClass, current, backwards, PredicateUtils.alwaysTrue());
 	}
 
-	public static <T extends @NonNull Enum<T>> @NonNull T cycleEnumConstant(
+	public static <T extends Enum<T>> @NonNull T cycleEnumConstant(
 			Class<? extends @NonNull T> enumClass,
 			@NonNull T current,
 			boolean backwards,
@@ -35,7 +35,7 @@ public final class EnumUtils {
 		);
 	}
 
-	public static <T extends @NonNull Enum<T>> @Nullable T cycleEnumConstantNullable(
+	public static <T extends Enum<T>> @Nullable T cycleEnumConstantNullable(
 			Class<? extends @NonNull T> enumClass,
 			@Nullable T current,
 			boolean backwards
@@ -48,7 +48,7 @@ public final class EnumUtils {
 		);
 	}
 
-	public static <T extends @NonNull Enum<T>> @Nullable T cycleEnumConstantNullable(
+	public static <T extends Enum<T>> @Nullable T cycleEnumConstantNullable(
 			Class<? extends @NonNull T> enumClass,
 			@Nullable T current,
 			boolean backwards,
@@ -66,7 +66,7 @@ public final class EnumUtils {
 	// nullable: Uses null as first value.
 	// current==null: nullable has to be true.
 	// Cycled through all values but none got accepted: Returns current value (can be null).
-	private static <E extends @NonNull Enum<E>, T extends @Nullable E> T cycleEnumConstant(
+	private static <E extends Enum<E>, T extends @Nullable E> T cycleEnumConstant(
 			Class<? extends @NonNull T> enumClass,
 			boolean nullable,
 			T current,
@@ -79,7 +79,7 @@ public final class EnumUtils {
 		return CollectionUtils.cycleValue(valuesList, nullable, current, backwards, predicate);
 	}
 
-	public static <E extends @NonNull Enum<E>> @Nullable E valueOf(
+	public static <E extends Enum<E>> @Nullable E valueOf(
 			Class<E> enumType,
 			@Nullable String enumName
 	) {

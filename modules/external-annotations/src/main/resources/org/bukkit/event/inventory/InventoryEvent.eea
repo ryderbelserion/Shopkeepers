@@ -1,0 +1,13 @@
+class org/bukkit/event/inventory/InventoryEvent
+getHandlerList
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;
+getInventory
+ ()Lorg/bukkit/inventory/Inventory;
+ ()L1org/bukkit/inventory/Inventory;
+getView
+ ()Lorg/bukkit/inventory/InventoryView;
+ ()L1org/bukkit/inventory/InventoryView;
+getViewers
+ ()Ljava/util/List<Lorg/bukkit/entity/HumanEntity;>;
+ ()L1java/util/List<L1org/bukkit/entity/HumanEntity;>;

@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -108,7 +107,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 				String displayName = StringUtils.replaceArguments(Messages.buttonTradeNotifications,
 						"state", state
 				);
-				List<? extends @NonNull String> lore = StringUtils.replaceArguments(
+				List<? extends String> lore = StringUtils.replaceArguments(
 						Messages.buttonTradeNotificationsLore,
 						"state", state
 				);

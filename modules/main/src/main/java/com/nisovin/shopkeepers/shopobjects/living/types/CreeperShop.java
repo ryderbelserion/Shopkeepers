@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -27,20 +26,20 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class CreeperShop extends SKLivingShopObject<@NonNull Creeper> {
+public class CreeperShop extends SKLivingShopObject<Creeper> {
 
-	public static final Property<@NonNull Boolean> POWERED = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> POWERED = new BasicProperty<Boolean>()
 			.dataKeyAccessor("powered", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> poweredProperty = new PropertyValue<>(POWERED)
+	private final PropertyValue<Boolean> poweredProperty = new PropertyValue<>(POWERED)
 			.onValueChanged(Unsafe.initialized(this)::applyPowered)
 			.build(properties);
 
 	public CreeperShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull CreeperShop> livingObjectType,
+			SKLivingShopObjectType<CreeperShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -66,8 +65,8 @@ public class CreeperShop extends SKLivingShopObject<@NonNull Creeper> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPoweredEditorButton());
 		return editorButtons;
 	}
@@ -89,6 +88,7 @@ public class CreeperShop extends SKLivingShopObject<@NonNull Creeper> {
 	private void applyPowered() {
 		Creeper entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setPowered(this.isPowered());
 	}
 

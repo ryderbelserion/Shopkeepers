@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -37,7 +36,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public PlayerNameArgument(String name, ArgumentFilter<? super @NonNull String> filter) {
+	public PlayerNameArgument(String name, ArgumentFilter<? super String> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
@@ -45,7 +44,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	// in display names).
 	public PlayerNameArgument(
 			String name,
-			ArgumentFilter<? super @NonNull String> filter,
+			ArgumentFilter<? super String> filter,
 			int minimumCompletionInput
 	) {
 		super(name, false, filter, minimumCompletionInput);
@@ -77,12 +76,12 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 *            <code>true</code> to include display name suggestions
 	 * @return the player name completion suggestions
 	 */
-	public static Iterable<? extends @NonNull String> getDefaultCompletionSuggestions(
+	public static Iterable<? extends String> getDefaultCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
 			String namePrefix,
-			Predicate<? super @NonNull Player> playerFilter,
+			Predicate<? super Player> playerFilter,
 			boolean includeDisplayNames
 	) {
 		// Only provide suggestions if there is a minimum length input:
@@ -95,8 +94,8 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		// Normalizes whitespace and converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(namePrefix);
 		// TODO Cast: Workaround for a limitation of CheckerFramework
-		Stream<@NonNull Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
-		Iterable<@NonNull String> suggestions = onlinePlayers
+		Stream<Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
+		Iterable<String> suggestions = onlinePlayers
 				.filter(playerFilter)
 				.<@Nullable String>map(player -> {
 					// Note: Not suggesting both the name and display name for the same player.
@@ -114,12 +113,12 @@ public class PlayerNameArgument extends ObjectNameArgument {
 					}
 					return null; // No match
 				}).filter(Objects::nonNull)
-				.<@NonNull String>map(Unsafe::assertNonNull)::iterator;
+				.map(Unsafe::assertNonNull)::iterator;
 		return suggestions;
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+	protected Iterable<? extends String> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix

@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -30,7 +29,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class MagmaCubeShop extends SKLivingShopObject<@NonNull MagmaCube> {
+public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 
 	// Note: Minecraft actually allows magma cubes with sizes up to 256 (internally stored as 0 -
 	// 255). However, at these sizes the magma cube is not properly rendered anymore, cannot be
@@ -38,19 +37,19 @@ public class MagmaCubeShop extends SKLivingShopObject<@NonNull MagmaCube> {
 	// We limit it to 10 since this seems to be a more reasonable limit.
 	public static final int MIN_SIZE = 1;
 	public static final int MAX_SIZE = 10;
-	public static final Property<@NonNull Integer> SIZE = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> SIZE = new BasicProperty<Integer>()
 			.dataKeyAccessor("magmaCubeSize", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.bounded(MIN_SIZE, MAX_SIZE))
 			.defaultValue(1)
 			.build();
 
-	private final PropertyValue<@NonNull Integer> sizeProperty = new PropertyValue<>(SIZE)
+	private final PropertyValue<Integer> sizeProperty = new PropertyValue<>(SIZE)
 			.onValueChanged(Unsafe.initialized(this)::applySize)
 			.build(properties);
 
 	public MagmaCubeShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull MagmaCubeShop> livingObjectType,
+			SKLivingShopObjectType<MagmaCubeShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -76,8 +75,8 @@ public class MagmaCubeShop extends SKLivingShopObject<@NonNull MagmaCube> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSizeEditorButton());
 		return editorButtons;
 	}
@@ -107,6 +106,7 @@ public class MagmaCubeShop extends SKLivingShopObject<@NonNull MagmaCube> {
 	private void applySize() {
 		MagmaCube entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		// Note: Minecraft will also adjust some of the magma cube's attributes, but these should
 		// not affect us.
 		entity.setSize(this.getSize());
@@ -118,7 +118,7 @@ public class MagmaCubeShop extends SKLivingShopObject<@NonNull MagmaCube> {
 		String displayName = StringUtils.replaceArguments(Messages.buttonMagmaCubeSize,
 				"size", size
 		);
-		List<@NonNull String> lore = StringUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore,
+		List<String> lore = StringUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore,
 				"size", size
 		);
 		ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);

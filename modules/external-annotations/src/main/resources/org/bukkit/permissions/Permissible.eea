@@ -1,0 +1,31 @@
+class org/bukkit/permissions/Permissible
+addAttachment
+ (Lorg/bukkit/plugin/Plugin;)Lorg/bukkit/permissions/PermissionAttachment;
+ (L1org/bukkit/plugin/Plugin;)L1org/bukkit/permissions/PermissionAttachment;
+addAttachment
+ (Lorg/bukkit/plugin/Plugin;I)Lorg/bukkit/permissions/PermissionAttachment;
+ (L1org/bukkit/plugin/Plugin;I)L0org/bukkit/permissions/PermissionAttachment;
+addAttachment
+ (Lorg/bukkit/plugin/Plugin;Ljava/lang/String;Z)Lorg/bukkit/permissions/PermissionAttachment;
+ (L1org/bukkit/plugin/Plugin;L1java/lang/String;Z)L1org/bukkit/permissions/PermissionAttachment;
+addAttachment
+ (Lorg/bukkit/plugin/Plugin;Ljava/lang/String;ZI)Lorg/bukkit/permissions/PermissionAttachment;
+ (L1org/bukkit/plugin/Plugin;L1java/lang/String;ZI)L0org/bukkit/permissions/PermissionAttachment;
+getEffectivePermissions
+ ()Ljava/util/Set<Lorg/bukkit/permissions/PermissionAttachmentInfo;>;
+ ()L1java/util/Set<L1org/bukkit/permissions/PermissionAttachmentInfo;>;
+hasPermission
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+hasPermission
+ (Lorg/bukkit/permissions/Permission;)Z
+ (L1org/bukkit/permissions/Permission;)Z
+isPermissionSet
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+isPermissionSet
+ (Lorg/bukkit/permissions/Permission;)Z
+ (L1org/bukkit/permissions/Permission;)Z
+removeAttachment
+ (Lorg/bukkit/permissions/PermissionAttachment;)V
+ (L1org/bukkit/permissions/PermissionAttachment;)V

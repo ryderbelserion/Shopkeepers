@@ -1,5 +1,5 @@
 /**
  * Classes related to trading.
  */
-@com.nisovin.shopkeepers.api.internal.util.annotations.NonNullByDefault
+@org.eclipse.jdt.annotation.NonNullByDefault
 package com.nisovin.shopkeepers.api.trading;

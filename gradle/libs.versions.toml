@@ -7,7 +7,9 @@ spigot = "1.20.6-R0.1-SNAPSHOT"
 # Individual NMS modules can use other CraftBukkit versions.
 craftbukkit = "1.20.6-R0.1-SNAPSHOT"
 
-checkerframework = "3.43.0"
+jdtannotations = "2.3.0"
+nonpe = "1.0.3"
+checkerframework = "3.46.0"
 
 worldguard = "7.0.0"
 towny = "0.98.1.0"
@@ -24,6 +26,8 @@ bukkit = { module = "org.bukkit:bukkit", version.ref = "bukkit" }
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
 craftbukkit = { module = "org.bukkit:craftbukkit", version.ref = "craftbukkit" }
 
+jdt-annotations = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdtannotations" }
+nonpe-java21 = { module = "com.vegardit.no-npe:no-npe-eea-java-21", version.ref = "nonpe" }
 checkerframework-qual = { module = "org.checkerframework:checker-qual", version.ref = "checkerframework" }
 checkerframework-checker = { module = "org.checkerframework:checker", version.ref = "checkerframework" }
 

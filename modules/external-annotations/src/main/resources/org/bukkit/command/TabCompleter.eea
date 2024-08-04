@@ -1,0 +1,4 @@
+class org/bukkit/command/TabCompleter
+onTabComplete
+ (Lorg/bukkit/command/CommandSender;Lorg/bukkit/command/Command;Ljava/lang/String;[Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;
+ (L1org/bukkit/command/CommandSender;L1org/bukkit/command/Command;L1java/lang/String;[1L1java/lang/String;)L0java/util/List<L1java/lang/String;>;

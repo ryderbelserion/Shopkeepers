@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * {@link MaxShopsPermission} is {@link Comparable} and ordered based on its {@link #getMaxShops()
  * maximum player shops limit}.
  */
-public class MaxShopsPermission implements Comparable<@NonNull MaxShopsPermission> {
+public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 
 	public static final MaxShopsPermission UNLIMITED = new MaxShopsPermission(
 			Integer.MAX_VALUE,
@@ -69,14 +69,14 @@ public class MaxShopsPermission implements Comparable<@NonNull MaxShopsPermissio
 	 *            <code>null</code>
 	 * @return the parsed list of {@link MaxShopsPermission}
 	 */
-	public static List<@NonNull MaxShopsPermission> parseList(
+	public static List<MaxShopsPermission> parseList(
 			String maxShopsPermissionOptionsList,
-			Consumer<? super @NonNull String> invalidPermissionOptionCallback
+			Consumer<? super String> invalidPermissionOptionCallback
 	) {
 		Validate.notNull(maxShopsPermissionOptionsList, "maxShopsPermissionOptionsList is null");
 		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback is null");
 		@NonNull String[] permissionOptions = StringUtils.removeWhitespace(maxShopsPermissionOptionsList).split(",");
-		List<@NonNull MaxShopsPermission> maxShopsPermissions = new ArrayList<>(permissionOptions.length);
+		List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>(permissionOptions.length);
 		for (String permissionOption : permissionOptions) {
 			MaxShopsPermission maxShopsPermission;
 			try {

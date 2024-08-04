@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -30,8 +29,8 @@ public final class Currencies {
 
 	// Not empty. Distinct normalized ids. Distinct items. Sorted by value.
 	// First currency has a value of 1.
-	private static final List<@NonNull Currency> ALL = new ArrayList<>();
-	private static final List<? extends @NonNull Currency> ALL_VIEW = Collections.unmodifiableList(ALL);
+	private static final List<Currency> ALL = new ArrayList<>();
+	private static final List<? extends Currency> ALL_VIEW = Collections.unmodifiableList(ALL);
 
 	static {
 		load();
@@ -71,7 +70,7 @@ public final class Currencies {
 		ALL.add(currency);
 	}
 
-	public static List<? extends @NonNull Currency> getAll() {
+	public static List<? extends Currency> getAll() {
 		return ALL_VIEW;
 	}
 

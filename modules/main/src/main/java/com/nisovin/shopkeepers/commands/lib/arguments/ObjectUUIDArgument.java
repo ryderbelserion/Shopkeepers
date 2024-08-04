@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -15,7 +13,7 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
  * {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} to provide
  * completions for partial inputs.
  */
-public abstract class ObjectUUIDArgument extends ObjectIdArgument<@NonNull UUID> {
+public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 3;
 
@@ -23,13 +21,13 @@ public abstract class ObjectUUIDArgument extends ObjectIdArgument<@NonNull UUID>
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ObjectUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
+	public ObjectUUIDArgument(String name, ArgumentFilter<? super UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ObjectUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull UUID> filter,
+			ArgumentFilter<? super UUID> filter,
 			int minimumCompletionInput
 	) {
 		super(

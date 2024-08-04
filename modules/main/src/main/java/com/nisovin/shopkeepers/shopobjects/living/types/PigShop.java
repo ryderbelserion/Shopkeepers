@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Pig;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -26,20 +25,20 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class PigShop extends BabyableShop<@NonNull Pig> {
+public class PigShop extends BabyableShop<Pig> {
 
-	public static final Property<@NonNull Boolean> SADDLE = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> SADDLE = new BasicProperty<Boolean>()
 			.dataKeyAccessor("saddle", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> saddleProperty = new PropertyValue<>(SADDLE)
+	private final PropertyValue<Boolean> saddleProperty = new PropertyValue<>(SADDLE)
 			.onValueChanged(Unsafe.initialized(this)::applySaddle)
 			.build(properties);
 
 	public PigShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull PigShop> livingObjectType,
+			SKLivingShopObjectType<PigShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -65,8 +64,8 @@ public class PigShop extends BabyableShop<@NonNull Pig> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSaddleEditorButton());
 		return editorButtons;
 	}
@@ -88,6 +87,7 @@ public class PigShop extends BabyableShop<@NonNull Pig> {
 	private void applySaddle() {
 		Pig entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setSaddle(this.hasSaddle());
 	}
 

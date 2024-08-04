@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -67,7 +66,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * Shop object type id.
 	 */
-	public static final Property<@NonNull String> SHOP_OBJECT_TYPE_ID = new BasicProperty<@NonNull String>()
+	public static final Property<String> SHOP_OBJECT_TYPE_ID = new BasicProperty<String>()
 			.name("type-id")
 			.dataKeyAccessor(DATA_KEY_SHOP_OBJECT_TYPE, StringSerializers.STRICT)
 			.validator(StringValidators.NON_EMPTY)
@@ -77,8 +76,8 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * Shop object type, derived from the serialized {@link #SHOP_OBJECT_TYPE_ID shop object type
 	 * id}.
 	 */
-	public static final Property<@NonNull AbstractShopObjectType<?>> SHOP_OBJECT_TYPE = new BasicProperty<@NonNull AbstractShopObjectType<?>>()
-			.dataKeyAccessor(DATA_KEY_SHOP_OBJECT_TYPE, new DataSerializer<@NonNull AbstractShopObjectType<?>>() {
+	public static final Property<AbstractShopObjectType<?>> SHOP_OBJECT_TYPE = new BasicProperty<AbstractShopObjectType<?>>()
+			.dataKeyAccessor(DATA_KEY_SHOP_OBJECT_TYPE, new DataSerializer<AbstractShopObjectType<?>>() {
 				@Override
 				public @Nullable Object serialize(AbstractShopObjectType<?> value) {
 					Validate.notNull(value, "value is null");
@@ -538,7 +537,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * 
 	 * @return the editor buttons
 	 */
-	public List<@NonNull Button> createEditorButtons() {
+	public List<Button> createEditorButtons() {
 		return new ArrayList<>(); // None by default, modifiable by subtypes
 	}
 }

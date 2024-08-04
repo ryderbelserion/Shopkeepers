@@ -573,7 +573,7 @@ public class BasicProperty<T> implements Property<T> {
 					// This implies that there is a valid default value.
 					return this.getDefaultValue();
 				} else if (this.isNullable()) {
-					return Unsafe.cast(null);
+					return Unsafe.uncheckedNull();
 				} else {
 					throw e;
 				}

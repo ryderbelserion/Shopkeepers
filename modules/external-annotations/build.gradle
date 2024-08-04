@@ -1,0 +1,37 @@
+plugins {
+	id 'java-library'
+	id 'org.checkerframework'
+	id 'maven-publish'
+	id 'eclipse'
+}
+
+dependencies {
+	compileOnlyApi libs.jdt.annotations
+	compileOnlyApi libs.nonpe.java21
+	// Include the 'src/main/resources' contents on the compile classpath so that the ECJ compiler
+	// finds the external annotations when invoked from Gradle with "-annotationpath CLASSPATH":
+	compileOnlyApi files('src/main/resources')
+	compileOnly libs.spigot.api // Includes the Bukkit API
+
+	testImplementation libs.spigot.api
+	testImplementation libs.junit
+}
+
+// Copies the project's jars into the build folder of the root project.
+task copyResults(type: Copy) {
+	from jar
+	into rootProject.buildDir
+}
+
+assemble {
+	dependsOn copyResults
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) { publication ->
+			configureMavenPublication(project, publication)
+			from project.components.java
+		}
+	}
+}

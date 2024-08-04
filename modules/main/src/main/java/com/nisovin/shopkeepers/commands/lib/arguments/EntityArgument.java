@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -22,23 +21,23 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * Currently, this only accepts UUIDs. In the future, additional inputs to specify an entity could
  * be added here (e.g. by name).
  */
-public class EntityArgument extends CommandArgument<@NonNull Entity> {
+public class EntityArgument extends CommandArgument<Entity> {
 
-	protected final ArgumentFilter<? super @NonNull Entity> filter; // Not null
+	protected final ArgumentFilter<? super Entity> filter; // Not null
 	private final EntityByUUIDArgument entityUUIDArgument;
-	private final TypedFirstOfArgument<@NonNull Entity> firstOfArgument;
+	private final TypedFirstOfArgument<Entity> firstOfArgument;
 
 	public EntityArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public EntityArgument(String name, ArgumentFilter<? super @NonNull Entity> filter) {
+	public EntityArgument(String name, ArgumentFilter<? super Entity> filter) {
 		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public EntityArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Entity> filter,
+			ArgumentFilter<? super Entity> filter,
 			int minimumUUIDCompletionInput
 	) {
 		super(name);
@@ -50,7 +49,7 @@ public class EntityArgument extends CommandArgument<@NonNull Entity> {
 				minimumUUIDCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+			protected Iterable<? extends UUID> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					int minimumCompletionInput,
@@ -84,7 +83,7 @@ public class EntityArgument extends CommandArgument<@NonNull Entity> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -107,7 +106,7 @@ public class EntityArgument extends CommandArgument<@NonNull Entity> {
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<? extends @NonNull UUID> getUUIDCompletionSuggestions(
+	protected Iterable<? extends UUID> getUUIDCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

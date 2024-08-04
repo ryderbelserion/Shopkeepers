@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -82,11 +81,11 @@ public class SKBookOffer implements BookOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	private static final Property<@NonNull String> BOOK_TITLE = new BasicProperty<@NonNull String>()
+	private static final Property<String> BOOK_TITLE = new BasicProperty<String>()
 			.dataKeyAccessor("book", StringSerializers.SCALAR)
 			.validator(StringValidators.NON_EMPTY)
 			.build();
-	private static final Property<@NonNull Integer> PRICE = new BasicProperty<@NonNull Integer>()
+	private static final Property<Integer> PRICE = new BasicProperty<Integer>()
 			.dataKeyAccessor("price", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.POSITIVE)
 			.build();
@@ -94,7 +93,7 @@ public class SKBookOffer implements BookOffer {
 	/**
 	 * A {@link DataSerializer} for values of type {@link BookOffer}.
 	 */
-	public static final DataSerializer<@NonNull BookOffer> SERIALIZER = new DataSerializer<@NonNull BookOffer>() {
+	public static final DataSerializer<BookOffer> SERIALIZER = new DataSerializer<BookOffer>() {
 		@Override
 		public @Nullable Object serialize(BookOffer value) {
 			Validate.notNull(value, "value is null");
@@ -122,9 +121,9 @@ public class SKBookOffer implements BookOffer {
 	 * <p>
 	 * All contained elements are expected to not be <code>null</code>.
 	 */
-	public static final DataSerializer<@NonNull List<? extends @NonNull BookOffer>> LIST_SERIALIZER = new DataSerializer<@NonNull List<? extends @NonNull BookOffer>>() {
+	public static final DataSerializer<List<? extends BookOffer>> LIST_SERIALIZER = new DataSerializer<List<? extends BookOffer>>() {
 		@Override
-		public @Nullable Object serialize(@ReadOnly List<? extends @NonNull BookOffer> value) {
+		public @Nullable Object serialize(@ReadOnly List<? extends BookOffer> value) {
 			Validate.notNull(value, "value is null");
 			DataContainer offerListData = DataContainer.create();
 			int id = 1;
@@ -137,12 +136,12 @@ public class SKBookOffer implements BookOffer {
 		}
 
 		@Override
-		public List<? extends @NonNull BookOffer> deserialize(
+		public List<? extends BookOffer> deserialize(
 				Object data
 		) throws InvalidDataException {
 			DataContainer offerListData = DataContainerSerializers.DEFAULT.deserialize(data);
-			Set<? extends @NonNull String> keys = offerListData.getKeys();
-			List<@NonNull BookOffer> offers = new ArrayList<>(keys.size());
+			Set<? extends String> keys = offerListData.getKeys();
+			List<BookOffer> offers = new ArrayList<>(keys.size());
 			for (String id : keys) {
 				Object offerData = Unsafe.assertNonNull(offerListData.get(id));
 				BookOffer offer;
@@ -160,7 +159,7 @@ public class SKBookOffer implements BookOffer {
 
 	public static void saveOffers(
 			DataValue dataValue,
-			@ReadOnly @Nullable List<? extends @NonNull BookOffer> offers
+			@ReadOnly @Nullable List<? extends BookOffer> offers
 	) {
 		Validate.notNull(dataValue, "dataValue is null");
 		if (offers == null) {
@@ -172,7 +171,7 @@ public class SKBookOffer implements BookOffer {
 		dataValue.set(offerListData);
 	}
 
-	public static List<? extends @NonNull BookOffer> loadOffers(
+	public static List<? extends BookOffer> loadOffers(
 			DataValue dataValue
 	) throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");

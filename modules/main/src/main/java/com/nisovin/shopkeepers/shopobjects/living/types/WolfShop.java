@@ -9,7 +9,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -35,9 +34,9 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class WolfShop extends SittableShop<@NonNull Wolf> {
+public class WolfShop extends SittableShop<Wolf> {
 
-	public static final Property<@NonNull Boolean> ANGRY = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> ANGRY = new BasicProperty<Boolean>()
 			.dataKeyAccessor("angry", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
@@ -50,24 +49,24 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 
 	// TODO Use correct variant type once we only support Bukkit 1.20.6 upwards. Will then also
 	// validate that the value is a valid wolf variant.
-	public static final Property<@NonNull NamespacedKey> VARIANT = new BasicProperty<@NonNull NamespacedKey>()
+	public static final Property<NamespacedKey> VARIANT = new BasicProperty<NamespacedKey>()
 			.dataKeyAccessor("wolfVariant", NamespacedKeySerializers.DEFAULT)
 			.defaultValue(NamespacedKeyUtils.create("minecraft", "pale"))
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> angryProperty = new PropertyValue<>(ANGRY)
+	private final PropertyValue<Boolean> angryProperty = new PropertyValue<>(ANGRY)
 			.onValueChanged(Unsafe.initialized(this)::applyAngry)
 			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
-	private final PropertyValue<@NonNull NamespacedKey> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<NamespacedKey> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
 	public WolfShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull WolfShop> livingObjectType,
+			SKLivingShopObjectType<WolfShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -99,8 +98,8 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		if (MC_1_20_6.isAvailable()) {
@@ -134,6 +133,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	private void applyAngry() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		// Only marks the wolf as angry for a random duration. We therefore apply this state again
 		// every shopkeeper tick.
 		entity.setAngry(this.isAngry());
@@ -191,6 +191,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	private void applyCollarColor() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:

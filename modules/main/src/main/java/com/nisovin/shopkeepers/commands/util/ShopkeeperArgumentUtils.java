@@ -18,7 +18,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -44,11 +43,11 @@ public final class ShopkeeperArgumentUtils {
 
 	public static final class TargetShopkeepersResult {
 
-		private final List<? extends @NonNull Shopkeeper> shopkeepers;
+		private final List<? extends Shopkeeper> shopkeepers;
 		private final @Nullable Text errorMessage;
 		// assert: !shopkeepers.isEmpty || errorMessage != null
 
-		private TargetShopkeepersResult(List<? extends @NonNull Shopkeeper> shopkeepers) {
+		private TargetShopkeepersResult(List<? extends Shopkeeper> shopkeepers) {
 			Validate.notNull(shopkeepers, "shopkeepers is null");
 			Validate.isTrue(!shopkeepers.isEmpty(), "shopkeepers is empty");
 			Validate.noNullElements(shopkeepers, "shopkeepers contains null");
@@ -67,7 +66,7 @@ public final class ShopkeeperArgumentUtils {
 			return (errorMessage == null);
 		}
 
-		public List<? extends @NonNull Shopkeeper> getShopkeepers() {
+		public List<? extends Shopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 
@@ -210,13 +209,13 @@ public final class ShopkeeperArgumentUtils {
 		if (!ShopContainers.isSupportedContainer(targetBlock.getType())) return null;
 
 		ProtectedContainers containerProtections = SKShopkeepersPlugin.getInstance().getProtectedContainers();
-		List<? extends @NonNull PlayerShopkeeper> shopsUsingContainer = containerProtections.getShopkeepersUsingContainer(targetBlock);
+		List<? extends PlayerShopkeeper> shopsUsingContainer = containerProtections.getShopkeepersUsingContainer(targetBlock);
 		if (shopsUsingContainer.isEmpty()) {
 			return new TargetShopkeepersResult(Messages.unusedContainer);
 		}
 
 		// Filter shops:
-		List<@NonNull Shopkeeper> acceptedShops = new ArrayList<>();
+		List<Shopkeeper> acceptedShops = new ArrayList<>();
 		for (Shopkeeper shopUsingContainer : shopsUsingContainer) {
 			if (filter.test(shopUsingContainer)) {
 				acceptedShops.add(shopUsingContainer);
@@ -243,7 +242,7 @@ public final class ShopkeeperArgumentUtils {
 		return new TargetShopkeepersResult(Collections.singletonList(shopkeeper));
 	}
 
-	public static List<? extends @NonNull Shopkeeper> getTargetedShopkeepers(
+	public static List<? extends Shopkeeper> getTargetedShopkeepers(
 			Player player,
 			TargetShopkeeperFilter shopkeeperFilter
 	) {
@@ -257,7 +256,7 @@ public final class ShopkeeperArgumentUtils {
 	}
 
 	// Returns an empty list if the command sender is not a player.
-	public static List<? extends @NonNull Shopkeeper> getTargetedShopkeepers(
+	public static List<? extends Shopkeeper> getTargetedShopkeepers(
 			CommandSender sender,
 			TargetShopkeeperFilter shopkeeperFilter
 	) {
@@ -275,14 +274,14 @@ public final class ShopkeeperArgumentUtils {
 		// Stores the player uuids and names of all shop owners found that match the given target
 		// player name. If this contains more than one entry then the player name is ambiguous.
 		// Not null, can be empty:
-		private final Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners;
-		private final List<? extends @NonNull PlayerShopkeeper> shops; // Not null, can be empty
+		private final Map<? extends UUID, ? extends String> matchingShopOwners;
+		private final List<? extends PlayerShopkeeper> shops; // Not null, can be empty
 
 		public OwnedPlayerShopsResult(
 				@Nullable UUID playerUUID,
 				@Nullable String playerName,
-				Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners,
-				List<? extends @NonNull PlayerShopkeeper> shops
+				Map<? extends UUID, ? extends String> matchingShopOwners,
+				List<? extends PlayerShopkeeper> shops
 		) {
 			Validate.isTrue(playerUUID != null || playerName != null,
 					"playerUUID and playerName are both null");
@@ -302,11 +301,11 @@ public final class ShopkeeperArgumentUtils {
 			return playerName;
 		}
 
-		public Map<? extends @NonNull UUID, ? extends @NonNull String> getMatchingShopOwners() {
+		public Map<? extends UUID, ? extends String> getMatchingShopOwners() {
 			return matchingShopOwners;
 		}
 
-		public List<? extends @NonNull PlayerShopkeeper> getShops() {
+		public List<? extends PlayerShopkeeper> getShops() {
 			return shops;
 		}
 	}
@@ -329,10 +328,10 @@ public final class ShopkeeperArgumentUtils {
 		String actualTargetPlayerName = targetPlayerName;
 
 		// Keep track if there are multiple shop owners with matching name:
-		Map<@NonNull UUID, @NonNull String> matchingShopOwners = new LinkedHashMap<>();
+		Map<UUID, String> matchingShopOwners = new LinkedHashMap<>();
 
 		// Search for shops owned by the specified player:
-		List<@NonNull PlayerShopkeeper> shops = new ArrayList<>();
+		List<PlayerShopkeeper> shops = new ArrayList<>();
 		for (Shopkeeper shopkeeper : ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers()) {
 			if (!(shopkeeper instanceof PlayerShopkeeper)) {
 				continue;
@@ -377,9 +376,9 @@ public final class ShopkeeperArgumentUtils {
 
 	public static final class ShopkeeperNameMatchers {
 
-		public static final ObjectMatcher<@NonNull Shopkeeper> DEFAULT = new ObjectMatcher<@NonNull Shopkeeper>() {
+		public static final ObjectMatcher<Shopkeeper> DEFAULT = new ObjectMatcher<Shopkeeper>() {
 			@Override
-			public Stream<? extends @NonNull Shopkeeper> match(String input) {
+			public Stream<? extends Shopkeeper> match(String input) {
 				if (StringUtils.isEmpty(input)) return Stream.empty();
 				return ShopkeepersAPI.getShopkeeperRegistry().getShopkeepersByName(input);
 			}

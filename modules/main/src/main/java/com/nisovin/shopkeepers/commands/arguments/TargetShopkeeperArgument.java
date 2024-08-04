@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -27,7 +26,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * targeted or the targeted shopkeeper is not accepted, the filter's corresponding error message is
  * used.
  */
-public class TargetShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
+public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
 	private final TargetShopkeeperFilter filter; // Not null
 
@@ -72,7 +71,7 @@ public class TargetShopkeeperArgument extends CommandArgument<@NonNull Shopkeepe
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

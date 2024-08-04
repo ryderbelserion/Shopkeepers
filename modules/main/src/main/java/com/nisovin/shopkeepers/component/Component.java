@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.component;
 import java.util.Collections;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -91,7 +90,7 @@ public abstract class Component {
 	 * 
 	 * @return the provided services, not <code>null</code>, can be empty
 	 */
-	public Set<? extends @NonNull Class<?>> getProvidedServices() {
+	public Set<? extends Class<?>> getProvidedServices() {
 		return Collections.emptySet();
 	}
 

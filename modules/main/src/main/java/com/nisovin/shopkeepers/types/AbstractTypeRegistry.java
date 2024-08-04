@@ -12,12 +12,11 @@ import com.nisovin.shopkeepers.api.types.TypeRegistry;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public abstract class AbstractTypeRegistry<T extends @NonNull AbstractType> implements TypeRegistry<T> {
+public abstract class AbstractTypeRegistry<T extends AbstractType> implements TypeRegistry<T> {
 
-	private final Map<@NonNull String, @NonNull T> registeredTypes = new LinkedHashMap<>();
-	private final Collection<? extends @NonNull T> registeredTypesView = Collections.unmodifiableCollection(
-			registeredTypes.values()
-	);
+	private final Map<String, @NonNull T> registeredTypes = new LinkedHashMap<>();
+	private final Collection<? extends @NonNull T> registeredTypesView
+			= Collections.unmodifiableCollection(registeredTypes.values());
 
 	protected AbstractTypeRegistry() {
 	}

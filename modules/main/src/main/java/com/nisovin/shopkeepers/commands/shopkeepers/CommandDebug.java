@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -22,8 +21,8 @@ class CommandDebug extends Command {
 
 	private static final class DebugOptionArgument extends FixedValuesArgument {
 
-		private static Map<? extends @NonNull String, ? extends @NonNull String> getDebugOptionsMap() {
-			Map<@NonNull String, @NonNull String> debugOptionsMap = new LinkedHashMap<>();
+		private static Map<? extends String, ? extends String> getDebugOptionsMap() {
+			Map<String, String> debugOptionsMap = new LinkedHashMap<>();
 			DebugOptions.getAll().forEach(debugOption -> {
 				debugOptionsMap.put(debugOption, debugOption);
 			});

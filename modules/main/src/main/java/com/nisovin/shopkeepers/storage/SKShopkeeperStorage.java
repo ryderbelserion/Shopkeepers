@@ -109,17 +109,17 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// These shopkeepers may no longer be loaded. This does not include shopkeepers that were
 	// deleted. This Set is swapped with another, empty Set when the shopkeepers are saved, so that
 	// we can track the shopkeepers that are marked as dirty in the meantime.
-	private Set<@NonNull AbstractShopkeeper> dirtyShopkeepers = new LinkedHashSet<>();
+	private Set<AbstractShopkeeper> dirtyShopkeepers = new LinkedHashSet<>();
 	// Shopkeepers (their ids) whose data we transferred to the storage, but which we were not yet
 	// able to save to disk.
 	// This Set is not modified while a save is in progress.
-	private final Set<@NonNull Integer> unsavedShopkeepers = new HashSet<>();
+	private final Set<Integer> unsavedShopkeepers = new HashSet<>();
 	// Shopkeepers (their ids) that got deleted since the last save. The next save will remove their
 	// data from the save file. This Set is not modified while a save is in progress.
-	private final Set<@NonNull Integer> unsavedDeletedShopkeepers = new HashSet<>();
+	private final Set<Integer> unsavedDeletedShopkeepers = new HashSet<>();
 	// Shopkeepers that got deleted during the last async save. Their data is removed from memory
 	// after the current save completes, and removed from the save file by the subsequent save.
-	private final Set<@NonNull AbstractShopkeeper> shopkeepersToDelete = new LinkedHashSet<>();
+	private final Set<AbstractShopkeeper> shopkeepersToDelete = new LinkedHashSet<>();
 
 	/* Loading */
 	private boolean currentlyLoading = false;
@@ -468,7 +468,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// will be the first entry in the save file, even if it is missing in the save file
 		// currently. If a data version is present in the loaded data, the 'missing' data version
 		// value is replaced with the actual data version afterwards.
-		Map<? extends @NonNull String, @NonNull ?> saveDataEntries = saveData.getValuesCopy();
+		Map<? extends String, @NonNull ?> saveDataEntries = saveData.getValuesCopy();
 		saveData.clear();
 		saveData.set(DATA_VERSION_KEY, DataVersion.MISSING.toString());
 		saveData.setAll(saveDataEntries);
@@ -519,7 +519,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			return false; // Disable without save
 		}
 
-		Set<? extends @NonNull String> keys = saveData.getKeys();
+		Set<? extends String> keys = saveData.getKeys();
 		// Contains at least the data-version entry:
 		assert keys.contains(DATA_VERSION_KEY);
 		int shopkeepersCount = (keys.size() - 1);
@@ -870,9 +870,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		// Previously dirty shopkeepers that we currently attempt to save. This Set is only modified
 		// synchronously, so it is safe to be accessed at any time by the storage.
-		Set<@NonNull AbstractShopkeeper> savingDirtyShopkeepers = new LinkedHashSet<>();
+		Set<AbstractShopkeeper> savingDirtyShopkeepers = new LinkedHashSet<>();
 		// The shopkeepers that we were not able to save for some reason:
-		private final Set<@NonNull AbstractShopkeeper> failedToSave = new LinkedHashSet<>();
+		private final Set<AbstractShopkeeper> failedToSave = new LinkedHashSet<>();
 
 		/* Last save */
 		// These variables get replaced during the next save.
@@ -928,7 +928,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			// Swap the dirty shopkeepers sets:
 			assert savingDirtyShopkeepers.isEmpty();
-			Set<@NonNull AbstractShopkeeper> newDirtyShopkeepers = savingDirtyShopkeepers;
+			Set<AbstractShopkeeper> newDirtyShopkeepers = savingDirtyShopkeepers;
 			savingDirtyShopkeepers = dirtyShopkeepers;
 			dirtyShopkeepers = newDirtyShopkeepers;
 
@@ -1157,7 +1157,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		private void wrapException(VoidCallable callable) throws ShopkeeperStorageSaveException {
-			this.wrapException((Callable<Void>) callable);
+			this.wrapException((Callable<@Nullable Void>) callable);
 		}
 
 		@Override

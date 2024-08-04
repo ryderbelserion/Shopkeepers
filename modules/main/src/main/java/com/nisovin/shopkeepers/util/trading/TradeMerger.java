@@ -8,7 +8,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
@@ -57,7 +56,7 @@ public class TradeMerger {
 	private static final long NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS = TimeUnit.MILLISECONDS.toNanos(500L);
 
 	private final Plugin plugin;
-	private final Consumer<@NonNull MergedTrades> mergedTradesConsumer;
+	private final Consumer<MergedTrades> mergedTradesConsumer;
 	private final MergeMode mergeMode;
 	// The maximum time span between the first and the last merged trade:
 	private long mergeDurationTicks; // Can be 0 to disable the trade merging
@@ -83,7 +82,7 @@ public class TradeMerger {
 	public TradeMerger(
 			Plugin plugin,
 			MergeMode mergeMode,
-			Consumer<@NonNull MergedTrades> mergedTradesConsumer
+			Consumer<MergedTrades> mergedTradesConsumer
 	) {
 		Validate.notNull(plugin, "plugin is null");
 		Validate.notNull(mergeMode, "mergeMode is null");

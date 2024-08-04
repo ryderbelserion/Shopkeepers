@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -97,7 +96,7 @@ class CommandList extends Command {
 		String targetPlayerName = context.getOrNull(ARGUMENT_PLAYER_NAME); // Can be null
 		assert listAllShops ^ listAdminShops ^ (targetPlayerUUID != null ^ targetPlayerName != null);
 
-		List<? extends @NonNull Shopkeeper> shops;
+		List<? extends Shopkeeper> shops;
 		if (listAllShops) {
 			// Permission check:
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
@@ -109,7 +108,7 @@ class CommandList extends Command {
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
 
 			// Searching admin shops:
-			List<@NonNull Shopkeeper> adminShops = new ArrayList<>();
+			List<Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof AdminShopkeeper) {
 					adminShops.add(shopkeeper);
@@ -159,7 +158,7 @@ class CommandList extends Command {
 
 			// If the input name is ambiguous, we print an error and require the player to be
 			// specified by uuid:
-			Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
+			Map<? extends UUID, ? extends String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
 			if (matchingShopOwners.size() > 1) {
 				assert targetPlayerName != null;

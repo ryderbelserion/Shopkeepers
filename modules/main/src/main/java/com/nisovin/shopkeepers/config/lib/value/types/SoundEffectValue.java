@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
@@ -10,7 +9,7 @@ import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class SoundEffectValue extends ValueType<@NonNull SoundEffect> {
+public class SoundEffectValue extends ValueType<SoundEffect> {
 
 	public static final SoundEffectValue INSTANCE = new SoundEffectValue();
 

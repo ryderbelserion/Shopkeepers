@@ -57,7 +57,7 @@ public class ConfigTests extends AbstractBukkitTest {
 		// In order to be able to compare the contents of this loaded config with the data of an
 		// in-memory serialized config, we need to convert all config sections to Maps.
 		// Modifiable shallow copy:
-		Map<@NonNull String, @NonNull Object> configData = ConfigUtils.getValues(config);
+		Map<String, Object> configData = ConfigUtils.getValues(config);
 		ConfigUtils.convertSectionsToMaps(configData);
 		return DataContainer.ofNonNull(configData); // Map-based data container
 	}
@@ -67,15 +67,15 @@ public class ConfigTests extends AbstractBukkitTest {
 		// Expected default config:
 		DataContainer expectedDefaultConfig = DataContainer.create();
 		Settings.getInstance().save(expectedDefaultConfig);
-		Set<? extends @NonNull String> expectedKeysSet = expectedDefaultConfig.getKeys();
-		List<? extends @NonNull String> expectedKeys = new ArrayList<>(expectedKeysSet);
-		Map<? extends @NonNull String, @NonNull ?> expectedValues = expectedDefaultConfig.getValues();
+		Set<? extends String> expectedKeysSet = expectedDefaultConfig.getKeys();
+		List<? extends String> expectedKeys = new ArrayList<>(expectedKeysSet);
+		Map<? extends String, @NonNull ?> expectedValues = expectedDefaultConfig.getValues();
 
 		// Actual default config:
 		DataContainer defaultConfig = this.loadConfigFromResource("config.yml");
-		Set<? extends @NonNull String> actualKeysSet = defaultConfig.getKeys();
-		List<? extends @NonNull String> actualKeys = new ArrayList<>(actualKeysSet);
-		Map<? extends @NonNull String, @NonNull ?> actualValues = defaultConfig.getValues();
+		Set<? extends String> actualKeysSet = defaultConfig.getKeys();
+		List<? extends String> actualKeys = new ArrayList<>(actualKeysSet);
+		Map<? extends String, @NonNull ?> actualValues = defaultConfig.getValues();
 
 		// Check for missing keys:
 		for (String expectedKey : expectedKeys) {
@@ -106,9 +106,9 @@ public class ConfigTests extends AbstractBukkitTest {
 		// Expected default language file:
 		DataContainer expectedDefaultLanguageFile = DataContainer.create();
 		Messages.getInstance().save(expectedDefaultLanguageFile);
-		Set<? extends @NonNull String> expectedKeysSet = expectedDefaultLanguageFile.getKeys();
-		List<? extends @NonNull String> expectedKeys = new ArrayList<>(expectedKeysSet);
-		Map<? extends @NonNull String, @NonNull ?> expectedValues = expectedDefaultLanguageFile.getValues();
+		Set<? extends String> expectedKeysSet = expectedDefaultLanguageFile.getKeys();
+		List<? extends String> expectedKeys = new ArrayList<>(expectedKeysSet);
+		Map<? extends String, @NonNull ?> expectedValues = expectedDefaultLanguageFile.getValues();
 
 		// Actual default language files:
 		@NonNull String[] languageFilePaths = new @NonNull String[] {
@@ -117,8 +117,8 @@ public class ConfigTests extends AbstractBukkitTest {
 		};
 		for (String languageFilePath : languageFilePaths) {
 			DataContainer languageFile = this.loadConfigFromResource(languageFilePath, ':');
-			Set<? extends @NonNull String> actualKeysSet = languageFile.getKeys();
-			List<? extends @NonNull String> actualKeys = new ArrayList<>(actualKeysSet);
+			Set<? extends String> actualKeysSet = languageFile.getKeys();
+			List<? extends String> actualKeys = new ArrayList<>(actualKeysSet);
 
 			// Check for missing keys:
 			for (String expectedKey : expectedKeys) {
@@ -141,7 +141,7 @@ public class ConfigTests extends AbstractBukkitTest {
 
 			if (languageFilePath.equals("lang/language-en-default.yml")) {
 				// Compare values:
-				Map<? extends @NonNull String, @NonNull ?> actualValues = languageFile.getValues();
+				Map<? extends String, @NonNull ?> actualValues = languageFile.getValues();
 
 				// Compare values:
 				for (String expectedKey : expectedKeys) {

@@ -16,7 +16,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -36,7 +35,7 @@ public final class PotionUtils {
 
 	// TODO This may need to be updated on Minecraft updates.
 	// Formatted like the keys of namespaced keys:
-	private static final Map<String, @NonNull PotionType> POTION_TYPE_ALIASES = new HashMap<>();
+	private static final Map<String, PotionType> POTION_TYPE_ALIASES = new HashMap<>();
 	static {
 		// Removed in Bukkit 1.20.5:
 		// POTION_TYPE_ALIASES.put("empty", PotionType.UNCRAFTABLE);
@@ -175,7 +174,7 @@ public final class PotionUtils {
 		// Parse the potion type from the remaining input:
 		String potionTypeInput = words.stream()
 				.filter(Objects::nonNull)
-				.<@NonNull String>map(Unsafe::assertNonNull)
+				.<String>map(Unsafe::assertNonNull)
 				.collect(Collectors.joining("_"));
 		PotionType potionType = parsePotionType(potionTypeInput);
 		if (potionType == null) {
@@ -247,7 +246,10 @@ public final class PotionUtils {
 	 * @return the found matching potion effect, or <code>null</code>
 	 * @see #equalsIgnoreDuration(PotionEffect, PotionEffect)
 	 */
-	public static @Nullable PotionEffect findIgnoreDuration(Collection<? extends @NonNull PotionEffect> effects, PotionEffect effect) {
+	public static @Nullable PotionEffect findIgnoreDuration(
+			Collection<? extends PotionEffect> effects,
+			PotionEffect effect
+	) {
 		for (PotionEffect collectionEffect : effects) {
 			if (PotionUtils.equalsIgnoreDuration(collectionEffect, effect)) {
 				return collectionEffect;

@@ -1,0 +1,108 @@
+class org/bukkit/Registry
+ <T::Lorg/bukkit/Keyed;>
+ <T::L1org/bukkit/Keyed;>
+ADVANCEMENT
+ Lorg/bukkit/Registry<Lorg/bukkit/advancement/Advancement;>;
+ L1org/bukkit/Registry<L1org/bukkit/advancement/Advancement;>;
+ART
+ Lorg/bukkit/Registry<Lorg/bukkit/Art;>;
+ L1org/bukkit/Registry<L1org/bukkit/Art;>;
+ATTRIBUTE
+ Lorg/bukkit/Registry<Lorg/bukkit/attribute/Attribute;>;
+ L1org/bukkit/Registry<L1org/bukkit/attribute/Attribute;>;
+BANNER_PATTERN
+ Lorg/bukkit/Registry<Lorg/bukkit/block/banner/PatternType;>;
+ L1org/bukkit/Registry<L1org/bukkit/block/banner/PatternType;>;
+BIOME
+ Lorg/bukkit/Registry<Lorg/bukkit/block/Biome;>;
+ L1org/bukkit/Registry<L1org/bukkit/block/Biome;>;
+BLOCK
+ Lorg/bukkit/Registry<Lorg/bukkit/block/BlockType;>;
+ L1org/bukkit/Registry<L1org/bukkit/block/BlockType;>;
+BOSS_BARS
+ Lorg/bukkit/Registry<Lorg/bukkit/boss/KeyedBossBar;>;
+ L1org/bukkit/Registry<L1org/bukkit/boss/KeyedBossBar;>;
+CAT_VARIANT
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/Cat$Type;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/Cat$Type;>;
+DAMAGE_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/damage/DamageType;>;
+ L1org/bukkit/Registry<L1org/bukkit/damage/DamageType;>;
+EFFECT
+ Lorg/bukkit/Registry<Lorg/bukkit/potion/PotionEffectType;>;
+ L1org/bukkit/Registry<L1org/bukkit/potion/PotionEffectType;>;
+ENCHANTMENT
+ Lorg/bukkit/Registry<Lorg/bukkit/enchantments/Enchantment;>;
+ L1org/bukkit/Registry<L1org/bukkit/enchantments/Enchantment;>;
+ENTITY_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/EntityType;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/EntityType;>;
+FLUID
+ Lorg/bukkit/Registry<Lorg/bukkit/Fluid;>;
+ L1org/bukkit/Registry<L1org/bukkit/Fluid;>;
+FROG_VARIANT
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/Frog$Variant;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/Frog$Variant;>;
+GAME_EVENT
+ Lorg/bukkit/Registry<Lorg/bukkit/GameEvent;>;
+ L1org/bukkit/Registry<L1org/bukkit/GameEvent;>;
+INSTRUMENT
+ Lorg/bukkit/Registry<Lorg/bukkit/MusicInstrument;>;
+ L1org/bukkit/Registry<L1org/bukkit/MusicInstrument;>;
+ITEM
+ Lorg/bukkit/Registry<Lorg/bukkit/inventory/ItemType;>;
+ L1org/bukkit/Registry<L1org/bukkit/inventory/ItemType;>;
+LOOT_TABLES
+ Lorg/bukkit/Registry<Lorg/bukkit/loot/LootTables;>;
+ L1org/bukkit/Registry<L1org/bukkit/loot/LootTables;>;
+MAP_DECORATION_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/map/MapCursor$Type;>;
+ L1org/bukkit/Registry<L1org/bukkit/map/MapCursor$Type;>;
+MATERIAL
+ Lorg/bukkit/Registry<Lorg/bukkit/Material;>;
+ L1org/bukkit/Registry<L1org/bukkit/Material;>;
+MEMORY_MODULE_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/memory/MemoryKey;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/memory/MemoryKey;>;
+PARTICLE_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/Particle;>;
+ L1org/bukkit/Registry<L1org/bukkit/Particle;>;
+POTION
+ Lorg/bukkit/Registry<Lorg/bukkit/potion/PotionType;>;
+ L1org/bukkit/Registry<L1org/bukkit/potion/PotionType;>;
+SOUNDS
+ Lorg/bukkit/Registry<Lorg/bukkit/Sound;>;
+ L1org/bukkit/Registry<L1org/bukkit/Sound;>;
+STATISTIC
+ Lorg/bukkit/Registry<Lorg/bukkit/Statistic;>;
+ L1org/bukkit/Registry<L1org/bukkit/Statistic;>;
+STRUCTURE
+ Lorg/bukkit/Registry<Lorg/bukkit/generator/structure/Structure;>;
+ L1org/bukkit/Registry<L1org/bukkit/generator/structure/Structure;>;
+STRUCTURE_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/generator/structure/StructureType;>;
+ L1org/bukkit/Registry<L1org/bukkit/generator/structure/StructureType;>;
+TRIM_MATERIAL
+ Lorg/bukkit/Registry<Lorg/bukkit/inventory/meta/trim/TrimMaterial;>;
+ L1org/bukkit/Registry<L1org/bukkit/inventory/meta/trim/TrimMaterial;>;
+TRIM_PATTERN
+ Lorg/bukkit/Registry<Lorg/bukkit/inventory/meta/trim/TrimPattern;>;
+ L1org/bukkit/Registry<L1org/bukkit/inventory/meta/trim/TrimPattern;>;
+VILLAGER_PROFESSION
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/Villager$Profession;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/Villager$Profession;>;
+VILLAGER_TYPE
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/Villager$Type;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/Villager$Type;>;
+WOLF_VARIANT
+ Lorg/bukkit/Registry<Lorg/bukkit/entity/Wolf$Variant;>;
+ L1org/bukkit/Registry<L1org/bukkit/entity/Wolf$Variant;>;
+get
+ (Lorg/bukkit/NamespacedKey;)TT;
+ (L1org/bukkit/NamespacedKey;)T0T;
+match
+ (Ljava/lang/String;)TT;
+ (L1java/lang/String;)T0T;
+stream
+ ()Ljava/util/stream/Stream<TT;>;
+ ()L1java/util/stream/Stream<T1T;>;

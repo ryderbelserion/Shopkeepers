@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -86,8 +85,8 @@ public final class PlayerMap {
 
 	private static final class WorldData {
 
-		private final List<@NonNull Player> players = new ArrayList<>();
-		private final List<@NonNull Player> playersView = Collections.unmodifiableList(players);
+		private final List<Player> players = new ArrayList<>();
+		private final List<Player> playersView = Collections.unmodifiableList(players);
 
 		private WorldData(String worldName) {
 			Validate.notNull(worldName, "worldName is null");
@@ -95,7 +94,7 @@ public final class PlayerMap {
 	}
 
 	private final Plugin plugin;
-	private final Map<@NonNull String, @NonNull WorldData> worlds = new HashMap<>();
+	private final Map<String, WorldData> worlds = new HashMap<>();
 	private final PlayerListener listener = new PlayerListener();
 
 	public PlayerMap(Plugin plugin) {
@@ -177,8 +176,8 @@ public final class PlayerMap {
 	 *            the world name
 	 * @return an unmodifiable view on the players inside the world, not <code>null</code>
 	 */
-	public List<? extends @NonNull Player> getPlayers(String worldName) {
-		@Nullable  WorldData worldData = this.getWorldData(worldName);
+	public List<? extends Player> getPlayers(String worldName) {
+		@Nullable WorldData worldData = this.getWorldData(worldName);
 		if (worldData == null) return Collections.emptyList();
 
 		return worldData.playersView;

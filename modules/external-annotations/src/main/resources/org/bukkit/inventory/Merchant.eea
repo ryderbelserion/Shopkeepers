@@ -1,0 +1,16 @@
+class org/bukkit/inventory/Merchant
+getRecipe
+ (I)Lorg/bukkit/inventory/MerchantRecipe;
+ (I)L1org/bukkit/inventory/MerchantRecipe;
+getRecipes
+ ()Ljava/util/List<Lorg/bukkit/inventory/MerchantRecipe;>;
+ ()L1java/util/List<L1org/bukkit/inventory/MerchantRecipe;>;
+getTrader
+ ()Lorg/bukkit/entity/HumanEntity;
+ ()L0org/bukkit/entity/HumanEntity;
+setRecipe
+ (ILorg/bukkit/inventory/MerchantRecipe;)V
+ (IL1org/bukkit/inventory/MerchantRecipe;)V
+setRecipes
+ (Ljava/util/List<Lorg/bukkit/inventory/MerchantRecipe;>;)V
+ (L1java/util/List<L1org/bukkit/inventory/MerchantRecipe;>;)V

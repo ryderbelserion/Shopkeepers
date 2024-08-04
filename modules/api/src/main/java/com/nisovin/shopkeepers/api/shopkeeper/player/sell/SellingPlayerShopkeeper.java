@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.api.shopkeeper.player.sell;
 import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
@@ -26,7 +25,7 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<? extends @NonNull PriceOffer> getOffers();
+	public List<? extends PriceOffer> getOffers();
 
 	/**
 	 * Gets the offer for the given type of item.
@@ -80,7 +79,7 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<? extends @NonNull PriceOffer> offers);
+	public void setOffers(List<? extends PriceOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -107,5 +106,5 @@ public interface SellingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<? extends @NonNull PriceOffer> offers);
+	public void addOffers(List<? extends PriceOffer> offers);
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -34,9 +33,7 @@ public final class MerchantUtils {
 			MerchantInventory merchantInventory
 	) {
 		int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
-		List<@NonNull MerchantRecipe> merchantRecipes = Unsafe.castNonNull(
-				merchantInventory.getMerchant().getRecipes()
-		);
+		List<MerchantRecipe> merchantRecipes = merchantInventory.getMerchant().getRecipes();
 		if (merchantRecipes.isEmpty()) {
 			return null;
 		}
@@ -48,7 +45,7 @@ public final class MerchantUtils {
 	public static TradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
 		Validate.notNull(merchantRecipe, "merchantRecipe is null");
 		// The returned ingredients are copies of the internal item stacks:
-		List<@NonNull ItemStack> ingredients = Unsafe.castNonNull(merchantRecipe.getIngredients());
+		List<ItemStack> ingredients = merchantRecipe.getIngredients();
 		UnmodifiableItemStack item1 = UnmodifiableItemStack.ofNonNull(ingredients.get(0));
 		UnmodifiableItemStack item2 = null;
 		if (ingredients.size() > 1) {
@@ -64,7 +61,7 @@ public final class MerchantUtils {
 	public static TradingRecipeDraft createTradingRecipeDraft(MerchantRecipe merchantRecipe) {
 		Validate.notNull(merchantRecipe, "merchantRecipe is null");
 		// The returned ingredients are copies of the internal item stacks:
-		List<@NonNull ItemStack> ingredients = Unsafe.castNonNull(merchantRecipe.getIngredients());
+		List<ItemStack> ingredients = merchantRecipe.getIngredients();
 		UnmodifiableItemStack item1 = UnmodifiableItemStack.ofNonNull(ingredients.get(0));
 		UnmodifiableItemStack item2 = null;
 		if (ingredients.size() > 1) {
@@ -123,20 +120,20 @@ public final class MerchantUtils {
 		return merchantRecipe;
 	}
 
-	public static List<@NonNull TradingRecipeDraft> createTradingRecipeDrafts(
-			List<? extends @NonNull MerchantRecipe> merchantRecipes
+	public static List<TradingRecipeDraft> createTradingRecipeDrafts(
+			List<? extends MerchantRecipe> merchantRecipes
 	) {
-		List<@NonNull TradingRecipeDraft> tradingRecipeDrafts = new ArrayList<>(merchantRecipes.size());
+		List<TradingRecipeDraft> tradingRecipeDrafts = new ArrayList<>(merchantRecipes.size());
 		merchantRecipes.forEach(merchantRecipe -> {
 			tradingRecipeDrafts.add(createTradingRecipeDraft(merchantRecipe));
 		});
 		return tradingRecipeDrafts;
 	}
 
-	public static List<@NonNull MerchantRecipe> createMerchantRecipes(
-			List<? extends @NonNull TradingRecipe> recipes
+	public static List<MerchantRecipe> createMerchantRecipes(
+			List<? extends TradingRecipe> recipes
 	) {
-		List<@NonNull MerchantRecipe> merchantRecipes = new ArrayList<>(recipes.size());
+		List<MerchantRecipe> merchantRecipes = new ArrayList<>(recipes.size());
 		recipes.forEach(recipe -> {
 			merchantRecipes.add(createMerchantRecipe(recipe));
 		});

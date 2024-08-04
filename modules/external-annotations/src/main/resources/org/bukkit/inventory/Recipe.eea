@@ -1,0 +1,4 @@
+class org/bukkit/inventory/Recipe
+getResult
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L1org/bukkit/inventory/ItemStack;

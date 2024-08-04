@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.api.ui;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 
 /**
@@ -16,7 +14,7 @@ public interface DefaultUITypes {
 	 * 
 	 * @return all default UI types
 	 */
-	public List<? extends @NonNull UIType> getAllUITypes();
+	public List<? extends UIType> getAllUITypes();
 
 	/**
 	 * Gets the default editor {@link UIType}.

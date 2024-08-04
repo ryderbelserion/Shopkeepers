@@ -1,0 +1,31 @@
+class org/bukkit/event/HandlerList
+getHandlerLists
+ ()Ljava/util/ArrayList<Lorg/bukkit/event/HandlerList;>;
+ ()L1java/util/ArrayList<L1org/bukkit/event/HandlerList;>;
+getRegisteredListeners
+ ()[Lorg/bukkit/plugin/RegisteredListener;
+ ()[1L1org/bukkit/plugin/RegisteredListener;
+getRegisteredListeners
+ (Lorg/bukkit/plugin/Plugin;)Ljava/util/ArrayList<Lorg/bukkit/plugin/RegisteredListener;>;
+ (L1org/bukkit/plugin/Plugin;)L1java/util/ArrayList<L1org/bukkit/plugin/RegisteredListener;>;
+register
+ (Lorg/bukkit/plugin/RegisteredListener;)V
+ (L1org/bukkit/plugin/RegisteredListener;)V
+registerAll
+ (Ljava/util/Collection<Lorg/bukkit/plugin/RegisteredListener;>;)V
+ (L1java/util/Collection<L1org/bukkit/plugin/RegisteredListener;>;)V
+unregister
+ (Lorg/bukkit/event/Listener;)V
+ (L1org/bukkit/event/Listener;)V
+unregister
+ (Lorg/bukkit/plugin/Plugin;)V
+ (L1org/bukkit/plugin/Plugin;)V
+unregister
+ (Lorg/bukkit/plugin/RegisteredListener;)V
+ (L1org/bukkit/plugin/RegisteredListener;)V
+unregisterAll
+ (Lorg/bukkit/event/Listener;)V
+ (L1org/bukkit/event/Listener;)V
+unregisterAll
+ (Lorg/bukkit/plugin/Plugin;)V
+ (L1org/bukkit/plugin/Plugin;)V

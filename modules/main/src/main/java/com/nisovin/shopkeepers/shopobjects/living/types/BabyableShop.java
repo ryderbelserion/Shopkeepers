@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Ageable;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -27,20 +26,20 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class BabyableShop<E extends @NonNull Ageable> extends SKLivingShopObject<E> {
+public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
-	public static final Property<@NonNull Boolean> BABY = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> BABY = new BasicProperty<Boolean>()
 			.dataKeyAccessor("baby", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> babyProperty = new PropertyValue<>(BABY)
+	private final PropertyValue<Boolean> babyProperty = new PropertyValue<>(BABY)
 			.onValueChanged(Unsafe.initialized(this)::applyBaby)
 			.build(properties);
 
 	public BabyableShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<? extends @NonNull BabyableShop<E>> livingObjectType,
+			SKLivingShopObjectType<? extends BabyableShop<E>> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -84,8 +83,8 @@ public class BabyableShop<E extends @NonNull Ageable> extends SKLivingShopObject
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		if (this.isBabyable()) {
 			editorButtons.add(this.getBabyEditorButton());
 		}
@@ -111,6 +110,7 @@ public class BabyableShop<E extends @NonNull Ageable> extends SKLivingShopObject
 		if (!this.isBabyable()) return;
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		if (this.isBaby()) {
 			entity.setBaby();
 		} else {

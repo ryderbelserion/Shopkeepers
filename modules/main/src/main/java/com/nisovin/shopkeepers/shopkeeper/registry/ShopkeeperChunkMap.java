@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -53,8 +52,8 @@ class ShopkeeperChunkMap {
 	}
 
 	// By world name:
-	private final Map<@NonNull String, @NonNull WorldShopkeepers> shopkeepersByWorld = new LinkedHashMap<>();
-	private final Set<@NonNull String> shopkeeperWorldsView = Collections.unmodifiableSet(shopkeepersByWorld.keySet());
+	private final Map<String, WorldShopkeepers> shopkeepersByWorld = new LinkedHashMap<>();
+	private final Set<String> shopkeeperWorldsView = Collections.unmodifiableSet(shopkeepersByWorld.keySet());
 
 	private final ChangeListener changeListener; // Not null
 
@@ -171,7 +170,7 @@ class ShopkeeperChunkMap {
 
 	// QUERIES
 
-	public Collection<? extends @NonNull String> getWorldsWithShopkeepers() {
+	public Collection<? extends String> getWorldsWithShopkeepers() {
 		return shopkeeperWorldsView;
 	}
 }

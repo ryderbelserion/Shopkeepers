@@ -9,10 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.container.ShopContainers;
 
 class RemoveShopOnContainerBreakListener implements Listener {
@@ -40,13 +38,13 @@ class RemoveShopOnContainerBreakListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		List<Block> blockList = event.blockList();
 		removeShopOnContainerBreak.handleBlocksBreakage(blockList);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		List<Block> blockList = event.blockList();
 		removeShopOnContainerBreak.handleBlocksBreakage(blockList);
 	}
 }

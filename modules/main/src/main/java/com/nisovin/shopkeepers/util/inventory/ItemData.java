@@ -48,7 +48,7 @@ public final class ItemData {
 		serializerPrefersPlainTextFormat(false);
 	}
 
-	private static final Property<@NonNull Material> ITEM_TYPE = new BasicProperty<@NonNull Material>()
+	private static final Property<Material> ITEM_TYPE = new BasicProperty<Material>()
 			.dataKeyAccessor("type", MinecraftEnumSerializers.Materials.LENIENT)
 			.validator(MaterialValidators.IS_ITEM)
 			.validator(MaterialValidators.NON_LEGACY)
@@ -64,7 +64,7 @@ public final class ItemData {
 
 	// Entries are lazily added and then cached:
 	// The mapped value can be null for items that do not support item meta.
-	private static final Map<@NonNull Material, @Nullable String> META_TYPE_BY_ITEM_TYPE = new HashMap<>();
+	private static final Map<Material, @Nullable String> META_TYPE_BY_ITEM_TYPE = new HashMap<>();
 
 	// Returns null for items that do not support ItemMeta.
 	private static @Nullable String getMetaType(Material itemType) {
@@ -99,11 +99,11 @@ public final class ItemData {
 	/**
 	 * A {@link DataSerializer} for values of type {@link ItemData}.
 	 */
-	public static final DataSerializer<@NonNull ItemData> SERIALIZER = new DataSerializer<@NonNull ItemData>() {
+	public static final DataSerializer<ItemData> SERIALIZER = new DataSerializer<ItemData>() {
 		@Override
 		public @Nullable Object serialize(ItemData value) {
 			Validate.notNull(value, "value is null");
-			Map<? extends @NonNull String, @NonNull ?> serializedMetaData = value.getSerializedMetaData();
+			Map<? extends String, @NonNull ?> serializedMetaData = value.getSerializedMetaData();
 			if (serializedMetaData.isEmpty()) {
 				// Use a more compact representation if there is no additional item data:
 				return value.getType().name();
@@ -114,7 +114,7 @@ public final class ItemData {
 
 			// Lazily instantiated, only if needed during serialization:
 			Lazy<@Nullable ItemMeta> lazyItemMeta = new Lazy<>(value::getItemMeta);
-			Lazy<@NonNull Map<? extends @NonNull String, @NonNull ?>> lazyPlainSerializedMetaData = new Lazy<>(
+			Lazy<Map<? extends String, @NonNull ?>> lazyPlainSerializedMetaData = new Lazy<>(
 					() -> {
 						ItemMeta itemMeta = lazyItemMeta.get();
 						if (itemMeta != null) {
@@ -139,7 +139,7 @@ public final class ItemData {
 			);
 			boolean preferPlainTextFormat = SERIALIZER_PREFERS_PLAIN_TEXT_FORMAT;
 
-			for (Entry<? extends @NonNull String, @NonNull ?> metaEntry : serializedMetaData.entrySet()) {
+			for (Entry<? extends String, @NonNull ?> metaEntry : serializedMetaData.entrySet()) {
 				String metaKey = metaEntry.getKey();
 				Object metaValue = metaEntry.getValue();
 
@@ -282,7 +282,7 @@ public final class ItemData {
 				// the given original data.
 				// Note: Additional information (e.g. the item type) does not need to be removed,
 				// but is simply ignored.
-				Map<@NonNull String, @NonNull Object> itemMetaData = itemDataData.getValuesCopy();
+				Map<String, Object> itemMetaData = itemDataData.getValuesCopy();
 
 				// Recursively replace all config sections with Maps, because the ItemMeta
 				// deserialization expects Maps:
@@ -331,7 +331,7 @@ public final class ItemData {
 	private final UnmodifiableItemStack dataItem; // Has an amount of 1
 	// Cache serialized item metadata, to avoid serializing it again for every comparison:
 	// Gets lazily initialized when needed.
-	private @ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> serializedMetaData = null;
+	private @ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> serializedMetaData = null;
 
 	public ItemData(Material type) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
@@ -342,7 +342,7 @@ public final class ItemData {
 	public ItemData(
 			Material type,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
 		this(UnmodifiableItemStack.ofNonNull(
@@ -353,7 +353,7 @@ public final class ItemData {
 	public ItemData(
 			ItemData otherItemData,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
 		this(UnmodifiableItemStack.ofNonNull(
@@ -405,7 +405,7 @@ public final class ItemData {
 	}
 
 	// Not null.
-	private Map<? extends @NonNull String, @NonNull ?> getSerializedMetaData() {
+	private Map<? extends String, @NonNull ?> getSerializedMetaData() {
 		// Lazily cache the serialized data:
 		if (serializedMetaData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();

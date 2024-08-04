@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopkeeper.spawning;
 import java.util.function.Consumer;
 
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState.State;
@@ -22,7 +21,7 @@ import com.nisovin.shopkeepers.util.taskqueue.TaskQueue;
  * use {@link AbstractShopObject#isSpawningScheduled()} to check if they are currently still pending
  * to be spawned.
  */
-public class ShopkeeperSpawnQueue extends TaskQueue<@NonNull AbstractShopkeeper> {
+public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 
 	// With this configuration we can spawn around 40 shopkeepers per second.
 	// A more frequently running task has a higher general overhead.
@@ -31,9 +30,9 @@ public class ShopkeeperSpawnQueue extends TaskQueue<@NonNull AbstractShopkeeper>
 	// between 0.05-0.25ms, with an average of around 0.1ms.
 	private static final int SPAWNS_PER_EXECUTION = 6;
 
-	private final Consumer<? super @NonNull AbstractShopkeeper> spawner;
+	private final Consumer<? super AbstractShopkeeper> spawner;
 
-	ShopkeeperSpawnQueue(Plugin plugin, Consumer<? super @NonNull AbstractShopkeeper> spawner) {
+	ShopkeeperSpawnQueue(Plugin plugin, Consumer<? super AbstractShopkeeper> spawner) {
 		super(plugin, SPAWN_TASK_PERIOD_TICKS, SPAWNS_PER_EXECUTION);
 		Validate.notNull(spawner, "spawner is null");
 		this.spawner = spawner;

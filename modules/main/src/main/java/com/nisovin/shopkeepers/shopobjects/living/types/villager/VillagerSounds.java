@@ -14,7 +14,6 @@ import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -69,7 +68,7 @@ public class VillagerSounds extends TradingListener {
 	private long lastSoundNanos = System.nanoTime();
 	private @Nullable BukkitTask tradeInteractionTask = null;
 
-	public VillagerSounds(SKLivingShopObject<? extends @NonNull AbstractVillager> shopObject) {
+	public VillagerSounds(SKLivingShopObject<? extends AbstractVillager> shopObject) {
 		Validate.notNull(shopObject, "shopObject is null");
 		assert AbstractVillager.class.isAssignableFrom(Unsafe.assertNonNull(shopObject.getEntityType().getEntityClass()));
 		this.shopObject = shopObject;

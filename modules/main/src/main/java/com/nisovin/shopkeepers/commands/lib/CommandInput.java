@@ -18,7 +18,7 @@ public final class CommandInput {
 	private final CommandSender sender;
 	private final Command command;
 	private final String commandAlias;
-	private final List<? extends @NonNull String> arguments; // Unmodifiable
+	private final List<? extends String> arguments; // Unmodifiable
 
 	// The arguments are expected to not change during the command processing.
 	public CommandInput(
@@ -40,7 +40,7 @@ public final class CommandInput {
 			CommandSender sender,
 			Command command,
 			String commandAlias,
-			List<? extends @NonNull String> arguments
+			List<? extends String> arguments
 	) {
 		Validate.notNull(sender, "sender is null");
 		Validate.notNull(command, "command is null");
@@ -91,7 +91,7 @@ public final class CommandInput {
 	 * 
 	 * @return an unmodifiable view on the arguments, not <code>null</code> but may be empty
 	 */
-	public List<? extends @NonNull String> getArguments() {
+	public List<? extends String> getArguments() {
 		return arguments;
 	}
 

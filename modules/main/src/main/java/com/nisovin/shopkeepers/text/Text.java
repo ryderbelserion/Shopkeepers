@@ -113,8 +113,8 @@ public interface Text {
 	 * @return the parsed Texts
 	 * @see #parse(String)
 	 */
-	public static List<@NonNull Text> parse(Collection<? extends @NonNull String> inputs) {
-		List<@NonNull Text> texts = new ArrayList<>(inputs.size());
+	public static List<Text> parse(Collection<? extends String> inputs) {
+		List<Text> texts = new ArrayList<>(inputs.size());
 		for (String input : inputs) {
 			texts.add(parse(input));
 		}
@@ -395,7 +395,7 @@ public interface Text {
 	 *            a mapping between placeholder keys and their arguments, not <code>null</code>
 	 * @return this Text
 	 */
-	public Text setPlaceholderArguments(Map<? extends @NonNull String, @NonNull ?> arguments);
+	public Text setPlaceholderArguments(Map<? extends String, @NonNull ?> arguments);
 
 	/**
 	 * Assigns the given arguments to their corresponding {@link PlaceholderText placeholders} used

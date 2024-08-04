@@ -11,7 +11,6 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -46,7 +45,7 @@ public final class WorldUtils {
 	public static double getCollisionDistanceToGround(
 			Location startLocation,
 			double maxDistance,
-			Set<? extends @NonNull Material> collidableFluids
+			Set<? extends Material> collidableFluids
 	) {
 		Validate.notNull(startLocation, "startLocation is null");
 		Validate.notNull(collidableFluids, "collidableFluids is null");

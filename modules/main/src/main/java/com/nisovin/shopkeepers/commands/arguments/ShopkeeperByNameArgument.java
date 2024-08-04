@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.stream.Stream;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -22,8 +21,7 @@ import com.nisovin.shopkeepers.util.java.CollectionUtils;
 /**
  * Determines a shopkeeper by the given name input.
  */
-public class ShopkeeperByNameArgument
-		extends ObjectByIdArgument<@NonNull String, @NonNull Shopkeeper> {
+public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkeeper> {
 
 	public ShopkeeperByNameArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
@@ -31,7 +29,7 @@ public class ShopkeeperByNameArgument
 
 	public ShopkeeperByNameArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter
+			ArgumentFilter<? super Shopkeeper> filter
 	) {
 		this(name, false, filter, PlayerNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
@@ -39,14 +37,14 @@ public class ShopkeeperByNameArgument
 	public ShopkeeperByNameArgument(
 			String name,
 			boolean joinRemainingArgs,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter,
+			ArgumentFilter<? super Shopkeeper> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, new IdArgumentArgs(minimumCompletionInput, joinRemainingArgs));
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull String> createIdArgument(
+	protected ObjectIdArgument<String> createIdArgument(
 			@UnknownInitialization ShopkeeperByNameArgument this,
 			String name,
 			IdArgumentArgs args
@@ -58,7 +56,7 @@ public class ShopkeeperByNameArgument
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+			protected Iterable<? extends String> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -84,13 +82,13 @@ public class ShopkeeperByNameArgument
 			CommandContextView context,
 			String nameInput
 	) throws ArgumentParseException {
-		Stream<? extends @NonNull Shopkeeper> shopkeepers = ShopkeeperNameMatchers.DEFAULT.match(nameInput);
+		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperNameMatchers.DEFAULT.match(nameInput);
 		return CollectionUtils.getFirstOrNull(shopkeepers);
 		// TODO deal with ambiguities
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+	protected Iterable<? extends String> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

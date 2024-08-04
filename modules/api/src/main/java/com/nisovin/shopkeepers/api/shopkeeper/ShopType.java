@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.api.shopkeeper;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.types.SelectableType;
 
 /**
@@ -12,7 +10,7 @@ import com.nisovin.shopkeepers.api.types.SelectableType;
  * @param <T>
  *            the type of shopkeeper that is described by this shop type
  */
-public interface ShopType<T extends @NonNull Shopkeeper> extends SelectableType {
+public interface ShopType<T extends Shopkeeper> extends SelectableType {
 
 	// Override to enforce that each subtype actually specifies a non-default display name.
 	@Override
@@ -39,5 +37,5 @@ public interface ShopType<T extends @NonNull Shopkeeper> extends SelectableType 
 	 * 
 	 * @return the trade setup description
 	 */
-	public List<? extends @NonNull String> getTradeSetupDescription();
+	public List<? extends String> getTradeSetupDescription();
 }

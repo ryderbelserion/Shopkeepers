@@ -1,0 +1,52 @@
+class org/bukkit/persistence/PersistentDataType
+BOOLEAN
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Byte;Ljava/lang/Boolean;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Byte;Ljava/lang/Boolean;>;
+BYTE
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Byte;Ljava/lang/Byte;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Byte;Ljava/lang/Byte;>;
+BYTE_ARRAY
+ Lorg/bukkit/persistence/PersistentDataType<[B[B>;
+ L1org/bukkit/persistence/PersistentDataType<[B[B>;
+DOUBLE
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Double;Ljava/lang/Double;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Double;Ljava/lang/Double;>;
+FLOAT
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Float;Ljava/lang/Float;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Float;Ljava/lang/Float;>;
+INTEGER
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Integer;Ljava/lang/Integer;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Integer;Ljava/lang/Integer;>;
+INTEGER_ARRAY
+ Lorg/bukkit/persistence/PersistentDataType<[I[I>;
+ L1org/bukkit/persistence/PersistentDataType<[I[I>;
+LIST
+ Lorg/bukkit/persistence/ListPersistentDataTypeProvider;
+ L1org/bukkit/persistence/ListPersistentDataTypeProvider;
+LONG
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Long;Ljava/lang/Long;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Long;Ljava/lang/Long;>;
+LONG_ARRAY
+ Lorg/bukkit/persistence/PersistentDataType<[J[J>;
+ L1org/bukkit/persistence/PersistentDataType<[J[J>;
+SHORT
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/Short;Ljava/lang/Short;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/Short;Ljava/lang/Short;>;
+STRING
+ Lorg/bukkit/persistence/PersistentDataType<Ljava/lang/String;Ljava/lang/String;>;
+ L1org/bukkit/persistence/PersistentDataType<Ljava/lang/String;Ljava/lang/String;>;
+TAG_CONTAINER
+ Lorg/bukkit/persistence/PersistentDataType<Lorg/bukkit/persistence/PersistentDataContainer;Lorg/bukkit/persistence/PersistentDataContainer;>;
+ L1org/bukkit/persistence/PersistentDataType<Lorg/bukkit/persistence/PersistentDataContainer;Lorg/bukkit/persistence/PersistentDataContainer;>;
+fromPrimitive
+ (TP;Lorg/bukkit/persistence/PersistentDataAdapterContext;)TC;
+ (T1P;L1org/bukkit/persistence/PersistentDataAdapterContext;)T1C;
+getComplexType
+ ()Ljava/lang/Class<TC;>;
+ ()L1java/lang/Class<TC;>;
+getPrimitiveType
+ ()Ljava/lang/Class<TP;>;
+ ()L1java/lang/Class<TP;>;
+toPrimitive
+ (TC;Lorg/bukkit/persistence/PersistentDataAdapterContext;)TP;
+ (T1C;L1org/bukkit/persistence/PersistentDataAdapterContext;)T1P;

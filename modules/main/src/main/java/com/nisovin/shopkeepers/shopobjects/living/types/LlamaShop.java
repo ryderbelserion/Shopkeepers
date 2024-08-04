@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Llama;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -32,9 +31,9 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
+public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
-	public static final Property<Llama.@NonNull Color> COLOR = new BasicProperty<Llama.@NonNull Color>()
+	public static final Property<Llama.Color> COLOR = new BasicProperty<Llama.Color>()
 			.dataKeyAccessor("color", EnumSerializers.lenient(Llama.Color.class))
 			.defaultValue(Llama.Color.CREAMY)
 			.build();
@@ -45,7 +44,7 @@ public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<Llama.@NonNull Color> colorProperty = new PropertyValue<>(COLOR)
+	private final PropertyValue<Llama.Color> colorProperty = new PropertyValue<>(COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyColor)
 			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> carpetColorProperty = new PropertyValue<>(CARPET_COLOR)
@@ -54,7 +53,7 @@ public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
 
 	public LlamaShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<? extends @NonNull LlamaShop<E>> livingObjectType,
+			SKLivingShopObjectType<? extends LlamaShop<E>> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -88,8 +87,8 @@ public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getCarpetColorEditorButton());
 		return editorButtons;
@@ -122,6 +121,7 @@ public class LlamaShop<E extends @NonNull Llama> extends ChestedHorseShop<E> {
 	private void applyColor() {
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setColor(this.getColor());
 	}
 

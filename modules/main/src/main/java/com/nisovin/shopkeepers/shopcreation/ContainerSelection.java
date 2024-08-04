@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -41,8 +40,8 @@ public class ContainerSelection {
 	);
 
 	// By player id:
-	private final Map<@NonNull UUID, @NonNull Deque<@NonNull BlockLocation>> recentlyPlacedContainers = new HashMap<>();
-	private final Map<@NonNull UUID, @NonNull Block> selectedContainer = new HashMap<>();
+	private final Map<UUID, Deque<BlockLocation>> recentlyPlacedContainers = new HashMap<>();
+	private final Map<UUID, Block> selectedContainer = new HashMap<>();
 
 	public ContainerSelection(ShopkeepersPlugin plugin, ProtectedContainers protectedContainers) {
 		Validate.notNull(plugin, "plugin is null");
@@ -78,7 +77,7 @@ public class ContainerSelection {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
 		UUID playerId = player.getUniqueId();
-		Deque<@NonNull BlockLocation> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(
+		Deque<BlockLocation> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(
 				playerId,
 				key -> new ArrayDeque<>(MAX_TRACKED_CONTAINERS + 1)
 		);
@@ -93,7 +92,7 @@ public class ContainerSelection {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
 		UUID playerId = player.getUniqueId();
-		@Nullable Deque<@NonNull BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerId);
+		@Nullable Deque<BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerId);
 		if (recentlyPlaced == null) return false;
 
 		BlockLocation containerLocation = this.getSharedKey(container);

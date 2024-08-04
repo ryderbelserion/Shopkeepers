@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.util.json;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.gson.Gson;
@@ -9,13 +8,11 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 
 public final class JsonUtils {
 
-	@SuppressWarnings("nullness:type.argument")
-	private static final ThreadLocal<@NonNull Gson> GSON = ThreadLocal.withInitial(() -> {
+	private static final ThreadLocal<Gson> GSON = ThreadLocal.withInitial(() -> {
 		Gson gson = newGsonBuilder().create();
 		return Unsafe.assertNonNull(gson);
 	});
-	@SuppressWarnings("nullness:type.argument")
-	private static final ThreadLocal<@NonNull Gson> GSON_PRETTY = ThreadLocal.withInitial(() -> {
+	private static final ThreadLocal<Gson> GSON_PRETTY = ThreadLocal.withInitial(() -> {
 		Gson gson = newGsonBuilder().setPrettyPrinting().create();
 		return Unsafe.assertNonNull(gson);
 	});

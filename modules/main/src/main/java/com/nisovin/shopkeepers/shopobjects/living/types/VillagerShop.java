@@ -10,7 +10,6 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -39,38 +38,33 @@ import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 
-public class VillagerShop extends BabyableShop<@NonNull Villager> {
+public class VillagerShop extends BabyableShop<Villager> {
 
-	private static final Registry<Villager.@NonNull Profession> REGISTRY_VILLAGER_PROFESSION
-			= Unsafe.castNonNull(Registry.VILLAGER_PROFESSION);
-	private static final Registry<Villager.@NonNull Type> REGISTRY_VILLAGER_TYPE
-			= Unsafe.castNonNull(Registry.VILLAGER_TYPE);
-
-	public static final Property<@NonNull Profession> PROFESSION = new BasicProperty<@NonNull Profession>()
-			.dataKeyAccessor("profession", KeyedSerializers.forRegistry(Profession.class, REGISTRY_VILLAGER_PROFESSION))
+	public static final Property<Profession> PROFESSION = new BasicProperty<Profession>()
+			.dataKeyAccessor("profession", KeyedSerializers.forRegistry(Profession.class, Registry.VILLAGER_PROFESSION))
 			.defaultValue(Profession.NONE)
 			.build();
 
-	public static final Property<Villager.@NonNull Type> VILLAGER_TYPE = new BasicProperty<Villager.@NonNull Type>()
-			.dataKeyAccessor("villagerType", KeyedSerializers.forRegistry(Villager.Type.class, REGISTRY_VILLAGER_TYPE))
+	public static final Property<Villager.Type> VILLAGER_TYPE = new BasicProperty<Villager.Type>()
+			.dataKeyAccessor("villagerType", KeyedSerializers.forRegistry(Villager.Type.class, Registry.VILLAGER_TYPE))
 			.defaultValue(Villager.Type.PLAINS)
 			.build();
 
 	public static final int MIN_VILLAGER_LEVEL = 1;
 	public static final int MAX_VILLAGER_LEVEL = 5;
-	public static final Property<@NonNull Integer> VILLAGER_LEVEL = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> VILLAGER_LEVEL = new BasicProperty<Integer>()
 			.dataKeyAccessor("villagerLevel", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.bounded(MIN_VILLAGER_LEVEL, MAX_VILLAGER_LEVEL))
 			.defaultValue(1)
 			.build();
 
-	private final PropertyValue<@NonNull Profession> professionProperty = new PropertyValue<>(PROFESSION)
+	private final PropertyValue<Profession> professionProperty = new PropertyValue<>(PROFESSION)
 			.onValueChanged(Unsafe.initialized(this)::applyProfession)
 			.build(properties);
-	private final PropertyValue<Villager.@NonNull Type> villagerTypeProperty = new PropertyValue<>(VILLAGER_TYPE)
+	private final PropertyValue<Villager.Type> villagerTypeProperty = new PropertyValue<>(VILLAGER_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applyVillagerType)
 			.build(properties);
-	private final PropertyValue<@NonNull Integer> villagerLevelProperty = new PropertyValue<>(VILLAGER_LEVEL)
+	private final PropertyValue<Integer> villagerLevelProperty = new PropertyValue<>(VILLAGER_LEVEL)
 			.onValueChanged(Unsafe.initialized(this)::applyVillagerLevel)
 			.build(properties);
 
@@ -78,7 +72,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public VillagerShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull VillagerShop> livingObjectType,
+			SKLivingShopObjectType<VillagerShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -148,8 +142,8 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getProfessionEditorButton());
 		editorButtons.add(this.getVillagerTypeEditorButton());
 		editorButtons.add(this.getVillagerLevelEditorButton());
@@ -168,7 +162,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public void cycleProfession(boolean backwards) {
 		this.setProfession(RegistryUtils.cycleKeyed(
-				REGISTRY_VILLAGER_PROFESSION,
+				Registry.VILLAGER_PROFESSION,
 				this.getProfession(),
 				backwards
 		));
@@ -177,6 +171,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 	private void applyProfession() {
 		Villager entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setProfession(this.getProfession());
 	}
 
@@ -271,7 +266,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public void cycleVillagerType(boolean backwards) {
 		this.setVillagerType(RegistryUtils.cycleKeyed(
-				REGISTRY_VILLAGER_TYPE,
+				Registry.VILLAGER_TYPE,
 				this.getVillagerType(),
 				backwards
 		));
@@ -280,6 +275,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 	private void applyVillagerType() {
 		Villager entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setVillagerType(this.getVillagerType());
 	}
 
@@ -361,6 +357,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 	private void applyVillagerLevel() {
 		Villager entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setVillagerLevel(this.getVillagerLevel());
 	}
 

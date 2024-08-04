@@ -458,7 +458,7 @@ public final class ItemUtils {
 			Material type,
 			int amount,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		assert type != null; // Checked by the ItemStack constructor
 		assert type.isItem();
@@ -472,7 +472,7 @@ public final class ItemUtils {
 			ItemData itemData,
 			int amount,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		Validate.notNull(itemData, "itemData is null");
 		return setDisplayNameAndLore(itemData.createItemStack(amount), displayName, lore);
@@ -483,7 +483,7 @@ public final class ItemUtils {
 	public static ItemStack setDisplayNameAndLore(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		return setItemMeta(itemStack, displayName, lore, null);
 	}
@@ -491,7 +491,7 @@ public final class ItemUtils {
 	public static ItemStack setItemMeta(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore,
+			@ReadOnly @Nullable List<? extends String> lore,
 			@Nullable Integer maxStackSize
 	) {
 		Validate.notNull(itemStack, "itemStack is null");
@@ -808,7 +808,7 @@ public final class ItemUtils {
 			@ReadOnly @Nullable ItemStack item,
 			Material type,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
@@ -883,7 +883,7 @@ public final class ItemUtils {
 	public static boolean matchesData(
 			@ReadOnly @Nullable ItemStack item,
 			Material dataType,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		if (item == null) return false;
@@ -895,7 +895,7 @@ public final class ItemUtils {
 	public static boolean matchesData(
 			@Nullable UnmodifiableItemStack item,
 			Material dataType,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		return matchesData(asItemStackOrNull(item), dataType, data, matchPartialLists);
@@ -924,31 +924,25 @@ public final class ItemUtils {
 		if (itemMetaData == null) return false;
 
 		// TODO Maybe there is a better way of doing this in the future..
-		Map<? extends @NonNull String, @NonNull ?> itemMetaDataMap = Unsafe.cast(
-				itemMetaData.serialize()
-		);
-		Map<? extends @NonNull String, @NonNull ?> dataMetaDataMap = Unsafe.cast(
-				dataMetaData.serialize()
-		);
+		Map<? extends String, @NonNull ?> itemMetaDataMap = itemMetaData.serialize();
+		Map<? extends String, @NonNull ?> dataMetaDataMap = dataMetaData.serialize();
 		return matchesData(itemMetaDataMap, dataMetaDataMap, matchPartialLists);
 	}
 
 	public static boolean matchesData(
 			@ReadOnly @Nullable ItemMeta itemMetaData,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		if (data == null || data.isEmpty()) return true;
 		if (itemMetaData == null) return false;
-		Map<? extends @NonNull String, @NonNull ?> itemMetaDataMap = Unsafe.cast(
-				itemMetaData.serialize()
-		);
+		Map<? extends String, @NonNull ?> itemMetaDataMap = itemMetaData.serialize();
 		return matchesData(itemMetaDataMap, data, matchPartialLists);
 	}
 
 	public static boolean matchesData(
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> itemData,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> itemData,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		return _matchesData(itemData, data, matchPartialLists);
@@ -1058,7 +1052,7 @@ public final class ItemUtils {
 	 * @return the Predicate
 	 */
 	public static Predicate<@ReadOnly @Nullable ItemStack> matchingItems(
-			@ReadOnly List<? extends @NonNull ItemData> itemDataList
+			@ReadOnly List<? extends ItemData> itemDataList
 	) {
 		Validate.notNull(itemDataList, "itemDataList is null");
 		assert !CollectionUtils.containsNull(itemDataList);

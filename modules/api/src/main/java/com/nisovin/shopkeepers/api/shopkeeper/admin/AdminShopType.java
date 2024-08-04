@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.api.shopkeeper.admin;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 
 /**
@@ -10,5 +8,5 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
  * @param <T>
  *            the type of admin shopkeeper that is described by this shop type
  */
-public interface AdminShopType<T extends @NonNull AdminShopkeeper> extends ShopType<T> {
+public interface AdminShopType<T extends AdminShopkeeper> extends ShopType<T> {
 }

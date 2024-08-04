@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Cat;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -31,13 +30,13 @@ import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class CatShop extends SittableShop<@NonNull Cat> {
+public class CatShop extends SittableShop<Cat> {
 
 	// TODO MC 1.21: Removed cat type enum. Cat registry is only available in 1.20.4+.
 	// Handle as string until we only support 1.20.4+, so that even when running in compatibility
 	// mode, and we fail to setup the fallback compat provider for cat types, we still preserve the
 	// previously stored cat types (even if we are not able to apply display or cycle them).
-	public static final Property<@NonNull String> CAT_TYPE = new BasicProperty<@NonNull String>()
+	public static final Property<String> CAT_TYPE = new BasicProperty<String>()
 			.dataKeyAccessor("catType", StringSerializers.STRICT_NON_EMPTY)
 			.defaultValue("TABBY")
 			.build();
@@ -48,7 +47,7 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<@NonNull String> catTypeProperty = new PropertyValue<>(CAT_TYPE)
+	private final PropertyValue<String> catTypeProperty = new PropertyValue<>(CAT_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applyCatType)
 			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
@@ -57,7 +56,7 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 
 	public CatShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull CatShop> livingObjectType,
+			SKLivingShopObjectType<CatShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -86,8 +85,8 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getCatTypeEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
@@ -209,6 +208,7 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	private void applyCollarColor() {
 		Cat entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:

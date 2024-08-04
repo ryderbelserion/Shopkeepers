@@ -8,7 +8,6 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -24,11 +23,11 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class EndermanShop extends SKLivingShopObject<@NonNull Enderman> {
+public class EndermanShop extends SKLivingShopObject<Enderman> {
 
 	public EndermanShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<? extends @NonNull EndermanShop> livingObjectType,
+			SKLivingShopObjectType<? extends EndermanShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -52,8 +51,8 @@ public class EndermanShop extends SKLivingShopObject<@NonNull Enderman> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		return editorButtons;
 	}
 

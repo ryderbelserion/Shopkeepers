@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.text;
 import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -101,7 +100,7 @@ public abstract class TextBuilder extends AbstractText {
 	 *            the child text, not <code>null</code>
 	 * @return the child Text
 	 */
-	public <T extends @NonNull Text> T child(T child) {
+	public <T extends Text> T child(T child) {
 		this.validateModification();
 		this.setChild(child);
 		// Returning the child Text here allows for convenient chaining when fluently building a
@@ -123,7 +122,7 @@ public abstract class TextBuilder extends AbstractText {
 	 *            the next text, not <code>null</code>
 	 * @return the next Text
 	 */
-	public <T extends @NonNull Text> T next(T next) {
+	public <T extends Text> T next(T next) {
 		this.validateModification();
 		this.setNext(next);
 		// Returning the next Text here allows for convenient chaining when fluently building a

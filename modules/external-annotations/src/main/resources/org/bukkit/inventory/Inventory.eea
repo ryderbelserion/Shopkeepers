@@ -1,0 +1,76 @@
+class org/bukkit/inventory/Inventory
+addItem
+ ([Lorg/bukkit/inventory/ItemStack;)Ljava/util/HashMap<Ljava/lang/Integer;Lorg/bukkit/inventory/ItemStack;>;
+ ([L1org/bukkit/inventory/ItemStack;)L1java/util/HashMap<L1java/lang/Integer;L1org/bukkit/inventory/ItemStack;>;
+all
+ (Lorg/bukkit/Material;)Ljava/util/HashMap<Ljava/lang/Integer;+Lorg/bukkit/inventory/ItemStack;>;
+ (L1org/bukkit/Material;)L1java/util/HashMap<L1java/lang/Integer;+L1org/bukkit/inventory/ItemStack;>;
+all
+ (Lorg/bukkit/inventory/ItemStack;)Ljava/util/HashMap<Ljava/lang/Integer;+Lorg/bukkit/inventory/ItemStack;>;
+ (L0org/bukkit/inventory/ItemStack;)L1java/util/HashMap<L1java/lang/Integer;+L1org/bukkit/inventory/ItemStack;>;
+contains
+ (Lorg/bukkit/Material;)Z
+ (L1org/bukkit/Material;)Z
+contains
+ (Lorg/bukkit/Material;I)Z
+ (L1org/bukkit/Material;I)Z
+contains
+ (Lorg/bukkit/inventory/ItemStack;)Z
+ (L0org/bukkit/inventory/ItemStack;)Z
+contains
+ (Lorg/bukkit/inventory/ItemStack;I)Z
+ (L0org/bukkit/inventory/ItemStack;I)Z
+containsAtLeast
+ (Lorg/bukkit/inventory/ItemStack;I)Z
+ (L0org/bukkit/inventory/ItemStack;I)Z
+first
+ (Lorg/bukkit/Material;)I
+ (L1org/bukkit/Material;)I
+first
+ (Lorg/bukkit/inventory/ItemStack;)I
+ (L1org/bukkit/inventory/ItemStack;)I
+getContents
+ ()[Lorg/bukkit/inventory/ItemStack;
+ ()[1L0org/bukkit/inventory/ItemStack;
+getHolder
+ ()Lorg/bukkit/inventory/InventoryHolder;
+ ()L0org/bukkit/inventory/InventoryHolder;
+getItem
+ (I)Lorg/bukkit/inventory/ItemStack;
+ (I)L0org/bukkit/inventory/ItemStack;
+getLocation
+ ()Lorg/bukkit/Location;
+ ()L0org/bukkit/Location;
+getStorageContents
+ ()[Lorg/bukkit/inventory/ItemStack;
+ ()[1L0org/bukkit/inventory/ItemStack;
+getType
+ ()Lorg/bukkit/event/inventory/InventoryType;
+ ()L1org/bukkit/event/inventory/InventoryType;
+getViewers
+ ()Ljava/util/List<Lorg/bukkit/entity/HumanEntity;>;
+ ()L1java/util/List<L1org/bukkit/entity/HumanEntity;>;
+iterator
+ ()Ljava/util/ListIterator<Lorg/bukkit/inventory/ItemStack;>;
+ ()L1java/util/ListIterator<L0org/bukkit/inventory/ItemStack;>;
+iterator
+ (I)Ljava/util/ListIterator<Lorg/bukkit/inventory/ItemStack;>;
+ (I)L1java/util/ListIterator<L0org/bukkit/inventory/ItemStack;>;
+remove
+ (Lorg/bukkit/Material;)V
+ (L1org/bukkit/Material;)V
+remove
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L1org/bukkit/inventory/ItemStack;)V
+removeItem
+ ([Lorg/bukkit/inventory/ItemStack;)Ljava/util/HashMap<Ljava/lang/Integer;Lorg/bukkit/inventory/ItemStack;>;
+ ([L1org/bukkit/inventory/ItemStack;)L1java/util/HashMap<L1java/lang/Integer;L1org/bukkit/inventory/ItemStack;>;
+setContents
+ ([Lorg/bukkit/inventory/ItemStack;)V
+ ([1L0org/bukkit/inventory/ItemStack;)V
+setItem
+ (ILorg/bukkit/inventory/ItemStack;)V
+ (IL0org/bukkit/inventory/ItemStack;)V
+setStorageContents
+ ([Lorg/bukkit/inventory/ItemStack;)V
+ ([1L0org/bukkit/inventory/ItemStack;)V

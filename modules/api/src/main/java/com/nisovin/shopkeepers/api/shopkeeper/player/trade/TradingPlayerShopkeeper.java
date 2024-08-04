@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.api.shopkeeper.player.trade;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
@@ -24,7 +22,7 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<? extends @NonNull TradeOffer> getOffers();
+	public List<? extends TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -39,7 +37,7 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<? extends @NonNull TradeOffer> offers);
+	public void setOffers(List<? extends TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -61,5 +59,5 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<? extends @NonNull TradeOffer> offers);
+	public void addOffers(List<? extends TradeOffer> offers);
 }

@@ -23,7 +23,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -41,11 +40,12 @@ class UIListener implements Listener {
 	 * The default handled types of inventory events. Any other types of inventory events need to be
 	 * explicitly requested via {@link UIHandler#getAdditionalInventoryEvents()}.
 	 */
-	private static final Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> DEFAULT_INVENTORY_EVENTS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-			InventoryClickEvent.class,
-			InventoryDragEvent.class,
-			InventoryCloseEvent.class
-	)));
+	private static final Set<? extends Class<? extends InventoryEvent>> DEFAULT_INVENTORY_EVENTS
+			= Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+					InventoryClickEvent.class,
+					InventoryDragEvent.class,
+					InventoryCloseEvent.class
+			)));
 
 	// This object indicates on the eventHandlerStack that no UI session is handling a particular
 	// inventory event.
@@ -53,7 +53,7 @@ class UIListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 	private final SKUIRegistry uiRegistry;
-	private final Set<@NonNull Class<? extends @NonNull Event>> handledEventTypes = new HashSet<>();
+	private final Set<Class<? extends Event>> handledEventTypes = new HashSet<>();
 
 	// Stores the UI session (or NO_UI_SESSION) that handles the currently processed inventory
 	// event.
@@ -67,7 +67,7 @@ class UIListener implements Listener {
 	// current inventory view. However, in order to guard against plugins that ignore this Bukkit
 	// API note, we check if the UI session is still valid and skip the late event handling if it is
 	// not.
-	private final Deque<@NonNull Object> eventHandlerStack = new ArrayDeque<>();
+	private final Deque<Object> eventHandlerStack = new ArrayDeque<>();
 
 	UIListener(ShopkeepersPlugin plugin, SKUIRegistry uiRegistry) {
 		Validate.notNull(plugin, "plugin is null");
@@ -93,10 +93,10 @@ class UIListener implements Listener {
 	// listener and accounted for in the eventHandlerStack, our newly registered event handlers
 	// won't be called yet for this particular event instance, not even during the late event
 	// priority phase.
-	void registerEventType(Class<? extends @NonNull InventoryEvent> eventClass) {
+	void registerEventType(Class<? extends InventoryEvent> eventClass) {
 		Validate.notNull(eventClass, "eventClass is null");
 		if (handledEventTypes.contains(eventClass)) return; // Already handled
-		Class<? extends @NonNull Event> registrationClass = EventUtils.getEventRegistrationClass(eventClass);
+		Class<? extends Event> registrationClass = EventUtils.getEventRegistrationClass(eventClass);
 		// Already handled as part of a parent class:
 		if (!handledEventTypes.add(registrationClass)) return;
 

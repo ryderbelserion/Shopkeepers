@@ -29,8 +29,8 @@ public abstract class AbstractItemStackSerializationTest<@Nullable S> extends Ab
 	protected void testDeserialization(
 			@Nullable ItemStack itemStack,
 			@Nullable S serialized,
-			@Nullable ItemStack deserialized)
-	{
+			@Nullable ItemStack deserialized
+	) {
 		Assert.assertEquals(
 				Unsafe.nullableAsNonNull(itemStack),
 				Unsafe.nullableAsNonNull(deserialized)

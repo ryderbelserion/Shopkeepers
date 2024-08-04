@@ -68,19 +68,19 @@ public class ConfigBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<? extends @NonNull String> getKeys() {
+	public Set<? extends String> getKeys() {
 		// TODO This is wasteful.
 		return Unsafe.cast(config.getKeys(false));
 	}
 
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getValues() {
+	public Map<? extends String, @NonNull ?> getValues() {
 		// TODO This is wasteful.
 		return this.getValuesCopy();
 	}
 
 	@Override
-	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
+	public Map<String, Object> getValuesCopy() {
 		return ConfigUtils.getValues(config);
 	}
 

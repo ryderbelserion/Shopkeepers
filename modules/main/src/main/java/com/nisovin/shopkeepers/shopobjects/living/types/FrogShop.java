@@ -29,7 +29,7 @@ import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual Frog type once we only support Bukkit 1.19 upwards
-public class FrogShop extends BabyableShop<@NonNull Animals> {
+public class FrogShop extends BabyableShop<Frog> {
 
 	// TODO Use correct enum type once we only support Bukkit 1.19 upwards
 	public static final Property<@NonNull String> VARIANT = new BasicProperty<@NonNull String>()
@@ -45,7 +45,7 @@ public class FrogShop extends BabyableShop<@NonNull Animals> {
 
 	public FrogShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull FrogShop> livingObjectType,
+			SKLivingShopObjectType<FrogShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -71,8 +71,8 @@ public class FrogShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}

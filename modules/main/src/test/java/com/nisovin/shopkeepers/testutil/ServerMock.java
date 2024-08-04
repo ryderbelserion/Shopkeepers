@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * Adopted from CraftBukkit.
  */
-class ServerMock extends ProxyHandler<@NonNull Server> {
+class ServerMock extends ProxyHandler<Server> {
 
 	// Static initializer: Ensures that this is only setup once across all tests.
 	static {

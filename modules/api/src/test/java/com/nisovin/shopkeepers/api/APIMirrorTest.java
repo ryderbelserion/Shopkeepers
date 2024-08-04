@@ -1,17 +1,12 @@
 package com.nisovin.shopkeepers.api;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -26,11 +21,9 @@ public class APIMirrorTest {
 	 */
 	@Test
 	public void testMatchingMethods() {
-		List<@NonNull Method> pluginMethods = Arrays.stream(
-				ShopkeepersPlugin.class.getDeclaredMethods()
-		).filter(method -> {
-			return Modifier.isAbstract(method.getModifiers());
-		}).collect(Collectors.<@NonNull Method>toList());
+		List<Method> pluginMethods = Arrays.stream(ShopkeepersPlugin.class.getDeclaredMethods())
+				.filter(method -> Modifier.isAbstract(method.getModifiers()))
+				.toList();
 		for (Method pluginMethod : pluginMethods) {
 			Method apiMethod = null;
 			try {

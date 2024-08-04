@@ -58,17 +58,17 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Set<? extends @NonNull String> getKeys() {
+	public Set<? extends String> getKeys() {
 		return dataContainer.getKeys();
 	}
 
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getValues() {
+	public Map<? extends String, @NonNull ?> getValues() {
 		return dataContainer.getValues();
 	}
 
 	@Override
-	public Map<@NonNull String, @NonNull Object> getValuesCopy() {
+	public Map<String, Object> getValuesCopy() {
 		return dataContainer.getValuesCopy();
 	}
 

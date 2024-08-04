@@ -1,0 +1,4 @@
+class org/bukkit/World
+getEntities
+ ()Ljava/util/List<Lorg/bukkit/entity/Entity;>;
+ ()L1java/util/List<L1org/bukkit/entity/Entity;>;

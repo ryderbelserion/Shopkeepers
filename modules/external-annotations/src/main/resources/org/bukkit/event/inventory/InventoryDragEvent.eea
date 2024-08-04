@@ -1,0 +1,28 @@
+class org/bukkit/event/inventory/InventoryDragEvent
+getCursor
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L0org/bukkit/inventory/ItemStack;
+getHandlerList
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;
+getHandlers
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;
+getInventorySlots
+ ()Ljava/util/Set<Ljava/lang/Integer;>;
+ ()L1java/util/Set<L1java/lang/Integer;>;
+getNewItems
+ ()Ljava/util/Map<Ljava/lang/Integer;Lorg/bukkit/inventory/ItemStack;>;
+ ()L1java/util/Map<L1java/lang/Integer;L1org/bukkit/inventory/ItemStack;>;
+getOldCursor
+ ()Lorg/bukkit/inventory/ItemStack;
+ ()L1org/bukkit/inventory/ItemStack;
+getRawSlots
+ ()Ljava/util/Set<Ljava/lang/Integer;>;
+ ()L1java/util/Set<L1java/lang/Integer;>;
+getType
+ ()Lorg/bukkit/event/inventory/DragType;
+ ()L1org/bukkit/event/inventory/DragType;
+setCursor
+ (Lorg/bukkit/inventory/ItemStack;)V
+ (L0org/bukkit/inventory/ItemStack;)V

@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -71,7 +70,7 @@ public final class InventoryUtils {
 	 */
 	public static boolean containsAtLeast(
 			@ReadOnly @Nullable ItemStack @ReadOnly [] contents,
-			Predicate<@ReadOnly ? super @NonNull ItemStack> predicate,
+			Predicate<@ReadOnly ? super ItemStack> predicate,
 			int amount
 	) {
 		Validate.notNull(contents, "contents is null");
@@ -203,7 +202,7 @@ public final class InventoryUtils {
 	 */
 	public static boolean containsAtLeast(
 			Iterable<@ReadOnly ? extends @Nullable ItemStack> contents,
-			Predicate<@ReadOnly ? super @NonNull ItemStack> predicate,
+			Predicate<@ReadOnly ? super ItemStack> predicate,
 			int amount
 	) {
 		Validate.notNull(contents, "contents is null");
@@ -535,7 +534,7 @@ public final class InventoryUtils {
 	 */
 	public static int removeItems(
 			@ReadOnly @Nullable ItemStack @ReadWrite [] contents,
-			Predicate<@ReadOnly ? super @NonNull ItemStack> itemMatcher,
+			Predicate<@ReadOnly ? super ItemStack> itemMatcher,
 			int amount
 	) {
 		Validate.notNull(contents, "contents is null");
@@ -671,7 +670,8 @@ public final class InventoryUtils {
 
 	// TODO Replace this with the corresponding Bukkit API method added in late 1.15.2. See
 	// https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/da9ef3c55fa3bce91f7fdcd77d50171be7297d7d
-	// Note: MC 1.20.5 added EquipmentSlot.Body. E.g. used for horse armor. Not relevant for PlayerInventory.
+	// Note: MC 1.20.5 added EquipmentSlot.Body. E.g. used for horse armor. Not relevant for
+	// PlayerInventory.
 	public static @Nullable ItemStack getItem(PlayerInventory playerInventory, EquipmentSlot slot) {
 		Validate.notNull(playerInventory, "playerInventory is null");
 		Validate.notNull(slot, "slot is null");

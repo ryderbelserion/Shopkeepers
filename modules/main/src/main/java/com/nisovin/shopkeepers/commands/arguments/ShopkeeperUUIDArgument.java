@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -37,13 +36,13 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
+	public ShopkeeperUUIDArgument(String name, ArgumentFilter<? super UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull UUID> filter,
+			ArgumentFilter<? super UUID> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, minimumCompletionInput);
@@ -72,23 +71,23 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	 *            <code>null</code>
 	 * @return the shopkeeper uuid completion suggestions
 	 */
-	public static Iterable<? extends @NonNull UUID> getDefaultCompletionSuggestions(
+	public static Iterable<? extends UUID> getDefaultCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
 			String uuidPrefix,
-			Predicate<? super @NonNull Shopkeeper> filter
+			Predicate<? super Shopkeeper> filter
 	) {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		// Suggestion for the unique id(s) of the targeted shopkeeper(s):
 		CommandSender sender = input.getSender();
-		List<? extends @NonNull Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(
+		List<? extends Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(
 				sender,
 				TargetShopkeeperFilter.ANY
 		);
 
 		// Only provide other suggestions if there is a minimum length input:
-		Stream<@NonNull Shopkeeper> shopkeepersStream;
+		Stream<Shopkeeper> shopkeepersStream;
 		if (uuidPrefix.length() >= minimumCompletionInput) {
 			// TODO Improve by using a TreeMap for the prefix matching?
 			shopkeepersStream = Stream.concat(
@@ -111,7 +110,7 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+	protected Iterable<? extends UUID> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix
