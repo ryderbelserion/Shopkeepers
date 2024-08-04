@@ -30,8 +30,11 @@ ext.buildVersion = version + '+' + getGitHash()
 ext.isSnapshot = version.contains('-SNAPSHOT')
 ext.pluginVersion = isSnapshot ? buildVersion : version
 
+Locale.setDefault(new Locale(System.getProperty("user.language"), System.getProperty("user.country")))
+
 println 'User home: ' + System.properties['user.home']
 println 'Local Maven repository: ' + repositories.mavenLocal().url.path
+println 'Locale: ' + Locale.getDefault()
 println 'Project version: ' + version
 println 'Build version: ' + buildVersion
 println 'Plugin version: ' + pluginVersion
@@ -166,6 +169,11 @@ subprojects {
 			afterEvaluate {
 				configureJarTaskWithMavenMetadata(project, jarTask)
 			}
+		}
+
+		javadoc {
+			options.locale = 'en_US'
+			options.encoding = 'UTF-8'
 		}
 
 		test {
