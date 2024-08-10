@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
@@ -195,16 +196,17 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	// Returns true if server is outdated.
 	private boolean isOutdatedServerVersion() {
 		// Validate that this server is running a minimum required version:
-		// TODO Add proper version parsing.
-		/*String cbVersion = Utils.getServerCBVersion(); // E.g. 1_13_R2
-		String bukkitVersion = Bukkit.getBukkitVersion(); // E.g. 1.13.1-R0.1-SNAPSHOT*/
-		try {
-			// This has been added with the recent changes to PlayerBedEnterEvent: TODO outdated
-			Class.forName("org.bukkit.event.player.PlayerBedEnterEvent$BedEnterResult");
-			return false;
+		// Changed in late Bukkit 1.20.6 from 'false' -> 'true':
+		// On the CraftBukkit side, there have been further bug fixes related to item serialization
+		// after that.
+		return !EntityType.ITEM.isSpawnable();
+		/*try {
+			// Changed during MC 1.21 from enum to interface:
+			Class<?> clazz = Class.forName("org.bukkit.entity.Villager$Type");
+			return clazz.isEnum();
 		} catch (ClassNotFoundException e) {
 			return true;
-		}
+		}*/
 	}
 
 	// Returns false if neither a compatible NMS version nor the fallback handler could be set up.
