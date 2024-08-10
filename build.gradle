@@ -1,6 +1,6 @@
 plugins {
 	id 'base' // Adds the clean task to the root project
-	id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
+	id 'com.gradleup.shadow' version '8.3.0' apply false
 	id 'org.checkerframework' version '0.6.39' apply false
 	// Useful for build debugging:
 	// https://gitlab.com/barfuin/gradle-taskinfo

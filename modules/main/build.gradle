@@ -2,7 +2,7 @@ plugins {
 	id 'java-library'
 	id 'org.checkerframework'
 	id 'maven-publish'
-	id 'com.github.johnrengelman.shadow'
+	id 'com.gradleup.shadow'
 	id 'eclipse'
 }
 
