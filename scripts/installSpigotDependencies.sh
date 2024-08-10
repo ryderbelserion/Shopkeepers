@@ -62,6 +62,7 @@ buildSpigotIfMissing 1.20.6 remapped
 #fi
 
 # Note: The plugin does not build with Spigot 1.21 versions before 2024-07-07 (due to enum changes).
-buildSpigotIfMissing 1.21 remapped
+# Build specific build number, because Spigot 1.21 was updated to point to 1.21.1.
+buildSpigotIfMissing 1.21 remapped 4289
 
 popd
