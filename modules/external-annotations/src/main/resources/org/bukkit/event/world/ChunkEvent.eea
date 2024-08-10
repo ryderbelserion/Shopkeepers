@@ -1,0 +1,4 @@
+class org/bukkit/event/world/ChunkEvent
+getChunk
+ ()Lorg/bukkit/Chunk;
+ ()L1org/bukkit/Chunk;

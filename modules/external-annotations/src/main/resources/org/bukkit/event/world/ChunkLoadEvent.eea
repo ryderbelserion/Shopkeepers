@@ -1,0 +1,4 @@
+class org/bukkit/event/world/ChunkLoadEvent
+getHandlerList
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;

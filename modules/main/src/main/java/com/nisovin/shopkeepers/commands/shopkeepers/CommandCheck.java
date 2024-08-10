@@ -144,6 +144,7 @@ class CommandCheck extends Command {
 		for (World world : Bukkit.getWorlds()) {
 			String worldName = world.getName();
 			Chunk[] worldLoadedChunks = world.getLoadedChunks();
+			int chunksWithLoadedEntities = 0;
 			List<Entity> worldEntities = world.getEntities();
 			int worldDeadEntities = 0;
 			int worldInvalidEntities = 0;
@@ -154,6 +155,9 @@ class CommandCheck extends Command {
 			int worldDeadEntitiesInChunks = 0;
 			int worldInvalidEntitiesInChunks = 0;
 			for (Chunk chunk : worldLoadedChunks) {
+				if (!chunk.isEntitiesLoaded()) continue;
+
+				chunksWithLoadedEntities++;
 				for (Entity entity : chunk.getEntities()) {
 					if (entity.isDead()) ++worldDeadEntitiesInChunks;
 					if (!entity.isValid()) ++worldInvalidEntitiesInChunks;
@@ -186,7 +190,8 @@ class CommandCheck extends Command {
 					+ worldInvalidEntities + " | " + worldDeadEntities);
 			sender.sendMessage("  Entities in chunks (invalid | dead): "
 					+ worldInvalidEntitiesInChunks + " | " + worldDeadEntitiesInChunks);
-			sender.sendMessage("  Loaded chunks: " + worldLoadedChunks.length);
+			sender.sendMessage("  Loaded chunks: " + worldLoadedChunks.length
+					+ " (with loaded entities: " + chunksWithLoadedEntities + ")");
 			if (worldTotalShopkeepers > 0) {
 				sender.sendMessage("  Chunks with shopkeepers | loaded | active: "
 						+ worldChunksWithShopkeepers + " | " + worldLoadedChunksWithShopkeepers

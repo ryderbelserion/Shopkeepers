@@ -1,0 +1,7 @@
+class org/bukkit/event/world/EntitiesLoadEvent
+getEntities
+ ()Ljava/util/List<Lorg/bukkit/entity/Entity;>;
+ ()L1java/util/List<L1org/bukkit/entity/Entity;>;
+getHandlerList
+ ()Lorg/bukkit/event/HandlerList;
+ ()L1org/bukkit/event/HandlerList;

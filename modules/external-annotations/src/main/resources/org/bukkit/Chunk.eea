@@ -1,0 +1,46 @@
+class org/bukkit/Chunk
+addPluginChunkTicket
+ (Lorg/bukkit/plugin/Plugin;)Z
+ (L1org/bukkit/plugin/Plugin;)Z
+contains
+ (Lorg/bukkit/block/Biome;)Z
+ (L1org/bukkit/block/Biome;)Z
+contains
+ (Lorg/bukkit/block/data/BlockData;)Z
+ (L1org/bukkit/block/data/BlockData;)Z
+getBlock
+ (III)Lorg/bukkit/block/Block;
+ (III)L1org/bukkit/block/Block;
+getChunkSnapshot
+ ()Lorg/bukkit/ChunkSnapshot;
+ ()L1org/bukkit/ChunkSnapshot;
+getChunkSnapshot
+ (ZZZ)Lorg/bukkit/ChunkSnapshot;
+ (ZZZ)L1org/bukkit/ChunkSnapshot;
+getEntities
+ ()[Lorg/bukkit/entity/Entity;
+ ()[1L1org/bukkit/entity/Entity;
+getLoadLevel
+ ()Lorg/bukkit/Chunk$LoadLevel;
+ ()L1org/bukkit/Chunk$LoadLevel;
+getPlayersSeeingChunk
+ ()Ljava/util/Collection<Lorg/bukkit/entity/Player;>;
+ ()L1java/util/Collection<L1org/bukkit/entity/Player;>;
+getPluginChunkTickets
+ ()Ljava/util/Collection<Lorg/bukkit/plugin/Plugin;>;
+ ()L1java/util/Collection<L1org/bukkit/plugin/Plugin;>;
+getStructures
+ ()Ljava/util/Collection<Lorg/bukkit/generator/structure/GeneratedStructure;>;
+ ()L1java/util/Collection<L1org/bukkit/generator/structure/GeneratedStructure;>;
+getStructures
+ (Lorg/bukkit/generator/structure/Structure;)Ljava/util/Collection<Lorg/bukkit/generator/structure/GeneratedStructure;>;
+ (Lorg/bukkit/generator/structure/Structure;)L1java/util/Collection<L1org/bukkit/generator/structure/GeneratedStructure;>;
+getTileEntities
+ ()[Lorg/bukkit/block/BlockState;
+ ()[1L1org/bukkit/block/BlockState;
+getWorld
+ ()Lorg/bukkit/World;
+ ()L1org/bukkit/World;
+removePluginChunkTicket
+ (Lorg/bukkit/plugin/Plugin;)Z
+ (L1org/bukkit/plugin/Plugin;)Z

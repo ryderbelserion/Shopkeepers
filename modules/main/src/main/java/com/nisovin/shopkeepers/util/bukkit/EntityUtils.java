@@ -318,7 +318,10 @@ public final class EntityUtils {
 		for (int chunkX = startX; chunkX <= endX; chunkX++) {
 			for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
 				if (!loadChunks && !world.isChunkLoaded(chunkX, chunkZ)) continue;
+
 				Chunk currentChunk = world.getChunkAt(chunkX, chunkZ);
+				if (!loadChunks && !currentChunk.isEntitiesLoaded()) continue;
+
 				for (Entity entity : currentChunk.getEntities()) {
 					// TODO This is a workaround: For some yet unknown reason entities sometimes
 					// report to be in a different world..

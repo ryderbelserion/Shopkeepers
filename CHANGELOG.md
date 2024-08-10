@@ -14,6 +14,7 @@ Date format: (YYYY-MM-DD)
   * Include the Eclipse JDT preference files for use by the ECJ compiler.
   * Use the JDT `NonNullByDefault` annotation which ECJ interprets as non-null-by-default in more contexts (e.g. for type parameters). Remove various now redundant null annotations.
   * Add `external-annotations` module for external ECJ null annotations. This reduces the need for various `assertNonNull` calls.
+* Internal: Avoid force-loading entities for chunks whose entities were not yet loaded, e.g. for the `check` command or the spawn blocking feature.
 
 ## v2.22.3 (2024-07-27)
 ### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
