@@ -3,15 +3,14 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.List;
 
 import org.bukkit.DyeColor;
-import org.bukkit.entity.Animals;
+import org.bukkit.Registry;
+import org.bukkit.entity.Frog;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -20,26 +19,22 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
-import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-// TODO Use actual Frog type once we only support Bukkit 1.19 upwards
 public class FrogShop extends BabyableShop<Frog> {
 
-	// TODO Use correct enum type once we only support Bukkit 1.19 upwards
-	public static final Property<@NonNull String> VARIANT = new BasicProperty<@NonNull String>()
-			.dataKeyAccessor("frogVariant", StringSerializers.STRICT)
-			// TODO Validate that the value is a valid frog type
-			.validator(StringValidators.NON_EMPTY)
-			.defaultValue("TEMPERATE")
+	public static final Property<Frog.Variant> VARIANT = new BasicProperty<Frog.Variant>()
+			.dataKeyAccessor("frogVariant", KeyedSerializers.forRegistry(Frog.Variant.class, Registry.FROG_VARIANT))
+			.defaultValue(Frog.Variant.TEMPERATE)
 			.build();
 
-	private final PropertyValue<@NonNull String> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<Frog.Variant> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
@@ -79,39 +74,44 @@ public class FrogShop extends BabyableShop<Frog> {
 
 	// VARIANT
 
-	public String getVariant() {
+	public Frog.Variant getVariant() {
 		return variantProperty.getValue();
 	}
 
-	public void setVariant(String variant) {
+	public void setVariant(Frog.Variant variant) {
 		variantProperty.setValue(variant);
 	}
 
 	public void cycleVariant(boolean backwards) {
-		this.setVariant(NMSManager.getProvider().cycleFrogVariant(this.getVariant(), backwards));
-		// this.setVariant(EnumUtils.cycleEnumConstant(Frog.Variant.class, this.getVariant(),
-		// backwards));
+		this.setVariant(RegistryUtils.cycleKeyed(
+				Registry.FROG_VARIANT,
+				this.getVariant(),
+				backwards
+		));
 	}
 
 	private void applyVariant() {
-		Animals entity = this.getEntity();
+		Frog entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setFrogVariant(entity, this.getVariant());
-		// entity.setVariant(this.getVariant());
+
+		entity.setVariant(this.getVariant());
 	}
 
 	private ItemStack getVariantEditorItem() {
 		ItemStack iconItem;
 		switch (this.getVariant()) {
-		case "TEMPERATE":
+		case TEMPERATE:
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.ORANGE));
 			break;
-		case "WARM":
+		case WARM:
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.LIGHT_GRAY));
 			break;
-		case "COLD":
-		default:
+		case COLD:
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.GREEN));
+			break;
+		default:
+			// Unknown:
+			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.PURPLE));
 			break;
 		}
 		ItemUtils.setDisplayNameAndLore(iconItem,

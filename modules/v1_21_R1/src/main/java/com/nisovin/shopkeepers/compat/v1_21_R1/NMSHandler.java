@@ -22,7 +22,6 @@ import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Frog;
 import org.bukkit.entity.GlowSquid;
 import org.bukkit.entity.Goat;
 import org.bukkit.entity.LivingEntity;
@@ -298,20 +297,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	// MC 1.19 specific features
-
-	@Override
-	public void setFrogVariant(LivingEntity frog, String variantName) {
-		((Frog) frog).setVariant(Frog.Variant.valueOf(variantName));
-	}
-
-	@Override
-	public String cycleFrogVariant(String variantName, boolean backwards) {
-		Registry<Frog.@NonNull Variant> frogVariantRegistry = Unsafe.castNonNull(Registry.FROG_VARIANT);
-		Frog.@Nullable Variant currentVariant = Registry.FROG_VARIANT.get(NamespacedKey.minecraft(variantName));
-		if (currentVariant == null) return variantName; // Not found
-
-		return RegistryUtils.cycleKeyed(frogVariantRegistry, currentVariant, backwards).getKey().getKey();
-	}
 
 	@Override
 	public void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
