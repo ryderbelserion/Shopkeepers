@@ -4,6 +4,7 @@ import org.bukkit.configuration.file.YamlConstructor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -23,7 +24,7 @@ public final class YamlUtils {
 		Representer yamlRepresenter = new CompactYamlRepresenter();
 		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
 		yamlRepresenter.setDefaultScalarStyle(ScalarStyle.PLAIN);
-		BaseConstructor yamlConstructor = new YamlConstructor();
+		BaseConstructor yamlConstructor = new YamlConstructor(new LoaderOptions());
 		return new Yaml(yamlConstructor, yamlRepresenter, yamlDumperOptions);
 	});
 

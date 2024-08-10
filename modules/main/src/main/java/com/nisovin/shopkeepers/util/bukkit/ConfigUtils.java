@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,12 +26,33 @@ public final class ConfigUtils {
 
 	// Shared and reused YAML config:
 	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(
-			YamlConfiguration::new
+			ConfigUtils::newYamlConfig
 	);
 
 	private static final LogDetectionHandler ERROR_DETECTION_HANDLER = new LogDetectionHandler();
 	static {
 		ERROR_DETECTION_HANDLER.setLevel(Level.SEVERE);
+	}
+
+	/**
+	 * Creates a new {@link YamlConfiguration} with some common default setup applied.
+	 * 
+	 * @return the new {@link YamlConfiguration}
+	 */
+	public static YamlConfiguration newYamlConfig() {
+		YamlConfiguration config = new YamlConfiguration();
+		// We (e.g. inside of language files), as well as the Bukkit server itself (e.g. for the
+		// serialization of attributes inside ItemMeta), can use keys that may contain dots. In
+		// order to prevent Bukkit from interpreting (and loading) these dots as configuration
+		// sections, we replace Bukkit's default configuration section path separator from dot to
+		// something else.
+		disablePathSeparator(config);
+		return config;
+	}
+
+	public static void disablePathSeparator(Configuration config) {
+		// Set to some highly unusual value:
+		config.options().pathSeparator('\0');
 	}
 
 	public static Map<String, Object> getValues(ConfigurationSection section) {

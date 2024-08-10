@@ -6,6 +6,10 @@ Date format: (YYYY-MM-DD)
 
 * Drop support for MC versions below 1.20.6 to update the plugin to use Java 21 and build against a more modern API version.
   * If you want to run this plugin on an older server version, you need to use an older plugin version.
+  * Internal: Various updates for Bukkit 1.20.6 and Java 21.
+* Item display name and lore data from the language file can be specified as Json text now.
+* Fix: Item data containing attribute modifiers was not correctly saved to the plugin config and failed to load.
+* Extend the item stack we use for server assumption tests to include newer item data.
 * Build: Use the Eclipse compiler for null analysis.
   * Include the Eclipse JDT preference files for use by the ECJ compiler.
   * Use the JDT `NonNullByDefault` annotation which ECJ interprets as non-null-by-default in more contexts (e.g. for type parameters). Remove various now redundant null annotations.

@@ -37,6 +37,7 @@ import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
@@ -754,6 +755,22 @@ public class Settings extends Config {
 
 	///// PERSISTENCE
 
+	private static ConfigData getPluginConfigData() {
+		Plugin plugin = SKShopkeepersPlugin.getInstance();
+		var pluginConfig = plugin.getConfig();
+		// The default dot path separator can cause issues.
+		// For example, since Bukkit 1.20.6, item attribute modifiers are now serialized using the
+		// attribute namespaced keys as section keys, which can contain dots. When saving ItemData
+		// with attribute modifiers, we filter the serialized item meta data (to produce a more
+		// minimal and user-friendly output) and then apply all preserved key-value pairs to this
+		// config-backed DataContainer. Setting values with a key containing dots would by default
+		// result in sub-sections to be created, which fails to properly deserialize later.
+		ConfigUtils.disablePathSeparator(pluginConfig);
+		// This is a wrapper around the Bukkit config. Config comments are preserved by the
+		// underlying Bukkit config.
+		return ConfigData.of(pluginConfig);
+	}
+
 	// Returns null on success, otherwise a severe issue prevented loading the config.
 	public static @Nullable ConfigLoadException loadConfig() {
 		Log.info("Loading config.");
@@ -764,9 +781,8 @@ public class Settings extends Config {
 
 		// Load config:
 		plugin.reloadConfig();
-		// This is a wrapper around the Bukkit config. Config comments are preserved by the
-		// underlying Bukkit config.
-		ConfigData configData = ConfigData.of(plugin.getConfig());
+
+		ConfigData configData = getPluginConfigData();
 
 		// Load settings from config:
 		boolean configChanged;
@@ -815,7 +831,7 @@ public class Settings extends Config {
 	public static void saveConfig() {
 		Log.info("Saving config.");
 		Plugin plugin = SKShopkeepersPlugin.getInstance();
-		ConfigData configData = ConfigData.of(plugin.getConfig());
+		ConfigData configData = getPluginConfigData();
 		Settings.getInstance().save(configData);
 		plugin.saveConfig();
 	}

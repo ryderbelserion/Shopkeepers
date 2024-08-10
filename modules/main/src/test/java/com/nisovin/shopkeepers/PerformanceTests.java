@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.Test;
@@ -21,8 +21,9 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MutableLong;
 import com.nisovin.shopkeepers.util.java.TimeUtils;
 
-import net.minecraft.server.v1_16_R3.GameProfileSerializer;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.component.PatchedDataComponentMap;
 
 public class PerformanceTests extends AbstractBukkitTest {
 
@@ -169,8 +170,15 @@ public class PerformanceTests extends AbstractBukkitTest {
 		String displayName = itemMeta.getDisplayName();
 		List<? extends String> lore = Unsafe.castNonNull(itemMeta.getLore());
 		CraftItemStack craftItemStack = CraftItemStack.asCraftCopy(itemStack);
-		NBTTagCompound tag = Unsafe.assertNonNull(CraftItemStack.asNMSCopy(itemStack).getTag());
-		NBTTagCompound tagCopy = tag.clone();
+		var componentsPatch = CraftItemStack.asNMSCopy(itemStack).getComponentsPatch();
+		var componentsPatchCopy = CraftItemStack.asNMSCopy(itemStack).getComponentsPatch();
+		var componentPredicate = DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(
+				DataComponentMap.EMPTY,
+				CraftItemStack.asNMSCopy(itemStack).getComponentsPatch()
+		));
+		// Components: Also includes unspecified default components.
+		var components = CraftItemStack.asNMSCopy(itemStack).getComponents();
+		var componentsCopy = CraftItemStack.asNMSCopy(itemStack).getComponents();
 
 		testPerformance(
 				"  ",
@@ -204,67 +212,67 @@ public class PerformanceTests extends AbstractBukkitTest {
 
 		testPerformance(
 				"  ",
-				"matching NBT tags",
+				"matching component patches",
+				warmupCount,
+				testCount,
+				() -> componentsPatch.equals(componentsPatchCopy)
+		);
+
+		testPerformance(
+				"  ",
+				"matching components",
+				warmupCount,
+				testCount,
+				() -> components.equals(componentsCopy)
+		);
+
+		testPerformance(
+				"  ",
+				"matching components with component predicate",
+				warmupCount,
+				testCount,
+				() -> componentPredicate.test(components)
+		);
+
+		testPerformance(
+				"  ",
+				"matching CraftItemStack with component predicate",
+				warmupCount,
+				testCount,
+				() -> componentPredicate.test(CraftItemStack.asNMSCopy(craftItemStack))
+		);
+
+		testPerformance(
+				"  ",
+				"matching ItemStack with component predicate",
+				warmupCount,
+				testCount,
+				() -> componentPredicate.test(CraftItemStack.asNMSCopy(itemStack))
+		);
+
+		testPerformance(
+				"  ",
+				"matching ItemStack component patches with component predicate",
 				warmupCount,
 				testCount,
 				() -> {
-					GameProfileSerializer.a(tag, tagCopy, false);
+					DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(
+							DataComponentMap.EMPTY,
+							CraftItemStack.asNMSCopy(itemStack).getComponentsPatch()
+					)).test(CraftItemStack.asNMSCopy(itemStack));
 				}
 		);
 
 		testPerformance(
 				"  ",
-				"matching CraftItemStack with NBT tag",
+				"matching CraftItemStack component patches with component predicate",
 				warmupCount,
 				testCount,
 				() -> {
-					GameProfileSerializer.a(
-							tag,
-							CraftItemStack.asNMSCopy(craftItemStack).getTag(),
-							false
-					);
-				}
-		);
-
-		testPerformance(
-				"  ",
-				"matching ItemStack with NBT tag",
-				warmupCount,
-				testCount,
-				() -> {
-					GameProfileSerializer.a(
-							tag,
-							CraftItemStack.asNMSCopy(itemStack).getTag(),
-							false
-					);
-				}
-		);
-
-		testPerformance(
-				"  ",
-				"matching ItemStack tags",
-				warmupCount,
-				testCount,
-				() -> {
-					GameProfileSerializer.a(
-							CraftItemStack.asNMSCopy(itemStack).getTag(),
-							CraftItemStack.asNMSCopy(itemStack).getTag(),
-							false
-					);
-				}
-		);
-
-		testPerformance(
-				"  ",
-				"matching CraftItemStack tags",
-				warmupCount,
-				testCount,
-				() -> {
-					GameProfileSerializer.a(
-							CraftItemStack.asNMSCopy(craftItemStack).getTag(),
-							CraftItemStack.asNMSCopy(craftItemStack).getTag(),
-							false
-					);
+					DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(
+							DataComponentMap.EMPTY,
+							CraftItemStack.asNMSCopy(craftItemStack).getComponentsPatch()
+					)).test(CraftItemStack.asNMSCopy(craftItemStack));
 				}
 		);
 	}
@@ -295,7 +303,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				testCount,
 				() -> {
 					try {
-						net.minecraft.server.v1_16_R3.ItemStack nmsItem = Unsafe.cast(
+						net.minecraft.world.item.ItemStack nmsItem = Unsafe.cast(
 								craftItemStackHandleField.get(fullCraftItemStack)
 						);
 						if (nmsItem != null) {
@@ -313,7 +321,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							fullCraftItemStack
 					);
 					if (nmsItem != null) {
@@ -328,7 +336,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							fullItemStack
 					);
 					if (nmsItem != null) {
@@ -344,7 +352,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				testCount,
 				() -> {
 					try {
-						net.minecraft.server.v1_16_R3.ItemStack nmsItem = Unsafe.cast(
+						net.minecraft.world.item.ItemStack nmsItem = Unsafe.cast(
 								craftItemStackHandleField.get(basicCraftItemStack)
 						);
 						if (nmsItem != null) {
@@ -362,7 +370,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							basicCraftItemStack
 					);
 					if (nmsItem != null) {
@@ -377,7 +385,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 				warmupCount,
 				testCount,
 				() -> {
-					net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(
+					net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(
 							basicItemStack
 					);
 					if (nmsItem != null) {

@@ -20,7 +20,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -754,7 +753,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				if (invulnerable) {
 					iconItem = new ItemStack(Material.POTION);
 					PotionMeta potionMeta = Unsafe.castNonNull(iconItem.getItemMeta());
-					potionMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
+					potionMeta.setBasePotionType(PotionType.HEALING);
 					iconItem.setItemMeta(potionMeta);
 				} else {
 					iconItem = new ItemStack(Material.GLASS_BOTTLE);

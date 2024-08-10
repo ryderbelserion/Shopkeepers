@@ -5,8 +5,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -74,9 +77,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private static final String DATA_VERSION_KEY = "data-version";
 
-	private static final String HEADER = "This file is not intended to be manually modified! If you"
-			+ " want to manually edit this file anyway, ensure that the server is not running"
-			+ " currently and that you have prepared a backup of this file.";
+	private static final List<@Nullable String> HEADER = Collections.unmodifiableList(Arrays.asList(
+			"This file is not intended to be manually modified! If you want to manually edit this"
+					+ " file anyway, ensure that the server is not running currently and that you"
+					+ " have prepared a backup of this file."
+	));
 
 	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
 
@@ -918,7 +923,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Set up the file header:
 			// This replaces any previously existing and loaded header and thereby ensures that it
 			// is always up-to-date after we have saved the file.
-			saveData.getConfig().options().header(HEADER);
+			saveData.getConfig().options().setHeader(HEADER);
 
 			// Reset the pendingSaveRequest flag here (and not just after a successful save), so
 			// that we can track any save requests that occur in the meantime, which require another

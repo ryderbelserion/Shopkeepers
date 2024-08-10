@@ -164,7 +164,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>CAMEL: okay TODO support sittable # 1.20
  * <li>SNIFFER: okay
  * <li>ARMADILLO: okay
- * <li>BOGGED: okay # 1.21
+ * <li>BOGGED: okay, TODO toggle sheared state # 1.21
  * <li>BREEZE: okay
  * </ul>
  **/
@@ -184,11 +184,11 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 
 	static {
 		Map<EntityType, List<? extends String>> aliases = new HashMap<>();
-		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList(
+		aliases.put(EntityType.MOOSHROOM, prepareAliases(Arrays.asList(
 				"mooshroom",
 				"mushroom-cow"
 		)));
-		aliases.put(EntityType.SNOWMAN, prepareAliases(Arrays.asList(
+		aliases.put(EntityType.SNOW_GOLEM, prepareAliases(Arrays.asList(
 				"snow-golem",
 				"snowman"
 		)));
@@ -501,7 +501,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					PandaShop::new
 			);
 			break;
-		case MUSHROOM_COW:
+		case MOOSHROOM:
 			objectType = new SKLivingShopObjectType<>(
 					livingShops,
 					entityType,
@@ -533,7 +533,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					MagmaCubeShop.class,
 					MagmaCubeShop::new);
 			break;
-		case SNOWMAN:
+		case SNOW_GOLEM:
 			objectType = new SKLivingShopObjectType<>(
 					livingShops,
 					entityType,

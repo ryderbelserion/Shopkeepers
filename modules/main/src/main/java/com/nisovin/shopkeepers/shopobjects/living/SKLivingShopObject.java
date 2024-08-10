@@ -790,7 +790,7 @@ public class SKLivingShopObject<E extends LivingEntity>
 		defaultPotionEffects.forEach(effect -> {
 			@Nullable PotionEffect activeEffect = PotionUtils.findIgnoreDuration(activePotionEffects, effect);
 			if (activeEffect != null
-					&& (activeEffect.getDuration() == PotionUtils.INFINITE_DURATION
+					&& (activeEffect.getDuration() == PotionEffect.INFINITE_DURATION
 							|| activeEffect.getDuration() > CHECK_PERIOD_TICKS)) {
 				return;
 			}

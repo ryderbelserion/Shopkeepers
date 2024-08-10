@@ -35,7 +35,7 @@ public class BukkitConfigDataStore extends ConfigBasedDataContainer implements D
 	 * @return the data store, not <code>null</code>
 	 */
 	public static BukkitConfigDataStore ofNewYamlConfig() {
-		return of(new YamlConfiguration());
+		return of(ConfigUtils.newYamlConfig());
 	}
 
 	/////

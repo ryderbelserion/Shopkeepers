@@ -89,7 +89,14 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 	private void applyBaby() {
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		entity.setBaby(this.isBaby());
+
+		if (this.isBaby()) {
+			entity.setBaby();
+		} else {
+			entity.setAdult();
+			// TODO: MC-9568: Growing up mobs get moved. Might be fixed.
+			this.teleportBack();
+		}
 	}
 
 	private ItemStack getBabyEditorItem() {

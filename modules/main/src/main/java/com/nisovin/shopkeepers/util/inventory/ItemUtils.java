@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util.inventory;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -488,7 +489,9 @@ public final class ItemUtils {
 		return setItemMeta(itemStack, displayName, lore, null);
 	}
 
-	public static ItemStack setItemMeta(
+	// Replaced in favor of setItemMeta that supports Json text.
+	@Deprecated
+	public static ItemStack setItemMetaLegacy(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName,
 			@ReadOnly @Nullable List<? extends String> lore,
@@ -507,6 +510,73 @@ public final class ItemUtils {
 				NMSManager.getProvider().setMaxStackSize(meta, maxStackSize);
 			}
 			itemStack.setItemMeta(meta);
+		}
+		return itemStack;
+	}
+
+	// Supports Json display name and lore.
+	public static ItemStack setItemMeta(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends String> lore,
+			@Nullable Integer maxStackSize
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		ItemMeta originalMeta = itemStack.getItemMeta();
+		if (originalMeta != null) {
+			@NonNull ItemMeta newItemMeta = originalMeta;
+			if (displayName != null || lore != null) {
+				// TODO Workaround for missing component API: ItemMeta supports Json text data
+				// during deserialization, so: Serialize the item meta, fill in / replace the text
+				// data, and then deserialize the item meta.
+
+				// Modifiable copy of the serialized item meta:
+				var serializedMeta = new LinkedHashMap<String, Object>(newItemMeta.serialize());
+				if (displayName != null) {
+					serializedMeta.put("display-name", displayName);
+				}
+				if (lore != null) {
+					serializedMeta.put("lore", Unsafe.cast(lore));
+				}
+				var deserializedMeta = ItemSerialization.deserializeItemMeta(serializedMeta);
+				if (deserializedMeta != null) {
+					newItemMeta = deserializedMeta;
+				}
+			}
+
+			if (maxStackSize != null) {
+				NMSManager.getProvider().setMaxStackSize(newItemMeta, maxStackSize);
+			}
+
+			itemStack.setItemMeta(newItemMeta);
+		}
+		return itemStack;
+	}
+
+	// Supports Json display name and lore.
+	public static ItemStack setItemName(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String itemName
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		if (itemName == null) return itemStack;
+
+		ItemMeta originalMeta = itemStack.getItemMeta();
+		if (originalMeta != null) {
+			@NonNull ItemMeta newItemMeta = originalMeta;
+			// TODO Workaround for missing component API: ItemMeta supports Json text data during
+			// deserialization, so: Serialize the item meta, fill in / replace the text data, and
+			// then deserialize the item meta.
+
+			// Modifiable copy of the serialized item meta:
+			var serializedMeta = new LinkedHashMap<String, Object>(newItemMeta.serialize());
+			serializedMeta.put("item-name", itemName);
+			var deserializedMeta = ItemSerialization.deserializeItemMeta(serializedMeta);
+			if (deserializedMeta != null) {
+				newItemMeta = deserializedMeta;
+			}
+
+			itemStack.setItemMeta(newItemMeta);
 		}
 		return itemStack;
 	}
@@ -535,6 +605,7 @@ public final class ItemUtils {
 
 	// Null to remove display name.
 	// The display name is expected to use Minecraft's color codes.
+	// Does not support Json text.
 	public static ItemStack setDisplayName(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName

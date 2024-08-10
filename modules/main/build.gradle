@@ -57,6 +57,7 @@ dependencies {
 	}
 }
 
+// Note: There is no need to remap the test classes to run them.
 test {
 	exclude 'com/nisovin/shopkeepers/PerformanceTests.class'
 }

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.configuration.file.YamlConfiguration;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.Config;
@@ -863,13 +862,7 @@ public class Messages extends Config {
 			Log.info("Loading language file: " + languageFile.getName());
 			try {
 				// Load the language config:
-				// The language config uses a simple key-value format, but the keys may contain dots
-				// to indicate structure. In order to prevent Bukkit from interpreting (and loading)
-				// these dots as config sections, we replace Bukkit's default config path separator
-				// from dot to something else.
-				YamlConfiguration yamlConfig = new YamlConfiguration();
-				yamlConfig.options().pathSeparator(':');
-				DataStore languageConfig = BukkitConfigDataStore.of(yamlConfig);
+				DataStore languageConfig = BukkitConfigDataStore.ofNewYamlConfig();
 				languageConfig.load(languageFile);
 
 				// Load messages:

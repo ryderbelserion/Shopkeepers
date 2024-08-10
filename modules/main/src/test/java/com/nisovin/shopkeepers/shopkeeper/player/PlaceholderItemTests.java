@@ -2,9 +2,9 @@ package com.nisovin.shopkeepers.shopkeeper.player;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
@@ -69,8 +69,8 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 
 	@Test
 	public void testEnchantedBooks() {
-		Enchantment fireProtectionEnchantment = Unsafe.assertNonNull(Enchantment.PROTECTION_FIRE);
-		Enchantment bindingCurseEnchantment = Unsafe.assertNonNull(Enchantment.BINDING_CURSE);
+		Enchantment fireProtectionEnchantment = Enchantment.FIRE_PROTECTION;
+		Enchantment bindingCurseEnchantment = Enchantment.BINDING_CURSE;
 
 		testParsing(
 				placeholderItem("fire_protection"),
@@ -140,108 +140,100 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 
 	@Test
 	public void testPotions() {
-		for (PotionType potionType : PotionType.values()) {
-			if (potionType == PotionType.UNCRAFTABLE) continue; // Skip. Removed in Bukkit 1.20.5
-
+		for (PotionType potionType : Registry.POTION) {
+			// Note: Long and strong potions are their own potion types. Their keys start with
+			// either "long" or "strong".
 			testParsing(
-					placeholderItem(potionType.name() + " potion"),
-					potion(new PotionData(potionType, false, false))
+					placeholderItem(potionType.getKey().getKey() + " potion"),
+					potion(potionType)
 			);
+		}
 
-			// Long variant:
-			if (potionType.isExtendable()) {
-				testParsing(
-						placeholderItem("long " + potionType.name() + " potion"),
-						potion(new PotionData(potionType, true, false))
-				);
-			}
-
-			// Strong variant:
-			if (potionType.isUpgradeable()) {
-				testParsing(
-						placeholderItem("strong " + potionType.name() + " potion"),
-						potion(new PotionData(potionType, false, true))
-				);
-			}
+		// Aliases:
+		for (var aliasEntry : PotionUtils.POTION_TYPE_ALIASES_VIEW.entrySet()) {
+			testParsing(
+					placeholderItem(aliasEntry.getKey()),
+					potion(aliasEntry.getValue())
+			);
 		}
 
 		// Formatting:
 		testParsing(
 				placeholderItem("night_vision"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("night-vision"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("night vision"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("  night_vision "),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("NIGHT_VISION"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("minecraft:night_vision"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
-		);
-
-		// Aliases:
-		testParsing(
-				placeholderItem("leaping"),
-				potion(new PotionData(PotionType.JUMP, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 
 		// Alternative formats:
 		testParsing(
 				placeholderItem("night_vision potion"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("night vision potion"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
-		);
-		testParsing(
-				placeholderItem("night vision 2"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
-		);
-		testParsing(
-				placeholderItem("night vision II"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
-		);
-		testParsing(
-				placeholderItem("night vision potion 2"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("potion of night vision"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
 		);
 		testParsing(
 				placeholderItem("potion night vision"),
-				potion(new PotionData(PotionType.NIGHT_VISION, false, false))
+				potion(PotionType.NIGHT_VISION)
+		);
+
+		// Variants:
+		testParsing(
+				placeholderItem("long regeneration"),
+				potion(PotionType.LONG_REGENERATION)
+		);
+		testParsing(
+				placeholderItem("regeneration II"),
+				potion(PotionType.STRONG_REGENERATION)
+		);
+		testParsing(
+				placeholderItem("regeneration 2"),
+				potion(PotionType.STRONG_REGENERATION)
+		);
+		testParsing(
+				placeholderItem("strong regeneration"),
+				potion(PotionType.STRONG_REGENERATION)
 		);
 
 		// Invalid variants:
 		// Not extendable, 'long' is ignored:
 		testParsing(
 				placeholderItem("long luck"),
-				potion(new PotionData(PotionType.LUCK, false, false))
+				potion(PotionType.LUCK)
 		);
 		// Not upgradable, 'strong' is ignored:
 		testParsing(
 				placeholderItem("strong luck"),
-				potion(new PotionData(PotionType.LUCK, false, false))
+				potion(PotionType.LUCK)
 		);
 		// Can't be both long and strong, 'strong' is ignored:
 		testParsing(
-				placeholderItem("long potion of speed 2"),
-				potion(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("long potion of swiftness 2"),
+				potion(PotionType.LONG_SWIFTNESS)
 		);
 
 		// Not a potion type, but a parsed as a normal potion item:
@@ -254,187 +246,187 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 	@Test
 	public void testSplashPotions() {
 		testParsing(
-				placeholderItem("speed splash potion"),
-				splashPotion(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("swiftness splash potion"),
+				splashPotion(PotionType.SWIFTNESS)
 		);
-		testParsing(placeholderItem("splash speed potion"),
-				splashPotion(new PotionData(PotionType.SPEED, false, false))
+		testParsing(placeholderItem("splash swiftness potion"),
+				splashPotion(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("splash potion of speed"),
-				splashPotion(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("splash potion of swiftness"),
+				splashPotion(PotionType.SWIFTNESS)
 		);
 
 		// Long variants:
 		testParsing(
-				placeholderItem("long splash potion of speed"),
-				splashPotion(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("long splash potion of swiftness"),
+				splashPotion(PotionType.LONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("splash potion of long speed"),
-				splashPotion(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("splash potion of long swiftness"),
+				splashPotion(PotionType.LONG_SWIFTNESS)
 		);
 
 		// Strong variants:
 		testParsing(
-				placeholderItem("strong splash potion of speed"),
-				splashPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("strong splash potion of swiftness"),
+				splashPotion(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("splash potion of strong speed"),
-				splashPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("splash potion of strong swiftness"),
+				splashPotion(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("splash potion of speed 2"),
-				splashPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("splash potion of swiftness 2"),
+				splashPotion(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("speed 2 splash potion"),
-				splashPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("swiftness 2 splash potion"),
+				splashPotion(PotionType.STRONG_SWIFTNESS)
 		);
 	}
 
 	@Test
 	public void testLingeringPotions() {
 		testParsing(
-				placeholderItem("speed lingering potion"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("swiftness lingering potion"),
+				lingeringPotion(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("lingering speed potion"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("lingering swiftness potion"),
+				lingeringPotion(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("lingering potion of speed"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("lingering potion of swiftness"),
+				lingeringPotion(PotionType.SWIFTNESS)
 		);
 
 		// Long variants:
 		testParsing(
-				placeholderItem("long lingering potion of speed"),
-				lingeringPotion(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("long lingering potion of swiftness"),
+				lingeringPotion(PotionType.LONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("lingering potion of long speed"),
-				lingeringPotion(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("lingering potion of long swiftness"),
+				lingeringPotion(PotionType.LONG_SWIFTNESS)
 		);
 
 		// Strong variants:
 		testParsing(
-				placeholderItem("strong lingering potion of speed"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("strong lingering potion of swiftness"),
+				lingeringPotion(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("lingering potion of strong speed"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("lingering potion of strong swiftness"),
+				lingeringPotion(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("lingering potion of speed 2"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("lingering potion of swiftness 2"),
+				lingeringPotion(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("speed 2 lingering potion"),
-				lingeringPotion(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("swiftness 2 lingering potion"),
+				lingeringPotion(PotionType.STRONG_SWIFTNESS)
 		);
 	}
 
 	@Test
 	public void testTippedArrows() {
 		testParsing(
-				placeholderItem("speed arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("swiftness arrow"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("speed potion arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("swiftness potion arrow"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("speed tipped potion arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("swiftness tipped potion arrow"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("speed tipped arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("swiftness tipped arrow"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("arrow of swiftness"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("arrow of speed potion"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("arrow of swiftness potion"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("potion arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("potion arrow of swiftness"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("tipped arrow of swiftness"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped potion arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("tipped potion arrow of swiftness"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped arrow of speed potion"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("tipped arrow of swiftness potion"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped speed potion arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, false))
+				placeholderItem("tipped swiftness potion arrow"),
+				tippedArrow(PotionType.SWIFTNESS)
 		);
 
 		// Long variants:
 		testParsing(
-				placeholderItem("long tipped arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("long tipped arrow of swiftness"),
+				tippedArrow(PotionType.LONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("long arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("long arrow of swiftness"),
+				tippedArrow(PotionType.LONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped arrow of long speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("tipped arrow of long swiftness"),
+				tippedArrow(PotionType.LONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("arrow of long speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("arrow of long swiftness"),
+				tippedArrow(PotionType.LONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("long speed arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, true, false))
+				placeholderItem("long swiftness arrow"),
+				tippedArrow(PotionType.LONG_SWIFTNESS)
 		);
 
 		// Strong variants:
 		testParsing(
-				placeholderItem("strong tipped arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("strong tipped arrow of swiftness"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("strong arrow of speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("strong arrow of swiftness"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped arrow of strong speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("tipped arrow of strong swiftness"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("arrow of strong speed"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("arrow of strong swiftness"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("tipped arrow of speed 2"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("tipped arrow of swiftness 2"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("speed 2 tipped arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("swiftness 2 tipped arrow"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 		testParsing(
-				placeholderItem("strong speed arrow"),
-				tippedArrow(new PotionData(PotionType.SPEED, false, true))
+				placeholderItem("strong swiftness arrow"),
+				tippedArrow(PotionType.STRONG_SWIFTNESS)
 		);
 	}
 
@@ -442,20 +434,20 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 		return PlaceholderItems.createPlaceholderItem(displayName);
 	}
 
-	private ItemStack potion(PotionData potionData) {
-		return PotionUtils.setPotionData(new ItemStack(Material.POTION), potionData);
+	private ItemStack potion(PotionType potionType) {
+		return PotionUtils.setPotionType(new ItemStack(Material.POTION), potionType);
 	}
 
-	private ItemStack splashPotion(PotionData potionData) {
-		return PotionUtils.setPotionData(new ItemStack(Material.SPLASH_POTION), potionData);
+	private ItemStack splashPotion(PotionType potionType) {
+		return PotionUtils.setPotionType(new ItemStack(Material.SPLASH_POTION), potionType);
 	}
 
-	private ItemStack lingeringPotion(PotionData potionData) {
-		return PotionUtils.setPotionData(new ItemStack(Material.LINGERING_POTION), potionData);
+	private ItemStack lingeringPotion(PotionType potionType) {
+		return PotionUtils.setPotionType(new ItemStack(Material.LINGERING_POTION), potionType);
 	}
 
-	private ItemStack tippedArrow(PotionData potionData) {
-		return PotionUtils.setPotionData(new ItemStack(Material.TIPPED_ARROW), potionData);
+	private ItemStack tippedArrow(PotionType potionType) {
+		return PotionUtils.setPotionType(new ItemStack(Material.TIPPED_ARROW), potionType);
 	}
 
 	private void testParsing(@Nullable ItemStack placeholderItem, @Nullable ItemStack expected) {

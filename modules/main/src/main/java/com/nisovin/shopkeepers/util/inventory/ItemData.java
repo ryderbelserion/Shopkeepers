@@ -35,9 +35,17 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class ItemData {
 
 	/**
-	 * Disabled by default because the conversion from the plain to the Json text format may be
+	 * Disabled by default because the conversion from the plain to the Json text format can be
 	 * unstable from one server version to another.
 	 */
+	// Also: SPIGOT-7571: Legacy color codes are now valid JSON text components. However, Bukkit
+	// handles these display name and lore strings differently depending on whether they are loaded
+	// from a config file (tries to parse the text as JSON components) versus when a plugin calls
+	// ItemMeta#setDisplayName / #setLore (does not attempt to parse the given strings as Json).
+	// When we serialize an ItemStack / ItemData that had a display name or lore set via the
+	// ItemMeta, and we use this 'preferPlainTextFormat' mode, we can end up with strings with
+	// legacy color codes inside the config that produce a different component format when loaded,
+	// since they are now considered valid Json text.
 	private static boolean SERIALIZER_PREFERS_PLAIN_TEXT_FORMAT = false;
 
 	public static void serializerPrefersPlainTextFormat(boolean preferPlainTextFormat) {
@@ -57,7 +65,6 @@ public final class ItemData {
 	private static final String META_TYPE_KEY = "meta-type";
 	private static final String DISPLAY_NAME_KEY = "display-name";
 	private static final String LORE_KEY = "lore";
-	private static final String LOC_NAME_KEY = "loc-name";
 
 	// Special case: Omitting 'blockMaterial' for empty TILE_ENTITY item meta.
 	private static final String TILE_ENTITY_BLOCK_MATERIAL_KEY = "blockMaterial";
@@ -129,9 +136,6 @@ public final class ItemData {
 							}
 							if (itemMeta.hasLore()) {
 								itemMeta.setLore(itemMeta.getLore());
-							}
-							if (itemMeta.hasLocalizedName()) {
-								itemMeta.setLocalizedName(itemMeta.getLocalizedName());
 							}
 						}
 						return ItemSerialization.serializeItemMetaOrEmpty(itemMeta);
@@ -210,29 +214,6 @@ public final class ItemData {
 
 						// Use alternative color codes:
 						metaValue = TextUtils.decolorizeUnknown(serializedLore);
-					}
-				} else if (LOC_NAME_KEY.equals(metaKey)) {
-					if (metaValue instanceof String) {
-						String serializedLocName = (String) metaValue;
-
-						if (preferPlainTextFormat) {
-							ItemMeta itemMeta = Unsafe.assertNonNull(lazyItemMeta.get());
-							String plainLocName = itemMeta.getLocalizedName();
-							if (!serializedLocName.equals(plainLocName)) {
-								// The serialized localized name might be in Json format. Check if
-								// we can preserve it even if we serialize it in plain format:
-								String plainSerializedLocName = Unsafe.castNonNull(
-										lazyPlainSerializedMetaData.get().get(LOC_NAME_KEY)
-								);
-								if (serializedLocName.equals(plainSerializedLocName)) {
-									// Use the plain representation:
-									serializedLocName = plainLocName;
-								}
-							}
-						}
-
-						// Use alternative color codes:
-						metaValue = TextUtils.decolorize(serializedLocName);
 					}
 				}
 

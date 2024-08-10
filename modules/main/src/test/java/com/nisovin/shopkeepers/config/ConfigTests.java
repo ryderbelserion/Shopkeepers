@@ -30,8 +30,6 @@ public class ConfigTests extends AbstractBukkitTest {
 
 	@BeforeClass
 	public static void setup() {
-		// Our default config uses the plain text format:
-		ItemData.serializerPrefersPlainTextFormat(true);
 	}
 
 	@AfterClass
@@ -39,15 +37,10 @@ public class ConfigTests extends AbstractBukkitTest {
 		ItemData.resetSerializerPrefersPlainTextFormat();
 	}
 
-	private DataContainer loadConfigFromResource(String resourcePath) {
-		return loadConfigFromResource(resourcePath, '.');
-	}
-
-	private DataContainer loadConfigFromResource(String resourcePath, char configPathSeparator) {
+	private DataContainer loadConfigFromResource(String resourcePath, boolean useBukkitSettings) {
 		InputStream configResource = ClassUtils.getResource(this.getClass(), resourcePath);
 
-		YamlConfiguration config = new YamlConfiguration();
-		config.options().pathSeparator(configPathSeparator);
+		YamlConfiguration config = useBukkitSettings ? new YamlConfiguration() : ConfigUtils.newYamlConfig();
 		try {
 			config.load(new InputStreamReader(configResource));
 		} catch (IOException | InvalidConfigurationException e) {
@@ -72,7 +65,9 @@ public class ConfigTests extends AbstractBukkitTest {
 		Map<? extends String, @NonNull ?> expectedValues = expectedDefaultConfig.getValues();
 
 		// Actual default config:
-		DataContainer defaultConfig = this.loadConfigFromResource("config.yml");
+		// Load the config just like Bukkit does it (i.e. with the default '.' section path
+		// separator).
+		DataContainer defaultConfig = this.loadConfigFromResource("config.yml", true);
 		Set<? extends String> actualKeysSet = defaultConfig.getKeys();
 		List<? extends String> actualKeys = new ArrayList<>(actualKeysSet);
 		Map<? extends String, @NonNull ?> actualValues = defaultConfig.getValues();
@@ -116,7 +111,7 @@ public class ConfigTests extends AbstractBukkitTest {
 				"lang/language-de.yml"
 		};
 		for (String languageFilePath : languageFilePaths) {
-			DataContainer languageFile = this.loadConfigFromResource(languageFilePath, ':');
+			DataContainer languageFile = this.loadConfigFromResource(languageFilePath, false);
 			Set<? extends String> actualKeysSet = languageFile.getKeys();
 			List<? extends String> actualKeys = new ArrayList<>(actualKeysSet);
 

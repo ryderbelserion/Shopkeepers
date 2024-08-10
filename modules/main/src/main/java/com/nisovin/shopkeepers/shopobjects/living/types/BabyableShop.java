@@ -115,7 +115,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 			entity.setBaby();
 		} else {
 			entity.setAdult();
-			// TODO: MC-9568: Growing up mobs get moved.
+			// TODO: MC-9568: Growing up mobs get moved. Might be fixed.
 			this.teleportBack();
 		}
 	}
