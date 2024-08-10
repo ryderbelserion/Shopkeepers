@@ -149,7 +149,7 @@ public class ComponentHolder {
 	) {
 		Validate.notNull(componentClass, "componentClass is null");
 		try {
-			return componentClass.newInstance();
+			return componentClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to create component of type "
 					+ componentClass.getName(), e);

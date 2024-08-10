@@ -176,7 +176,7 @@ public abstract class Config {
 	) {
 		assert valueTypeClass != null;
 		try {
-			return valueTypeClass.newInstance();
+			return valueTypeClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Could not instantiate ValueType: "
 					+ valueTypeClass.getName(), e);
@@ -281,7 +281,7 @@ public abstract class Config {
 	) {
 		assert valueTypeProviderClass != null;
 		try {
-			return valueTypeProviderClass.newInstance();
+			return valueTypeProviderClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Could not instantiate ValueTypeProvider: "
 					+ valueTypeProviderClass.getName(), e);
