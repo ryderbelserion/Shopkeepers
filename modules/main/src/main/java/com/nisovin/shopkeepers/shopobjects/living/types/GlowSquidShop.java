@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -99,8 +98,7 @@ public class GlowSquidShop extends SKLivingShopObject<GlowSquid> {
 		if (this.isDark()) {
 			iconItem = new ItemStack(Material.INK_SAC);
 		} else {
-			Material iconType = Unsafe.assertNonNull(MC_1_17.GLOW_INK_SAC.orElse(Material.INK_SAC));
-			iconItem = new ItemStack(iconType);
+			iconItem = new ItemStack(Material.GLOW_INK_SAC);
 		}
 		ItemUtils.setDisplayNameAndLore(iconItem,
 				Messages.buttonGlowSquidDark,

@@ -13,7 +13,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.MC_1_20_6;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -99,9 +98,7 @@ public class WolfShop extends SittableShop<Wolf> {
 		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
-		if (MC_1_20_6.isAvailable()) {
-			editorButtons.add(this.getVariantEditorButton());
-		}
+		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
 

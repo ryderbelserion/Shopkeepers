@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.MC_1_19;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -94,10 +93,8 @@ public class GoatShop extends BabyableShop<Goat> {
 		if (!Settings.silenceLivingShopEntities) {
 			editorButtons.add(this.getScreamingEditorButton());
 		}
-		if (MC_1_19.isAvailable()) {
-			editorButtons.add(this.getLeftHornEditorButton());
-			editorButtons.add(this.getRightHornEditorButton());
-		}
+		editorButtons.add(this.getLeftHornEditorButton());
+		editorButtons.add(this.getRightHornEditorButton());
 		return editorButtons;
 	}
 
@@ -179,10 +176,7 @@ public class GoatShop extends BabyableShop<Goat> {
 	private ItemStack getLeftHornEditorItem() {
 		ItemStack iconItem;
 		if (this.hasLeftHorn()) {
-			Material iconType = Unsafe.assertNonNull(
-					MC_1_19.GOAT_HORN.orElse(Material.LIME_STAINED_GLASS_PANE)
-			);
-			iconItem = new ItemStack(iconType);
+			iconItem = new ItemStack(Material.GOAT_HORN);
 		} else {
 			iconItem = new ItemStack(Material.BARRIER);
 		}
@@ -235,10 +229,7 @@ public class GoatShop extends BabyableShop<Goat> {
 	private ItemStack getRightHornEditorItem() {
 		ItemStack iconItem;
 		if (this.hasRightHorn()) {
-			Material iconType = Unsafe.assertNonNull(
-					MC_1_19.GOAT_HORN.orElse(Material.LIME_STAINED_GLASS_PANE)
-			);
-			iconItem = new ItemStack(iconType);
+			iconItem = new ItemStack(Material.GOAT_HORN);
 		} else {
 			iconItem = new ItemStack(Material.BARRIER);
 		}

@@ -21,7 +21,6 @@ import org.checkerframework.checker.nullness.qual.PolyNull;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
@@ -120,8 +119,8 @@ public final class ItemUtils {
 
 	public static boolean isHangingSign(@Nullable Material material) {
 		if (material == null) return false;
-		return material.data == MC_1_20.HANGING_SIGN_BLOCK_DATA.orElse(null)
-				|| material.data == MC_1_20.WALL_HANGING_SIGN_BLOCK_DATA.orElse(null);
+		return material.data == org.bukkit.block.data.type.HangingSign.class
+				|| material.data == org.bukkit.block.data.type.WallHangingSign.class;
 	}
 
 	public static boolean isRail(@Nullable Material material) {

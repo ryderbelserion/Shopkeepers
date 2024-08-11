@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObjectType;
-import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -37,7 +36,7 @@ public final class SKHangingSignShopObjectType
 
 	@Override
 	public boolean isEnabled() {
-		return MC_1_20.isAvailable() && Settings.enableHangingSignShops;
+		return Settings.enableHangingSignShops;
 	}
 
 	@Override

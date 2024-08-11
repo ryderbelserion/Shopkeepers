@@ -20,8 +20,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObject;
-import com.nisovin.shopkeepers.compat.MC_1_17;
-import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
@@ -48,15 +46,8 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	private static final String DATA_KEY_SIGN_TYPE = "signType";
 	public static final Property<SignType> SIGN_TYPE = new BasicProperty<SignType>()
 			.dataKeyAccessor(DATA_KEY_SIGN_TYPE, EnumSerializers.lenient(SignType.class))
-			.validator(value -> {
-				// Only validate on MC 1.20 or above. Otherwise, the default value would already be
-				// considered invalid.
-				// On versions below MC 1.20 (or 1.19 with the MC 1.20 data pack) the sign type is
-				// not validated, but also not expected to be used: It is only used during spawning,
-				// but the spawning of disabled object types is skipped.
-				Validate.isTrue(!MC_1_20.isAvailable() || value.isHangingSupported(),
-						() -> "Unsupported hanging sign type: '" + value.name() + "'.");
-			})
+			.validator(value -> Validate.isTrue(value.isHangingSupported(),
+					() -> "Unsupported hanging sign type: '" + value.name() + "'."))
 			.defaultValue(SignType.OAK)
 			.build();
 
@@ -197,9 +188,7 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	public List<Button> createEditorButtons() {
 		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
-		if (MC_1_17.isAvailable()) {
-			editorButtons.add(this.getGlowingTextEditorButton());
-		}
+		editorButtons.add(this.getGlowingTextEditorButton());
 		return editorButtons;
 	}
 
@@ -342,8 +331,7 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 	private ItemStack getGlowingTextEditorItem() {
 		ItemStack iconItem;
 		if (this.isGlowingText()) {
-			Material iconType = Unsafe.assertNonNull(MC_1_17.GLOW_INK_SAC.orElse(Material.INK_SAC));
-			iconItem = new ItemStack(iconType);
+			iconItem = new ItemStack(Material.GLOW_INK_SAC);
 		} else {
 			iconItem = new ItemStack(Material.INK_SAC);
 		}
