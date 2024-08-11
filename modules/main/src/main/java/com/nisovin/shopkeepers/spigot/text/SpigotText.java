@@ -281,6 +281,9 @@ public final class SpigotText {
 			assert hoverEvent != null;
 			net.md_5.bungee.api.chat.HoverEvent.Action action = toSpigot(hoverEvent.getAction());
 			BaseComponent[] value = new BaseComponent[] { toSpigot(hoverEvent.getValue()) };
+			// TODO https://github.com/SpigotMC/BungeeCord/issues/3688: There is currently no API
+			// that correctly serializes the item data as Content. However, serializing the item NBT
+			// text works.
 			return new net.md_5.bungee.api.chat.HoverEvent(action, value);
 		}
 

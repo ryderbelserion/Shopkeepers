@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.compat.v1_20_R5;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R4.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R4.entity.CraftLivingEntity;
@@ -235,13 +234,5 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.world.item.ItemStack nmsItem = asNMSItemStack(itemStack);
 		Tag itemNBT = nmsItem.saveOptional(MinecraftServer.getDefaultRegistryAccess());
 		return itemNBT.toString();
-	}
-
-	@Override
-	public @Nullable String getItemTypeTranslationKey(Material material) {
-		Validate.notNull(material, "material is null");
-		net.minecraft.world.item.Item nmsItem = CraftMagicNumbers.getItem(material);
-		if (nmsItem == null) return null;
-		return nmsItem.getDescriptionId();
 	}
 }

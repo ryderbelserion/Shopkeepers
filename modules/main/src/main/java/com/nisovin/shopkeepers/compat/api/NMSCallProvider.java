@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.compat.api;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -87,11 +86,9 @@ public interface NMSCallProvider {
 	public void updateTrades(Player player);
 
 	// For use in chat hover messages, null if not supported.
+	// TODO: Bukkit 1.20.6 also contains ItemMeta#getAsString now. However, this only includes the
+	// item's NBT data, not the full item stack NBT. And BungeeCord's HoverEvent Item content does
+	// not correctly serialize the data currently
+	// (https://github.com/SpigotMC/BungeeCord/issues/3688).
 	public @Nullable String getItemSNBT(@ReadOnly ItemStack itemStack);
-
-	// For use in translatable item type names, null if not supported.
-	// Note: This might not necessarily match the name that is usually displayed for an ItemStack,
-	// but rather the translated item type name (for example for items such as different types of
-	// potions, skulls, etc.).
-	public @Nullable String getItemTypeTranslationKey(Material material);
 }

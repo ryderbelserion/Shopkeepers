@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.compat;
 
 import java.lang.reflect.Method;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -142,11 +141,6 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public @Nullable String getItemSNBT(ItemStack itemStack) {
-		return null; // Not supported.
-	}
-
-	@Override
-	public @Nullable String getItemTypeTranslationKey(Material material) {
 		return null; // Not supported.
 	}
 }
