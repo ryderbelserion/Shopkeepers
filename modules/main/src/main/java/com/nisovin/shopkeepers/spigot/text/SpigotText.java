@@ -68,6 +68,7 @@ public final class SpigotText {
 
 		private static final class TextStyle {
 
+			// Must be an actual color:
 			private net.md_5.bungee.api.@Nullable ChatColor color = null;
 			private @Nullable Boolean bold = null;
 			private @Nullable Boolean italic = null;
@@ -78,6 +79,8 @@ public final class SpigotText {
 			public void setFormatting(net.md_5.bungee.api.ChatColor formatting) {
 				assert formatting != null;
 				if (formatting.getColor() != null) {
+					// Color resets formatting:
+					this.reset();
 					this.color = formatting;
 				} else if (formatting == net.md_5.bungee.api.ChatColor.BOLD) {
 					bold = true;
@@ -91,7 +94,6 @@ public final class SpigotText {
 					obfuscated = true;
 				} else if (formatting == net.md_5.bungee.api.ChatColor.RESET) {
 					this.reset();
-					this.color = formatting;
 				} else {
 					Log.warning("Unexpected Text formatting: " + formatting);
 				}
@@ -106,7 +108,7 @@ public final class SpigotText {
 				obfuscated = null;
 			}
 
-			public void apply(BaseComponent component) {
+			public void applyTo(BaseComponent component) {
 				assert component != null;
 				component.setColor(Unsafe.nullableAsNonNull(color));
 				component.setBold(Unsafe.nullableAsNonNull(bold));
@@ -153,7 +155,7 @@ public final class SpigotText {
 							|| chatColor == net.md_5.bungee.api.ChatColor.RESET) {
 						current = newTextComponent(parent, textStyle);
 					} else {
-						textStyle.apply(current);
+						textStyle.applyTo(current);
 					}
 					component = current;
 				}
@@ -211,7 +213,7 @@ public final class SpigotText {
 
 				component = new TranslatableComponent(translationKey, spigotTranslationArgs);
 				parent.addExtra(component);
-				textStyle.apply(component);
+				textStyle.applyTo(component);
 				current = null;
 				ignoreChild = true;
 			} else {
@@ -240,7 +242,7 @@ public final class SpigotText {
 			assert parent != null && textStyle != null;
 			TextComponent component = new TextComponent();
 			parent.addExtra(component);
-			textStyle.apply(component);
+			textStyle.applyTo(component);
 			return component;
 		}
 
