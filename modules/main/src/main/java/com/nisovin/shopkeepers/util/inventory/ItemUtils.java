@@ -22,7 +22,6 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.MC_1_20;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
@@ -507,7 +506,7 @@ public final class ItemUtils {
 				meta.setLore(Unsafe.cast(lore));
 			}
 			if (maxStackSize != null) {
-				NMSManager.getProvider().setMaxStackSize(meta, maxStackSize);
+				meta.setMaxStackSize(maxStackSize);
 			}
 			itemStack.setItemMeta(meta);
 		}
@@ -545,7 +544,7 @@ public final class ItemUtils {
 			}
 
 			if (maxStackSize != null) {
-				NMSManager.getProvider().setMaxStackSize(newItemMeta, maxStackSize);
+				newItemMeta.setMaxStackSize(maxStackSize);
 			}
 
 			itemStack.setItemMeta(newItemMeta);

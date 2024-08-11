@@ -1,14 +1,8 @@
 package com.nisovin.shopkeepers.compat.v1_21_R1;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
-import org.bukkit.block.sign.SignSide;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftLivingEntity;
@@ -19,34 +13,21 @@ import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_21_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.AbstractVillager;
-import org.bukkit.entity.Axolotl;
-import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.GlowSquid;
-import org.bukkit.entity.Goat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wolf;
-import org.bukkit.entity.Wolf.Variant;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
-import com.nisovin.shopkeepers.util.annotations.ReadWrite;
-import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
-import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.CollectionUtils;
-import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -262,115 +243,5 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.world.item.Item nmsItem = CraftMagicNumbers.getItem(material);
 		if (nmsItem == null) return null;
 		return nmsItem.getDescriptionId();
-	}
-
-	// MC 1.17 specific features
-
-	@Override
-	public void setAxolotlVariant(LivingEntity axolotl, String variantName) {
-		((Axolotl) axolotl).setVariant(Axolotl.Variant.valueOf(variantName));
-	}
-
-	@Override
-	public String cycleAxolotlVariant(String variantName, boolean backwards) {
-		return EnumUtils.cycleEnumConstant(
-				Axolotl.Variant.class,
-				Axolotl.Variant.valueOf(variantName),
-				backwards
-		).name();
-	}
-
-	@Override
-	public void setGlowSquidDark(LivingEntity glowSquid, boolean dark) {
-		// Integer.MAX_VALUE should be sufficiently long to not require periodic refreshes.
-		((GlowSquid) glowSquid).setDarkTicksRemaining(dark ? Integer.MAX_VALUE : 0);
-	}
-
-	@Override
-	public void setScreamingGoat(LivingEntity goat, boolean screaming) {
-		((Goat) goat).setScreaming(screaming);
-	}
-
-	@Override
-	public void setGlowingText(Sign sign, boolean glowingText) {
-		sign.getSide(Side.FRONT).setGlowingText(glowingText);
-	}
-
-	// MC 1.19 specific features
-
-	@Override
-	public void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
-		((Goat) goat).setLeftHorn(hasLeftHorn);
-	}
-
-	@Override
-	public void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
-		((Goat) goat).setRightHorn(hasRightHorn);
-	}
-
-	// MC 1.20 specific features
-
-	@Override
-	public void setSignBackLines(Sign sign, @NonNull String[] lines) {
-		SignSide signSide = sign.getSide(Side.BACK);
-		signSide.setLine(0, lines[0]);
-		signSide.setLine(1, lines[1]);
-		signSide.setLine(2, lines[2]);
-		signSide.setLine(3, lines[3]);
-	}
-
-	@Override
-	public void setSignBackGlowingText(Sign sign, boolean glowingText) {
-		SignSide signSide = sign.getSide(Side.BACK);
-		signSide.setGlowingText(glowingText);
-	}
-
-	// MC 1.20.4 specific features
-
-	// Registry instead of enum.
-	@Override
-	public Cat.@Nullable Type getCatType(String typeName) {
-		@Nullable NamespacedKey key = NamespacedKeyUtils.parse(typeName);
-		if (key == null) return null; // Not recognized
-
-		return Registry.CAT_VARIANT.get(key); // Null if not found
-	}
-
-	@Override
-	public String cycleCatType(String typeName, boolean backwards) {
-		Cat.@Nullable Type catType = this.getCatType(typeName);
-		if (catType == null) return typeName; // Current value not found
-
-		return RegistryUtils.cycleKeyed(Registry.CAT_VARIANT, catType, backwards).getKey().toString();
-	}
-
-	// MC 1.20.5 specific features
-
-	private @Nullable List<NamespacedKey> WOLF_VARIANT_KEYS = null;
-
-	public List<NamespacedKey> getWolfVariantKeys() {
-		if (WOLF_VARIANT_KEYS == null) {
-			WOLF_VARIANT_KEYS = RegistryUtils.getKeys(Registry.WOLF_VARIANT);
-		}
-		assert WOLF_VARIANT_KEYS != null;
-		return WOLF_VARIANT_KEYS;
-	}
-
-	@Override
-	public void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
-		itemMeta.setMaxStackSize(maxStackSize);
-	}
-
-	@Override
-	public NamespacedKey cycleWolfVariant(NamespacedKey variantKey, boolean backwards) {
-		return CollectionUtils.cycleValue(getWolfVariantKeys(), variantKey, backwards);
-	}
-
-	@Override
-	public void setWolfVariant(Wolf wolf, NamespacedKey variantKey) {
-		@Nullable Variant variant = Registry.WOLF_VARIANT.get(variantKey);
-		if (variant == null) return; // Variant not found
-
-		wolf.setVariant(variant);
 	}
 }

@@ -1,23 +1,16 @@
 package com.nisovin.shopkeepers.compat.api;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.CompatVersion;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
-import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -101,80 +94,4 @@ public interface NMSCallProvider {
 	// but rather the translated item type name (for example for items such as different types of
 	// potions, skulls, etc.).
 	public @Nullable String getItemTypeTranslationKey(Material material);
-
-	// MC 1.17 specific features
-	// TODO Remove this once we only support MC 1.17 and above.
-
-	public default void setAxolotlVariant(LivingEntity axolotl, String variantName) {
-		// Not supported by default.
-	}
-
-	public default String cycleAxolotlVariant(String variantName, boolean backwards) {
-		// Not supported by default.
-		return variantName;
-	}
-
-	public default void setGlowSquidDark(LivingEntity glowSquid, boolean dark) {
-		// Not supported by default.
-	}
-
-	public default void setScreamingGoat(LivingEntity goat, boolean screaming) {
-		// Not supported by default.
-	}
-
-	public default void setGlowingText(Sign sign, boolean glowingText) {
-		// Not supported by default.
-	}
-
-	// MC 1.19 specific features
-	// TODO Remove this once we only support MC 1.19 and above.
-
-	public default void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
-		// Not supported by default.
-	}
-
-	public default void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
-		// Not supported by default.
-	}
-
-	// MC 1.20 specific features
-	// TODO Remove this once we only support MC 1.20 and above.
-
-	public default void setSignBackLines(Sign sign, @NonNull String[] lines) {
-		// Not supported by default.
-	}
-
-	public default void setSignBackGlowingText(Sign sign, boolean glowingText) {
-		// Not supported by default.
-	}
-
-	// MC 1.20.4 specific features
-	// TODO Remove this once we only support MC 1.20.4 and above.
-	// Cat registry was added in 1.20.4. Was an enum before that. Enum removed in 1.21.
-
-	public default Cat.@Nullable Type getCatType(String typeName) {
-		// Not supported by default.
-		return null;
-	}
-
-	public default String cycleCatType(String typeName, boolean backwards) {
-		// Not supported by default.
-		return typeName;
-	}
-
-	// MC 1.20.5 specific features
-	// TODO Remove this once we only support MC 1.20.5 and above.
-
-	public default void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
-		// Not supported by default.
-	}
-
-	public default NamespacedKey cycleWolfVariant(NamespacedKey variantKey, boolean backwards) {
-		// Not supported by default.
-		return variantKey;
-	}
-
-	public default void setWolfVariant(Wolf wolf, NamespacedKey variantKey) {
-		// Not supported by default.
-	}
 }

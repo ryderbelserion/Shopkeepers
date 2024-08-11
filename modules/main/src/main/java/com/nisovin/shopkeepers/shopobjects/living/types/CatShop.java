@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.entity.Cat;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +13,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -21,24 +21,21 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
-import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class CatShop extends SittableShop<Cat> {
 
-	// TODO MC 1.21: Removed cat type enum. Cat registry is only available in 1.20.4+.
-	// Handle as string until we only support 1.20.4+, so that even when running in compatibility
-	// mode, and we fail to setup the fallback compat provider for cat types, we still preserve the
-	// previously stored cat types (even if we are not able to apply display or cycle them).
-	public static final Property<String> CAT_TYPE = new BasicProperty<String>()
-			.dataKeyAccessor("catType", StringSerializers.STRICT_NON_EMPTY)
-			.defaultValue("TABBY")
+	public static final Property<Cat.Type> CAT_TYPE = new BasicProperty<Cat.Type>()
+			.dataKeyAccessor("catType", KeyedSerializers.forRegistry(Cat.Type.class, Registry.CAT_VARIANT))
+			.defaultValue(Cat.Type.TABBY)
 			.build();
 
 	public static final Property<@Nullable DyeColor> COLLAR_COLOR = new BasicProperty<@Nullable DyeColor>()
@@ -47,7 +44,7 @@ public class CatShop extends SittableShop<Cat> {
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<String> catTypeProperty = new PropertyValue<>(CAT_TYPE)
+	private final PropertyValue<Cat.Type> catTypeProperty = new PropertyValue<>(CAT_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applyCatType)
 			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
@@ -94,33 +91,32 @@ public class CatShop extends SittableShop<Cat> {
 
 	// CAT TYPE
 
-	public String getCatType() {
+	public Cat.Type getCatType() {
 		return catTypeProperty.getValue();
 	}
 
-	public void setCatType(String catType) {
+	public void setCatType(Cat.Type catType) {
 		catTypeProperty.setValue(catType);
 	}
 
 	public void cycleCatType(boolean backwards) {
-		this.setCatType(NMSManager.getProvider().cycleCatType(this.getCatType(), backwards));
+		this.setCatType(RegistryUtils.cycleKeyed(
+				Registry.CAT_VARIANT,
+				this.getCatType(),
+				backwards
+		));
 	}
 
 	private void applyCatType() {
 		Cat entity = this.getEntity();
 		if (entity == null) return; // Not spawned
 
-		Cat.@Nullable Type catType = NMSManager.getProvider().getCatType(this.getCatType());
-		if (catType == null) return; // Not supported
-
-		entity.setCatType(catType);
+		entity.setCatType(this.getCatType());
 	}
 
 	private ItemStack getCatTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		Cat.@Nullable Type catType = NMSManager.getProvider().getCatType(this.getCatType());
-		if (catType == null) catType = Cat.Type.TABBY;
-		switch (catType) {
+		switch (this.getCatType()) {
 		case TABBY:
 			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
 			break;

@@ -1,0 +1,28 @@
+class org/bukkit/entity/Wolf$Variant
+ASHEN
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+BLACK
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+CHESTNUT
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+PALE
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+RUSTY
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+SNOWY
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+SPOTTED
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+STRIPED
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;
+WOODS
+ Lorg/bukkit/entity/Wolf$Variant;
+ L1org/bukkit/entity/Wolf$Variant;

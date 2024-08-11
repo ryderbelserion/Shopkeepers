@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.MC_1_20_6;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -23,12 +22,12 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
-import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.serialization.bukkit.NamespacedKeySerializers;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -47,11 +46,9 @@ public class WolfShop extends SittableShop<Wolf> {
 			.defaultValue(null)
 			.build();
 
-	// TODO Use correct variant type once we only support Bukkit 1.20.6 upwards. Will then also
-	// validate that the value is a valid wolf variant.
-	public static final Property<NamespacedKey> VARIANT = new BasicProperty<NamespacedKey>()
-			.dataKeyAccessor("wolfVariant", NamespacedKeySerializers.DEFAULT)
-			.defaultValue(NamespacedKeyUtils.create("minecraft", "pale"))
+	public static final Property<Wolf.Variant> VARIANT = new BasicProperty<Wolf.Variant>()
+			.dataKeyAccessor("wolfVariant", KeyedSerializers.forRegistry(Wolf.Variant.class, Registry.WOLF_VARIANT))
+			.defaultValue(Wolf.Variant.PALE)
 			.build();
 
 	private final PropertyValue<Boolean> angryProperty = new PropertyValue<>(ANGRY)
@@ -60,7 +57,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
-	private final PropertyValue<NamespacedKey> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<Wolf.Variant> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
@@ -239,24 +236,27 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	// VARIANT
 
-	public NamespacedKey getVariant() {
+	public Wolf.Variant getVariant() {
 		return variantProperty.getValue();
 	}
 
-	public void setVariant(NamespacedKey variant) {
+	public void setVariant(Wolf.Variant variant) {
 		variantProperty.setValue(variant);
 	}
 
 	public void cycleVariant(boolean backwards) {
-		this.setVariant(NMSManager.getProvider().cycleWolfVariant(this.getVariant(), backwards));
+		this.setVariant(RegistryUtils.cycleKeyed(
+				Registry.WOLF_VARIANT,
+				this.getVariant(),
+				backwards
+		));
 	}
 
 	private void applyVariant() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
 
-		NMSManager.getProvider().setWolfVariant(entity, this.getVariant());
-		// entity.setVariant(this.getVariant());
+		entity.setVariant(this.getVariant());
 	}
 
 	private ItemStack getVariantEditorItem() {

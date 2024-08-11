@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Squid;
+import org.bukkit.entity.GlowSquid;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -11,7 +11,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.MC_1_17;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -28,8 +27,7 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-// TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
-public class GlowSquidShop extends SKLivingShopObject<Squid> {
+public class GlowSquidShop extends SKLivingShopObject<GlowSquid> {
 
 	public static final Property<Boolean> DARK = new BasicProperty<Boolean>()
 			.dataKeyAccessor("darkGlowSquid", BooleanSerializers.LENIENT)
@@ -89,10 +87,11 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	}
 
 	private void applyDark() {
-		Squid entity = this.getEntity();
+		GlowSquid entity = this.getEntity();
 		if (entity == null) return; // Not spawned
 
-		NMSManager.getProvider().setGlowSquidDark(entity, this.isDark());
+		// Integer.MAX_VALUE should be sufficiently long to not require periodic refreshes.
+		entity.setDarkTicksRemaining(this.isDark() ? Integer.MAX_VALUE : 0);
 	}
 
 	private ItemStack getDarkEditorItem() {

@@ -154,7 +154,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * randomly spawns with saddle (gets cleared), TODO saddle property, shivering property (may require
  * continuously updating the entity state) # 1.16.2
  * <li>PIGLIN_BRUTE: okay, TODO add baby property # 1.17
- * <li>AXOLOTL: okay, spawns with random variant in vanilla
+ * <li>AXOLOTL: okay, spawns with random variant in vanilla, TODO play dead?
  * <li>GLOW_SQUID: okay
  * <li>GOAT: okay, randomly spawns as screaming variant in vanilla
  * <li>ALLAY: okay
@@ -577,55 +577,51 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					PufferFishShop::new
 			);
 			break;
+		case AXOLOTL:
+			objectType = new SKLivingShopObjectType<>(
+					livingShops,
+					entityType,
+					identifier,
+					aliases,
+					permission,
+					AxolotlShop.class,
+					AxolotlShop::new
+			);
+			break;
+		case GLOW_SQUID:
+			objectType = new SKLivingShopObjectType<>(
+					livingShops,
+					entityType,
+					identifier,
+					aliases,
+					permission,
+					GlowSquidShop.class,
+					GlowSquidShop::new
+			);
+			break;
+		case GOAT:
+			objectType = new SKLivingShopObjectType<>(
+					livingShops,
+					entityType,
+					identifier,
+					aliases,
+					permission,
+					GoatShop.class,
+					GoatShop::new
+			);
+			break;
+		case FROG:
+			objectType = new SKLivingShopObjectType<>(
+					livingShops,
+					entityType,
+					identifier,
+					aliases,
+					permission,
+					FrogShop.class,
+					FrogShop::new
+			);
+			break;
 		default:
-			switch (entityType.name()) {
-			case "AXOLOTL": // TODO Move up once we only support MC 1.17 upwards.
-				objectType = new SKLivingShopObjectType<>(
-						livingShops,
-						entityType,
-						identifier,
-						aliases,
-						permission,
-						AxolotlShop.class,
-						AxolotlShop::new
-				);
-				break;
-			case "GLOW_SQUID": // TODO Move up once we only support MC 1.17 upwards.
-				objectType = new SKLivingShopObjectType<>(
-						livingShops,
-						entityType,
-						identifier,
-						aliases,
-						permission,
-						GlowSquidShop.class,
-						GlowSquidShop::new
-				);
-				break;
-			case "GOAT": // TODO Move up once we only support MC 1.17 upwards.
-				objectType = new SKLivingShopObjectType<>(
-						livingShops,
-						entityType,
-						identifier,
-						aliases,
-						permission,
-						GoatShop.class,
-						GoatShop::new
-				);
-				break;
-			case "FROG": // TODO Move up once we only support MC 1.19 upwards.
-				objectType = new SKLivingShopObjectType<>(
-						livingShops,
-						entityType,
-						identifier,
-						aliases,
-						permission,
-						FrogShop.class,
-						FrogShop::new
-				);
-				break;
-			default:
-				break;
-			}
 			break;
 		}
 

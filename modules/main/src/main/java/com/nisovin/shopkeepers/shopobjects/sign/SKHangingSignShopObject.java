@@ -22,7 +22,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.HangingSignShopObject;
 import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.MC_1_20;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
@@ -33,6 +32,7 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.bukkit.SignUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
@@ -173,9 +173,8 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 		// Common sign setup (e.g. sign content):
 		SignShops.updateShopSign(sign, shopkeeper);
 
-		// Glowing text, on both sides:
-		NMSManager.getProvider().setGlowingText(sign, this.isGlowingText());
-		NMSManager.getProvider().setSignBackGlowingText(sign, this.isGlowingText());
+		// Glowing text:
+		this.applyGlowingText(sign);
 
 		// Apply sign changes:
 		sign.update(false, false);
@@ -325,12 +324,15 @@ public class SKHangingSignShopObject extends BaseBlockShopObject implements Hang
 		Sign sign = this.getSign();
 		if (sign == null) return; // Not spawned or no longer a sign
 
-		// Apply the glowing text to both sign sides:
-		NMSManager.getProvider().setGlowingText(sign, this.isGlowingText());
-		NMSManager.getProvider().setSignBackGlowingText(sign, this.isGlowingText());
+		this.applyGlowingText(sign);
 
 		// Sign block type is still the same (no force required), and we want to skip physics:
 		sign.update(false, false);
+	}
+
+	private void applyGlowingText(Sign sign) {
+		// Apply the glowing text to both sign sides:
+		SignUtils.setBothSidesGlowingText(sign, this.isGlowingText());
 	}
 
 	public void cycleGlowingText(boolean backwards) {

@@ -1,0 +1,7 @@
+class org/bukkit/entity/Tameable
+getOwner
+ ()Lorg/bukkit/entity/AnimalTamer;
+ ()L0org/bukkit/entity/AnimalTamer;
+setOwner
+ (Lorg/bukkit/entity/AnimalTamer;)V
+ (L0org/bukkit/entity/AnimalTamer;)V

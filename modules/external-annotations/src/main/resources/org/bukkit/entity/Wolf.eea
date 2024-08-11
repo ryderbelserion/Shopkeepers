@@ -1,0 +1,13 @@
+class org/bukkit/entity/Wolf
+getCollarColor
+ ()Lorg/bukkit/DyeColor;
+ ()L1org/bukkit/DyeColor;
+getVariant
+ ()Lorg/bukkit/entity/Wolf$Variant;
+ ()L1org/bukkit/entity/Wolf$Variant;
+setCollarColor
+ (Lorg/bukkit/DyeColor;)V
+ (L1org/bukkit/DyeColor;)V
+setVariant
+ (Lorg/bukkit/entity/Wolf$Variant;)V
+ (L1org/bukkit/entity/Wolf$Variant;)V
