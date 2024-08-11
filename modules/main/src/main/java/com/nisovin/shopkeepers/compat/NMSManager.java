@@ -22,8 +22,11 @@ public final class NMSManager {
 
 	// We have to update and rebuild our compat code whenever the mappings changed.
 	// Changes to the mappings version do not necessarily align with a bump of the CraftBukkit
-	// version. To reduce the number of CraftBukkit versions to depend on and build, we only support
-	// the latest mappings version for every CraftBukkit version.
+	// version. If the mappings changed without a bump of the CraftBukkit version, we only support
+	// the latest mappings version: Our modules can only depend on specific CraftBukkit versions,
+	// and building different build versions of CraftBukkit that share the same artifact version
+	// overwrite each other inside the Maven repository. Also, we want to limit the number of
+	// CraftBukkit versions we depend on and build.
 	// Although they look similar, our compat versions do not necessarily match CraftBukkit's
 	// 'Minecraft Version': Our revision number (behind the 'R') is incremented for every new compat
 	// module for a specific major Minecraft version, which usually aligns with mappings updates for
@@ -31,6 +34,7 @@ public final class NMSManager {
 	// frequently.
 	static {
 		// Registered in the order from latest to oldest.
+		register(new CompatVersion("1_21_R2", "1.21.1", "7092ff1ff9352ad7e2260dc150e6a3ec"));
 		register(new CompatVersion("1_21_R1", "1.21", "229d7afc75b70a6c388337687ac4da1f"));
 		// Note: MC 1.20.6 completely replaced 1.20.5. We only support 1.20.6.
 		register(new CompatVersion("1_20_R5", "1.20.6", "ee13f98a43b9c5abffdcc0bb24154460"));

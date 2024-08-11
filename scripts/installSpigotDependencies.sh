@@ -65,4 +65,6 @@ buildSpigotIfMissing 1.20.6 remapped
 # Build specific build number, because Spigot 1.21 was updated to point to 1.21.1.
 buildSpigotIfMissing 1.21 remapped 4289
 
+buildSpigotIfMissing 1.21.1 remapped
+
 popd

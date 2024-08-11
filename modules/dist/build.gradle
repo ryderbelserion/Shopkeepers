@@ -6,7 +6,8 @@ plugins {
 
 def nmsModules = [
 	':shopkeepers-v1_20_R5',
-	':shopkeepers-v1_21_R1'
+	':shopkeepers-v1_21_R1',
+	':shopkeepers-v1_21_R2'
 ]
 
 configurations {

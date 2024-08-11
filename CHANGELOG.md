@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.23.0 (TBA)
 ### Supported MC versions: 1.21, 1.20.6
 
+* Update for MC 1.21.1.
 * Drop support for MC versions below 1.20.6 to update the plugin to use Java 21 and build against a more modern API version.
   * If you want to run this plugin on an older server version, you need to use an older plugin version.
   * Internal: Various updates for Bukkit 1.20.6 and Java 21.

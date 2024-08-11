@@ -55,9 +55,6 @@ To support the latest mappings version:
 		* Wool material by dye color, carpet material by dye color.
 	* Also check if the supported containers in ShopContainers require changes.
 
-* New EquipmentSlots:
-	* EquipmentUtils and ItemUtils#getItem(PlayerInventory, EquipmentSlot) may need to be adapted.
-
 * New enchantments:
 	* Check the aliases inside EnchantmentUtils.
 
