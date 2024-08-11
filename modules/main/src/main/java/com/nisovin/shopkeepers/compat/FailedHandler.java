@@ -19,17 +19,7 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Class<?> nmsEntityClass;
 	private final Method nmsEntitySetOnGroundMethod;
 
-	private final Class<?> nmsItemStackClass;
-	private final Method nmsGetTagMethod;
-
-	private final Class<?> nmsGameProfileSerializerClass;
-	private final Class<?> nmsNBTBaseClass;
-	private final Method nmsAreNBTMatchingMethod;
-
 	// CraftBukkit
-	private final Class<?> obcCraftItemStackClass;
-	private final Method obcAsNMSCopyMethod;
-
 	private final Class<?> obcCraftEntityClass;
 	private final Method obcGetHandleMethod;
 
@@ -37,27 +27,14 @@ public final class FailedHandler implements NMSCallProvider {
 		String cbPackage = ServerUtils.getCraftBukkitPackage();
 
 		// Minecraft
-		nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
-		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("s"); // getTag
 
 		nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
 		nmsEntitySetOnGroundMethod = nmsEntityClass.getDeclaredMethod(
-				"c", // setOnGround
-				boolean.class
-		);
-
-		nmsGameProfileSerializerClass = Class.forName("net.minecraft.nbt.GameProfileSerializer");
-		nmsNBTBaseClass = Class.forName("net.minecraft.nbt.NBTBase");
-		nmsAreNBTMatchingMethod = nmsGameProfileSerializerClass.getDeclaredMethod(
-				"a",
-				nmsNBTBaseClass,
-				nmsNBTBaseClass,
+				"d", // setOnGround
 				boolean.class
 		);
 
 		// CraftBukkit
-		obcCraftItemStackClass = Class.forName(cbPackage + ".inventory.CraftItemStack");
-		obcAsNMSCopyMethod = obcCraftItemStackClass.getDeclaredMethod("asNMSCopy", ItemStack.class);
 
 		obcCraftEntityClass = Class.forName(cbPackage + ".entity.CraftEntity");
 		obcGetHandleMethod = obcCraftEntityClass.getDeclaredMethod("getHandle");
@@ -109,29 +86,12 @@ public final class FailedHandler implements NMSCallProvider {
 		assert required != null && provided != null;
 		if (provided.getType() != required.getType()) return false;
 
-		// TODO Minecraft 1.20.5+ uses DataComponentPredicates for matching data.
-		try {
-			Object nmsProvided = Unsafe.assertNonNull(
-					obcAsNMSCopyMethod.invoke(Unsafe.uncheckedNull(), provided)
-			);
-			Object nmsRequired = Unsafe.assertNonNull(
-					obcAsNMSCopyMethod.invoke(Unsafe.uncheckedNull(), required)
-			);
-			Object providedTag = nmsGetTagMethod.invoke(nmsProvided);
-			Object requiredTag = nmsGetTagMethod.invoke(nmsRequired);
-			return Unsafe.castNonNull(nmsAreNBTMatchingMethod.invoke(
-					Unsafe.uncheckedNull(),
-					Unsafe.nullableAsNonNull(requiredTag),
-					Unsafe.nullableAsNonNull(providedTag),
-					false
-			));
-		} catch (Exception e) {
-			// Fallback: Check for metadata equality. In this case the behavior of this method is no
-			// longer equivalent to Minecraft's item comparison behavior!
-			// The direction of this check is important, because the required item stack might be an
-			// UnmodifiableItemStack.
-			return required.isSimilar(provided);
-		}
+		// TODO Minecraft 1.20.5+ uses DataComponentPredicates for matching items. Implement a
+		// reflection-based fallback?
+
+		// Fallback: Check for metadata equality. This behavior is stricter than vanilla Minecraft's
+		// item comparison.
+		return required.isSimilar(provided);
 	}
 
 	@Override

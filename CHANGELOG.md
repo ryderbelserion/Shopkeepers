@@ -10,6 +10,9 @@ Date format: (YYYY-MM-DD)
 * Item display name and lore data from the language file can be specified as Json text now.
 * Fix: Item data containing attribute modifiers was not correctly saved to the plugin config and failed to load.
 * Extend the item stack we use for server assumption tests to include newer item data.
+* Update the compatibility mode:
+  * Fix: The compatibility mode periodically set all shopkeepers mobs on fire.
+  * Remove broken reflection-based item NBT matching logic. In compatibility mode, we simply compare items for equality now, which is usually stricter than Minecraft's actual item comparisons (i.e. trades might get blocked that would usually be allowed).
 * Build: Use the Eclipse compiler for null analysis.
   * Include the Eclipse JDT preference files for use by the ECJ compiler.
   * Use the JDT `NonNullByDefault` annotation which ECJ interprets as non-null-by-default in more contexts (e.g. for type parameters). Remove various now redundant null annotations.
