@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>Shopkeeper data version: This version indicates changes to the data format of individual
  * shopkeepers, such as the renaming, removal, or the addition of attributes for specific types of
  * shopkeepers or shop objects. This version can for example be used to determine required
- * shopkeeper data migrations. Not all shopkeepers might be affected be a certain change, so changes
+ * shopkeeper data migrations. Not all shopkeepers might be affected by a certain change, so changes
  * to this version do not necessarily trigger a full save of all shopkeepers.
  * <li>Minecraft data version: This data version is dictated by Minecraft and updates with every
  * server update, even minor ones. Minecraft sometimes updates or extends the data or data format of

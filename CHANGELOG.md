@@ -4,6 +4,8 @@ Date format: (YYYY-MM-DD)
 ## v2.23.1 (TBA)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6
 
+* Config: Remove `file-encoding` setting: We use Bukkit to load the save data, which always expects the data to be UTF-8 encoded.
+
 ## v2.23.0 (2024-08-11)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6
 

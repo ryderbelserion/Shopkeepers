@@ -1,9 +1,5 @@
 package com.nisovin.shopkeepers.config;
 
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -43,7 +39,6 @@ import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
-import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Trilean;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -52,7 +47,7 @@ public class Settings extends Config {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 6;
+	public static int configVersion = 7;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
@@ -66,7 +61,6 @@ public class Settings extends Config {
 	/*
 	 * Shopkeeper Data
 	 */
-	public static String fileEncoding = "UTF-8";
 	public static boolean saveInstantly = true;
 
 	public static boolean convertPlayerItems = false;
@@ -379,8 +373,6 @@ public class Settings extends Config {
 
 		public static DateTimeFormatter dateTimeFormatter = Unsafe.uncheckedNull();
 
-		public static Charset fileCharset = Unsafe.uncheckedNull();
-
 		public static TradingRecipeDraft sellingEmptyTrade = Unsafe.uncheckedNull();
 		public static TradingRecipeDraft sellingEmptyTradeSlotItems = Unsafe.uncheckedNull();
 		public static TradingRecipeDraft buyingEmptyTrade = Unsafe.uncheckedNull();
@@ -432,21 +424,6 @@ public class Settings extends Config {
 				Messages.dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat)
 						.withZone(Unsafe.assertNonNull(ZoneId.systemDefault()));
-			}
-
-			// Charset derived from specified file encoding:
-			if (StringUtils.isEmpty(fileEncoding)) {
-				Log.warning(INSTANCE.getLogPrefix() + "'file-encoding' is empty. "
-						+ "Using default 'UTF-8'.");
-				fileEncoding = "UTF-8";
-			}
-			try {
-				fileCharset = Charset.forName(fileEncoding);
-			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-				Log.warning(INSTANCE.getLogPrefix() + "Invalid or unsupported 'file-encoding' ('"
-						+ fileEncoding + "'). Using default 'UTF-8'.");
-				fileEncoding = "UTF-8";
-				fileCharset = Unsafe.assertNonNull(StandardCharsets.UTF_8);
 			}
 
 			sellingEmptyTrade = new TradingRecipeDraft(
@@ -730,12 +707,10 @@ public class Settings extends Config {
 
 		public final boolean debug;
 		public final List<? extends String> debugOptions;
-		public final Charset fileCharset;
 
 		private AsyncSettings() {
 			this.debug = Settings.debug;
 			this.debugOptions = Collections.unmodifiableList(new ArrayList<>(Settings.debugOptions));
-			this.fileCharset = DerivedSettings.fileCharset;
 		}
 	}
 

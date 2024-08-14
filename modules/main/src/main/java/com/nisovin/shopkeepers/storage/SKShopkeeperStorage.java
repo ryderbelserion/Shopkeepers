@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.storage;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -30,7 +31,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
@@ -454,8 +454,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 		}
 
-		// Load the save data with the specified encoding:
-		try (Reader reader = Files.newBufferedReader(saveFile, DerivedSettings.fileCharset)) {
+		// Load the save data:
+		try (Reader reader = Files.newBufferedReader(saveFile, StandardCharsets.UTF_8)) {
 			// Since Bukkit 1.16.5, this automatically clears the save data before loading the new
 			// entries.
 			saveData.load(reader);
@@ -1078,8 +1078,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				this.wrapException(() -> FileUtils.checkIsDirectoryWritable(saveFileDirectory));
 			}
 
-			// Create new temporary save file and write data to it, using the specified encoding:
-			try (Writer writer = Files.newBufferedWriter(tempSaveFile, DerivedSettings.fileCharset)) {
+			// Create new temporary save file and write data to it:
+			try (Writer writer = Files.newBufferedWriter(tempSaveFile, StandardCharsets.UTF_8)) {
 				writer.write(data);
 			} catch (IOException e) {
 				throw new ShopkeeperStorageSaveException(
