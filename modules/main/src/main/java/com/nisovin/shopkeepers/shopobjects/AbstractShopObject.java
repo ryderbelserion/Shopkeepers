@@ -489,7 +489,7 @@ public abstract class AbstractShopObject implements ShopObject {
 		if (particleLocation == null) return;
 
 		World world = LocationUtils.getWorld(particleLocation);
-		world.spawnParticle(Particle.VILLAGER_ANGRY, particleLocation, 1);
+		world.spawnParticle(Particle.ANGRY_VILLAGER, particleLocation, 1);
 	}
 
 	// NAMING

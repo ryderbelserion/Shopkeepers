@@ -5,8 +5,6 @@ import java.util.function.Predicate;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.compat.MC_1_19;
-import com.nisovin.shopkeepers.compat.MC_1_20;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public enum SignType {
@@ -15,69 +13,69 @@ public enum SignType {
 	OAK(
 			Material.OAK_SIGN,
 			Material.OAK_WALL_SIGN,
-			MC_1_20.OAK_HANGING_SIGN.orElse(null),
-			MC_1_20.OAK_WALL_HANGING_SIGN.orElse(null)//
+			Material.OAK_HANGING_SIGN,
+			Material.OAK_WALL_HANGING_SIGN
 	),
 	// Previously persisted as 'REDWOOD'.
 	SPRUCE(
 			Material.SPRUCE_SIGN,
 			Material.SPRUCE_WALL_SIGN,
-			MC_1_20.SPRUCE_HANGING_SIGN.orElse(null),
-			MC_1_20.SPRUCE_WALL_HANGING_SIGN.orElse(null)//
+			Material.SPRUCE_HANGING_SIGN,
+			Material.SPRUCE_WALL_HANGING_SIGN
 	),
 	BIRCH(
 			Material.BIRCH_SIGN,
 			Material.BIRCH_WALL_SIGN,
-			MC_1_20.BIRCH_HANGING_SIGN.orElse(null),
-			MC_1_20.BIRCH_WALL_HANGING_SIGN.orElse(null)//
+			Material.BIRCH_HANGING_SIGN,
+			Material.BIRCH_WALL_HANGING_SIGN
 	),
 	JUNGLE(
 			Material.JUNGLE_SIGN,
 			Material.JUNGLE_WALL_SIGN,
-			MC_1_20.JUNGLE_HANGING_SIGN.orElse(null),
-			MC_1_20.JUNGLE_WALL_HANGING_SIGN.orElse(null)//
+			Material.JUNGLE_HANGING_SIGN,
+			Material.JUNGLE_WALL_HANGING_SIGN
 	),
 	ACACIA(
 			Material.ACACIA_SIGN,
 			Material.ACACIA_WALL_SIGN,
-			MC_1_20.ACACIA_HANGING_SIGN.orElse(null),
-			MC_1_20.ACACIA_WALL_HANGING_SIGN.orElse(null)//
+			Material.ACACIA_HANGING_SIGN,
+			Material.ACACIA_WALL_HANGING_SIGN
 	),
 	DARK_OAK(
 			Material.DARK_OAK_SIGN,
 			Material.DARK_OAK_WALL_SIGN,
-			MC_1_20.DARK_OAK_HANGING_SIGN.orElse(null),
-			MC_1_20.DARK_OAK_WALL_HANGING_SIGN.orElse(null)//
+			Material.DARK_OAK_HANGING_SIGN,
+			Material.DARK_OAK_WALL_HANGING_SIGN
 	),
 	CRIMSON(
 			Material.CRIMSON_SIGN,
 			Material.CRIMSON_WALL_SIGN,
-			MC_1_20.CRIMSON_HANGING_SIGN.orElse(null),
-			MC_1_20.CRIMSON_WALL_HANGING_SIGN.orElse(null)//
+			Material.CRIMSON_HANGING_SIGN,
+			Material.CRIMSON_WALL_HANGING_SIGN
 	),
 	WARPED(
 			Material.WARPED_SIGN,
 			Material.WARPED_WALL_SIGN,
-			MC_1_20.WARPED_HANGING_SIGN.orElse(null),
-			MC_1_20.WARPED_WALL_HANGING_SIGN.orElse(null)//
+			Material.WARPED_HANGING_SIGN,
+			Material.WARPED_WALL_HANGING_SIGN
 	),
 	MANGROVE(
-			MC_1_19.MANGROVE_SIGN.orElse(null),
-			MC_1_19.MANGROVE_WALL_SIGN.orElse(null),
-			MC_1_20.MANGROVE_HANGING_SIGN.orElse(null),
-			MC_1_20.MANGROVE_WALL_HANGING_SIGN.orElse(null)//
+			Material.MANGROVE_SIGN,
+			Material.MANGROVE_WALL_SIGN,
+			Material.MANGROVE_HANGING_SIGN,
+			Material.MANGROVE_WALL_HANGING_SIGN
 	),
 	BAMBOO(
-			MC_1_20.BAMBOO_SIGN.orElse(null),
-			MC_1_20.BAMBOO_WALL_SIGN.orElse(null),
-			MC_1_20.BAMBOO_HANGING_SIGN.orElse(null),
-			MC_1_20.BAMBOO_WALL_HANGING_SIGN.orElse(null)//
+			Material.BAMBOO_SIGN,
+			Material.BAMBOO_WALL_SIGN,
+			Material.BAMBOO_HANGING_SIGN,
+			Material.BAMBOO_WALL_HANGING_SIGN
 	),
 	CHERRY(
-			MC_1_20.CHERRY_SIGN.orElse(null),
-			MC_1_20.CHERRY_WALL_SIGN.orElse(null),
-			MC_1_20.CHERRY_HANGING_SIGN.orElse(null),
-			MC_1_20.CHERRY_WALL_HANGING_SIGN.orElse(null)//
+			Material.CHERRY_SIGN,
+			Material.CHERRY_WALL_SIGN,
+			Material.CHERRY_HANGING_SIGN,
+			Material.CHERRY_WALL_HANGING_SIGN
 	);
 
 	public static final Predicate<SignType> IS_SUPPORTED = SignType::isSupported;

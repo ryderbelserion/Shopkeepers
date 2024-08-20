@@ -30,7 +30,7 @@ public final class NamespacedKeySerializers {
 		@Override
 		public NamespacedKey deserialize(Object data) throws InvalidDataException {
 			String keyString = StringSerializers.STRICT.deserialize(data);
-			@Nullable NamespacedKey key = NamespacedKey.fromString(keyString);
+			@Nullable NamespacedKey key = NamespacedKey.fromString(keyString.toLowerCase());
 			if (key == null) {
 				throw new InvalidDataException("Invalid namespaced key: '" + keyString + "'");
 			}

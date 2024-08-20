@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
@@ -33,7 +34,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.trading.TradeEffect;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.currency.Currency;

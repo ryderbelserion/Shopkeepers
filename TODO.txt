@@ -1,5 +1,7 @@
 High priority:
-* 
+* Re-work the config.yml/messages.yml internally as to provide easier config options and more message customization!
+* Items need to be stored differently in save.yml
+* Run a profiler while interacting with the plugin to find spots to touch up on.
 
 Mid priority:
 * For any commands allowing for a targeted shopkeeper: Print 'Ambiguous shopkeeper. Specify the shopkeeper explicitly instead.' error in case more than one shopkeeper is targeted?

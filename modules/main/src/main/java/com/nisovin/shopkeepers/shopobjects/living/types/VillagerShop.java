@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,27 +28,27 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 
 public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	private static final String DATA_KEY_PROFESSION = "profession";
 	public static final Property<@NonNull Profession> PROFESSION = new BasicProperty<@NonNull Profession>()
-			.dataKeyAccessor(DATA_KEY_PROFESSION, EnumSerializers.lenient(Profession.class))
+			.dataKeyAccessor(DATA_KEY_PROFESSION, KeyedSerializers.forRegistry(Profession.class, Registry.VILLAGER_PROFESSION))
 			.defaultValue(Profession.NONE)
 			.build();
 
 	public static final Property<Villager.@NonNull Type> VILLAGER_TYPE = new BasicProperty<Villager.@NonNull Type>()
-			.dataKeyAccessor("villagerType", EnumSerializers.lenient(Villager.Type.class))
+			.dataKeyAccessor("villagerType", KeyedSerializers.forRegistry(Villager.Type.class, Registry.VILLAGER_TYPE))
 			.defaultValue(Villager.Type.PLAINS)
 			.build();
 
@@ -163,7 +164,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public void cycleProfession(boolean backwards) {
 		this.setProfession(
-				EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards)
+				RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_PROFESSION, this.getProfession(), backwards)
 		);
 	}
 
@@ -175,51 +176,50 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	private ItemStack getProfessionEditorItem() {
 		ItemStack iconItem;
-		switch (this.getProfession()) {
-		case ARMORER:
+		switch (this.getProfession().getKey().getKey()) {
+		case "armorer":
 			iconItem = new ItemStack(Material.BLAST_FURNACE);
 			break;
-		case BUTCHER:
+		case "butcher":
 			iconItem = new ItemStack(Material.SMOKER);
 			break;
-		case CARTOGRAPHER:
+		case "cartographer":
 			iconItem = new ItemStack(Material.CARTOGRAPHY_TABLE);
 			break;
-		case CLERIC:
+		case "cleric":
 			iconItem = new ItemStack(Material.BREWING_STAND);
 			break;
-		case FARMER:
+		case "farmer":
 			iconItem = new ItemStack(Material.WHEAT); // Instead of COMPOSTER
 			break;
-		case FISHERMAN:
+		case "fisherman":
 			iconItem = new ItemStack(Material.FISHING_ROD); // Instead of BARREL
 			break;
-		case FLETCHER:
+		case "fletcher":
 			iconItem = new ItemStack(Material.FLETCHING_TABLE);
 			break;
-		case LEATHERWORKER:
+		case "leatherworker":
 			iconItem = new ItemStack(Material.LEATHER); // Instead of CAULDRON
 			break;
-		case LIBRARIAN:
+		case "librarian":
 			iconItem = new ItemStack(Material.LECTERN);
 			break;
-		case MASON:
+		case "mason":
 			iconItem = new ItemStack(Material.STONECUTTER);
 			break;
-		case SHEPHERD:
+		case "shephard":
 			iconItem = new ItemStack(Material.LOOM);
 			break;
-		case TOOLSMITH:
+		case "toolsmith":
 			iconItem = new ItemStack(Material.SMITHING_TABLE);
 			break;
-		case WEAPONSMITH:
+		case "weaponsmith":
 			iconItem = new ItemStack(Material.GRINDSTONE);
 			break;
-		case NITWIT:
+		case "nitwit":
 			iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 			ItemUtils.setLeatherColor(iconItem, Color.GREEN);
 			break;
-		case NONE:
 		default:
 			iconItem = new ItemStack(Material.BARRIER);
 			break;
@@ -264,7 +264,7 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	public void cycleVillagerType(boolean backwards) {
 		this.setVillagerType(
-				EnumUtils.cycleEnumConstant(Villager.Type.class, this.getVillagerType(), backwards)
+				RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_TYPE, this.getVillagerType(), backwards)
 		);
 	}
 
@@ -276,27 +276,27 @@ public class VillagerShop extends BabyableShop<@NonNull Villager> {
 
 	private ItemStack getVillagerTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (this.getVillagerType()) {
+		switch (this.getVillagerType().toString()) {
 		default:
-		case PLAINS:
+		case "minecraft:plains":
 			// Default brown color:
 			break;
-		case DESERT:
+		case "minecraft:desert":
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 			break;
-		case JUNGLE:
+		case "minecraft:jungle":
 			ItemUtils.setLeatherColor(iconItem, Color.YELLOW.mixColors(Color.ORANGE));
 			break;
-		case SAVANNA:
+		case "minecraft:savanna":
 			ItemUtils.setLeatherColor(iconItem, Color.RED);
 			break;
-		case SNOW:
+		case "minecraft:snow":
 			ItemUtils.setLeatherColor(iconItem, DyeColor.CYAN.getColor());
 			break;
-		case SWAMP:
+		case "minecraft:swamp":
 			ItemUtils.setLeatherColor(iconItem, DyeColor.PURPLE.getColor());
 			break;
-		case TAIGA:
+		case "minecraft:taiga":
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		}

@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.function.Predicate;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +13,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;

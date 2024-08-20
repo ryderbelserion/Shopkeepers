@@ -185,11 +185,11 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 
 	static {
 		Map<@NonNull EntityType, @NonNull List<? extends @NonNull String>> aliases = new HashMap<>();
-		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList(
+		aliases.put(EntityType.MOOSHROOM, prepareAliases(Arrays.asList(
 				"mooshroom",
 				"mushroom-cow"
 		)));
-		aliases.put(EntityType.SNOWMAN, prepareAliases(Arrays.asList(
+		aliases.put(EntityType.SNOW_GOLEM, prepareAliases(Arrays.asList(
 				"snow-golem",
 				"snowman"
 		)));
@@ -502,7 +502,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					PandaShop::new
 			);
 			break;
-		case MUSHROOM_COW:
+		case EntityType.MOOSHROOM:
 			objectType = new SKLivingShopObjectType<>(
 					livingShops,
 					entityType,
@@ -534,7 +534,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					MagmaCubeShop.class,
 					MagmaCubeShop::new);
 			break;
-		case SNOWMAN:
+			case SNOW_GOLEM:
 			objectType = new SKLivingShopObjectType<>(
 					livingShops,
 					entityType,

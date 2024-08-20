@@ -4,9 +4,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -23,11 +25,6 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.commands.Commands;
-import com.nisovin.shopkeepers.compat.MC_1_17;
-import com.nisovin.shopkeepers.compat.MC_1_19;
-import com.nisovin.shopkeepers.compat.MC_1_20;
-import com.nisovin.shopkeepers.compat.MC_1_20_6;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.compat.ServerAssumptionsTest;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
@@ -75,6 +72,8 @@ import com.nisovin.shopkeepers.world.ForcingEntityTeleporter;
 import com.nisovin.shopkeepers.world.PlayerMap;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepersPlugin {
+
+	private final long startTime;
 
 	private static final Set<? extends @NonNull String> SKIP_PRELOADING_CLASSES = Collections.unmodifiableSet(
 			new HashSet<>(Arrays.asList(
@@ -170,8 +169,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	private final PluginMetrics pluginMetrics = new PluginMetrics(Unsafe.initialized(this));
 
-	private boolean outdatedServer = false;
-	private boolean incompatibleServer = false;
 	private @Nullable ConfigLoadException configLoadError = null; // Null on success
 
 	private void loadAllPluginClasses() {
@@ -193,26 +190,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 	}
 
-	// Returns true if server is outdated.
-	private boolean isOutdatedServerVersion() {
-		// Validate that this server is running a minimum required version:
-		// TODO Add proper version parsing.
-		/*String cbVersion = Utils.getServerCBVersion(); // E.g. 1_13_R2
-		String bukkitVersion = Bukkit.getBukkitVersion(); // E.g. 1.13.1-R0.1-SNAPSHOT*/
-		try {
-			// This has been added with the recent changes to PlayerBedEnterEvent: TODO outdated
-			Class.forName("org.bukkit.event.player.PlayerBedEnterEvent$BedEnterResult");
-			return false;
-		} catch (ClassNotFoundException e) {
-			return true;
-		}
-	}
-
-	// Returns false if neither a compatible NMS version nor the fallback handler could be set up.
-	private boolean setupNMS() {
-		return NMSManager.load(this);
-	}
-
 	private void registerDefaults() {
 		Log.info("Registering defaults.");
 		livingShops.onRegisterDefaults();
@@ -223,6 +200,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	public SKShopkeepersPlugin() {
 		super();
+
+		this.startTime = System.nanoTime();
 	}
 
 	@Override
@@ -236,18 +215,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// (usually during shutdown) when the plugin jar gets replaced during runtime (e.g. for hot
 		// reloads):
 		this.loadAllPluginClasses();
-
-		// Validate that this server is running a minimum required version:
-		this.outdatedServer = this.isOutdatedServerVersion();
-		if (this.outdatedServer) {
-			return;
-		}
-
-		// Try to load suitable NMS (or fallback) code:
-		this.incompatibleServer = !this.setupNMS();
-		if (this.incompatibleServer) {
-			return;
-		}
 
 		// Load config:
 		this.configLoadError = Settings.loadConfig();
@@ -280,27 +247,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			InternalShopkeepersAPI.enable(this);
 		}
 
-		// Validate that this server is running a minimum required version:
-		if (this.outdatedServer) {
-			Log.severe("Outdated server version (" + Bukkit.getVersion()
-					+ "): Shopkeepers cannot be enabled. Please update your server!");
-			this.setEnabled(false); // also calls onDisable
-			return;
-		}
-
-		// Check if the server version is incompatible:
-		if (this.incompatibleServer) {
-			Log.severe("Incompatible server version: Shopkeepers cannot be enabled.");
-			this.setEnabled(false); // Also calls onDisable
-			return;
-		}
-
 		// Load config (if not already loaded during onLoad):
 		if (!alreadySetUp) {
 			this.configLoadError = Settings.loadConfig();
 		} else {
 			Log.debug("Config already loaded.");
 		}
+
 		if (this.configLoadError != null) {
 			Log.severe("Could not load the config!", configLoadError);
 			this.setEnabled(false); // Also calls onDisable
@@ -314,13 +267,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			Log.debug("Language file already loaded.");
 		}
 
-		// Check for and initialize version dependent utilities:
-		MC_1_17.init();
-		MC_1_19.init();
-		MC_1_20.init();
-		MC_1_20_6.init();
+		NMSManager.load();
 
-		// Inform about Spigot exclusive features:
+        // Inform about Spigot exclusive features:
 		if (SpigotFeatures.isSpigotAvailable()) {
 			Log.debug("Spigot-based server found: Enabling Spigot exclusive features.");
 		} else {
@@ -421,6 +370,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Load shopkeepers from saved data:
 		boolean loadingSuccessful = shopkeeperStorage.reload();
+
 		if (!loadingSuccessful) {
 			// Detected an issue during loading.
 			// Disabling the plugin without saving, to prevent loss of shopkeeper data:
@@ -453,6 +403,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Event debugger:
 		eventDebugger.onEnable();
+
+		getComponentLogger().info("Done ({})!", String.format(Locale.ROOT, "%.3fs", (double) (System.nanoTime() - this.startTime) / 1.0E9D));
 	}
 
 	@Override

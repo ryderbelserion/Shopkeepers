@@ -1,49 +1,14 @@
-#################
-## Eclipse
-#################
-
-.project
-.metadata
-.gradle/
-bin/
-target/
-build/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.classpath
-.settings/
-.loadpath
-.flattened-pom.xml
-
-# Locally stored "Eclipse launch configurations"
-*.launch
-
-#############
-## IntelliJ
-#############
-
+.gradle
 .idea
-*.iml
+build
 
-############
-## OS
-############
+buildSrc/.gradle
+buildSrc/build
 
-# Windows image file caches
-Thumbs.db
+api/.gradle
+api/build
 
-# Folder config file
-Desktop.ini
+!run/eula.txt
+run
 
-# Mac crap
-.DS_Store
-
-############
-
-**/logs
-jabba
-
+jars

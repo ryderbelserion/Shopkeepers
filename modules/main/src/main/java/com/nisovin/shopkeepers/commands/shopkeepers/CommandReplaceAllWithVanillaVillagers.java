@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -26,7 +27,6 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;

@@ -2,11 +2,7 @@ package com.nisovin.shopkeepers.ui.villager.editor;
 
 import java.util.List;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -46,9 +42,9 @@ import com.nisovin.shopkeepers.ui.villager.VillagerUIHelper;
 import com.nisovin.shopkeepers.ui.villager.equipmentEditor.VillagerEquipmentEditorUI;
 import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -494,54 +490,53 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			@Override
 			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
-				switch (profession) {
-				case ARMORER:
-					iconItem = new ItemStack(Material.BLAST_FURNACE);
-					break;
-				case BUTCHER:
-					iconItem = new ItemStack(Material.SMOKER);
-					break;
-				case CARTOGRAPHER:
-					iconItem = new ItemStack(Material.CARTOGRAPHY_TABLE);
-					break;
-				case CLERIC:
-					iconItem = new ItemStack(Material.BREWING_STAND);
-					break;
-				case FARMER:
-					iconItem = new ItemStack(Material.WHEAT); // Instead of COMPOSTER
-					break;
-				case FISHERMAN:
-					iconItem = new ItemStack(Material.FISHING_ROD); // Instead of BARREL
-					break;
-				case FLETCHER:
-					iconItem = new ItemStack(Material.FLETCHING_TABLE);
-					break;
-				case LEATHERWORKER:
-					iconItem = new ItemStack(Material.LEATHER); // Instead of CAULDRON
-					break;
-				case LIBRARIAN:
-					iconItem = new ItemStack(Material.LECTERN);
-					break;
-				case MASON:
-					iconItem = new ItemStack(Material.STONECUTTER);
-					break;
-				case SHEPHERD:
-					iconItem = new ItemStack(Material.LOOM);
-					break;
-				case TOOLSMITH:
-					iconItem = new ItemStack(Material.SMITHING_TABLE);
-					break;
-				case WEAPONSMITH:
-					iconItem = new ItemStack(Material.GRINDSTONE);
-					break;
-				case NITWIT:
-					iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-					ItemUtils.setLeatherColor(iconItem, Color.GREEN);
-					break;
-				case NONE:
-				default:
-					iconItem = new ItemStack(Material.BARRIER);
-					break;
+				switch (profession.getKey().getKey()) {
+					case "armorer":
+						iconItem = new ItemStack(Material.BLAST_FURNACE);
+						break;
+					case "butcher":
+						iconItem = new ItemStack(Material.SMOKER);
+						break;
+					case "cartographer":
+						iconItem = new ItemStack(Material.CARTOGRAPHY_TABLE);
+						break;
+					case "cleric":
+						iconItem = new ItemStack(Material.BREWING_STAND);
+						break;
+					case "farmer":
+						iconItem = new ItemStack(Material.WHEAT); // Instead of COMPOSTER
+						break;
+					case "fisherman":
+						iconItem = new ItemStack(Material.FISHING_ROD); // Instead of BARREL
+						break;
+					case "fletcher":
+						iconItem = new ItemStack(Material.FLETCHING_TABLE);
+						break;
+					case "leatherworker":
+						iconItem = new ItemStack(Material.LEATHER); // Instead of CAULDRON
+						break;
+					case "librarian":
+						iconItem = new ItemStack(Material.LECTERN);
+						break;
+					case "mason":
+						iconItem = new ItemStack(Material.STONECUTTER);
+						break;
+					case "shephard":
+						iconItem = new ItemStack(Material.LOOM);
+						break;
+					case "toolsmith":
+						iconItem = new ItemStack(Material.SMITHING_TABLE);
+						break;
+					case "weaponsmith":
+						iconItem = new ItemStack(Material.GRINDSTONE);
+						break;
+					case "nitwit":
+						iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
+						ItemUtils.setLeatherColor(iconItem, Color.GREEN);
+						break;
+					default:
+						iconItem = new ItemStack(Material.BARRIER);
+						break;
 				}
 				assert iconItem != null;
 				ItemUtils.setDisplayNameAndLore(iconItem,
@@ -565,7 +560,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				// replace the new trades with the old ones from the editor. But we try to preserve
 				// the old trades with their original data:
 				List<MerchantRecipe> previousRecipes = villager.getRecipes();
-				profession = EnumUtils.cycleEnumConstant(Profession.class, profession, backwards);
+				profession = RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_PROFESSION, profession, backwards);
 				regularVillager.setProfession(profession);
 				// Restore previous trades with their original data:
 				villager.setRecipes(previousRecipes);
@@ -592,27 +587,27 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			@Override
 			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-				switch (villagerType) {
+				switch (villagerType.getKey().getKey()) {
 				default:
-				case PLAINS:
+				case "plains":
 					// Default brown color:
 					break;
-				case DESERT:
+				case "desert":
 					ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 					break;
-				case JUNGLE:
+				case "jungle":
 					ItemUtils.setLeatherColor(iconItem, Color.YELLOW.mixColors(Color.ORANGE));
 					break;
-				case SAVANNA:
+				case "savanna":
 					ItemUtils.setLeatherColor(iconItem, Color.RED);
 					break;
-				case SNOW:
+				case "snow":
 					ItemUtils.setLeatherColor(iconItem, DyeColor.CYAN.getColor());
 					break;
-				case SWAMP:
+				case "swamp":
 					ItemUtils.setLeatherColor(iconItem, DyeColor.PURPLE.getColor());
 					break;
-				case TAIGA:
+				case "taiga":
 					ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 					break;
 				}
@@ -633,8 +628,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				}
 
 				boolean backwards = clickEvent.isRightClick();
-				villagerType = EnumUtils.cycleEnumConstant(
-						Villager.Type.class,
+				villagerType = RegistryUtils.cycleKeyedConstant(
+						Registry.VILLAGER_TYPE,
 						villagerType,
 						backwards
 				);
@@ -752,7 +747,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				if (invulnerable) {
 					iconItem = new ItemStack(Material.POTION);
 					PotionMeta potionMeta = Unsafe.castNonNull(iconItem.getItemMeta());
-					potionMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
+					potionMeta.setBasePotionData(new PotionData(PotionType.HEALING));
 					iconItem.setItemMeta(potionMeta);
 				} else {
 					iconItem = new ItemStack(Material.GLASS_BOTTLE);

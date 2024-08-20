@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import java.util.List;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Animals;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -11,8 +12,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.MC_1_19;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -97,10 +96,9 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 		if (!Settings.silenceLivingShopEntities) {
 			editorButtons.add(this.getScreamingEditorButton());
 		}
-		if (MC_1_19.isAvailable()) {
-			editorButtons.add(this.getLeftHornEditorButton());
-			editorButtons.add(this.getRightHornEditorButton());
-		}
+
+		editorButtons.add(this.getLeftHornEditorButton());
+		editorButtons.add(this.getRightHornEditorButton());
 		return editorButtons;
 	}
 
@@ -178,15 +176,8 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	private ItemStack getLeftHornEditorItem() {
-		ItemStack iconItem;
-		if (this.hasLeftHorn()) {
-			Material iconType = Unsafe.assertNonNull(
-					MC_1_19.GOAT_HORN.orElse(Material.LIME_STAINED_GLASS_PANE)
-			);
-			iconItem = new ItemStack(iconType);
-		} else {
-			iconItem = new ItemStack(Material.BARRIER);
-		}
+		ItemStack iconItem = new ItemStack(this.hasLeftHorn() ? Material.GOAT_HORN : Material.BARRIER);
+
 		return ItemUtils.setDisplayNameAndLore(iconItem,
 				Messages.buttonGoatLeftHorn,
 				Messages.buttonGoatLeftHornLore
@@ -233,15 +224,8 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	private ItemStack getRightHornEditorItem() {
-		ItemStack iconItem;
-		if (this.hasRightHorn()) {
-			Material iconType = Unsafe.assertNonNull(
-					MC_1_19.GOAT_HORN.orElse(Material.LIME_STAINED_GLASS_PANE)
-			);
-			iconItem = new ItemStack(iconType);
-		} else {
-			iconItem = new ItemStack(Material.BARRIER);
-		}
+		ItemStack iconItem = new ItemStack(this.hasRightHorn() ? Material.GOAT_HORN : Material.BARRIER);
+
 		return ItemUtils.setDisplayNameAndLore(iconItem,
 				Messages.buttonGoatRightHorn,
 				Messages.buttonGoatRightHornLore

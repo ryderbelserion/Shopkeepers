@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.Collections;
 import java.util.List;
-
+import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,12 +15,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
-import com.nisovin.shopkeepers.compat.MC_1_17;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -278,9 +275,7 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	public List<@NonNull Button> createEditorButtons() {
 		List<@NonNull Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
-		if (MC_1_17.isAvailable()) {
-			editorButtons.add(this.getGlowingTextEditorButton());
-		}
+		editorButtons.add(this.getGlowingTextEditorButton());
 		return editorButtons;
 	}
 
@@ -407,13 +402,8 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	}
 
 	private ItemStack getGlowingTextEditorItem() {
-		ItemStack iconItem;
-		if (this.isGlowingText()) {
-			Material iconType = Unsafe.assertNonNull(MC_1_17.GLOW_INK_SAC.orElse(Material.INK_SAC));
-			iconItem = new ItemStack(iconType);
-		} else {
-			iconItem = new ItemStack(Material.INK_SAC);
-		}
+		ItemStack iconItem = new ItemStack(this.isGlowingText() ? Material.GLOW_INK_SAC : Material.INK_SAC);
+
 		return ItemUtils.setDisplayNameAndLore(iconItem,
 				Messages.buttonSignGlowingText,
 				Messages.buttonSignGlowingTextLore

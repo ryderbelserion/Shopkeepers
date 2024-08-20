@@ -168,8 +168,8 @@ public class ServerAssumptionsTest {
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setLore(Arrays.asList(ChatColor.GREEN + "lore1", "lore2"));
 		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.PIERCING), 1, true);
-		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.ARROW_DAMAGE), 1, true);
-		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.DAMAGE_ARTHROPODS), 1, true);
+		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.POWER), 1, true);
+		itemMeta.addEnchant(Unsafe.assertNonNull(Enchantment.BANE_OF_ARTHROPODS), 1, true);
 		itemMeta.setCustomModelData(1);
 		itemMeta.setUnbreakable(true);
 		itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);

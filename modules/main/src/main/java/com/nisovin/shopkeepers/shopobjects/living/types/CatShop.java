@@ -2,9 +2,8 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import java.util.List;
 
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import com.nisovin.shopkeepers.compat.NMSManager;
+import org.bukkit.*;
 import org.bukkit.entity.Cat;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,20 +30,13 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class CatShop extends SittableShop<@NonNull Cat> {
 
-	public static final Property<Cat.@NonNull Type> CAT_TYPE = new BasicProperty<Cat.@NonNull Type>()
-			.dataKeyAccessor("catType", EnumSerializers.lenient(Cat.Type.class))
-			.defaultValue(Cat.Type.TABBY)
-			.build();
-
 	public static final Property<@Nullable DyeColor> COLLAR_COLOR = new BasicProperty<@Nullable DyeColor>()
 			.dataKeyAccessor("collarColor", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates 'no collar' / untamed
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<Cat.@NonNull Type> catTypeProperty = new PropertyValue<>(CAT_TYPE)
-			.onValueChanged(Unsafe.initialized(this)::applyCatType)
-			.build(properties);
+	private PropertyValue<Cat.@NonNull Type> catTypeProperty;
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
@@ -61,6 +53,15 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	@Override
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
+		if (catTypeProperty == null) {
+			Property<Cat.@NonNull Type> catType = new BasicProperty<Cat.@NonNull Type>()
+					.dataKeyAccessor("catType", NMSManager.getProvider().getCatTypeSerializer())
+					.defaultValue(Cat.Type.TABBY)
+					.build();
+			catTypeProperty = new PropertyValue<>(catType)
+					.onValueChanged(Unsafe.initialized(this)::applyCatType)
+					.build(properties);
+		}
 		catTypeProperty.load(shopObjectData);
 		collarColorProperty.load(shopObjectData);
 	}
@@ -98,7 +99,7 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	}
 
 	public void cycleCatType(boolean backwards) {
-		this.setCatType(EnumUtils.cycleEnumConstant(Cat.Type.class, this.getCatType(), backwards));
+		this.setCatType(NMSManager.getProvider().cycleCatType(this.getCatType(), backwards));
 	}
 
 	private void applyCatType() {
@@ -109,38 +110,38 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 
 	private ItemStack getCatTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (this.getCatType()) {
-		case TABBY:
+		switch (this.getCatType().getKey().getKey()) {
+		case "tabby":
 			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
 			break;
-		case ALL_BLACK:
+		case "all_black":
 			ItemUtils.setLeatherColor(iconItem, Color.BLACK);
 			break;
-		case BLACK:
+		case "black":
 			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixDyes(DyeColor.GRAY));
 			break;
-		case BRITISH_SHORTHAIR:
+		case "british_shorthair":
 			ItemUtils.setLeatherColor(iconItem, Color.SILVER);
 			break;
-		case CALICO:
+		case "calico":
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE.mixDyes(DyeColor.BROWN));
 			break;
-		case JELLIE:
+		case "jellie":
 			ItemUtils.setLeatherColor(iconItem, Color.GRAY);
 			break;
-		case PERSIAN:
+		case "persian":
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.ORANGE));
 			break;
-		case RAGDOLL:
+		case "ragdoll":
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
-		case RED:
+		case "red":
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 			break;
-		case SIAMESE:
+		case "siamese":
 			ItemUtils.setLeatherColor(iconItem, Color.GRAY.mixDyes(DyeColor.BROWN));
 			break;
-		case WHITE:
+		case "white":
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
 		default:
