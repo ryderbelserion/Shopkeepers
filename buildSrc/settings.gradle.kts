@@ -5,7 +5,6 @@ dependencyResolutionManagement {
         maven("https://repo.crazycrew.us/releases")
 
         gradlePluginPortal()
-
         mavenCentral()
     }
 }
