@@ -26,7 +26,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -67,7 +66,7 @@ class CreateListener implements Listener {
 	private final ShopkeeperPlacement shopkeeperPlacement;
 
 	// By player UUID:
-	private final Map<@NonNull UUID, @NonNull MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
+	private final Map<UUID, MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
 
 	// Cached value whether the shop creation item selection message is enabled:
 	private boolean shopCreationItemSelectedMessageEnabled;

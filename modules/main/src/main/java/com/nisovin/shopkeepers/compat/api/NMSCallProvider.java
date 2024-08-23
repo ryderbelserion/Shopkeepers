@@ -4,9 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -79,90 +80,9 @@ public interface NMSCallProvider {
     void updateTrades(Player player);
 
 	// For use in chat hover messages, null if not supported.
-	@Nullable String getItemSNBT(@ReadOnly ItemStack itemStack);
-
-	// For use in translatable item type names, null if not supported.
-	// Note: This might not necessarily match the name that is usually displayed for an ItemStack,
-	// but rather the translated item type name (for example for items such as different types of
-	// potions, skulls, etc.).
-	@Nullable String getItemTypeTranslationKey(Material material);
-
-	// MC 1.17 specific features
-	// TODO Remove this once we only support MC 1.17 and above.
-	default void setAxolotlVariant(LivingEntity axolotl, String variantName) {
-		// Not supported by default.
-	}
-
-	default String cycleAxolotlVariant(String variantName, boolean backwards) {
-		// Not supported by default.
-		return variantName;
-	}
-
-	default void setGlowSquidDark(LivingEntity glowSquid, boolean dark) {
-		// Not supported by default.
-	}
-
-	default void setScreamingGoat(LivingEntity goat, boolean screaming) {
-		// Not supported by default.
-	}
-
-	default void setGlowingText(Sign sign, boolean glowingText) {
-		// Not supported by default.
-	}
-
-	// MC 1.19 specific features
-	// TODO Remove this once we only support MC 1.19 and above.
-	default void setFrogVariant(LivingEntity frog, String variantName) {
-		// Not supported by default.
-	}
-
-	default String cycleFrogVariant(String variantName, boolean backwards) {
-		// Not supported by default.
-		return variantName;
-	}
-
-	default void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
-		// Not supported by default.
-	}
-
-	default void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
-		// Not supported by default.
-	}
-
-	// MC 1.20 specific features
-	// TODO Remove this once we only support MC 1.20 and above.
-	default void setSignBackLines(Sign sign, @NonNull String[] lines) {
-		// Not supported by default.
-	}
-
-	default void setSignBackGlowingText(Sign sign, boolean glowingText) {
-		// Not supported by default.
-	}
-
-	// MC 1.20.3 specific features
-	// TODO Remove this once we only support MC 1.20.3 and above.
-	default DataSerializer<Cat.@NonNull Type> getCatTypeSerializer() {
-		// Not supported by default.
-		return null;
-	}
-
-	default Cat.Type cycleCatType(Cat.Type type, boolean backwards) {
-		// Not supported by default.
-		return type;
-	}
-
-	// MC 1.20.5 specific features
-	// TODO Remove this once we only support MC 1.20.5 and above.
-	default void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
-		// Not supported by default.
-	}
-
-	default NamespacedKey cycleWolfVariant(NamespacedKey variantKey, boolean backwards) {
-		// Not supported by default.
-		return variantKey;
-	}
-
-	default void setWolfVariant(Wolf wolf, NamespacedKey variantKey) {
-		// Not supported by default.
-	}
+	// TODO: Bukkit 1.20.6 also contains ItemMeta#getAsString now. However, this only includes the
+	// item's NBT data, not the full item stack NBT. And BungeeCord's HoverEvent Item content does
+	// not correctly serialize the data currently
+	// (https://github.com/SpigotMC/BungeeCord/issues/3688).
+	public @Nullable String getItemSNBT(@ReadOnly ItemStack itemStack);
 }

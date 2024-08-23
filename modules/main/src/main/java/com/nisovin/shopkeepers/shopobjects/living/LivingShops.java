@@ -43,7 +43,7 @@ public class LivingShops {
 
 				boolean migrated = false;
 
-				// TODO Remove this migration again at some point
+				// TODO Remove these migrations again at some point
 				// MC 1.16:
 				// Convert 'pig-zombie' to 'zombified-piglin':
 				if (objectTypeId.equals("pig-zombie")) {
@@ -54,7 +54,6 @@ public class LivingShops {
 
 				// MC 1.20.5:
 				// Convert 'mushroom-cow' to 'mooshroom':
-				//todo() EntityType.MUSHROOM_COW.name().equals("MOOSHROOM") && check this later if it errors.
 				if (objectTypeId.equals("mushroom-cow")) {
 					shopObjectData.set(AbstractShopObject.SHOP_OBJECT_TYPE_ID, "mooshroom");
 					Log.warning(logPrefix + "Migrated object type 'mushroom-cow' to 'mooshroom'.");
@@ -62,7 +61,6 @@ public class LivingShops {
 				}
 
 				// Convert 'snowman' to 'snow-golem':
-				//todo() EntityType.SNOWMAN.name().equals("SNOW_GOLEM") check this later if it errors.
 				if (objectTypeId.equals("snowman")) {
 					shopObjectData.set(AbstractShopObject.SHOP_OBJECT_TYPE_ID, "snow-golem");
 					Log.warning(logPrefix + "Migrated object type 'snowman' to 'snow-golem'.");

@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,9 +25,8 @@ import com.nisovin.shopkeepers.util.logging.LogDetectionHandler;
 public final class ConfigUtils {
 
 	// Shared and reused YAML config:
-	@SuppressWarnings("nullness:type.argument")
-	private static final ThreadLocal<@NonNull YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(
-			YamlConfiguration::new
+	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(
+			ConfigUtils::newYamlConfig
 	);
 
 	private static final LogDetectionHandler ERROR_DETECTION_HANDLER = new LogDetectionHandler();
@@ -34,8 +34,29 @@ public final class ConfigUtils {
 		ERROR_DETECTION_HANDLER.setLevel(Level.SEVERE);
 	}
 
-	public static Map<@NonNull String, @NonNull Object> getValues(ConfigurationSection section) {
-		return Unsafe.castNonNull(section.getValues(false));
+	/**
+	 * Creates a new {@link YamlConfiguration} with some common default setup applied.
+	 * 
+	 * @return the new {@link YamlConfiguration}
+	 */
+	public static YamlConfiguration newYamlConfig() {
+		YamlConfiguration config = new YamlConfiguration();
+		// We (e.g. inside of language files), as well as the Bukkit server itself (e.g. for the
+		// serialization of attributes inside ItemMeta), can use keys that may contain dots. In
+		// order to prevent Bukkit from interpreting (and loading) these dots as configuration
+		// sections, we replace Bukkit's default configuration section path separator from dot to
+		// something else.
+		disablePathSeparator(config);
+		return config;
+	}
+
+	public static void disablePathSeparator(Configuration config) {
+		// Set to some highly unusual value:
+		config.options().pathSeparator('\0');
+	}
+
+	public static Map<String, Object> getValues(ConfigurationSection section) {
+		return section.getValues(false);
 	}
 
 	// The given root config section itself is not converted.
@@ -45,7 +66,7 @@ public final class ConfigUtils {
 			if (value instanceof ConfigurationSection) {
 				ConfigurationSection section = (ConfigurationSection) value;
 				// Recursively replace config sections with maps:
-				Map<@NonNull String, @NonNull Object> innerSectionMap = getValues(section);
+				Map<String, Object> innerSectionMap = getValues(section);
 				convertSectionsToMaps(innerSectionMap);
 				rootSection.set(key, innerSectionMap);
 			}
@@ -53,24 +74,20 @@ public final class ConfigUtils {
 	}
 
 	// Also converts the given root config section.
-	public static Map<@NonNull String, @NonNull Object> convertSectionsToMaps(
-			ConfigurationSection rootSection
-	) {
-		Map<@NonNull String, @NonNull Object> sectionMap = getValues(rootSection);
+	public static Map<String, Object> convertSectionsToMaps(ConfigurationSection rootSection) {
+		Map<String, Object> sectionMap = getValues(rootSection);
 		convertSectionsToMaps(sectionMap);
 		return sectionMap;
 	}
 
 	// This requires the given Map to be modifiable.
-	public static void convertSectionsToMaps(
-			Map<? extends @NonNull String, @NonNull Object> rootMap
-	) {
+	public static void convertSectionsToMaps(Map<? extends String, Object> rootMap) {
 		rootMap.entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
 				ConfigurationSection section = (ConfigurationSection) value;
 				// Recursively replace config sections with maps:
-				Map<@NonNull String, @NonNull Object> innerSectionMap = getValues(section);
+				Map<String, Object> innerSectionMap = getValues(section);
 				convertSectionsToMaps(innerSectionMap);
 				entry.setValue(innerSectionMap);
 			}
@@ -97,22 +114,20 @@ public final class ConfigUtils {
 	}
 
 	// Mimics Bukkit's serialization. Includes the type key of the given ConfigurationSerializable.
-	public static Map<@NonNull String, @NonNull Object> serialize(
-			ConfigurationSerializable serializable
-	) {
+	public static Map<String, Object> serialize(ConfigurationSerializable serializable) {
 		Validate.notNull(serializable, "serializable is null");
-		Map<@NonNull String, @NonNull Object> dataMap = new LinkedHashMap<>();
+		Map<String, Object> dataMap = new LinkedHashMap<>();
 		dataMap.put(
 				ConfigurationSerialization.SERIALIZED_TYPE_KEY,
 				ConfigurationSerialization.getAlias(serializable.getClass())
 		);
-		dataMap.putAll(Unsafe.castNonNull(serializable.serialize()));
+		dataMap.putAll(serializable.serialize());
 		return dataMap;
 	}
 
 	// Expects the Map to contain a type key, and any inner serializable data to already be
 	// deserialized.
-	public static <T extends @NonNull ConfigurationSerializable> @Nullable T deserialize(
+	public static <T extends ConfigurationSerializable> @Nullable T deserialize(
 			@Nullable Map<? extends @Nullable String, ?> dataMap
 	) {
 		if (dataMap == null) return null;
@@ -125,11 +140,11 @@ public final class ConfigUtils {
 		}
 	}
 
-	public static Map<@NonNull String, @NonNull Object> serializeDeeply(
+	public static Map<String, Object> serializeDeeply(
 			ConfigurationSerializable serializable
 	) {
 		Validate.notNull(serializable, "serializable is null");
-		Map<@NonNull String, @NonNull Object> dataMap = serialize(serializable);
+		Map<String, Object> dataMap = serialize(serializable);
 		serializeDeeply(dataMap);
 		return dataMap;
 	}
@@ -138,24 +153,24 @@ public final class ConfigUtils {
 	// ConfigurationSections, in the given Map with their respective serializations. The given Map
 	// is expected to be modifiable. But since the inner Maps may be immutable, they may need to be
 	// copied.
-	public static void serializeDeeply(@Nullable Map<?, @NonNull Object> dataMap) {
+	public static void serializeDeeply(@Nullable Map<?, Object> dataMap) {
 		if (dataMap == null) return;
 		dataMap.entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 			if (value instanceof Map) {
 				// The Map may be unmodifiable. But since we may need to recursively replace its
 				// entries, we need to copy it.
-				Map<?, @NonNull Object> innerMap = new LinkedHashMap<>((Map<?, @NonNull ?>) value);
+				Map<?, Object> innerMap = new LinkedHashMap<>((Map<?, @NonNull ?>) value);
 				serializeDeeply(innerMap);
 				entry.setValue(innerMap);
 			} else if (value instanceof ConfigurationSection) {
 				ConfigurationSection section = (ConfigurationSection) value;
-				Map<@NonNull String, @NonNull Object> innerSectionMap = getValues(section);
+				Map<String, Object> innerSectionMap = getValues(section);
 				serializeDeeply(innerSectionMap);
 				entry.setValue(innerSectionMap);
 			} else if (value instanceof ConfigurationSerializable) {
 				ConfigurationSerializable serializable = (ConfigurationSerializable) value;
-				Map<@NonNull String, @NonNull Object> innerSerializableData = serializeDeeply(serializable);
+				Map<String, Object> innerSerializableData = serializeDeeply(serializable);
 				entry.setValue(innerSerializableData);
 			}
 		});
@@ -223,7 +238,7 @@ public final class ConfigUtils {
 		Logger configSerializationLogger = Logger.getLogger(ConfigurationSerialization.class.getName());
 
 		// Capture the current logger state:
-		Handler[] handlers = configSerializationLogger.getHandlers();
+		@NonNull Handler[] handlers = configSerializationLogger.getHandlers();
 		boolean useParent = configSerializationLogger.getUseParentHandlers();
 		try {
 			// Disable logging:
@@ -241,10 +256,7 @@ public final class ConfigUtils {
 			// Check if we detected an error:
 			LogRecord error = ERROR_DETECTION_HANDLER.getLastLogRecord();
 			if (error != null) {
-				throw new InvalidConfigurationException(
-						Unsafe.nullableAsNonNull(error.getMessage()),
-						Unsafe.nullableAsNonNull(error.getThrown())
-				);
+				throw new InvalidConfigurationException(error.getMessage(), error.getThrown());
 			}
 		} finally {
 			// Reset the error detection handler:

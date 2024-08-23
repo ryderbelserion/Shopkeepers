@@ -35,9 +35,17 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class ItemData {
 
 	/**
-	 * Disabled by default because the conversion from the plain to the Json text format may be
+	 * Disabled by default because the conversion from the plain to the Json text format can be
 	 * unstable from one server version to another.
 	 */
+	// Also: SPIGOT-7571: Legacy color codes are now valid JSON text components. However, Bukkit
+	// handles these display name and lore strings differently depending on whether they are loaded
+	// from a config file (tries to parse the text as JSON components) versus when a plugin calls
+	// ItemMeta#setDisplayName / #setLore (does not attempt to parse the given strings as Json).
+	// When we serialize an ItemStack / ItemData that had a display name or lore set via the
+	// ItemMeta, and we use this 'preferPlainTextFormat' mode, we can end up with strings with
+	// legacy color codes inside the config that produce a different component format when loaded,
+	// since they are now considered valid Json text.
 	private static boolean SERIALIZER_PREFERS_PLAIN_TEXT_FORMAT = false;
 
 	public static void serializerPrefersPlainTextFormat(boolean preferPlainTextFormat) {
@@ -48,7 +56,7 @@ public final class ItemData {
 		serializerPrefersPlainTextFormat(false);
 	}
 
-	private static final Property<@NonNull Material> ITEM_TYPE = new BasicProperty<@NonNull Material>()
+	private static final Property<Material> ITEM_TYPE = new BasicProperty<Material>()
 			.dataKeyAccessor("type", MinecraftEnumSerializers.Materials.LENIENT)
 			.validator(MaterialValidators.IS_ITEM)
 			.validator(MaterialValidators.NON_LEGACY)
@@ -57,14 +65,13 @@ public final class ItemData {
 	private static final String META_TYPE_KEY = "meta-type";
 	private static final String DISPLAY_NAME_KEY = "display-name";
 	private static final String LORE_KEY = "lore";
-	private static final String LOC_NAME_KEY = "loc-name";
 
 	// Special case: Omitting 'blockMaterial' for empty TILE_ENTITY item meta.
 	private static final String TILE_ENTITY_BLOCK_MATERIAL_KEY = "blockMaterial";
 
 	// Entries are lazily added and then cached:
 	// The mapped value can be null for items that do not support item meta.
-	private static final Map<@NonNull Material, @Nullable String> META_TYPE_BY_ITEM_TYPE = new HashMap<>();
+	private static final Map<Material, @Nullable String> META_TYPE_BY_ITEM_TYPE = new HashMap<>();
 
 	// Returns null for items that do not support ItemMeta.
 	private static @Nullable String getMetaType(Material itemType) {
@@ -99,11 +106,11 @@ public final class ItemData {
 	/**
 	 * A {@link DataSerializer} for values of type {@link ItemData}.
 	 */
-	public static final DataSerializer<@NonNull ItemData> SERIALIZER = new DataSerializer<@NonNull ItemData>() {
+	public static final DataSerializer<ItemData> SERIALIZER = new DataSerializer<ItemData>() {
 		@Override
 		public @Nullable Object serialize(ItemData value) {
 			Validate.notNull(value, "value is null");
-			Map<? extends @NonNull String, @NonNull ?> serializedMetaData = value.getSerializedMetaData();
+			Map<? extends String, @NonNull ?> serializedMetaData = value.getSerializedMetaData();
 			if (serializedMetaData.isEmpty()) {
 				// Use a more compact representation if there is no additional item data:
 				return value.getType().name();
@@ -114,7 +121,7 @@ public final class ItemData {
 
 			// Lazily instantiated, only if needed during serialization:
 			Lazy<@Nullable ItemMeta> lazyItemMeta = new Lazy<>(value::getItemMeta);
-			Lazy<@NonNull Map<? extends @NonNull String, @NonNull ?>> lazyPlainSerializedMetaData = new Lazy<>(
+			Lazy<Map<? extends String, @NonNull ?>> lazyPlainSerializedMetaData = new Lazy<>(
 					() -> {
 						ItemMeta itemMeta = lazyItemMeta.get();
 						if (itemMeta != null) {
@@ -130,16 +137,13 @@ public final class ItemData {
 							if (itemMeta.hasLore()) {
 								itemMeta.setLore(itemMeta.getLore());
 							}
-							if (itemMeta.hasLocalizedName()) {
-								itemMeta.setLocalizedName(itemMeta.getLocalizedName());
-							}
 						}
 						return ItemSerialization.serializeItemMetaOrEmpty(itemMeta);
 					}
 			);
 			boolean preferPlainTextFormat = SERIALIZER_PREFERS_PLAIN_TEXT_FORMAT;
 
-			for (Entry<? extends @NonNull String, @NonNull ?> metaEntry : serializedMetaData.entrySet()) {
+			for (Entry<? extends String, @NonNull ?> metaEntry : serializedMetaData.entrySet()) {
 				String metaKey = metaEntry.getKey();
 				Object metaValue = metaEntry.getValue();
 
@@ -211,29 +215,6 @@ public final class ItemData {
 						// Use alternative color codes:
 						metaValue = TextUtils.decolorizeUnknown(serializedLore);
 					}
-				} else if (LOC_NAME_KEY.equals(metaKey)) {
-					if (metaValue instanceof String) {
-						String serializedLocName = (String) metaValue;
-
-						if (preferPlainTextFormat) {
-							ItemMeta itemMeta = Unsafe.assertNonNull(lazyItemMeta.get());
-							String plainLocName = itemMeta.getLocalizedName();
-							if (!serializedLocName.equals(plainLocName)) {
-								// The serialized localized name might be in Json format. Check if
-								// we can preserve it even if we serialize it in plain format:
-								String plainSerializedLocName = Unsafe.castNonNull(
-										lazyPlainSerializedMetaData.get().get(LOC_NAME_KEY)
-								);
-								if (serializedLocName.equals(plainSerializedLocName)) {
-									// Use the plain representation:
-									serializedLocName = plainLocName;
-								}
-							}
-						}
-
-						// Use alternative color codes:
-						metaValue = TextUtils.decolorize(serializedLocName);
-					}
 				}
 
 				// Insert the entry into the data container:
@@ -282,7 +263,7 @@ public final class ItemData {
 				// the given original data.
 				// Note: Additional information (e.g. the item type) does not need to be removed,
 				// but is simply ignored.
-				Map<@NonNull String, @NonNull Object> itemMetaData = itemDataData.getValuesCopy();
+				Map<String, Object> itemMetaData = itemDataData.getValuesCopy();
 
 				// Recursively replace all config sections with Maps, because the ItemMeta
 				// deserialization expects Maps:
@@ -331,7 +312,7 @@ public final class ItemData {
 	private final UnmodifiableItemStack dataItem; // Has an amount of 1
 	// Cache serialized item metadata, to avoid serializing it again for every comparison:
 	// Gets lazily initialized when needed.
-	private @ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> serializedMetaData = null;
+	private @ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> serializedMetaData = null;
 
 	public ItemData(Material type) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
@@ -342,7 +323,7 @@ public final class ItemData {
 	public ItemData(
 			Material type,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
 		this(UnmodifiableItemStack.ofNonNull(
@@ -353,7 +334,7 @@ public final class ItemData {
 	public ItemData(
 			ItemData otherItemData,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
 		this(UnmodifiableItemStack.ofNonNull(
@@ -405,7 +386,7 @@ public final class ItemData {
 	}
 
 	// Not null.
-	private Map<? extends @NonNull String, @NonNull ?> getSerializedMetaData() {
+	private Map<? extends String, @NonNull ?> getSerializedMetaData() {
 		// Lazily cache the serialized data:
 		if (serializedMetaData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();

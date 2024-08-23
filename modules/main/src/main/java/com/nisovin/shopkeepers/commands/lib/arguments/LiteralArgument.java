@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -16,19 +15,19 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class LiteralArgument extends CommandArgument<@NonNull String> {
+public class LiteralArgument extends CommandArgument<String> {
 
 	public static final String FORMAT_PREFIX = "'";
 	public static final String FORMAT_SUFFIX = "'";
 
 	// Not null nor containing null or empty literals, combines the argument name and aliases:
-	private final List<@NonNull String> literals;
+	private final List<String> literals;
 
 	public LiteralArgument(String name) {
 		this(name, Collections.emptyList());
 	}
 
-	public LiteralArgument(String name, List<? extends @NonNull String> aliases) {
+	public LiteralArgument(String name, List<? extends String> aliases) {
 		super(name);
 
 		// Initialize literals:
@@ -44,7 +43,7 @@ public class LiteralArgument extends CommandArgument<@NonNull String> {
 	}
 
 	@Override
-	public CommandArgument<@NonNull String> setDisplayName(@Nullable String displayName) {
+	public CommandArgument<String> setDisplayName(@Nullable String displayName) {
 		if (displayName != null) {
 			Validate.isTrue(literals.contains(displayName),
 					"displayName does not match any of the literals of this LiteralArgument");
@@ -82,7 +81,7 @@ public class LiteralArgument extends CommandArgument<@NonNull String> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -91,7 +90,7 @@ public class LiteralArgument extends CommandArgument<@NonNull String> {
 			return Collections.emptyList();
 		}
 
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		// Hiding the argument name if a different display name is used:
 		boolean skipName = (!this.getName().equals(this.getDisplayName()));

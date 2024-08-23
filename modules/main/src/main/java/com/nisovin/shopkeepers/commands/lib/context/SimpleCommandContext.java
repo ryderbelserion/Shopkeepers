@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class SimpleCommandContext implements CommandContext {
 
-	protected final Map<@NonNull String, @NonNull Object> values = new LinkedHashMap<>();
+	protected final Map<String, Object> values = new LinkedHashMap<>();
 	private final CommandContextView view = new CommandContextView(Unsafe.initialized(this));
 
 	/**
@@ -66,7 +66,7 @@ public class SimpleCommandContext implements CommandContext {
 	}
 
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getMapView() {
+	public Map<? extends String, @NonNull ?> getMapView() {
 		return Collections.unmodifiableMap(values);
 	}
 

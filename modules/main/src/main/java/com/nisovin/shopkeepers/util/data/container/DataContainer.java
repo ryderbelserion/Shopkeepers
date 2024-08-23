@@ -109,7 +109,7 @@ public interface DataContainer {
 			ConfigurationSection configSection = (ConfigurationSection) dataSource;
 			return new ConfigBasedDataContainer(configSection);
 		} else if (dataSource instanceof Map) {
-			Map<@NonNull String, @NonNull Object> map = Unsafe.castNonNull(dataSource);
+			Map<String, Object> map = Unsafe.castNonNull(dataSource);
 			return new MapBasedDataContainer(map);
 		} else if (dataSource instanceof DataContainer) {
 			return (DataContainer) dataSource;
@@ -633,9 +633,8 @@ public interface DataContainer {
 	 * @throws InvalidDataException
 	 *             if the value cannot be loaded (optional)
 	 */
-	public <T> @Nullable T getOrNullIfMissing(
-			DataLoader<? extends T> loader
-	) throws InvalidDataException;
+	public <T> @Nullable T getOrNullIfMissing(DataLoader<? extends T> loader)
+			throws InvalidDataException;
 
 	/**
 	 * Loads the value for the given {@link DataLoader}, but returns <code>null</code> if the
@@ -687,7 +686,7 @@ public interface DataContainer {
 	 * 
 	 * @return a Set of the keys of this data container
 	 */
-	public Set<? extends @NonNull String> getKeys();
+	public Set<? extends String> getKeys();
 
 	/**
 	 * Gets a {@link Map} of the contents of this data container.
@@ -697,7 +696,7 @@ public interface DataContainer {
 	 * 
 	 * @return the contents of this data container
 	 */
-	public Map<? extends @NonNull String, @NonNull ?> getValues();
+	public Map<? extends String, @NonNull ?> getValues();
 
 	/**
 	 * Gets a (shallow) copy of the contents of this data container as a {@link Map}.
@@ -707,7 +706,7 @@ public interface DataContainer {
 	 * 
 	 * @return the contents of this data container
 	 */
-	public Map<@NonNull String, @NonNull Object> getValuesCopy();
+	public Map<String, Object> getValuesCopy();
 
 	/**
 	 * Gets an unmodifiable view on this data container.

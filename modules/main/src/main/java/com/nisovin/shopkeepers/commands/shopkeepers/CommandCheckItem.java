@@ -6,7 +6,6 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
@@ -60,7 +59,7 @@ class CommandCheckItem extends PlayerCommand {
 	private static String checkItems(
 			ItemStack mainHand,
 			ItemStack offHand,
-			Predicate<? super @NonNull ItemStack> check
+			Predicate<? super ItemStack> check
 	) {
 		return toDisplayString(check.test(mainHand)) + " / " + toDisplayString(check.test(offHand));
 	}

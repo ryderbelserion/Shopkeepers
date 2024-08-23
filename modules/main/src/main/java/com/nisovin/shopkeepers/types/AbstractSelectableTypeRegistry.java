@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public abstract class AbstractSelectableTypeRegistry<T extends @NonNull AbstractSelectableType>
+public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectableType>
 		extends AbstractTypeRegistry<T> implements SelectableTypeRegistry<T> {
 
 	private static class Link<T> {
@@ -19,7 +19,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends @NonNull Abstract
 		private @Nullable T next = null;
 	}
 
-	private final Map<@NonNull String, @NonNull Link<T>> links = new HashMap<>();
+	private final Map<String, Link<T>> links = new HashMap<>();
 	private @Nullable T first = null;
 	private @Nullable T last = null;
 
@@ -125,7 +125,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends @NonNull Abstract
 	// SELECTION MANAGEMENT
 
 	// Player name -> selected type
-	protected final Map<@NonNull String, @NonNull T> selections = new HashMap<>();
+	protected final Map<String, @NonNull T> selections = new HashMap<>();
 
 	@Override
 	public @Nullable T getDefaultSelection(Player player) {

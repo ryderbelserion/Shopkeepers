@@ -22,13 +22,11 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.PlayerInventory;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeCompletedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.trading.TradeEffect;
@@ -60,9 +58,8 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class TradingHandler extends AbstractShopkeeperUIHandler {
 
-	private static final Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> ADDITIONAL_INVENTORY_EVENTS = Collections.singleton(
-			TradeSelectEvent.class
-	);
+	private static final Set<? extends Class<? extends InventoryEvent>> ADDITIONAL_INVENTORY_EVENTS
+			= Collections.singleton(TradeSelectEvent.class);
 
 	// Those slot ids match both raw slot ids and regular slot ids for the merchant inventory view
 	// with the merchant inventory at the top:
@@ -70,14 +67,14 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	protected static final int BUY_ITEM_2_SLOT_ID = 1;
 	protected static final int RESULT_ITEM_SLOT_ID = 2;
 
-	private final List<@NonNull TradingListener> tradingListeners = new ArrayList<>();
+	private final List<TradingListener> tradingListeners = new ArrayList<>();
 
 	public TradingHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
 
 	@Override
-	protected Set<? extends @NonNull Class<? extends @NonNull InventoryEvent>> getAdditionalInventoryEvents() {
+	protected Set<? extends Class<? extends InventoryEvent>> getAdditionalInventoryEvents() {
 		return ADDITIONAL_INVENTORY_EVENTS;
 	}
 
@@ -129,7 +126,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		Player player = uiSession.getPlayer();
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
-		List<? extends @NonNull TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		if (recipes.isEmpty()) {
 			this.debugNotOpeningUI(player, "Shopkeeper has no offers.");
 			TextUtils.sendMessage(player, Messages.cannotTradeNoOffers);
@@ -140,7 +137,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	protected boolean openTradeWindow(
 			String title,
-			List<? extends @NonNull TradingRecipe> recipes,
+			List<? extends TradingRecipe> recipes,
 			Player player
 	) {
 		// Set up merchant:
@@ -155,7 +152,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		return (player.openMerchant(merchant, true) != null);
 	}
 
-	protected Merchant setupMerchant(String title, List<? extends @NonNull TradingRecipe> recipes) {
+	protected Merchant setupMerchant(String title, List<? extends TradingRecipe> recipes) {
 		Merchant merchant = Bukkit.createMerchant(title);
 		this.setupMerchantRecipes(merchant, recipes);
 		return merchant;
@@ -163,18 +160,18 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	protected void setupMerchantRecipes(
 			Merchant merchant,
-			List<? extends @NonNull TradingRecipe> recipes
+			List<? extends TradingRecipe> recipes
 	) {
 		// Create list of merchant recipes:
-		List<@NonNull MerchantRecipe> merchantRecipes = this.createMerchantRecipes(recipes);
+		List<MerchantRecipe> merchantRecipes = this.createMerchantRecipes(recipes);
 		// Set merchant's recipes:
-		merchant.setRecipes(Unsafe.cast(merchantRecipes));
+		merchant.setRecipes(merchantRecipes);
 	}
 
-	protected List<@NonNull MerchantRecipe> createMerchantRecipes(
-			List<? extends @NonNull TradingRecipe> recipes
+	protected List<MerchantRecipe> createMerchantRecipes(
+			List<? extends TradingRecipe> recipes
 	) {
-		List<@NonNull MerchantRecipe> merchantRecipes = new ArrayList<>();
+		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
 		for (TradingRecipe recipe : recipes) {
 			merchantRecipes.add(this.createMerchantRecipe(recipe));
 		}
@@ -201,11 +198,11 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		assert openInventory.getType() == InventoryType.MERCHANT;
 		MerchantInventory merchantInventory = (MerchantInventory) openInventory.getTopInventory();
 		Merchant merchant = merchantInventory.getMerchant();
-		@NonNull List<@NonNull MerchantRecipe> oldMerchantRecipes = Unsafe.cast(merchant.getRecipes());
+		List<MerchantRecipe> oldMerchantRecipes = merchant.getRecipes();
 
 		Shopkeeper shopkeeper = this.getShopkeeper();
-		List<? extends @NonNull TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
-		List<@NonNull MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
+		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
 		if (MerchantUtils.MERCHANT_RECIPES_IGNORE_USES_EXCEPT_BLOCKED.equals(
 				oldMerchantRecipes,
 				newMerchantRecipes
@@ -222,7 +219,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		this.ensureNoFewerRecipes(oldMerchantRecipes, newMerchantRecipes);
 
 		// Set merchant's recipes:
-		merchant.setRecipes(Unsafe.cast(newMerchantRecipes));
+		merchant.setRecipes(newMerchantRecipes);
 
 		// Update recipes for the client:
 		NMSManager.getProvider().updateTrades(player);
@@ -238,8 +235,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	// trades are rather unusual. Instead we try to (heuristically) determine the recipes that were
 	// removed, and then insert blocked variants of these recipes.
 	private void ensureNoFewerRecipes(
-			List<? extends @NonNull MerchantRecipe> oldMerchantRecipes,
-			List<@NonNull MerchantRecipe> newMerchantRecipes
+			List<? extends MerchantRecipe> oldMerchantRecipes,
+			List<MerchantRecipe> newMerchantRecipes
 	) {
 		int oldRecipeCount = oldMerchantRecipes.size();
 		int newRecipeCount = newMerchantRecipes.size();
@@ -407,7 +404,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// No trade available.
 			return;
 		}
-		resultSlotItem = Unsafe.assertNonNull(resultSlotItem);
+		assert resultSlotItem != null;
 		assert trade.getTradingRecipe().getResultItem().isSimilar(resultSlotItem);
 
 		PlayerInventory playerInventory = player.getInventory();
@@ -738,14 +735,14 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
-		offeredItem1 = Unsafe.assertNonNull(offeredItem1);
+		assert offeredItem1 != null;
 
 		if (Settings.useStrictItemComparison) {
 			// Verify that the recipe items are perfectly matching (they can still be swapped
 			// though):
 			boolean item1Similar = ItemUtils.isSimilar(requiredItem1, offeredItem1);
 			ItemStack offeredItem2Final = offeredItem2;
-			Lazy<@NonNull Boolean> item2Similar = new Lazy<>(
+			Lazy<Boolean> item2Similar = new Lazy<>(
 					() -> ItemUtils.isSimilar(requiredItem2, offeredItem2Final)
 			);
 			if (!item1Similar || !item2Similar.get()) {

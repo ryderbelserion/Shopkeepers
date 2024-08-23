@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -28,7 +26,7 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
  * the command's input arguments.
  * 
  * @param <T>
- *            the type of the parsed argument
+ *            the type of the parsed argument, can be nullable for optional arguments
  */
 public abstract class CommandArgument<T> {
 
@@ -47,7 +45,7 @@ public abstract class CommandArgument<T> {
 	private @Nullable String displayName = null; // Null to use default (name), not empty
 	// Null if not yet set, empty if it has no parent:
 	@SuppressWarnings("annotations.on.use")
-	private @Nullable Optional<@NonNull CommandArgument<?>> parent = null;
+	private @Nullable Optional<CommandArgument<?>> parent = null;
 
 	/**
 	 * Create a new {@link CommandArgument}.
@@ -120,9 +118,7 @@ public abstract class CommandArgument<T> {
 	 *            the parent argument, or <code>null</code> to indicate that this argument has no
 	 *            parent
 	 */
-	public final void setParent(
-			@UnknownInitialization(CommandArgument.class) @Nullable CommandArgument<?> parent
-	) {
+	public final void setParent(@Nullable CommandArgument<?> parent) {
 		Validate.State.isTrue(this.parent == null, "Parent has already been set!");
 		Validate.isTrue(parent != this, "Cannot set parent to self!");
 		this.parent = Optional.ofNullable(parent); // Can be empty
@@ -238,11 +234,9 @@ public abstract class CommandArgument<T> {
 
 	private final MessageArguments defaultErrorMsgArgs = this.setupDefaultErrorMsgArgs();
 
-	private MessageArguments setupDefaultErrorMsgArgs(
-			@UnknownInitialization CommandArgument<T> this
-	) {
+	private MessageArguments setupDefaultErrorMsgArgs(CommandArgument<T> this) {
 		// Dynamically resolve arguments:
-		Map<@NonNull String, @NonNull Object> args = new HashMap<>();
+		Map<String, Object> args = new HashMap<>();
 		Supplier<?> argumentNameSupplier = () -> {
 			CommandArgument<?> rootArgument = Unsafe.initialized(this).getRootArgument();
 			return rootArgument.getDisplayName();
@@ -444,7 +438,7 @@ public abstract class CommandArgument<T> {
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions'
 	 *         (not <code>null</code> and not containing <code>null</code>)
 	 */
-	public abstract List<? extends @NonNull String> complete(
+	public abstract List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

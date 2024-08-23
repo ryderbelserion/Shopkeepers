@@ -6,7 +6,6 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.google.common.base.Preconditions;
@@ -27,7 +26,7 @@ public abstract class ShopCreationData {
 	private @Nullable Location spawnLocation; // Modifiable, can be null for virtual shops
 	private @Nullable BlockFace targetedBlockFace; // Modifiable
 
-	private @Nullable Map<@NonNull String, @NonNull Object> additionalData;
+	private @Nullable Map<String, Object> additionalData;
 
 	/**
 	 * Creates a {@link ShopCreationData}.

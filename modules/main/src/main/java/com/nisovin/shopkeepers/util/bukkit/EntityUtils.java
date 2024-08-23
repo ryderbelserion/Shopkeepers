@@ -23,7 +23,6 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -37,7 +36,7 @@ public final class EntityUtils {
 	// Temporarily re-used location object:
 	private static final Location SHARED_LOCATION = new Location(null, 0, 0, 0);
 
-	private static final Set<@NonNull Material> LAVA = Collections.singleton(Material.LAVA);
+	private static final Set<Material> LAVA = Collections.singleton(Material.LAVA);
 
 	/**
 	 * Gets the types of fluids this type of entity can stand on.
@@ -49,7 +48,7 @@ public final class EntityUtils {
 	 * @return the fluids on which entities of this type can stand, not <code>null</code> but can be
 	 *         empty
 	 */
-	public static Set<? extends @NonNull Material> getCollidableFluids(EntityType entityType) {
+	public static Set<? extends Material> getCollidableFluids(EntityType entityType) {
 		// Even though blazes sink to the ground in vanilla Minecraft, we allow them to stand on top
 		// of lava because that makes them more useful in nether themed shops. They are also able to
 		// fly and hover in mid-air, so this deviation from vanilla is not that severe.
@@ -75,7 +74,9 @@ public final class EntityUtils {
 		if (entityType == EntityType.HUSK) return false;
 		if (entityType == EntityType.PHANTOM) return true;
 
-		Class<? extends Entity> entityClass = Unsafe.assertNonNull(entityType.getEntityClass());
+		@Nullable Class<? extends Entity> entityClass = entityType.getEntityClass();
+		if (entityClass == null) return false;
+
 		return Zombie.class.isAssignableFrom(entityClass)
 				|| Skeleton.class.isAssignableFrom(entityClass);
 	}
@@ -143,7 +144,7 @@ public final class EntityUtils {
 	}
 
 	public static void printEntityCounts(Chunk chunk) {
-		Map<@NonNull EntityType, Integer> entityCounts = new EnumMap<>(EntityType.class);
+		Map<EntityType, Integer> entityCounts = new EnumMap<>(EntityType.class);
 		Entity[] entities = chunk.getEntities();
 		for (Entity entity : entities) {
 			EntityType entityType = entity.getType();
@@ -159,7 +160,7 @@ public final class EntityUtils {
 	}
 
 	// If acceptedTypes is empty, the returned Predicate accepts all entity types.
-	public static Predicate<Entity> filterByType(Set<? extends @NonNull EntityType> acceptedTypes) {
+	public static Predicate<Entity> filterByType(Set<? extends EntityType> acceptedTypes) {
 		if (acceptedTypes.isEmpty()) {
 			return PredicateUtils.alwaysTrue();
 		} else {
@@ -174,7 +175,7 @@ public final class EntityUtils {
 	public static @Nullable Player getNearestPlayer(
 			Location location,
 			double radius,
-			Predicate<? super @NonNull Player> filter
+			Predicate<? super Player> filter
 	) {
 		World world = location.getWorld();
 		if (world == null) return null;
@@ -196,16 +197,16 @@ public final class EntityUtils {
 		return nearestPlayer;
 	}
 
-	public static List<@NonNull Player> getNearbyPlayers(Location location, double radius) {
+	public static List<Player> getNearbyPlayers(Location location, double radius) {
 		return getNearbyPlayers(location, radius, PredicateUtils.alwaysTrue());
 	}
 
-	public static List<@NonNull Player> getNearbyPlayers(
+	public static List<Player> getNearbyPlayers(
 			Location location,
 			double radius,
-			Predicate<? super @NonNull Player> filter
+			Predicate<? super Player> filter
 	) {
-		List<@NonNull Player> players = new ArrayList<>();
+		List<Player> players = new ArrayList<>();
 		World world = location.getWorld();
 		if (world == null) return players;
 
@@ -223,20 +224,20 @@ public final class EntityUtils {
 	}
 
 	// If searchedTypes is empty, this includes all entity types.
-	public static List<@NonNull Entity> getNearbyEntities(
+	public static List<Entity> getNearbyEntities(
 			Location location,
 			double radius,
 			boolean loadChunks,
-			Set<? extends @NonNull EntityType> searchedTypes
+			Set<? extends EntityType> searchedTypes
 	) {
 		return getNearbyEntities(location, radius, loadChunks, filterByType(searchedTypes));
 	}
 
-	public static List<@NonNull Entity> getNearbyEntities(
+	public static List<Entity> getNearbyEntities(
 			Location location,
 			double radius,
 			boolean loadChunks,
-			Predicate<? super @NonNull Entity> filter
+			Predicate<? super Entity> filter
 	) {
 		Validate.notNull(filter, "filter is null");
 
@@ -246,7 +247,7 @@ public final class EntityUtils {
 		int centerChunkZ = location.getBlockZ() >> 4;
 		int chunkRadius = ((int) (radius / 16)) + 1;
 		double radius2 = radius * radius;
-		Predicate<@NonNull Entity> combinedFilter = (entity) -> {
+		Predicate<Entity> combinedFilter = (entity) -> {
 			Location entityLoc = entity.getLocation();
 			if (entityLoc.distanceSquared(location) > radius2) {
 				return false;
@@ -265,22 +266,22 @@ public final class EntityUtils {
 
 	// If searchedTypes is empty, this includes all entity types.
 	// chunkRadius of 0: Search only within the given chunk.
-	public static List<@NonNull Entity> getNearbyChunkEntities(
+	public static List<Entity> getNearbyChunkEntities(
 			Chunk chunk,
 			int chunkRadius,
 			boolean loadChunks,
-			Set<? extends @NonNull EntityType> searchedTypes
+			Set<? extends EntityType> searchedTypes
 	) {
 		return getNearbyChunkEntities(chunk, chunkRadius, loadChunks, filterByType(searchedTypes));
 	}
 
 	// chunkRadius of 0: Search only within the given chunk.
 	// filter of null: Accepts all found entities.
-	public static List<@NonNull Entity> getNearbyChunkEntities(
+	public static List<Entity> getNearbyChunkEntities(
 			Chunk chunk,
 			int chunkRadius,
 			boolean loadChunks,
-			Predicate<? super @NonNull Entity> filter
+			Predicate<? super Entity> filter
 	) {
 		Validate.notNull(chunk, "chunk is null");
 		return getNearbyChunkEntities(
@@ -295,19 +296,19 @@ public final class EntityUtils {
 
 	// chunkRadius of 0: Search only within the center chunk.
 	// filter of null: Accepts all found entities.
-	public static List<@NonNull Entity> getNearbyChunkEntities(
+	public static List<Entity> getNearbyChunkEntities(
 			World world,
 			int centerChunkX,
 			int centerChunkZ,
 			int chunkRadius,
 			boolean loadChunks,
-			Predicate<? super @NonNull Entity> filter
+			Predicate<? super Entity> filter
 	) {
 		Validate.notNull(world, "world is null");
 		Validate.notNull(filter, "filter is null");
 
 		// Assert: World is loaded.
-		List<@NonNull Entity> entities = new ArrayList<>();
+		List<Entity> entities = new ArrayList<>();
 		if (chunkRadius < 0) return entities;
 
 		int startX = centerChunkX - chunkRadius;
@@ -317,7 +318,10 @@ public final class EntityUtils {
 		for (int chunkX = startX; chunkX <= endX; chunkX++) {
 			for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
 				if (!loadChunks && !world.isChunkLoaded(chunkX, chunkZ)) continue;
+
 				Chunk currentChunk = world.getChunkAt(chunkX, chunkZ);
+				if (!loadChunks && !currentChunk.isEntitiesLoaded()) continue;
+
 				for (Entity entity : currentChunk.getEntities()) {
 					// TODO This is a workaround: For some yet unknown reason entities sometimes
 					// report to be in a different world..
@@ -348,7 +352,7 @@ public final class EntityUtils {
 
 	public static @Nullable Entity getTargetedEntity(
 			Player player,
-			Predicate<? super @NonNull Entity> filter
+			Predicate<? super Entity> filter
 	) {
 		Validate.notNull(filter, "filter is null");
 		Location playerLoc = player.getEyeLocation();

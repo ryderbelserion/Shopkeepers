@@ -148,13 +148,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private @Nullable ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
 
-	private final List<@NonNull SKShopkeeperSnapshot> snapshots = new ArrayList<>();
-	private final List<? extends @NonNull SKShopkeeperSnapshot> snapshotsView = Collections.unmodifiableList(snapshots);
+	private final List<SKShopkeeperSnapshot> snapshots = new ArrayList<>();
+	private final List<? extends SKShopkeeperSnapshot> snapshotsView = Collections.unmodifiableList(snapshots);
 
 	private final ShopkeeperComponentHolder components = new ShopkeeperComponentHolder(Unsafe.initialized(this));
 
 	// Map of dynamically evaluated message arguments:
-	private final Map<@NonNull String, @NonNull Supplier<@NonNull ?>> messageArgumentsMap = new HashMap<>();
+	private final Map<String, Supplier<@NonNull ?>> messageArgumentsMap = new HashMap<>();
 	private final MessageArguments messageArguments = MessageArguments.ofMap(messageArgumentsMap);
 
 	// Whether there have been changes to the shopkeeper's data that the storage is not yet aware
@@ -167,7 +167,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private boolean ticking = false;
 
 	// UI type identifier -> UI handler
-	private final Map<@NonNull String, @NonNull UIHandler> uiHandlers = new HashMap<>();
+	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
 
 	// Internally used for load balancing purposes:
 	private final int tickingGroup = ShopkeeperTicker.nextTickingGroup();
@@ -733,8 +733,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Shop type, derived from the serialized {@link #SHOP_TYPE_ID shop type id}.
 	 */
-	public static final Property<@NonNull AbstractShopType<?>> SHOP_TYPE = new BasicProperty<@NonNull AbstractShopType<?>>()
-			.dataKeyAccessor(DATA_KEY_SHOP_TYPE, new DataSerializer<@NonNull AbstractShopType<?>>() {
+	public static final Property<AbstractShopType<?>> SHOP_TYPE = new BasicProperty<AbstractShopType<?>>()
+			.dataKeyAccessor(DATA_KEY_SHOP_TYPE, new DataSerializer<AbstractShopType<?>>() {
 				@Override
 				public @Nullable Object serialize(AbstractShopType<?> value) {
 					Validate.notNull(value, "value is null");
@@ -759,11 +759,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// ATTRIBUTES
 
-	public static final Property<@NonNull Integer> ID = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> ID = new BasicProperty<Integer>()
 			.dataKeyAccessor("id", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.POSITIVE)
 			.build();
-	public static final Property<@NonNull UUID> UNIQUE_ID = new BasicProperty<@NonNull UUID>()
+	public static final Property<UUID> UNIQUE_ID = new BasicProperty<UUID>()
 			.dataKeyAccessor("uniqueId", UUIDSerializers.LENIENT)
 			.build();
 	public static final Property<@Nullable String> WORLD_NAME = new BasicProperty<@Nullable String>()
@@ -772,22 +772,22 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			)
 			.nullable() // For virtual shopkeepers
 			.build();
-	public static final Property<@NonNull Integer> LOCATION_X = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> LOCATION_X = new BasicProperty<Integer>()
 			.dataKeyAccessor("x", NumberSerializers.INTEGER)
 			.useDefaultIfMissing() // For virtual shopkeepers
 			.defaultValue(0)
 			.build();
-	public static final Property<@NonNull Integer> LOCATION_Y = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> LOCATION_Y = new BasicProperty<Integer>()
 			.dataKeyAccessor("y", NumberSerializers.INTEGER)
 			.useDefaultIfMissing() // For virtual shopkeepers
 			.defaultValue(0)
 			.build();
-	public static final Property<@NonNull Integer> LOCATION_Z = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> LOCATION_Z = new BasicProperty<Integer>()
 			.dataKeyAccessor("z", NumberSerializers.INTEGER)
 			.useDefaultIfMissing() // For virtual shopkeepers
 			.defaultValue(0)
 			.build();
-	public static final Property<@NonNull Float> YAW = new BasicProperty<@NonNull Float>()
+	public static final Property<Float> YAW = new BasicProperty<Float>()
 			.dataKeyAccessor("yaw", NumberSerializers.FLOAT)
 			// For virtual shopkeepers, and if missing (e.g. in pre 2.13.4 versions):
 			.useDefaultIfMissing()
@@ -796,9 +796,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// This always loads a non-null location, even for virtual shopkeepers.
 	// This ensures that we can inspect and validate the loaded coordinates even if the world name
 	// is null.
-	public static final Property<@NonNull BlockLocation> LOCATION = new BasicProperty<@NonNull BlockLocation>()
+	public static final Property<BlockLocation> LOCATION = new BasicProperty<BlockLocation>()
 			.name("location")
-			.dataAccessor(new DataAccessor<@NonNull BlockLocation>() {
+			.dataAccessor(new DataAccessor<BlockLocation>() {
 				@Override
 				public void save(DataContainer dataContainer, @Nullable BlockLocation value) {
 					if (value != null) {
@@ -1112,9 +1112,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param messageArguments
 	 *            the Map of lazily and dynamically evaluated message arguments
 	 */
-	protected void populateMessageArguments(
-			Map<@NonNull String, @NonNull Supplier<@NonNull ?>> messageArguments
-	) {
+	protected void populateMessageArguments(Map<String, Supplier<@NonNull ?>> messageArguments) {
 		messageArguments.put("id", this::getId);
 		messageArguments.put("uuid", this::getUniqueId);
 		messageArguments.put("name", () -> Text.parse(this.getName()));
@@ -1132,7 +1130,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// NAMING
 
-	public static final Property<@NonNull String> NAME = new BasicProperty<@NonNull String>()
+	public static final Property<String> NAME = new BasicProperty<String>()
 			.dataKeyAccessor("name", ColoredStringSerializers.SCALAR)
 			.useDefaultIfMissing()
 			.defaultValue("")
@@ -1187,8 +1185,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Shop object data.
 	 */
-	public static final Property<@NonNull ShopObjectData> SHOP_OBJECT_DATA = new BasicProperty<@NonNull ShopObjectData>()
-			.dataKeyAccessor("object", new DataSerializer<@NonNull ShopObjectData>() {
+	public static final Property<ShopObjectData> SHOP_OBJECT_DATA = new BasicProperty<ShopObjectData>()
+			.dataKeyAccessor("object", new DataSerializer<ShopObjectData>() {
 				@Override
 				public @Nullable Object serialize(ShopObjectData value) {
 					return DataContainerSerializers.DEFAULT.serialize(value);
@@ -1209,7 +1207,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// SNAPSHOTS
 
-	public static final Property<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>> SNAPSHOTS = new BasicProperty<@NonNull List<? extends @NonNull SKShopkeeperSnapshot>>()
+	public static final Property<List<? extends SKShopkeeperSnapshot>> SNAPSHOTS = new BasicProperty<List<? extends SKShopkeeperSnapshot>>()
 			.dataKeyAccessor("snapshots", SKShopkeeperSnapshot.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
@@ -1225,7 +1223,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 					ShopkeeperData shopkeeperData,
 					String logPrefix
 			) throws InvalidDataException {
-				List<? extends @NonNull SKShopkeeperSnapshot> snapshots = shopkeeperData.get(SNAPSHOTS);
+				List<? extends SKShopkeeperSnapshot> snapshots = shopkeeperData.get(SNAPSHOTS);
 				if (snapshots.isEmpty()) return false;
 
 				int shopkeeperId = shopkeeperData.get(ID);
@@ -1246,7 +1244,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private void loadSnapshots(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		List<? extends @NonNull SKShopkeeperSnapshot> loadedSnapshots = shopkeeperData.get(SNAPSHOTS);
+		List<? extends SKShopkeeperSnapshot> loadedSnapshots = shopkeeperData.get(SNAPSHOTS);
 		snapshots.clear();
 		try {
 			// Applies additional shopkeeper specific validations:
@@ -1275,7 +1273,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public final List<? extends @NonNull ShopkeeperSnapshot> getSnapshots() {
+	public final List<? extends ShopkeeperSnapshot> getSnapshots() {
 		return snapshotsView;
 	}
 
@@ -1378,14 +1376,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public abstract boolean hasTradingRecipes(@Nullable Player player);
 
 	@Override
-	public abstract List<? extends @NonNull TradingRecipe> getTradingRecipes(
+	public abstract List<? extends TradingRecipe> getTradingRecipes(
 			@Nullable Player player
 	);
 
 	// USER INTERFACES
 
 	@Override
-	public final Collection<? extends @NonNull UISession> getUISessions() {
+	public final Collection<? extends UISession> getUISessions() {
 		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISessions(this);
 	}
 

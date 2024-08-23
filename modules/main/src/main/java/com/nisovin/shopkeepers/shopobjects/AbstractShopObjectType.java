@@ -21,14 +21,14 @@ import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public abstract class AbstractShopObjectType<T extends @NonNull AbstractShopObject>
+public abstract class AbstractShopObjectType<T extends AbstractShopObject>
 		extends AbstractSelectableType implements ShopObjectType<T> {
 
 	private final Class<@NonNull T> shopObjectClass;
 
 	protected AbstractShopObjectType(
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			@Nullable String permission,
 			Class<@NonNull T> shopObjectClass
 	) {

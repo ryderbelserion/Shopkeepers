@@ -25,10 +25,10 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class ComponentHolder {
 
-	private final Map<@NonNull Class<? extends @NonNull Component>, @NonNull Component> components = new LinkedHashMap<>();
-	private final Collection<? extends @NonNull Component> componentsView = Collections.unmodifiableCollection(components.values());
+	private final Map<Class<? extends Component>, Component> components = new LinkedHashMap<>();
+	private final Collection<? extends Component> componentsView = Collections.unmodifiableCollection(components.values());
 
-	private final Map<@NonNull Class<?>, @NonNull Component> services = new HashMap<>();
+	private final Map<Class<?>, Component> services = new HashMap<>();
 
 	/**
 	 * Creates a new {@link ComponentHolder}.
@@ -43,7 +43,7 @@ public class ComponentHolder {
 	 * 
 	 * @return an unmodifiable view on the currently attached components, not <code>null</code>
 	 */
-	public final Collection<? extends @NonNull Component> getComponents() {
+	public final Collection<? extends Component> getComponents() {
 		return componentsView;
 	}
 
@@ -73,7 +73,7 @@ public class ComponentHolder {
 	 * @throws RuntimeException
 	 *             if the component of the given type is missing but cannot be created
 	 */
-	public final <C extends @NonNull Component> @NonNull C getOrAdd(
+	public final <C extends Component> @NonNull C getOrAdd(
 			Class<? extends @NonNull C> componentClass
 	) {
 		@NonNull C component = Unsafe.castNonNull(components.computeIfAbsent(
@@ -96,7 +96,7 @@ public class ComponentHolder {
 	 * @param component
 	 *            the component, not <code>null</code>
 	 */
-	public final <C extends @NonNull Component> void add(@NonNull C component) {
+	public final <C extends Component> void add(@NonNull C component) {
 		Validate.notNull(component, "component is null");
 		Validate.isTrue(component.getHolder() == null,
 				"component is already attached to some holder");
@@ -149,7 +149,7 @@ public class ComponentHolder {
 	) {
 		Validate.notNull(componentClass, "componentClass is null");
 		try {
-			return componentClass.newInstance();
+			return componentClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to create component of type "
 					+ componentClass.getName(), e);

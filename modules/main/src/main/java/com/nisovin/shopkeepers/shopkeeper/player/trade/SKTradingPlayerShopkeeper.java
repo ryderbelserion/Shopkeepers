@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -33,8 +32,8 @@ public class SKTradingPlayerShopkeeper
 		extends AbstractPlayerShopkeeper implements TradingPlayerShopkeeper {
 
 	// There can be multiple different offers for the same kind of item:
-	private final List<@NonNull TradeOffer> offers = new ArrayList<>();
-	private final List<? extends @NonNull TradeOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<TradeOffer> offers = new ArrayList<>();
+	private final List<? extends TradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a new and not yet initialized {@link SKTradingPlayerShopkeeper}.
@@ -78,11 +77,11 @@ public class SKTradingPlayerShopkeeper
 	}
 
 	@Override
-	public List<? extends @NonNull TradingRecipe> getTradingRecipes(@Nullable Player player) {
+	public List<? extends TradingRecipe> getTradingRecipes(@Nullable Player player) {
 		// Empty if the container is not found
 		@Nullable ItemStack[] containerContents = this.getContainerContents();
-		List<? extends @NonNull TradeOffer> offers = this.getOffers();
-		List<@NonNull TradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<? extends TradeOffer> offers = this.getOffers();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			UnmodifiableItemStack resultItem = offer.getResultItem();
 			boolean outOfStock = !InventoryUtils.containsAtLeast(
@@ -99,7 +98,7 @@ public class SKTradingPlayerShopkeeper
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "offers";
-	public static final Property<@NonNull List<? extends @NonNull TradeOffer>> OFFERS = new BasicProperty<@NonNull List<? extends @NonNull TradeOffer>>()
+	public static final Property<List<? extends TradeOffer>> OFFERS = new BasicProperty<List<? extends TradeOffer>>()
 			.dataKeyAccessor(DATA_KEY_OFFERS, SKTradeOffer.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
@@ -135,7 +134,7 @@ public class SKTradingPlayerShopkeeper
 	}
 
 	@Override
-	public List<? extends @NonNull TradeOffer> getOffers() {
+	public List<? extends TradeOffer> getOffers() {
 		return offersView;
 	}
 
@@ -169,14 +168,14 @@ public class SKTradingPlayerShopkeeper
 	}
 
 	@Override
-	public void setOffers(List<? extends @NonNull TradeOffer> offers) {
+	public void setOffers(List<? extends TradeOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(List<? extends @NonNull TradeOffer> offers) {
+	private void _setOffers(List<? extends TradeOffer> offers) {
 		assert offers != null && !CollectionUtils.containsNull(offers);
 		this._clearOffers();
 		this._addOffers(offers);
@@ -199,14 +198,14 @@ public class SKTradingPlayerShopkeeper
 	}
 
 	@Override
-	public void addOffers(List<? extends @NonNull TradeOffer> offers) {
+	public void addOffers(List<? extends TradeOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(List<? extends @NonNull TradeOffer> offers) {
+	private void _addOffers(List<? extends TradeOffer> offers) {
 		assert offers != null && !CollectionUtils.containsNull(offers);
 		offers.forEach(this::_addOffer);
 	}

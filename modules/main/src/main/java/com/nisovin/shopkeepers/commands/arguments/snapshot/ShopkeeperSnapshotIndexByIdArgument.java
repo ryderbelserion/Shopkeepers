@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -32,23 +31,22 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * Invalid ids (i.e. ids that are out of bounds) are rejected.
  */
-public class ShopkeeperSnapshotIndexByIdArgument
-		extends ObjectByIdArgument<@NonNull Integer, @NonNull Integer> {
+public class ShopkeeperSnapshotIndexByIdArgument extends ObjectByIdArgument<Integer, Integer> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 1;
 
-	private final CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument;
+	private final CommandArgument<? extends Shopkeeper> shopkeeperArgument;
 
 	public ShopkeeperSnapshotIndexByIdArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument
 	) {
 		this(name, shopkeeperArgument, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperSnapshotIndexByIdArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument,
 			int minimumCompletionInput
 	) {
 		super(name, ArgumentFilter.acceptAny(), new IdArgumentArgs(minimumCompletionInput));
@@ -57,19 +55,19 @@ public class ShopkeeperSnapshotIndexByIdArgument
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull Integer> createIdArgument(
+	protected ObjectIdArgument<Integer> createIdArgument(
 			@UnknownInitialization ShopkeeperSnapshotIndexByIdArgument this,
 			String name,
 			IdArgumentArgs args
 	) {
-		return new ObjectIdArgument<@NonNull Integer>(
+		return new ObjectIdArgument<Integer>(
 				name,
 				new PositiveIntegerArgument(name + ":id"),
 				ArgumentFilter.acceptAny(),
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+			protected Iterable<? extends Integer> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -118,7 +116,7 @@ public class ShopkeeperSnapshotIndexByIdArgument
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+	protected Iterable<? extends Integer> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

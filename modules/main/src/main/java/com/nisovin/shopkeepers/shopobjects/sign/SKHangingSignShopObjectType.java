@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -20,8 +19,8 @@ import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public final class SKHangingSignShopObjectType
-		extends BaseBlockShopObjectType<@NonNull SKHangingSignShopObject>
-		implements HangingSignShopObjectType<@NonNull SKHangingSignShopObject> {
+		extends BaseBlockShopObjectType<SKHangingSignShopObject>
+		implements HangingSignShopObjectType<SKHangingSignShopObject> {
 
 	private final BaseBlockShops blockShops;
 

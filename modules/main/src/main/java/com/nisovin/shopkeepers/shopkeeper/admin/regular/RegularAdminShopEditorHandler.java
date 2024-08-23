@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -20,7 +19,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class RegularAdminShopEditorHandler extends EditorHandler {
 
-	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<@NonNull TradeOffer> {
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<TradeOffer> {
 
 		private final SKRegularAdminShopkeeper shopkeeper;
 
@@ -30,11 +29,11 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		}
 
 		@Override
-		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
+		public List<TradingRecipeDraft> getTradingRecipes() {
 			// Add the shopkeeper's offers:
-			List<? extends @NonNull TradeOffer> offers = shopkeeper.getOffers();
+			List<? extends TradeOffer> offers = shopkeeper.getOffers();
 			// With heuristic initial capacity:
-			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
+			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
 			offers.forEach(offer -> {
 				// The offer returns immutable items, so there is no need to copy them.
 				TradingRecipeDraft recipe = new TradingRecipeDraft(
@@ -48,12 +47,12 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		}
 
 		@Override
-		protected List<? extends @NonNull TradeOffer> getOffers() {
+		protected List<? extends TradeOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<? extends @NonNull TradeOffer> newOffers) {
+		protected void setOffers(List<? extends TradeOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 

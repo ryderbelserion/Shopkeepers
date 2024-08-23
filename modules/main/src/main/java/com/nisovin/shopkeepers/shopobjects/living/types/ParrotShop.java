@@ -6,7 +6,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.Parrot;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -27,20 +26,20 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class ParrotShop extends SittableShop<@NonNull Parrot> {
+public class ParrotShop extends SittableShop<Parrot> {
 
-	public static final Property<Parrot.@NonNull Variant> VARIANT = new BasicProperty<Parrot.@NonNull Variant>()
+	public static final Property<Parrot.Variant> VARIANT = new BasicProperty<Parrot.Variant>()
 			.dataKeyAccessor("parrotVariant", EnumSerializers.lenient(Parrot.Variant.class))
 			.defaultValue(Parrot.Variant.RED)
 			.build();
 
-	private final PropertyValue<Parrot.@NonNull Variant> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<Parrot.Variant> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
 	public ParrotShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull ParrotShop> livingObjectType,
+			SKLivingShopObjectType<ParrotShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -66,8 +65,8 @@ public class ParrotShop extends SittableShop<@NonNull Parrot> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
@@ -91,6 +90,7 @@ public class ParrotShop extends SittableShop<@NonNull Parrot> {
 	private void applyVariant() {
 		Parrot entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setVariant(this.getVariant());
 	}
 

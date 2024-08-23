@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.api.shopobjects.virtual;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 
@@ -11,6 +9,5 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
  * @param <T>
  *            the type of the shop objects this represents
  */
-public interface VirtualShopObjectType<T extends @NonNull VirtualShopObject>
-		extends ShopObjectType<T> {
+public interface VirtualShopObjectType<T extends VirtualShopObject> extends ShopObjectType<T> {
 }

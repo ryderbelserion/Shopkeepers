@@ -3,14 +3,11 @@ package com.nisovin.shopkeepers.shopkeeper.player.buy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public final class BuyingPlayerShopType
-		extends AbstractPlayerShopType<@NonNull SKBuyingPlayerShopkeeper> {
+public final class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerShopkeeper> {
 
 	public BuyingPlayerShopType() {
 		super(
@@ -37,7 +34,7 @@ public final class BuyingPlayerShopType
 	}
 
 	@Override
-	public List<? extends @NonNull String> getTradeSetupDescription() {
+	public List<? extends String> getTradeSetupDescription() {
 		return Messages.tradeSetupDescBuying;
 	}
 

@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.util.inventory;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +11,12 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -31,22 +31,20 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class PotionUtils {
 
-	// TODO Use Bukkit's PotionEffect.INFINITE_DURATION once we only support MC 1.19.4+
-	public static final int INFINITE_DURATION = -1;
-
 	// TODO This may need to be updated on Minecraft updates.
 	// Formatted like the keys of namespaced keys:
-	private static final Map<String, @NonNull PotionType> POTION_TYPE_ALIASES = new HashMap<>();
+	private static final Map<String, PotionType> POTION_TYPE_ALIASES = new HashMap<>();
+	// Visible for testing:
+	public static Map<? extends String, ? extends PotionType> POTION_TYPE_ALIASES_VIEW = Collections.unmodifiableMap(POTION_TYPE_ALIASES);
 	static {
 		// Removed in Bukkit 1.20.5:
 		// POTION_TYPE_ALIASES.put("empty", PotionType.UNCRAFTABLE);
-		// TODO Renamed in Bukkit 1.20.5:
-		// https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/8a34e009148cc297bcc9eb5c250fc4f5b071c4a7
-		POTION_TYPE_ALIASES.put("leaping", PotionType.LEAPING);
-		POTION_TYPE_ALIASES.put("swiftness", PotionType.SWIFTNESS);
-		POTION_TYPE_ALIASES.put("healing", PotionType.HEALING);
-		POTION_TYPE_ALIASES.put("harming", PotionType.HARMING);
-		POTION_TYPE_ALIASES.put("regeneration", PotionType.REGENERATION);
+		// Renamed in Bukkit 1.20.5, but the old names are still recognized by us:
+		POTION_TYPE_ALIASES.put("jump", PotionType.LEAPING);
+		POTION_TYPE_ALIASES.put("speed", PotionType.SWIFTNESS);
+		POTION_TYPE_ALIASES.put("instant_heal", PotionType.HEALING);
+		POTION_TYPE_ALIASES.put("instant_damage", PotionType.HARMING);
+		POTION_TYPE_ALIASES.put("regen", PotionType.REGENERATION);
 	}
 
 	/**
@@ -89,7 +87,7 @@ public final class PotionUtils {
 	}
 
 	/**
-	 * Parsed a potion item from a textual format.
+	 * Parses a potion item from a textual format.
 	 * <p>
 	 * Expected formats:
 	 * <ul>
@@ -167,15 +165,15 @@ public final class PotionUtils {
 		assert itemType != null;
 
 		// Long and strong potion variants:
-		boolean extended = CollectionUtils.replace(words, "long", null);
-		boolean upgraded = CollectionUtils.replace(words, "strong", null)
+		boolean isLong = CollectionUtils.replace(words, "long", null);
+		boolean isStrong = CollectionUtils.replace(words, "strong", null)
 				|| CollectionUtils.replace(words, "2", null)
 				|| CollectionUtils.replace(words, "ii", null);
 
 		// Parse the potion type from the remaining input:
 		String potionTypeInput = words.stream()
 				.filter(Objects::nonNull)
-				.<@NonNull String>map(Unsafe::assertNonNull)
+				.<String>map(Unsafe::assertNonNull)
 				.collect(Collectors.joining("_"));
 		PotionType potionType = parsePotionType(potionTypeInput);
 		if (potionType == null) {
@@ -184,43 +182,71 @@ public final class PotionUtils {
 		}
 
 		// Validate potion variants:
-		if (extended && !potionType.isExtendable()) {
-			extended = false;
+		if (isLong && !potionType.isExtendable()) {
+			isLong = false;
 		}
-		if (upgraded && !potionType.isUpgradeable()) {
-			upgraded = false;
+		if (isStrong && !potionType.isUpgradeable()) {
+			isStrong = false;
 		}
-		if (extended && upgraded) {
+		if (isLong && isStrong) {
 			// Only one of these variants is allowed at the same time:
-			upgraded = false;
+			isStrong = false;
+		}
+
+		// Get the specified potion variant:
+		if (isLong) {
+			var longPotionType = getLongPotionType(potionType);
+			if (longPotionType != null) {
+				potionType = longPotionType;
+			}
+		} else if (isStrong) {
+			var strongPotionType = getStrongPotionType(potionType);
+			if (strongPotionType != null) {
+				potionType = strongPotionType;
+			}
 		}
 
 		ItemStack item = new ItemStack(itemType, 1);
-		PotionData potionData = new PotionData(potionType, extended, upgraded);
-		item = setPotionData(item, potionData);
+		item = setPotionType(item, potionType);
 		return item;
 	}
 
+	public static @Nullable PotionType getLongPotionType(PotionType potionType) {
+		var key = potionType.getKey();
+		if (key.getKey().startsWith("long_")) return potionType;
+		if (!potionType.isExtendable()) return null;
+
+		return Registry.POTION.get(NamespacedKeyUtils.create(key.getNamespace(), "long_" + key.getKey()));
+	}
+
+	public static @Nullable PotionType getStrongPotionType(PotionType potionType) {
+		var key = potionType.getKey();
+		if (key.getKey().startsWith("strong_")) return potionType;
+		if (!potionType.isUpgradeable()) return null;
+
+		return Registry.POTION.get(NamespacedKeyUtils.create(key.getNamespace(), "strong_" + key.getKey()));
+	}
+
 	/**
-	 * Sets the {@link PotionData} of the given {@link ItemStack}, if its
+	 * Sets the {@link PotionType} of the given {@link ItemStack}, if its
 	 * {@link ItemStack#getItemMeta() ItemMeta} is of type {@link PotionMeta}.
 	 * <p>
 	 * This applies, for example, to potions, splash potions, lingering potions, and tipped arrows.
 	 * 
 	 * @param itemStack
 	 *            the item stack, not <code>null</code>
-	 * @param potionData
-	 *            the potion data, not <code>null</code>
+	 * @param potionType
+	 *            the potion type, not <code>null</code>
 	 * @return the same item stack
-	 * @see PotionMeta#setBasePotionData(PotionData)
+	 * @see PotionMeta#setBasePotionType(PotionType)
 	 */
-	public static ItemStack setPotionData(@ReadWrite ItemStack itemStack, PotionData potionData) {
+	public static ItemStack setPotionType(@ReadWrite ItemStack itemStack, PotionType potionType) {
 		Validate.notNull(itemStack, "itemStack is null");
-		Validate.notNull(potionData, "potionData is null");
+		Validate.notNull(potionType, "potionType is null");
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta instanceof PotionMeta) {
 			PotionMeta potionMeta = (PotionMeta) itemMeta;
-			potionMeta.setBasePotionData(potionData);
+			potionMeta.setBasePotionType(potionType);
 			itemStack.setItemMeta(potionMeta);
 		}
 		return itemStack;
@@ -247,7 +273,10 @@ public final class PotionUtils {
 	 * @return the found matching potion effect, or <code>null</code>
 	 * @see #equalsIgnoreDuration(PotionEffect, PotionEffect)
 	 */
-	public static @Nullable PotionEffect findIgnoreDuration(Collection<? extends @NonNull PotionEffect> effects, PotionEffect effect) {
+	public static @Nullable PotionEffect findIgnoreDuration(
+			Collection<? extends PotionEffect> effects,
+			PotionEffect effect
+	) {
 		for (PotionEffect collectionEffect : effects) {
 			if (PotionUtils.equalsIgnoreDuration(collectionEffect, effect)) {
 				return collectionEffect;

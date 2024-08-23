@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.bstats.bukkit.Metrics;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
@@ -22,7 +21,7 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 
 	public FeaturesChart() {
 		super("used_features", () -> {
-			Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Integer>> allFeatures = new LinkedHashMap<>();
+			Map<String, Map<String, Integer>> allFeatures = new LinkedHashMap<>();
 			// Plugin compatibility features:
 			addFeatureEntry(
 					allFeatures,
@@ -154,7 +153,7 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 
 	// Converts the given boolean value to a more user-friendly 'Yes'/'No' value.
 	private static void addFeatureEntry(
-			Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Integer>> allFeatures,
+			Map<String, Map<String, Integer>> allFeatures,
 			String featureName,
 			boolean value
 	) {
@@ -164,7 +163,7 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 
 	// Uses the String representation of the given object as value in the chart.
 	private static void addFeatureEntry(
-			Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Integer>> allFeatures,
+			Map<String, Map<String, Integer>> allFeatures,
 			String featureName,
 			Object value
 	) {

@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -109,7 +108,7 @@ public class OptionalArgument<T> extends FallbackArgument<@Nullable T> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

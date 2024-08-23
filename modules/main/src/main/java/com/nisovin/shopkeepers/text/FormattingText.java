@@ -23,7 +23,7 @@ public class FormattingText extends TextBuilder {
 	 * Gets the formatting code.
 	 * <p>
 	 * This can be the code of a {@link ChatColor#isColor() color}, a {@link ChatColor#isFormat()
-	 * format}, or {@link ChatColor#RESET}, or a hex color in the format "#aabbcc".
+	 * format}, {@link ChatColor#RESET}, or a hex color in the format "#aabbcc".
 	 * 
 	 * @return the formatting code, not <code>null</code>
 	 */

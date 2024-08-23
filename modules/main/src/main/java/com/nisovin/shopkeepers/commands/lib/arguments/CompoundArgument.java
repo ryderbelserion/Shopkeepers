@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -28,18 +27,18 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 
 	public static final String FORMAT_DELIMITER = " ";
 
-	private final List<? extends @NonNull CommandArgument<?>> arguments;
+	private final List<? extends CommandArgument<?>> arguments;
 	private final boolean useReducedFormat;
 	// Null if the default (parent) reduced format shall be used:
 	private final @Nullable String reducedFormat;
 
-	public CompoundArgument(String name, List<? extends @NonNull CommandArgument<?>> arguments) {
+	public CompoundArgument(String name, List<? extends CommandArgument<?>> arguments) {
 		this(name, arguments, true);
 	}
 
 	public CompoundArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<?>> arguments,
+			List<? extends CommandArgument<?>> arguments,
 			boolean joinFormats
 	) {
 		this(name, arguments, joinFormats, true);
@@ -47,7 +46,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 
 	public CompoundArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<?>> arguments,
+			List<? extends CommandArgument<?>> arguments,
 			boolean joinFormats,
 			boolean useReducedFormat
 	) {
@@ -56,7 +55,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		// Arguments:
 		Validate.notNull(arguments, "arguments is null");
 		Validate.isTrue(!arguments.isEmpty(), "arguments is empty");
-		List<@NonNull CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
+		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
 			Validate.notNull(argument, "arguments contains null");
@@ -93,7 +92,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		}
 	}
 
-	public List<? extends @NonNull CommandArgument<?>> getArguments() {
+	public List<? extends CommandArgument<?>> getArguments() {
 		return arguments;
 	}
 
@@ -151,12 +150,12 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 	) throws ArgumentParseException;
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
 	) {
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		CommandContext localContext = new SimpleCommandContext();
 		CommandContextView localContextView = localContext.getView();
 		// Similar to Command#handleTabCompletion

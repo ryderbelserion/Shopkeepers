@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.ui.editor;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 
@@ -32,7 +31,7 @@ public interface TradingRecipesAdapter {
 	 * 
 	 * @return the trading recipe drafts
 	 */
-	public List<@NonNull TradingRecipeDraft> getTradingRecipes();
+	public List<TradingRecipeDraft> getTradingRecipes();
 
 	/**
 	 * Updates the merchant's offers based on the given {@link TradingRecipeDraft}s from the editor.
@@ -51,8 +50,5 @@ public interface TradingRecipesAdapter {
 	 * @return the (estimate) number of merchant offers that were changed, or <code>0</code> if no
 	 *         offers changed
 	 */
-	public int updateTradingRecipes(
-			Player player,
-			List<? extends @NonNull TradingRecipeDraft> recipes
-	);
+	public int updateTradingRecipes(Player player, List<? extends TradingRecipeDraft> recipes);
 }

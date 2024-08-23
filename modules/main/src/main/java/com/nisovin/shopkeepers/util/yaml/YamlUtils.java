@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.util.yaml;
 
 import org.bukkit.configuration.file.YamlConstructor;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -15,8 +15,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class YamlUtils {
 
 	// Compact (single line) Yaml formatting:
-	@SuppressWarnings("nullness:type.argument")
-	private static final ThreadLocal<@NonNull Yaml> YAML_COMPACT = ThreadLocal.withInitial(() -> {
+	private static final ThreadLocal<Yaml> YAML_COMPACT = ThreadLocal.withInitial(() -> {
 		DumperOptions yamlDumperOptions = new DumperOptions();
 		yamlDumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
 		yamlDumperOptions.setDefaultScalarStyle(ScalarStyle.PLAIN);
@@ -25,7 +24,7 @@ public final class YamlUtils {
 		Representer yamlRepresenter = new CompactYamlRepresenter();
 		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
 		yamlRepresenter.setDefaultScalarStyle(ScalarStyle.PLAIN);
-		BaseConstructor yamlConstructor = new YamlConstructor();
+		BaseConstructor yamlConstructor = new YamlConstructor(new LoaderOptions());
 		return new Yaml(yamlConstructor, yamlRepresenter, yamlDumperOptions);
 	});
 

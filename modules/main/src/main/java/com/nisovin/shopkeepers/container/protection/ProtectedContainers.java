@@ -14,7 +14,6 @@ import org.bukkit.block.data.type.Chest;
 import org.bukkit.block.data.type.Chest.Type;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -72,7 +71,7 @@ public class ProtectedContainers {
 	private final SKShopkeepersPlugin plugin;
 	private final ContainerProtectionListener containerProtectionListener = new ContainerProtectionListener(Unsafe.initialized(this));
 	private final InventoryMoveItemListener inventoryMoveItemListener = new InventoryMoveItemListener(Unsafe.initialized(this));
-	private final Map<@NonNull BlockLocation, @NonNull List<@NonNull PlayerShopkeeper>> protectedContainers = new HashMap<>();
+	private final Map<BlockLocation, List<PlayerShopkeeper>> protectedContainers = new HashMap<>();
 
 	public ProtectedContainers(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -102,7 +101,7 @@ public class ProtectedContainers {
 	public void addContainer(BlockLocation location, PlayerShopkeeper shopkeeper) {
 		Validate.notNull(location, "location is null");
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		List<@NonNull PlayerShopkeeper> shopkeepers = protectedContainers.computeIfAbsent(
+		List<PlayerShopkeeper> shopkeepers = protectedContainers.computeIfAbsent(
 				location.immutable(),
 				key -> new ArrayList<>(1)
 		);
@@ -128,7 +127,7 @@ public class ProtectedContainers {
 	}
 
 	// Gets the shopkeepers that are directly using the container at the specified location:
-	private @Nullable List<? extends @NonNull PlayerShopkeeper> _getShopkeepers(
+	private @Nullable List<? extends PlayerShopkeeper> _getShopkeepers(
 			String worldName,
 			int x,
 			int y,
@@ -139,7 +138,7 @@ public class ProtectedContainers {
 	}
 
 	// Gets the shopkeepers that are directly using the specified container block:
-	private @Nullable List<? extends @NonNull PlayerShopkeeper> _getShopkeepers(Block block) {
+	private @Nullable List<? extends PlayerShopkeeper> _getShopkeepers(Block block) {
 		return this._getShopkeepers(
 				block.getWorld().getName(),
 				block.getX(),
@@ -149,15 +148,13 @@ public class ProtectedContainers {
 	}
 
 	// Gets the shopkeepers that are directly using the container at the specified location:
-	public List<? extends @NonNull PlayerShopkeeper> getShopkeepers(
+	public List<? extends PlayerShopkeeper> getShopkeepers(
 			String worldName,
 			int x,
 			int y,
 			int z
 	) {
-		List<? extends @NonNull PlayerShopkeeper> shopkeepers = this._getShopkeepers(
-				worldName, x, y, z
-		);
+		List<? extends PlayerShopkeeper> shopkeepers = this._getShopkeepers(worldName, x, y, z);
 		if (shopkeepers != null) {
 			return Collections.unmodifiableList(shopkeepers);
 		} else {
@@ -165,7 +162,7 @@ public class ProtectedContainers {
 		}
 	}
 
-	public List<? extends @NonNull PlayerShopkeeper> getShopkeepers(Block block) {
+	public List<? extends PlayerShopkeeper> getShopkeepers(Block block) {
 		return this.getShopkeepers(
 				block.getWorld().getName(),
 				block.getX(),
@@ -184,9 +181,7 @@ public class ProtectedContainers {
 			int z,
 			@Nullable Player player
 	) {
-		List<? extends @NonNull PlayerShopkeeper> shopkeepers = this._getShopkeepers(
-				worldName, x, y, z
-		);
+		List<? extends PlayerShopkeeper> shopkeepers = this._getShopkeepers(worldName, x, y, z);
 		// Check if there are any shopkeepers using this container:
 		if (shopkeepers == null) return false;
 		assert !shopkeepers.isEmpty();
@@ -218,7 +213,7 @@ public class ProtectedContainers {
 	//
 
 	// Gets reused by isContainerProtected calls:
-	private final List<@NonNull PlayerShopkeeper> tempResultsList = new ArrayList<>();
+	private final List<PlayerShopkeeper> tempResultsList = new ArrayList<>();
 
 	/**
 	 * Checks if the given container block is protected.
@@ -312,23 +307,21 @@ public class ProtectedContainers {
 
 	// Gets the shopkeepers which use the container at the given location (directly or by a
 	// connected chest):
-	public List<? extends @NonNull PlayerShopkeeper> getShopkeepersUsingContainer(
-			Block containerBlock
-	) {
+	public List<? extends PlayerShopkeeper> getShopkeepersUsingContainer(Block containerBlock) {
 		return this.getShopkeepersUsingContainer(containerBlock, new ArrayList<>());
 	}
 
 	// Gets the shopkeepers which use the container at the given location (directly or by a
 	// connected chest), and adds them to the provided list:
-	private List<? extends @NonNull PlayerShopkeeper> getShopkeepersUsingContainer(
+	private List<? extends PlayerShopkeeper> getShopkeepersUsingContainer(
 			Block containerBlock,
-			List<@NonNull PlayerShopkeeper> results
+			List<PlayerShopkeeper> results
 	) {
 		Validate.notNull(containerBlock, "containerBlock is null!");
 		Validate.notNull(results, "results is null!");
 
 		// Check if the block is directly used by shopkeepers:
-		List<? extends @NonNull PlayerShopkeeper> shopkeepers = this._getShopkeepers(containerBlock);
+		List<? extends PlayerShopkeeper> shopkeepers = this._getShopkeepers(containerBlock);
 		if (shopkeepers != null) {
 			assert !shopkeepers.isEmpty();
 			results.addAll(shopkeepers);

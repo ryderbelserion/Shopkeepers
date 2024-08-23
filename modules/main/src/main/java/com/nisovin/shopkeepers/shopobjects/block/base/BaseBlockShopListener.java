@@ -233,17 +233,17 @@ class BaseBlockShopListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		List<Block> blockList = event.blockList();
 		this.removeProtectedBlocks(blockList);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		@NonNull List<@NonNull Block> blockList = Unsafe.cast(event.blockList());
+		List<Block> blockList = event.blockList();
 		this.removeProtectedBlocks(blockList);
 	}
 
-	private void removeProtectedBlocks(List<? extends @NonNull Block> blockList) {
+	private void removeProtectedBlocks(List<? extends Block> blockList) {
 		assert blockList != null;
 		blockList.removeIf(this::isProtectedBlock);
 	}

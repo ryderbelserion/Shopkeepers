@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.inventory.EquipmentSlot;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -26,13 +25,13 @@ public class SKLivingShopEquipment implements LivingShopEquipment {
 	/**
 	 * A {@link DataSerializer} for values of type {@link LivingShopEquipment}.
 	 */
-	public static final DataSerializer<@NonNull LivingShopEquipment> SERIALIZER
-			= new DataSerializer<@NonNull LivingShopEquipment>() {
+	public static final DataSerializer<LivingShopEquipment> SERIALIZER
+			= new DataSerializer<LivingShopEquipment>() {
 				@Override
 				public @Nullable Object serialize(LivingShopEquipment value) {
 					Validate.notNull(value, "value is null");
 					DataContainer equipmentData = DataContainer.create();
-					for (Entry<? extends @NonNull EquipmentSlot, ? extends @Nullable UnmodifiableItemStack> entry : value.getItems().entrySet()) {
+					for (Entry<? extends EquipmentSlot, ? extends @Nullable UnmodifiableItemStack> entry : value.getItems().entrySet()) {
 						// The items are assumed to be immutable.
 						equipmentData.set(entry.getKey().name(), entry.getValue());
 					}
@@ -61,9 +60,9 @@ public class SKLivingShopEquipment implements LivingShopEquipment {
 				}
 			};
 
-	private final Map<@NonNull EquipmentSlot, @NonNull UnmodifiableItemStack> items
+	private final Map<EquipmentSlot, UnmodifiableItemStack> items
 			= new EnumMap<>(EquipmentSlot.class);
-	private final Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> itemsView
+	private final Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> itemsView
 			= Collections.unmodifiableMap(items);
 
 	private @Nullable Runnable changedListener;
@@ -77,7 +76,7 @@ public class SKLivingShopEquipment implements LivingShopEquipment {
 	}
 
 	@Override
-	public Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> getItems() {
+	public Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> getItems() {
 		return itemsView;
 	}
 

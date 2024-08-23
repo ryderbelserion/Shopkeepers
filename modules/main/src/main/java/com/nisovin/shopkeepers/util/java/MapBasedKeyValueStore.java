@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.util.java;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -11,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class MapBasedKeyValueStore implements KeyValueStore {
 
-	private final Map<@NonNull String, @NonNull Object> map;
+	private final Map<String, Object> map;
 
 	/**
 	 * Creates a new {@link MapBasedKeyValueStore} based on a new {@link HashMap}.
@@ -28,7 +27,7 @@ public class MapBasedKeyValueStore implements KeyValueStore {
 	 * @param map
 	 *            the map to use as key-value storage, not <code>null</code>
 	 */
-	public MapBasedKeyValueStore(Map<@NonNull String, @NonNull Object> map) {
+	public MapBasedKeyValueStore(Map<String, Object> map) {
 		Validate.notNull(map, "map is null");
 		this.map = map;
 	}

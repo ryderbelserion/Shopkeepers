@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.ChestedHorse;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -26,20 +25,20 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class ChestedHorseShop<E extends @NonNull ChestedHorse> extends BabyableShop<E> {
+public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
-	public static final Property<@NonNull Boolean> CARRYING_CHEST = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> CARRYING_CHEST = new BasicProperty<Boolean>()
 			.dataKeyAccessor("carryingChest", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> carryingChestProperty = new PropertyValue<>(CARRYING_CHEST)
+	private final PropertyValue<Boolean> carryingChestProperty = new PropertyValue<>(CARRYING_CHEST)
 			.onValueChanged(Unsafe.initialized(this)::applyCarryingChest)
 			.build(properties);
 
 	public ChestedHorseShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<? extends @NonNull ChestedHorseShop<E>> livingObjectType,
+			SKLivingShopObjectType<? extends ChestedHorseShop<E>> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -65,8 +64,8 @@ public class ChestedHorseShop<E extends @NonNull ChestedHorse> extends BabyableS
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getCarryingChestEditorButton());
 		return editorButtons;
 	}
@@ -88,6 +87,7 @@ public class ChestedHorseShop<E extends @NonNull ChestedHorse> extends BabyableS
 	private void applyCarryingChest() {
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setCarryingChest(this.isCarryingChest());
 	}
 

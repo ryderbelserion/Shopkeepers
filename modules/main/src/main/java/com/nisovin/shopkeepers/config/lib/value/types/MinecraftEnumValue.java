@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
  * @param <E>
  *            the enum type
  */
-public class MinecraftEnumValue<E extends @NonNull Enum<E>> extends EnumValue<E> {
+public class MinecraftEnumValue<E extends Enum<E>> extends EnumValue<E> {
 
 	public MinecraftEnumValue(Class<@NonNull E> enumClass) {
 		super(enumClass);

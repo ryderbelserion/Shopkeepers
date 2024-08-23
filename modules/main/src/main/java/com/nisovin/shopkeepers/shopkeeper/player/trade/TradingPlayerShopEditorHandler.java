@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -31,8 +30,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	private static class TradingRecipesAdapter
-			extends DefaultTradingRecipesAdapter<@NonNull TradeOffer> {
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<TradeOffer> {
 
 		private final SKTradingPlayerShopkeeper shopkeeper;
 
@@ -42,11 +40,11 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
+		public List<TradingRecipeDraft> getTradingRecipes() {
 			// Add the shopkeeper's offers:
-			List<? extends @NonNull TradeOffer> offers = shopkeeper.getOffers();
+			List<? extends TradeOffer> offers = shopkeeper.getOffers();
 			// With heuristic initial capacity:
-			List<@NonNull TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
+			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8);
 			offers.forEach(offer -> {
 				// The offer returns copies of its items:
 				TradingRecipeDraft recipe = new TradingRecipeDraft(
@@ -59,7 +57,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 			// Add new empty recipe drafts for items from the container without existing offer:
 			// We only add one recipe per similar item:
-			List<@NonNull ItemStack> newRecipes = new ArrayList<>();
+			List<ItemStack> newRecipes = new ArrayList<>();
 			// Empty if the container is not found:
 			@Nullable ItemStack[] containerContents = shopkeeper.getContainerContents();
 			for (ItemStack containerItem : containerContents) {
@@ -91,12 +89,12 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		}
 
 		@Override
-		protected List<? extends @NonNull TradeOffer> getOffers() {
+		protected List<? extends TradeOffer> getOffers() {
 			return shopkeeper.getOffers();
 		}
 
 		@Override
-		protected void setOffers(List<? extends @NonNull TradeOffer> newOffers) {
+		protected void setOffers(List<? extends TradeOffer> newOffers) {
 			shopkeeper.setOffers(newOffers);
 		}
 

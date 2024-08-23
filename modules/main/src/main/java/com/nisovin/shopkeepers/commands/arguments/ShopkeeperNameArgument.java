@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -37,14 +36,14 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperNameArgument(String name, ArgumentFilter<? super @NonNull String> filter) {
+	public ShopkeeperNameArgument(String name, ArgumentFilter<? super String> filter) {
 		this(name, false, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperNameArgument(
 			String name,
 			boolean joinRemainingArgs,
-			ArgumentFilter<? super @NonNull String> filter,
+			ArgumentFilter<? super String> filter,
 			int minimumCompletionInput
 	) {
 		super(name, joinRemainingArgs, filter, minimumCompletionInput);
@@ -68,12 +67,12 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 	 *            only suggestions for shopkeepers accepted by this predicate get included
 	 * @return the shopkeeper name completion suggestions
 	 */
-	public static Iterable<? extends @NonNull String> getDefaultCompletionSuggestions(
+	public static Iterable<? extends String> getDefaultCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
 			String namePrefix,
-			Predicate<? super @NonNull Shopkeeper> shopkeeperFilter
+			Predicate<? super Shopkeeper> shopkeeperFilter
 	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (namePrefix.length() < minimumCompletionInput) {
@@ -85,8 +84,8 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 		// TODO Improve by using a TreeMap for the prefix matching?
 		ShopkeeperRegistry shopkeeperRegistry = ShopkeepersAPI.getShopkeeperRegistry();
 		// TODO CheckerFramework complains when using a wildcard Stream here.
-		Stream<@NonNull Shopkeeper> shopkeepers = Unsafe.castNonNull(shopkeeperRegistry.getAllShopkeepers().stream());
-		Iterable<@NonNull String> suggestions = shopkeepers
+		Stream<Shopkeeper> shopkeepers = Unsafe.castNonNull(shopkeeperRegistry.getAllShopkeepers().stream());
+		Iterable<String> suggestions = shopkeepers
 				.filter(shopkeeperFilter)
 				.<@Nullable String>map(shopkeeper -> {
 					String name = TextUtils.stripColor(shopkeeper.getName());
@@ -98,12 +97,12 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 					}
 					return null; // No match
 				}).filter(Objects::nonNull)
-				.<@NonNull String>map(Unsafe::assertNonNull)::iterator;
+				.map(Unsafe::assertNonNull)::iterator;
 		return suggestions;
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+	protected Iterable<? extends String> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix

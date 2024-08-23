@@ -17,7 +17,6 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.input.InputManager;
 import com.nisovin.shopkeepers.input.InputRequest;
@@ -45,8 +44,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
  * context, so that the request can decide how to process it. This includes the decision on whether
  * the event shall be cancelled or not: The events are not automatically cancelled.
  */
-public class InteractionInput extends InputManager<@NonNull Event>
-		implements Listener {
+public class InteractionInput extends InputManager<Event> implements Listener {
 
 	/**
 	 * An {@link InputRequest} for interaction inputs with support for interaction filtering and
@@ -54,7 +52,7 @@ public class InteractionInput extends InputManager<@NonNull Event>
 	 * <p>
 	 * By default, {@link Request} only reacts to {@link PlayerInteractEvent}s.
 	 */
-	public interface Request extends InputRequest<@NonNull Event> {
+	public interface Request extends InputRequest<Event> {
 
 		/**
 		 * Tests if this request accepts the given {@link PlayerInteractEvent}.
@@ -128,7 +126,7 @@ public class InteractionInput extends InputManager<@NonNull Event>
 	private static final long INTERACTION_DELAY_MILLIS = 50L;
 
 	// By player UUID:
-	private final Map<@NonNull UUID, @NonNull MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
+	private final Map<UUID, MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
 
 	public InteractionInput(Plugin plugin) {
 		super(plugin);
@@ -185,10 +183,10 @@ public class InteractionInput extends InputManager<@NonNull Event>
 		this.onPlayerInteractEntity(event);
 	}
 
-	private <E extends @NonNull PlayerEvent & Cancellable> void handleInteraction(E event) {
+	private <E extends PlayerEvent & Cancellable> void handleInteraction(E event) {
 		// Check if there is a pending request for the player:
 		Player player = event.getPlayer();
-		InputRequest<@NonNull Event> request = this.getRequest(player);
+		InputRequest<Event> request = this.getRequest(player);
 		if (request == null) return; // There is no request for the player
 
 		// Ignore the event if we already handled an interaction for the player recently:
@@ -233,7 +231,7 @@ public class InteractionInput extends InputManager<@NonNull Event>
 		request.onInput(event);
 	}
 
-	private boolean isInteractionAccepted(InputRequest<@NonNull Event> request, Event event) {
+	private boolean isInteractionAccepted(InputRequest<Event> request, Event event) {
 		if (!(request instanceof Request)) return true; // No filters
 
 		Request interactRequest = (Request) request;

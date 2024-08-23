@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class ListValue<E> extends ValueType<@NonNull List<E>> {
+public class ListValue<E> extends ValueType<List<E>> {
 
 	public static final String DEFAULT_LIST_DELIMITER = ",";
 

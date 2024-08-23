@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -21,15 +20,15 @@ import com.nisovin.shopkeepers.util.java.Validate;
 final class WorldShopkeepers {
 
 	private final String worldName;
-	private final Map<@NonNull ChunkCoords, @NonNull ChunkShopkeepers> shopkeepersByChunk = new HashMap<>();
+	private final Map<ChunkCoords, ChunkShopkeepers> shopkeepersByChunk = new HashMap<>();
 	// Unmodifiable entries:
-	private final Map<@NonNull ChunkCoords, @NonNull List<? extends @NonNull AbstractShopkeeper>> shopkeeperViewsByChunk = new LinkedHashMap<>();
+	private final Map<ChunkCoords, List<? extends AbstractShopkeeper>> shopkeeperViewsByChunk = new LinkedHashMap<>();
 	// Unmodifiable map with unmodifiable entries:
-	private final Map<@NonNull ChunkCoords, @NonNull List<? extends @NonNull AbstractShopkeeper>> shopkeepersByChunkView = Collections.unmodifiableMap(shopkeeperViewsByChunk);
+	private final Map<ChunkCoords, List<? extends AbstractShopkeeper>> shopkeepersByChunkView = Collections.unmodifiableMap(shopkeeperViewsByChunk);
 	private int shopkeeperCount = 0;
 
 	// Note: Already unmodifiable.
-	private final Set<? extends @NonNull AbstractShopkeeper> shopkeepersView = new AbstractSet<@NonNull AbstractShopkeeper>() {
+	private final Set<? extends AbstractShopkeeper> shopkeepersView = new AbstractSet<AbstractShopkeeper>() {
 		@Override
 		public Iterator<AbstractShopkeeper> iterator() {
 			if (this.isEmpty()) {
@@ -104,11 +103,11 @@ final class WorldShopkeepers {
 		return shopkeeperCount;
 	}
 
-	public Set<? extends @NonNull AbstractShopkeeper> getShopkeepers() {
+	public Set<? extends AbstractShopkeeper> getShopkeepers() {
 		return shopkeepersView;
 	}
 
-	public Map<? extends @NonNull ChunkCoords, ? extends @NonNull List<? extends @NonNull AbstractShopkeeper>> getShopkeepersByChunk() {
+	public Map<? extends ChunkCoords, ? extends List<? extends AbstractShopkeeper>> getShopkeepersByChunk() {
 		return shopkeepersByChunkView;
 	}
 }

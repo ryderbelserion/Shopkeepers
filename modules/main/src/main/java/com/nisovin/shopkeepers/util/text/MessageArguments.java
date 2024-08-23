@@ -26,7 +26,7 @@ public interface MessageArguments {
 	 *            the mapping from keys to message arguments, not <code>null</code>
 	 * @return the {@link MessageArguments}
 	 */
-	public static MessageArguments ofMap(Map<? extends @NonNull String, @NonNull ?> arguments) {
+	public static MessageArguments ofMap(Map<? extends String, @NonNull ?> arguments) {
 		return new MapMessageArguments(arguments);
 	}
 

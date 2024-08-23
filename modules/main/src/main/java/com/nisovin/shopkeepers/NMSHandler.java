@@ -1,6 +1,12 @@
 package com.nisovin.shopkeepers;
 
 import java.lang.reflect.Field;
+import org.bukkit.entity.AbstractVillager;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import java.util.List;
 import java.util.Objects;
 import org.bukkit.Material;
@@ -24,8 +30,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
@@ -35,8 +39,6 @@ import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
 import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.CollectionUtils;
-import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 import net.minecraft.core.component.DataComponentMap;
@@ -157,7 +159,7 @@ public final class NMSHandler implements NMSCallProvider {
 				Log.severe("Failed to retrieve the underlying Minecraft ItemStack!", e);
 			}
 		}
-		return CraftItemStack.asNMSCopy(itemStack);
+		return Unsafe.assertNonNull(CraftItemStack.asNMSCopy(itemStack));
 	}
 
 	@Override
@@ -230,131 +232,9 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public @Nullable String getItemSNBT(@Nullable ItemStack itemStack) {
 		Validate.notNull(itemStack, "itemStack is null");
+		assert itemStack != null;
 		net.minecraft.world.item.ItemStack nmsItem = asNMSItemStack(itemStack);
 		Tag itemNBT = nmsItem.saveOptional(MinecraftServer.getDefaultRegistryAccess());
 		return itemNBT.toString();
-	}
-
-	@Override
-	public @Nullable String getItemTypeTranslationKey(Material material) {
-		Validate.notNull(material, "material is null");
-		net.minecraft.world.item.Item nmsItem = CraftMagicNumbers.getItem(material);
-		if (nmsItem == null) return null;
-		return nmsItem.getDescriptionId();
-	}
-
-	// MC 1.17 specific features
-
-	@Override
-	public void setAxolotlVariant(LivingEntity axolotl, String variantName) {
-		((Axolotl) axolotl).setVariant(Axolotl.Variant.valueOf(variantName));
-	}
-
-	@Override
-	public String cycleAxolotlVariant(String variantName, boolean backwards) {
-		return EnumUtils.cycleEnumConstant(
-				Axolotl.Variant.class,
-				Axolotl.Variant.valueOf(variantName),
-				backwards
-		).name();
-	}
-
-	@Override
-	public void setGlowSquidDark(LivingEntity glowSquid, boolean dark) {
-		// Integer.MAX_VALUE should be sufficiently long to not require periodic refreshes.
-		((GlowSquid) glowSquid).setDarkTicksRemaining(dark ? Integer.MAX_VALUE : 0);
-	}
-
-	@Override
-	public void setScreamingGoat(LivingEntity goat, boolean screaming) {
-		((Goat) goat).setScreaming(screaming);
-	}
-
-	@Override
-	public void setGlowingText(Sign sign, boolean glowingText) {
-		sign.getSide(Side.FRONT).setGlowingText(glowingText);
-	}
-
-	// MC 1.19 specific features
-
-	@Override
-	public void setFrogVariant(LivingEntity frog, String variantName) {
-		((Frog) frog).setVariant(Frog.Variant.valueOf(variantName));
-	}
-
-	@Override
-	public String cycleFrogVariant(String variantName, boolean backwards) {
-		Frog.Variant currentVariant = Objects.requireNonNull(Registry.FROG_VARIANT.get(NamespacedKey.minecraft(variantName)));
-		return RegistryUtils.cycleKeyedConstant(Registry.FROG_VARIANT, currentVariant, backwards).getKey().getKey();
-	}
-
-	@Override
-	public void setGoatLeftHorn(LivingEntity goat, boolean hasLeftHorn) {
-		((Goat) goat).setLeftHorn(hasLeftHorn);
-	}
-
-	@Override
-	public void setGoatRightHorn(LivingEntity goat, boolean hasRightHorn) {
-		((Goat) goat).setRightHorn(hasRightHorn);
-	}
-
-	// MC 1.20 specific features
-
-	@Override
-	public void setSignBackLines(Sign sign, @NonNull String[] lines) {
-		SignSide signSide = sign.getSide(Side.BACK);
-		signSide.setLine(0, lines[0]);
-		signSide.setLine(1, lines[1]);
-		signSide.setLine(2, lines[2]);
-		signSide.setLine(3, lines[3]);
-	}
-
-	@Override
-	public void setSignBackGlowingText(Sign sign, boolean glowingText) {
-		SignSide signSide = sign.getSide(Side.BACK);
-		signSide.setGlowingText(glowingText);
-	}
-
-	// MC 1.20.3 specific features
-
-	@Override
-	public DataSerializer<Cat.@NonNull Type> getCatTypeSerializer() {
-		return KeyedSerializers.forRegistry(Cat.Type.class, Registry.CAT_VARIANT);
-	}
-
-	@Override
-	public Cat.Type cycleCatType(Cat.Type type, boolean backwards) {
-		return RegistryUtils.cycleKeyedConstant(Registry.CAT_VARIANT, type, backwards);
-	}
-
-	// MC 1.20.5 specific features
-
-	private List<@NonNull NamespacedKey> WOLF_VARIANT_KEYS = null;
-
-	public @NonNull List<@NonNull NamespacedKey> getWolfVariantKeys() {
-		if (WOLF_VARIANT_KEYS == null) {
-			Registry<Wolf.@NonNull Variant> wolfVariantRegistry = Unsafe.castNonNull(Registry.WOLF_VARIANT);
-			WOLF_VARIANT_KEYS = RegistryUtils.getKeys(wolfVariantRegistry);
-		}
-		assert WOLF_VARIANT_KEYS != null;
-		return WOLF_VARIANT_KEYS;
-	}
-
-	@Override
-	public void setMaxStackSize(@ReadWrite ItemMeta itemMeta, @Nullable Integer maxStackSize) {
-		itemMeta.setMaxStackSize(maxStackSize);
-	}
-
-	@Override
-	public NamespacedKey cycleWolfVariant(NamespacedKey variantKey, boolean backwards) {
-		return CollectionUtils.cycleValue(getWolfVariantKeys(), variantKey, backwards);
-	}
-
-	@Override
-	public void setWolfVariant(Wolf wolf, NamespacedKey variantKey) {
-		@Nullable Variant variant = Registry.WOLF_VARIANT.get(variantKey);
-		if (variant == null) return; // Variant not found
-
-		wolf.setVariant(variant);
 	}
 }

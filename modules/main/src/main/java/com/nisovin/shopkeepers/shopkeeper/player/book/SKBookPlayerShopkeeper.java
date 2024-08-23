@@ -13,7 +13,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -45,8 +44,8 @@ public class SKBookPlayerShopkeeper
 		extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
 	// Contains only one offer for a specific book (book title):
-	private final List<@NonNull BookOffer> offers = new ArrayList<>();
-	private final List<? extends @NonNull BookOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<BookOffer> offers = new ArrayList<>();
+	private final List<? extends BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a new and not yet initialized {@link SKBookPlayerShopkeeper}.
@@ -90,11 +89,11 @@ public class SKBookPlayerShopkeeper
 	}
 
 	@Override
-	public List<? extends @NonNull TradingRecipe> getTradingRecipes(@Nullable Player player) {
-		Map<? extends @NonNull String, ? extends @NonNull ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
+	public List<? extends TradingRecipe> getTradingRecipes(@Nullable Player player) {
+		Map<? extends String, ? extends ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
-		List<? extends @NonNull BookOffer> offers = this.getOffers();
-		List<@NonNull TradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<? extends BookOffer> offers = this.getOffers();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
@@ -133,9 +132,9 @@ public class SKBookPlayerShopkeeper
 	 * 
 	 * @return the book items mapped by their title, or an empty Map if the container is not found
 	 */
-	protected Map<? extends @NonNull String, ? extends @NonNull ItemStack> getCopyableBooksFromContainer() {
+	protected Map<? extends String, ? extends ItemStack> getCopyableBooksFromContainer() {
 		// Linked Map: Preserves the order of encountered items.
-		Map<@NonNull String, @NonNull ItemStack> booksByTitle = new LinkedHashMap<>();
+		Map<String, ItemStack> booksByTitle = new LinkedHashMap<>();
 		// Empty if the container is not found:
 		@Nullable ItemStack[] contents = this.getContainerContents();
 		for (ItemStack itemStack : contents) {
@@ -203,7 +202,7 @@ public class SKBookPlayerShopkeeper
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "offers";
-	public static final Property<@NonNull List<? extends @NonNull BookOffer>> OFFERS = new BasicProperty<@NonNull List<? extends @NonNull BookOffer>>()
+	public static final Property<List<? extends BookOffer>> OFFERS = new BasicProperty<List<? extends BookOffer>>()
 			.dataKeyAccessor(DATA_KEY_OFFERS, SKBookOffer.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
@@ -239,7 +238,7 @@ public class SKBookPlayerShopkeeper
 	}
 
 	@Override
-	public List<? extends @NonNull BookOffer> getOffers() {
+	public List<? extends BookOffer> getOffers() {
 		return offersView;
 	}
 
@@ -271,7 +270,7 @@ public class SKBookPlayerShopkeeper
 	@Override
 	public void removeOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
-		Iterator<@NonNull BookOffer> iterator = offers.iterator();
+		Iterator<BookOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			if (iterator.next().getBookTitle().equals(bookTitle)) {
 				iterator.remove();
@@ -292,14 +291,14 @@ public class SKBookPlayerShopkeeper
 	}
 
 	@Override
-	public void setOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
+	public void setOffers(@ReadOnly List<? extends BookOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
+	private void _setOffers(@ReadOnly List<? extends BookOffer> offers) {
 		assert offers != null && !CollectionUtils.containsNull(offers);
 		this._clearOffers();
 		this._addOffers(offers);
@@ -326,14 +325,14 @@ public class SKBookPlayerShopkeeper
 	}
 
 	@Override
-	public void addOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
+	public void addOffers(@ReadOnly List<? extends BookOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(@ReadOnly List<? extends @NonNull BookOffer> offers) {
+	private void _addOffers(@ReadOnly List<? extends BookOffer> offers) {
 		assert offers != null && !CollectionUtils.containsNull(offers);
 		// This replaces any previous offers for the same books:
 		offers.forEach(this::_addOffer);

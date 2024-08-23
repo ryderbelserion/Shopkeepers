@@ -5,7 +5,7 @@
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Determines the required config migrations. Do not edit manually!
-config-version: 6
+config-version: 7
 # The initial debugging state of the plugin.
 debug: false
 # Additional debugging options.
@@ -52,12 +52,6 @@ language: en-default
 # Shopkeeper Data
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The file encoding to use for the save file. If you have issues with the save
-# file, such as special characters not being saved correctly, make sure that
-# this encoding supports these characters. It is recommended to keep this at
-# its default 'UTF-8'. It is not supported to dynamically change this encoding
-# after the save file has already been created.
-file-encoding: "UTF-8"
 # Whether to immediately save all shopkeeper data whenever a shopkeeper is
 # edited. If disabled, the shopkeeper data is saved in 5 minute intervals and
 # when the plugin is shut down.

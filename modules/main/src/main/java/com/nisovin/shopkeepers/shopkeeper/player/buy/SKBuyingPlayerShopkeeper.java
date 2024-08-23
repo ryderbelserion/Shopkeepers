@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -35,8 +34,8 @@ public class SKBuyingPlayerShopkeeper
 		extends AbstractPlayerShopkeeper implements BuyingPlayerShopkeeper {
 
 	// Contains only one offer for any specific type of item:
-	private final List<@NonNull PriceOffer> offers = new ArrayList<>();
-	private final List<? extends @NonNull PriceOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<PriceOffer> offers = new ArrayList<>();
+	private final List<? extends PriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a new and not yet initialized {@link SKBuyingPlayerShopkeeper}.
@@ -80,10 +79,10 @@ public class SKBuyingPlayerShopkeeper
 	}
 
 	@Override
-	public List<? extends @NonNull TradingRecipe> getTradingRecipes(@Nullable Player player) {
+	public List<? extends TradingRecipe> getTradingRecipes(@Nullable Player player) {
 		int currencyInContainer = this.getCurrencyInContainer();
-		List<? extends @NonNull PriceOffer> offers = this.getOffers();
-		List<@NonNull TradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<? extends PriceOffer> offers = this.getOffers();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			// Both the offer's and the trading recipe's items are immutable. So there is no need to
 			// copy the item.
@@ -104,7 +103,7 @@ public class SKBuyingPlayerShopkeeper
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "offers";
-	public static final Property<@NonNull List<? extends @NonNull PriceOffer>> OFFERS = new BasicProperty<@NonNull List<? extends @NonNull PriceOffer>>()
+	public static final Property<List<? extends PriceOffer>> OFFERS = new BasicProperty<List<? extends PriceOffer>>()
 			.dataKeyAccessor(DATA_KEY_OFFERS, SKPriceOffer.LIST_SERIALIZER)
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
@@ -140,7 +139,7 @@ public class SKBuyingPlayerShopkeeper
 	}
 
 	@Override
-	public List<? extends @NonNull PriceOffer> getOffers() {
+	public List<? extends PriceOffer> getOffers() {
 		return offersView;
 	}
 
@@ -164,7 +163,7 @@ public class SKBuyingPlayerShopkeeper
 	@Override
 	public void removeOffer(@ReadOnly ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
-		Iterator<? extends @NonNull PriceOffer> iterator = offers.iterator();
+		Iterator<? extends PriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			PriceOffer offer = iterator.next();
 			if (offer.getItem().isSimilar(tradedItem)) {
@@ -192,14 +191,14 @@ public class SKBuyingPlayerShopkeeper
 	}
 
 	@Override
-	public void setOffers(@ReadOnly List<? extends @NonNull PriceOffer> offers) {
+	public void setOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(@ReadOnly List<? extends @NonNull PriceOffer> offers) {
+	private void _setOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		assert offers != null && !CollectionUtils.containsNull(offers);
 		this._clearOffers();
 		this._addOffers(offers);
@@ -225,14 +224,14 @@ public class SKBuyingPlayerShopkeeper
 	}
 
 	@Override
-	public void addOffers(@ReadOnly List<? extends @NonNull PriceOffer> offers) {
+	public void addOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		Validate.notNull(offers, "offers is null");
 		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(@ReadOnly List<? extends @NonNull PriceOffer> offers) {
+	private void _addOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		assert offers != null && !CollectionUtils.containsNull(offers);
 		// This replaces any previous offers for the same items:
 		offers.forEach(this::_addOffer);

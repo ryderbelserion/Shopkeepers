@@ -22,7 +22,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -54,7 +53,7 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private static final String TRADE_LOGS_FOLDER = "trade-logs";
 	private static final String FILE_NAME_PREFIX = "trades-";
-	private static final List<? extends @NonNull String> CSV_HEADER = Collections.unmodifiableList(Arrays.asList(
+	private static final List<? extends String> CSV_HEADER = Collections.unmodifiableList(Arrays.asList(
 			"time",
 			"player_uuid",
 			"player_name",
@@ -101,7 +100,7 @@ public class CsvTradeLogger implements TradeLogger {
 	private final CsvFormatter csv = new CsvFormatter()
 			.escapeNewlines(false)
 			.warnOnNewlines();
-	private List<@NonNull TradeRecord> pending = new ArrayList<>();
+	private List<TradeRecord> pending = new ArrayList<>();
 	private final SaveTask saveTask;
 	private @Nullable BukkitTask delayedSaveTask = null;
 	// This is reset to the current configuration value prior to every save. This ensures that the
@@ -177,7 +176,7 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private class SaveTask extends SingletonTask {
 
-		private List<@NonNull TradeRecord> saving = new ArrayList<>();
+		private List<TradeRecord> saving = new ArrayList<>();
 		private @Nullable SaveContext saveContext = null;
 		private boolean saveSucceeded = false;
 		private long lastSaveErrorMsgMillis = 0L;
@@ -212,7 +211,7 @@ public class CsvTradeLogger implements TradeLogger {
 
 			// Swap the pending and saving lists of trades:
 			assert saving.isEmpty();
-			List<@NonNull TradeRecord> temp = saving;
+			List<TradeRecord> temp = saving;
 			saving = pending;
 			pending = temp;
 
@@ -302,10 +301,10 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private static class SaveContext {
 
-		private final List<? extends @NonNull TradeRecord> trades;
+		private final List<? extends TradeRecord> trades;
 		private int nextUnsaved = 0;
 
-		SaveContext(List<? extends @NonNull TradeRecord> trades) {
+		SaveContext(List<? extends TradeRecord> trades) {
 			assert trades != null && !CollectionUtils.containsNull(trades);
 			this.trades = trades;
 		}
@@ -322,7 +321,7 @@ public class CsvTradeLogger implements TradeLogger {
 		}
 
 		// May return a sublist view:
-		public List<? extends @NonNull TradeRecord> getUnsavedTrades() {
+		public List<? extends TradeRecord> getUnsavedTrades() {
 			if (!this.hasUnsavedTrades()) {
 				return Collections.emptyList();
 			} else {

@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -34,13 +33,13 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public PlayerUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
+	public PlayerUUIDArgument(String name, ArgumentFilter<? super UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public PlayerUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull UUID> filter,
+			ArgumentFilter<? super UUID> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, minimumCompletionInput);
@@ -71,12 +70,12 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	 *            only suggestions for players accepted by this predicate get included
 	 * @return the player uuid completion suggestions
 	 */
-	public static Iterable<? extends @NonNull UUID> getDefaultCompletionSuggestions(
+	public static Iterable<? extends UUID> getDefaultCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
 			String uuidPrefix,
-			Predicate<? super @NonNull Player> playerFilter
+			Predicate<? super Player> playerFilter
 	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (uuidPrefix.length() < minimumCompletionInput) {
@@ -85,7 +84,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		// TODO Cast: Workaround for a limitation of CheckerFramework
-		Stream<@NonNull Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
+		Stream<Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
 		return onlinePlayers
 				.filter(playerFilter)
 				.map(Player::getUniqueId)
@@ -96,7 +95,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+	protected Iterable<? extends UUID> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix

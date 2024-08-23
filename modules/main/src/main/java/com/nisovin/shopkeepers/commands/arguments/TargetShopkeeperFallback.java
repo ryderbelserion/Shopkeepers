@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgument;
@@ -15,14 +13,14 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * If the sender is not a player, the parsing exception of the original argument is thrown (the
  * original argument might get reevaluated is some parsing context has changed).
  */
-public class TargetShopkeeperFallback extends TypedFallbackArgument<@NonNull Shopkeeper> {
+public class TargetShopkeeperFallback extends TypedFallbackArgument<Shopkeeper> {
 
-	public TargetShopkeeperFallback(CommandArgument<@NonNull Shopkeeper> argument) {
+	public TargetShopkeeperFallback(CommandArgument<Shopkeeper> argument) {
 		this(argument, TargetShopkeeperFilter.ANY);
 	}
 
 	public TargetShopkeeperFallback(
-			CommandArgument<@NonNull Shopkeeper> argument,
+			CommandArgument<Shopkeeper> argument,
 			TargetShopkeeperFilter filter
 	) {
 		super(

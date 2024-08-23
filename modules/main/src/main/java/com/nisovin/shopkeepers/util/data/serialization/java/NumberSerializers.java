@@ -64,7 +64,7 @@ public final class NumberSerializers {
 	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
 	 * {@link DataSerializer} tries to convert the given data to an {@link Integer}.
 	 */
-	public static final DataSerializer<@NonNull Integer> INTEGER = new NumberSerializer<@NonNull Integer>(
+	public static final DataSerializer<Integer> INTEGER = new NumberSerializer<Integer>(
 			Integer.class
 	) {
 		@Override
@@ -79,9 +79,7 @@ public final class NumberSerializers {
 	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
 	 * {@link DataSerializer} tries to convert the given data to a {@link Float}.
 	 */
-	public static final DataSerializer<@NonNull Float> FLOAT = new NumberSerializer<@NonNull Float>(
-			Float.class
-	) {
+	public static final DataSerializer<Float> FLOAT = new NumberSerializer<Float>(Float.class) {
 		@Override
 		public @Nullable Float deserializeNumber(Object data) throws InvalidDataException {
 			return ConversionUtils.toFloat(data);
@@ -94,9 +92,7 @@ public final class NumberSerializers {
 	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
 	 * {@link DataSerializer} tries to convert the given data to a {@link Double}.
 	 */
-	public static final DataSerializer<@NonNull Double> DOUBLE = new NumberSerializer<@NonNull Double>(
-			Double.class
-	) {
+	public static final DataSerializer<Double> DOUBLE = new NumberSerializer<Double>(Double.class) {
 		@Override
 		public @Nullable Double deserializeNumber(Object data) throws InvalidDataException {
 			return ConversionUtils.toDouble(data);

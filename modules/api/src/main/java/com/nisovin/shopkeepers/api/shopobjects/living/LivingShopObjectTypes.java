@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.api.shopobjects.living;
 import java.util.Collection;
 
 import org.bukkit.entity.EntityType;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -16,7 +15,7 @@ public interface LivingShopObjectTypes {
 	 * 
 	 * @return the shop object types
 	 */
-	public Collection<? extends @NonNull LivingShopObjectType<?>> getAll();
+	public Collection<? extends LivingShopObjectType<?>> getAll();
 
 	/**
 	 * Gets the {@link LivingShopObjectType} for the given {@link EntityType}.

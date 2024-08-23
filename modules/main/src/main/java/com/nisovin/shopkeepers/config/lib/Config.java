@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -44,8 +43,8 @@ public abstract class Config {
 	private @Nullable ValueTypeRegistry customDefaultValueTypes = null;
 
 	// Lazily setup cache of all settings:
-	private @Nullable Map<@NonNull String, @NonNull FieldSetting<?>> settings = null;
-	private @Nullable Collection<? extends @NonNull FieldSetting<?>> settingsView = null;
+	private @Nullable Map<String, FieldSetting<?>> settings = null;
+	private @Nullable Collection<? extends FieldSetting<?>> settingsView = null;
 
 	protected Config() {
 	}
@@ -62,7 +61,7 @@ public abstract class Config {
 	// SETTINGS SETUP
 
 	private void setupSettings() {
-		Map<@NonNull String, @NonNull FieldSetting<?>> settings = this.settings;
+		Map<String, FieldSetting<?>> settings = this.settings;
 		if (settings != null) {
 			return; // Already setup
 		}
@@ -83,9 +82,9 @@ public abstract class Config {
 		customDefaultValueTypes = null;
 	}
 
-	private Stream<@NonNull Field> streamSettingFields() {
+	private Stream<Field> streamSettingFields() {
 		Class<?> configClass = this.getClass();
-		Stream<@NonNull Field> settings = this.streamSettingFields(configClass);
+		Stream<Field> settings = this.streamSettingFields(configClass);
 
 		// Append setting fields of parent config classes (allows for composition of config
 		// classes):
@@ -99,8 +98,8 @@ public abstract class Config {
 		return settings;
 	}
 
-	private final Stream<@NonNull Field> streamSettingFields(Class<?> configClass) {
-		List<@NonNull Field> fields = Arrays.asList(configClass.getDeclaredFields());
+	private final Stream<Field> streamSettingFields(Class<?> configClass) {
+		List<Field> fields = Arrays.asList(configClass.getDeclaredFields());
 		return fields.stream().filter(field -> {
 			// Filter fields:
 			if (field.isSynthetic()) return false;
@@ -165,7 +164,7 @@ public abstract class Config {
 	protected final <T> @Nullable ValueType<T> getValueTypeByAnnotation(Field field) {
 		WithValueType valueTypeAnnotation = field.getAnnotation(WithValueType.class);
 		if (valueTypeAnnotation != null) {
-			Class<? extends @NonNull ValueType<?>> valueTypeClass = valueTypeAnnotation.value();
+			Class<? extends ValueType<?>> valueTypeClass = valueTypeAnnotation.value();
 			assert valueTypeClass != null;
 			return (ValueType<T>) instantiateValueType(valueTypeClass);
 		}
@@ -173,11 +172,11 @@ public abstract class Config {
 	}
 
 	private static ValueType<?> instantiateValueType(
-			Class<? extends @NonNull ValueType<?>> valueTypeClass
+			Class<? extends ValueType<?>> valueTypeClass
 	) {
 		assert valueTypeClass != null;
 		try {
-			return valueTypeClass.newInstance();
+			return valueTypeClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Could not instantiate ValueType: "
 					+ valueTypeClass.getName(), e);
@@ -278,11 +277,11 @@ public abstract class Config {
 	}
 
 	private static ValueTypeProvider instantiateValueTypeProvider(
-			Class<? extends @NonNull ValueTypeProvider> valueTypeProviderClass
+			Class<? extends ValueTypeProvider> valueTypeProviderClass
 	) {
 		assert valueTypeProviderClass != null;
 		try {
-			return valueTypeProviderClass.newInstance();
+			return valueTypeProviderClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Could not instantiate ValueTypeProvider: "
 					+ valueTypeProviderClass.getName(), e);
@@ -296,7 +295,7 @@ public abstract class Config {
 	 * 
 	 * @return an unmodifiable view on the settings
 	 */
-	public final Collection<? extends @NonNull Setting<?>> getSettings() {
+	public final Collection<? extends Setting<?>> getSettings() {
 		this.setupSettings();
 		return Unsafe.assertNonNull(settingsView);
 	}
@@ -521,7 +520,7 @@ public abstract class Config {
 	 *            the texts with {@code &}-based color codes, not <code>null</code>
 	 * @return a new list containing the corresponding texts with Minecraft's color codes
 	 */
-	protected static List<@NonNull String> c(List<? extends @NonNull String> texts) {
+	protected static List<String> c(List<? extends String> texts) {
 		return TextUtils.colorize(texts);
 	}
 }

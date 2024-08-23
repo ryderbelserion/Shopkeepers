@@ -3,8 +3,6 @@ package com.nisovin.shopkeepers.shopkeeper.migration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -20,7 +18,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
  */
 public final class ShopkeeperDataMigrator {
 
-	private static final List<@NonNull Migration> migrations = new ArrayList<>();
+	private static final List<Migration> migrations = new ArrayList<>();
 
 	/**
 	 * Registers the given {@link Migration}.

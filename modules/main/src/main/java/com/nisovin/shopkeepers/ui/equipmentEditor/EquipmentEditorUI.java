@@ -6,7 +6,6 @@ import java.util.function.BiConsumer;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -19,9 +18,9 @@ public class EquipmentEditorUI {
 	public static boolean request(
 			AbstractShopkeeper shopkeeper,
 			Player player,
-			List<? extends @NonNull EquipmentSlot> supportedSlots,
-			Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> currentEquipment,
-			BiConsumer<@NonNull EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged
+			List<? extends EquipmentSlot> supportedSlots,
+			Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> currentEquipment,
+			BiConsumer<EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged
 	) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		Validate.notNull(player, "player is null");

@@ -11,7 +11,6 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -67,7 +66,7 @@ public class ShopkeeperSpawner {
 	// entry whenever a world is saved, even if the world does not contain any shopkeepers yet.
 	// World entries are removed again once the world has been unloaded and the last shopkeeper has
 	// been removed.
-	private final Map<@NonNull String, @NonNull WorldData> worlds = new HashMap<>();
+	private final Map<String, WorldData> worlds = new HashMap<>();
 
 	public ShopkeeperSpawner(SKShopkeepersPlugin plugin, SKShopkeeperRegistry shopkeeperRegistry) {
 		Validate.notNull(plugin, "plugin is null");
@@ -166,8 +165,8 @@ public class ShopkeeperSpawner {
 
 	// SHOPKEEPER SPAWN STATE
 
-	private static final Predicate<@NonNull AbstractShopkeeper> IS_SPAWNING = ShopkeeperSpawner::isSpawning;
-	private static final Predicate<@NonNull AbstractShopkeeper> IS_DESPAWNING = ShopkeeperSpawner::isDespawning;
+	private static final Predicate<AbstractShopkeeper> IS_SPAWNING = ShopkeeperSpawner::isSpawning;
+	private static final Predicate<AbstractShopkeeper> IS_DESPAWNING = ShopkeeperSpawner::isDespawning;
 
 	private static State getSpawnState(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
@@ -454,10 +453,10 @@ public class ShopkeeperSpawner {
 	public void spawnChunkShopkeepers(
 			ChunkCoords chunkCoords,
 			String spawnReason,
-			Predicate<? super @NonNull AbstractShopkeeper> filter,
+			Predicate<? super AbstractShopkeeper> filter,
 			boolean spawnImmediately
 	) {
-		Collection<? extends @NonNull AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
+		Collection<? extends AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
 		this.spawnChunkShopkeepers(chunkCoords, spawnReason, shopkeepers, filter, spawnImmediately);
 	}
 
@@ -465,8 +464,8 @@ public class ShopkeeperSpawner {
 	public void spawnChunkShopkeepers(
 			ChunkCoords chunkCoords,
 			String spawnReason,
-			Collection<? extends @NonNull AbstractShopkeeper> shopkeepers,
-			Predicate<? super @NonNull AbstractShopkeeper> filter,
+			Collection<? extends AbstractShopkeeper> shopkeepers,
+			Predicate<? super AbstractShopkeeper> filter,
 			boolean spawnImmediately
 	) {
 		assert chunkCoords != null && spawnReason != null && shopkeepers != null && filter != null;
@@ -571,10 +570,10 @@ public class ShopkeeperSpawner {
 	public void despawnChunkShopkeepers(
 			ChunkCoords chunkCoords,
 			String despawnReason,
-			Predicate<? super @NonNull AbstractShopkeeper> filter,
-			@Nullable Consumer<? super @NonNull AbstractShopkeeper> onDespawned
+			Predicate<? super AbstractShopkeeper> filter,
+			@Nullable Consumer<? super AbstractShopkeeper> onDespawned
 	) {
-		Collection<? extends @NonNull AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
+		Collection<? extends AbstractShopkeeper> shopkeepers = shopkeeperRegistry.getShopkeepersInChunkSnapshot(chunkCoords);
 		this.despawnChunkShopkeepers(chunkCoords, despawnReason, shopkeepers, filter, onDespawned);
 	}
 
@@ -583,9 +582,9 @@ public class ShopkeeperSpawner {
 	public void despawnChunkShopkeepers(
 			ChunkCoords chunkCoords,
 			String despawnReason,
-			Collection<? extends @NonNull AbstractShopkeeper> shopkeepers,
-			Predicate<? super @NonNull AbstractShopkeeper> filter,
-			@Nullable Consumer<? super @NonNull AbstractShopkeeper> onDespawned
+			Collection<? extends AbstractShopkeeper> shopkeepers,
+			Predicate<? super AbstractShopkeeper> filter,
+			@Nullable Consumer<? super AbstractShopkeeper> onDespawned
 	) {
 		assert chunkCoords != null && despawnReason != null && shopkeepers != null && filter != null;
 		if (shopkeepers.isEmpty()) return;
@@ -677,7 +676,7 @@ public class ShopkeeperSpawner {
 	void spawnShopkeepersInWorld(
 			String worldName,
 			String spawnReason,
-			Predicate<? super @NonNull AbstractShopkeeper> shopkeeperFilter,
+			Predicate<? super AbstractShopkeeper> shopkeeperFilter,
 			boolean spawnImmediately
 	) {
 		assert worldName != null && spawnReason != null && shopkeeperFilter != null;
@@ -690,14 +689,14 @@ public class ShopkeeperSpawner {
 
 		// The shopkeeper chunk map can change while we iterate over these chunks. We therefore need
 		// to create a snapshot of these chunks first.
-		List<? extends @NonNull ChunkCoords> chunks = new ArrayList<>(shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet());
+		List<? extends ChunkCoords> chunks = new ArrayList<>(shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet());
 
 		// Mark all shopkeepers as 'spawning' up front, so that we can detect and account for spawn
 		// state changes that happen in the meantime:
 		chunks.forEach(chunkCoords -> {
 			if (!shopkeeperRegistry.isChunkActive(chunkCoords)) return;
 
-			Collection<? extends @NonNull AbstractShopkeeper> chunkShopkeepers = shopkeeperRegistry.getShopkeepersInChunk(chunkCoords);
+			Collection<? extends AbstractShopkeeper> chunkShopkeepers = shopkeeperRegistry.getShopkeepersInChunk(chunkCoords);
 			chunkShopkeepers.forEach(shopkeeper -> {
 				// TODO Cast is required due to a limitation of CheckerFramework
 				if (!shopkeeperFilter.test(Unsafe.cast(shopkeeper))) return;
@@ -706,7 +705,7 @@ public class ShopkeeperSpawner {
 		});
 
 		// We only spawn the shopkeepers that are still marked as 'spawning' once we process them:
-		Predicate<? super @NonNull AbstractShopkeeper> newShopkeeperFilter = IS_SPAWNING.and(shopkeeperFilter);
+		Predicate<? super AbstractShopkeeper> newShopkeeperFilter = IS_SPAWNING.and(shopkeeperFilter);
 		assert newShopkeeperFilter != null;
 
 		chunks.forEach(chunkCoords -> {
@@ -730,8 +729,8 @@ public class ShopkeeperSpawner {
 	void despawnShopkeepersInWorld(
 			String worldName,
 			String despawnReason,
-			Predicate<? super @NonNull AbstractShopkeeper> shopkeeperFilter,
-			@Nullable Consumer<? super @NonNull AbstractShopkeeper> onDespawned
+			Predicate<? super AbstractShopkeeper> shopkeeperFilter,
+			@Nullable Consumer<? super AbstractShopkeeper> onDespawned
 	) {
 		assert worldName != null && despawnReason != null && shopkeeperFilter != null;
 
@@ -743,7 +742,7 @@ public class ShopkeeperSpawner {
 
 		// The shopkeeper chunk map can change while we iterate over these chunks. We therefore need
 		// to create a snapshot of these chunks first.
-		List<? extends @NonNull ChunkCoords> chunks = new ArrayList<>(
+		List<? extends ChunkCoords> chunks = new ArrayList<>(
 				shopkeeperRegistry.getShopkeepersByChunks(worldName).keySet()
 		);
 
@@ -752,7 +751,7 @@ public class ShopkeeperSpawner {
 		chunks.forEach(chunkCoords -> {
 			if (!shopkeeperRegistry.isChunkActive(chunkCoords)) return;
 
-			Collection<? extends @NonNull AbstractShopkeeper> chunkShopkeepers = shopkeeperRegistry.getShopkeepersInChunk(chunkCoords);
+			Collection<? extends AbstractShopkeeper> chunkShopkeepers = shopkeeperRegistry.getShopkeepersInChunk(chunkCoords);
 			chunkShopkeepers.forEach(shopkeeper -> {
 				// TODO Cast is required due to a limitation of CheckerFramework
 				if (!shopkeeperFilter.test(Unsafe.cast(shopkeeper))) return;
@@ -762,7 +761,7 @@ public class ShopkeeperSpawner {
 
 		// We only despawn the shopkeepers that are still marked as 'despawning' once we process
 		// them:
-		Predicate<? super @NonNull AbstractShopkeeper> newShopkeeperFilter = IS_DESPAWNING.and(shopkeeperFilter);
+		Predicate<? super AbstractShopkeeper> newShopkeeperFilter = IS_DESPAWNING.and(shopkeeperFilter);
 		assert newShopkeeperFilter != null;
 
 		chunks.forEach(chunkCoords -> {

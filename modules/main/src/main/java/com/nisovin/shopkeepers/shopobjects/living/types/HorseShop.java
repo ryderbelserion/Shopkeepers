@@ -11,7 +11,6 @@ import org.bukkit.entity.Horse;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -36,7 +35,7 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class HorseShop extends BabyableShop<@NonNull Horse> {
+public class HorseShop extends BabyableShop<Horse> {
 
 	public enum HorseArmor {
 
@@ -57,17 +56,17 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 		}
 	}
 
-	public static final Property<Horse.@NonNull Color> COLOR = new BasicProperty<Horse.@NonNull Color>()
+	public static final Property<Horse.Color> COLOR = new BasicProperty<Horse.Color>()
 			.dataKeyAccessor("color", EnumSerializers.lenient(Horse.Color.class))
 			.defaultValue(Horse.Color.BROWN)
 			.build();
 
-	public static final Property<Horse.@NonNull Style> STYLE = new BasicProperty<Horse.@NonNull Style>()
+	public static final Property<Horse.Style> STYLE = new BasicProperty<Horse.Style>()
 			.dataKeyAccessor("style", EnumSerializers.lenient(Horse.Style.class))
 			.defaultValue(Horse.Style.NONE)
 			.build();
 
-	public static final Property<@NonNull Boolean> SADDLE = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> SADDLE = new BasicProperty<Boolean>()
 			.dataKeyAccessor("saddle", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
@@ -78,13 +77,13 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 			.defaultValue(null)
 			.build();
 
-	private final PropertyValue<Horse.@NonNull Color> colorProperty = new PropertyValue<>(COLOR)
+	private final PropertyValue<Horse.Color> colorProperty = new PropertyValue<>(COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyColor)
 			.build(properties);
-	private final PropertyValue<Horse.@NonNull Style> styleProperty = new PropertyValue<>(STYLE)
+	private final PropertyValue<Horse.Style> styleProperty = new PropertyValue<>(STYLE)
 			.onValueChanged(Unsafe.initialized(this)::applyStyle)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> saddleProperty = new PropertyValue<>(SADDLE)
+	private final PropertyValue<Boolean> saddleProperty = new PropertyValue<>(SADDLE)
 			.onValueChanged(Unsafe.initialized(this)::applySaddle)
 			.build(properties);
 	private final PropertyValue<@Nullable HorseArmor> armorProperty = new PropertyValue<>(ARMOR)
@@ -93,7 +92,7 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 
 	public HorseShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull HorseShop> livingObjectType,
+			SKLivingShopObjectType<HorseShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -128,8 +127,8 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getStyleEditorButton());
 		editorButtons.add(this.getSaddleEditorButton());
@@ -164,6 +163,7 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 	private void applyColor() {
 		Horse entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setColor(this.getColor());
 	}
 
@@ -236,6 +236,7 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 	private void applyStyle() {
 		Horse entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setStyle(this.getStyle());
 	}
 
@@ -289,6 +290,7 @@ public class HorseShop extends BabyableShop<@NonNull Horse> {
 	private void applySaddle() {
 		Horse entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.getInventory().setSaddle(this.hasSaddle() ? new ItemStack(Material.SADDLE) : null);
 	}
 

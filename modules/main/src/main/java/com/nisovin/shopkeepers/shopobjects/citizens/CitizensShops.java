@@ -14,7 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -83,7 +82,7 @@ public class CitizensShops {
 	// created are not contained in this mapping.
 	// If multiple shopkeepers are associated with the same NPC, this mapping keeps track of all of
 	// these shopkeepers.
-	private final Map<@NonNull UUID, @NonNull List<@NonNull AbstractShopkeeper>> shopkeepersByNpcId = new HashMap<>();
+	private final Map<UUID, List<AbstractShopkeeper>> shopkeepersByNpcId = new HashMap<>();
 
 	public CitizensShops(SKShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -273,7 +272,7 @@ public class CitizensShops {
 		AbstractShopkeeper shopkeeper = citizensShop.getShopkeeper();
 		// If there is no entry for this NPC id yet, we create a new List with an initial capacity
 		// of 1, because we usually expect there to only be one shopkeeper associated with the NPC:
-		List<@NonNull AbstractShopkeeper> shopkeepers = shopkeepersByNpcId.computeIfAbsent(
+		List<AbstractShopkeeper> shopkeepers = shopkeepersByNpcId.computeIfAbsent(
 				npcId,
 				key -> new ArrayList<>(1)
 		);
@@ -302,12 +301,12 @@ public class CitizensShops {
 	// If there are multiple shopkeepers associated with the given NPC, this only returns one of
 	// them.
 	public @Nullable AbstractShopkeeper getShopkeeper(NPC npc) {
-		List<? extends @NonNull AbstractShopkeeper> shopkeepers = this.getShopkeepers(npc);
+		List<? extends AbstractShopkeeper> shopkeepers = this.getShopkeepers(npc);
 		return shopkeepers.isEmpty() ? null : shopkeepers.get(0);
 	}
 
 	// Returns an empty list if there are no shopkeepers associated with the given NPC.
-	public List<? extends @NonNull AbstractShopkeeper> getShopkeepers(NPC npc) {
+	public List<? extends AbstractShopkeeper> getShopkeepers(NPC npc) {
 		Validate.notNull(npc, "npc is null");
 		UUID npcId = npc.getUniqueId();
 		assert npcId != null;
@@ -315,9 +314,9 @@ public class CitizensShops {
 	}
 
 	// Returns an empty list if there are no shopkeepers associated with the given NPC id.
-	private List<? extends @NonNull AbstractShopkeeper> getShopkeepers(UUID npcId) {
+	private List<? extends AbstractShopkeeper> getShopkeepers(UUID npcId) {
 		Validate.notNull(npcId, "npcId is null");
-		List<@NonNull AbstractShopkeeper> shopkeepers = shopkeepersByNpcId.get(npcId);
+		List<AbstractShopkeeper> shopkeepers = shopkeepersByNpcId.get(npcId);
 		return (shopkeepers != null) ? shopkeepers : Collections.emptyList();
 	}
 
@@ -443,7 +442,7 @@ public class CitizensShops {
 				return;
 			}
 
-			List<? extends @NonNull AbstractShopkeeper> shopkeepers = this.getShopkeepers(npcUniqueId);
+			List<? extends AbstractShopkeeper> shopkeepers = this.getShopkeepers(npcUniqueId);
 			if (shopkeepers.size() > 1) {
 				// There are multiple Citizen shopkeepers using the same NPC.
 				// We consider the first registered shopkeeper to be the legitimate one and don't

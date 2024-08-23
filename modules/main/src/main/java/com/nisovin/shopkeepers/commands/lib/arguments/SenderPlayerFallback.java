@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -22,9 +21,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * If the sender is not a player, a {@link RequiresPlayerArgumentException} is thrown.
  */
-public class SenderPlayerFallback extends TypedFallbackArgument<@NonNull Player> {
+public class SenderPlayerFallback extends TypedFallbackArgument<Player> {
 
-	public static class SenderPlayerArgument extends CommandArgument<@NonNull Player> {
+	public static class SenderPlayerArgument extends CommandArgument<Player> {
 
 		public SenderPlayerArgument(String name) {
 			super(name);
@@ -50,7 +49,7 @@ public class SenderPlayerFallback extends TypedFallbackArgument<@NonNull Player>
 		}
 
 		@Override
-		public List<? extends @NonNull String> complete(
+		public List<? extends String> complete(
 				CommandInput input,
 				CommandContextView context,
 				ArgumentsReader argsReader
@@ -59,7 +58,7 @@ public class SenderPlayerFallback extends TypedFallbackArgument<@NonNull Player>
 		}
 	}
 
-	public SenderPlayerFallback(CommandArgument<@NonNull Player> argument) {
+	public SenderPlayerFallback(CommandArgument<Player> argument) {
 		super(
 				Validate.notNull(argument, "argument is null"),
 				new SenderPlayerArgument(argument.getName())

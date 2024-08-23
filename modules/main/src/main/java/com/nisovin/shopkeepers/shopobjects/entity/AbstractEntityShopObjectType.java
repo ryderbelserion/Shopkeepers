@@ -16,12 +16,12 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
  * @param <T>
  *            the type of the shop objects this represents
  */
-public abstract class AbstractEntityShopObjectType<T extends @NonNull AbstractEntityShopObject>
+public abstract class AbstractEntityShopObjectType<T extends AbstractEntityShopObject>
 		extends AbstractShopObjectType<T> implements EntityShopObjectType<T> {
 
 	protected AbstractEntityShopObjectType(
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			@Nullable String permission,
 			Class<@NonNull T> shopObjectType
 	) {

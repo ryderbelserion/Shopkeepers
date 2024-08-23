@@ -9,7 +9,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -24,7 +23,7 @@ public final class EnchantmentUtils {
 	private static final int MAX_LEVEL = Short.MAX_VALUE;
 
 	// Lower case keys:
-	private static final Map<String, @NonNull Integer> LEVEL_NAMES = new HashMap<>();
+	private static final Map<String, Integer> LEVEL_NAMES = new HashMap<>();
 	static {
 		LEVEL_NAMES.put("min", Integer.MIN_VALUE); // Uses the enchantment's normal min level
 		LEVEL_NAMES.put("max", Integer.MAX_VALUE); // Uses the enchantment's normal max level
@@ -42,12 +41,12 @@ public final class EnchantmentUtils {
 
 	// TODO This may require updating on Minecraft updates.
 	// Formatted like the keys of namespaced keys:
-	private static final Map<String, @NonNull Enchantment> ALIASES = new HashMap<>();
+	private static final Map<String, Enchantment> ALIASES = new HashMap<>();
 	static {
-		ALIASES.put("curse_of_binding", Unsafe.assertNonNull(Enchantment.BINDING_CURSE));
-		ALIASES.put("curse_of_vanishing", Unsafe.assertNonNull(Enchantment.VANISHING_CURSE));
-		ALIASES.put("sweeping_edge", Unsafe.assertNonNull(Enchantment.SWEEPING_EDGE));
-		ALIASES.put("channelling", Unsafe.assertNonNull(Enchantment.CHANNELING));
+		ALIASES.put("curse_of_binding", Enchantment.BINDING_CURSE);
+		ALIASES.put("curse_of_vanishing", Enchantment.VANISHING_CURSE);
+		ALIASES.put("sweeping_edge", Enchantment.SWEEPING_EDGE);
+		ALIASES.put("channelling", Enchantment.CHANNELING);
 	}
 
 	public static @Nullable Enchantment parseEnchantment(String input) {

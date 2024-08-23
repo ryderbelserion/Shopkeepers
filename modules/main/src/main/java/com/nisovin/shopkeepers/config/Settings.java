@@ -1,9 +1,5 @@
 package com.nisovin.shopkeepers.config;
 
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,7 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -38,12 +33,12 @@ import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
-import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Trilean;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -52,10 +47,10 @@ public class Settings extends Config {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 6;
+	public static int configVersion = 7;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
-	public static List<@NonNull String> debugOptions = new ArrayList<>(0);
+	public static List<String> debugOptions = new ArrayList<>(0);
 	public static boolean enableMetrics = true;
 
 	/*
@@ -66,12 +61,11 @@ public class Settings extends Config {
 	/*
 	 * Shopkeeper Data
 	 */
-	public static String fileEncoding = "UTF-8";
 	public static boolean saveInstantly = true;
 
 	public static boolean convertPlayerItems = false;
 	public static boolean convertAllPlayerItems = true;
-	public static List<@NonNull ItemData> convertPlayerItemsExceptions = new ArrayList<>();
+	public static List<ItemData> convertPlayerItemsExceptions = new ArrayList<>();
 
 	/*
 	 * Plugin Compatibility
@@ -124,7 +118,7 @@ public class Settings extends Config {
 	// Villager is the default and therefore first. The other entity types are alphabetically
 	// sorted.
 	// TODO Generate the default enabled mobs list based on the server's version.
-	public static List<@NonNull String> enabledLivingShops = CollectionUtils.addAll(
+	public static List<String> enabledLivingShops = CollectionUtils.addAll(
 			new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())),
 			CollectionUtils.sort(Arrays.asList(
 					EntityType.COW.name(),
@@ -379,8 +373,6 @@ public class Settings extends Config {
 
 		public static DateTimeFormatter dateTimeFormatter = Unsafe.uncheckedNull();
 
-		public static Charset fileCharset = Unsafe.uncheckedNull();
-
 		public static TradingRecipeDraft sellingEmptyTrade = Unsafe.uncheckedNull();
 		public static TradingRecipeDraft sellingEmptyTradeSlotItems = Unsafe.uncheckedNull();
 		public static TradingRecipeDraft buyingEmptyTrade = Unsafe.uncheckedNull();
@@ -408,9 +400,9 @@ public class Settings extends Config {
 		public static Pattern shopNamePattern = Unsafe.uncheckedNull();
 
 		// Sorted in descending order:
-		public static final List<@NonNull MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
+		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
 
-		public static final Set<@NonNull EntityType> enabledLivingShops = new LinkedHashSet<>();
+		public static final Set<EntityType> enabledLivingShops = new LinkedHashSet<>();
 
 		static {
 			// Initial setup of default values:
@@ -432,21 +424,6 @@ public class Settings extends Config {
 				Messages.dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat)
 						.withZone(Unsafe.assertNonNull(ZoneId.systemDefault()));
-			}
-
-			// Charset derived from specified file encoding:
-			if (StringUtils.isEmpty(fileEncoding)) {
-				Log.warning(INSTANCE.getLogPrefix() + "'file-encoding' is empty. "
-						+ "Using default 'UTF-8'.");
-				fileEncoding = "UTF-8";
-			}
-			try {
-				fileCharset = Charset.forName(fileEncoding);
-			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-				Log.warning(INSTANCE.getLogPrefix() + "Invalid or unsupported 'file-encoding' ('"
-						+ fileEncoding + "'). Using default 'UTF-8'.");
-				fileEncoding = "UTF-8";
-				fileCharset = Unsafe.assertNonNull(StandardCharsets.UTF_8);
 			}
 
 			sellingEmptyTrade = new TradingRecipeDraft(
@@ -729,13 +706,11 @@ public class Settings extends Config {
 		}
 
 		public final boolean debug;
-		public final List<? extends @NonNull String> debugOptions;
-		public final Charset fileCharset;
+		public final List<? extends String> debugOptions;
 
 		private AsyncSettings() {
 			this.debug = Settings.debug;
 			this.debugOptions = Collections.unmodifiableList(new ArrayList<>(Settings.debugOptions));
-			this.fileCharset = DerivedSettings.fileCharset;
 		}
 	}
 
@@ -755,6 +730,22 @@ public class Settings extends Config {
 
 	///// PERSISTENCE
 
+	private static ConfigData getPluginConfigData() {
+		Plugin plugin = SKShopkeepersPlugin.getInstance();
+		var pluginConfig = plugin.getConfig();
+		// The default dot path separator can cause issues.
+		// For example, since Bukkit 1.20.6, item attribute modifiers are now serialized using the
+		// attribute namespaced keys as section keys, which can contain dots. When saving ItemData
+		// with attribute modifiers, we filter the serialized item meta data (to produce a more
+		// minimal and user-friendly output) and then apply all preserved key-value pairs to this
+		// config-backed DataContainer. Setting values with a key containing dots would by default
+		// result in sub-sections to be created, which fails to properly deserialize later.
+		ConfigUtils.disablePathSeparator(pluginConfig);
+		// This is a wrapper around the Bukkit config. Config comments are preserved by the
+		// underlying Bukkit config.
+		return ConfigData.of(pluginConfig);
+	}
+
 	// Returns null on success, otherwise a severe issue prevented loading the config.
 	public static @Nullable ConfigLoadException loadConfig() {
 		Log.info("Loading config.");
@@ -765,9 +756,8 @@ public class Settings extends Config {
 
 		// Load config:
 		plugin.reloadConfig();
-		// This is a wrapper around the Bukkit config. Config comments are preserved by the
-		// underlying Bukkit config.
-		ConfigData configData = ConfigData.of(plugin.getConfig());
+
+		ConfigData configData = getPluginConfigData();
 
 		// Load settings from config:
 		boolean configChanged;
@@ -816,7 +806,7 @@ public class Settings extends Config {
 	public static void saveConfig() {
 		Log.info("Saving config.");
 		Plugin plugin = SKShopkeepersPlugin.getInstance();
-		ConfigData configData = ConfigData.of(plugin.getConfig());
+		ConfigData configData = getPluginConfigData();
 		Settings.getInstance().save(configData);
 		plugin.saveConfig();
 	}

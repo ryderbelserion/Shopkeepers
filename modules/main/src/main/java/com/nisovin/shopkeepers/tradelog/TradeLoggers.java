@@ -9,7 +9,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeCompletedEvent;
@@ -25,7 +24,7 @@ import com.nisovin.shopkeepers.util.trading.TradeMerger.MergeMode;
 public class TradeLoggers implements Listener {
 
 	private final Plugin plugin;
-	private final List<@NonNull TradeLogger> loggers = new ArrayList<>();
+	private final List<TradeLogger> loggers = new ArrayList<>();
 	// In order to represent the logged trades more compactly, we merge equivalent trades that are
 	// triggered in quick succession over a certain period of time. The maximum merge duration is
 	// configurable, and the trade merging can also be disabled.

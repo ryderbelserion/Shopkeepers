@@ -4,10 +4,9 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Material;
-import org.bukkit.entity.Animals;
+import org.bukkit.entity.Goat;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -28,37 +27,36 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-// TODO Use actual Goal type once we only support Bukkit 1.17 upwards
-public class GoatShop extends BabyableShop<@NonNull Animals> {
+public class GoatShop extends BabyableShop<Goat> {
 
-	public static final Property<@NonNull Boolean> SCREAMING = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> SCREAMING = new BasicProperty<Boolean>()
 			.dataKeyAccessor("screaming", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	public static final Property<@NonNull Boolean> LEFT_HORN = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> LEFT_HORN = new BasicProperty<Boolean>()
 			.dataKeyAccessor("leftHorn", BooleanSerializers.LENIENT)
 			.defaultValue(true)
 			.build();
 
-	public static final Property<@NonNull Boolean> RIGHT_HORN = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> RIGHT_HORN = new BasicProperty<Boolean>()
 			.dataKeyAccessor("rightHorn", BooleanSerializers.LENIENT)
 			.defaultValue(true)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> screamingProperty = new PropertyValue<>(SCREAMING)
+	private final PropertyValue<Boolean> screamingProperty = new PropertyValue<>(SCREAMING)
 			.onValueChanged(Unsafe.initialized(this)::applyScreaming)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> leftHornProperty = new PropertyValue<>(LEFT_HORN)
+	private final PropertyValue<Boolean> leftHornProperty = new PropertyValue<>(LEFT_HORN)
 			.onValueChanged(Unsafe.initialized(this)::applyLeftHorn)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> rightHornProperty = new PropertyValue<>(RIGHT_HORN)
+	private final PropertyValue<Boolean> rightHornProperty = new PropertyValue<>(RIGHT_HORN)
 			.onValueChanged(Unsafe.initialized(this)::applyRightHorn)
 			.build(properties);
 
 	public GoatShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull GoatShop> livingObjectType,
+			SKLivingShopObjectType<GoatShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -90,8 +88,8 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		// The screaming option is hidden if shopkeeper mobs are silent.
 		if (!Settings.silenceLivingShopEntities) {
 			editorButtons.add(this.getScreamingEditorButton());
@@ -117,9 +115,10 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	private void applyScreaming() {
-		Animals entity = this.getEntity();
+		Goat entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setScreamingGoat(entity, this.isScreaming());
+
+		entity.setScreaming(this.isScreaming());
 	}
 
 	private ItemStack getScreamingEditorItem() {
@@ -170,9 +169,10 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	private void applyLeftHorn() {
-		Animals entity = this.getEntity();
+		Goat entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setGoatLeftHorn(entity, this.hasLeftHorn());
+
+		entity.setLeftHorn(this.hasLeftHorn());
 	}
 
 	private ItemStack getLeftHornEditorItem() {
@@ -218,9 +218,10 @@ public class GoatShop extends BabyableShop<@NonNull Animals> {
 	}
 
 	private void applyRightHorn() {
-		Animals entity = this.getEntity();
+		Goat entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		NMSManager.getProvider().setGoatRightHorn(entity, this.hasRightHorn());
+
+		entity.setRightHorn(this.hasRightHorn());
 	}
 
 	private ItemStack getRightHornEditorItem() {

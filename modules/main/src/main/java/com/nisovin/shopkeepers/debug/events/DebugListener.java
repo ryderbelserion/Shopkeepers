@@ -9,7 +9,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredListener;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -54,7 +53,7 @@ public class DebugListener implements Listener {
 		boolean printedListeners = false;
 	}
 
-	private final Map<@NonNull String, @NonNull EventData> eventData = new HashMap<>();
+	private final Map<String, EventData> eventData = new HashMap<>();
 	private @Nullable String lastLoggedEvent = null;
 	private int lastLoggedEventCounter = 0;
 

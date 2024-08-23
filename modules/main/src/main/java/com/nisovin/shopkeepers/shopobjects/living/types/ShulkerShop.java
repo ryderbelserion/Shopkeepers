@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -37,7 +36,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
+public class ShulkerShop extends SKLivingShopObject<Shulker> {
 
 	public static final Property<@Nullable DyeColor> COLOR = new BasicProperty<@Nullable DyeColor>()
 			.dataKeyAccessor("color", EnumSerializers.lenient(DyeColor.class))
@@ -45,7 +44,7 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 			.defaultValue(null)
 			.build();
 
-	public static final Property<@NonNull BlockFace> ATTACHED_FACE = new BasicProperty<@NonNull BlockFace>()
+	public static final Property<BlockFace> ATTACHED_FACE = new BasicProperty<BlockFace>()
 			.dataKeyAccessor("attachedFace", EnumSerializers.lenient(BlockFace.class))
 			.validator(value -> {
 				Validate.isTrue(BlockFaceUtils.isBlockSide(value),
@@ -59,13 +58,13 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	private final PropertyValue<@Nullable DyeColor> colorProperty = new PropertyValue<>(COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyColor)
 			.build(properties);
-	private final PropertyValue<@NonNull BlockFace> attachedFaceProperty = new PropertyValue<>(ATTACHED_FACE)
+	private final PropertyValue<BlockFace> attachedFaceProperty = new PropertyValue<>(ATTACHED_FACE)
 			.onValueChanged(Unsafe.initialized(this)::applyAttachedFace)
 			.build(properties);
 
 	public ShulkerShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull ShulkerShop> livingObjectType,
+			SKLivingShopObjectType<ShulkerShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -141,8 +140,8 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		return editorButtons;
 	}
@@ -166,6 +165,7 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	private void applyColor() {
 		Shulker entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		// TODO Bukkit's Shulker interface does not specify the nullness
 		entity.setColor(Unsafe.nullableAsNonNull(this.getColor()));
 	}
@@ -227,6 +227,7 @@ public class ShulkerShop extends SKLivingShopObject<@NonNull Shulker> {
 	private void applyAttachedFace() {
 		Shulker entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		this.applyAttachedFace(entity);
 	}
 

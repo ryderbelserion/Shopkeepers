@@ -14,12 +14,12 @@ import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
  * @param <T>
  *            the shop object type
  */
-public abstract class BaseBlockShopObjectType<T extends @NonNull BaseBlockShopObject>
+public abstract class BaseBlockShopObjectType<T extends BaseBlockShopObject>
 		extends AbstractBlockShopObjectType<T> {
 
 	protected BaseBlockShopObjectType(
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			@Nullable String permission,
 			Class<@NonNull T> shopObjectType
 	) {

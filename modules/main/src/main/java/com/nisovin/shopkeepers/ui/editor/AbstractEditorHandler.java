@@ -18,7 +18,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -84,7 +83,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	protected final TradingRecipesAdapter tradingRecipesAdapter;
 
-	private final Map<@NonNull UUID, @NonNull EditorSession> editorSessions = new HashMap<>();
+	private final Map<UUID, EditorSession> editorSessions = new HashMap<>();
 
 	protected AbstractEditorHandler(
 			AbstractUIType uiType,
@@ -558,7 +557,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		dirtyButtons = true;
 	}
 
-	protected final void addButtons(Iterable<? extends @NonNull Button> buttons) {
+	protected final void addButtons(Iterable<? extends Button> buttons) {
 		Validate.notNull(buttons, "buttons is null");
 		for (Button button : buttons) {
 			this.addButton(button);
@@ -598,7 +597,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	 */
 	protected EditorSession createEditorSession(
 			UISession uiSession,
-			List<@NonNull TradingRecipeDraft> recipes,
+			List<TradingRecipeDraft> recipes,
 			Inventory inventory
 	) {
 		return new EditorSession(uiSession, recipes, inventory);
@@ -620,7 +619,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		this.setup();
 
 		// Set up session:
-		List<@NonNull TradingRecipeDraft> recipes = tradingRecipesAdapter.getTradingRecipes();
+		List<TradingRecipeDraft> recipes = tradingRecipesAdapter.getTradingRecipes();
 
 		// Create inventory:
 		Inventory inventory = Bukkit.createInventory(
@@ -662,7 +661,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		Inventory inventory = editorSession.getInventory();
 		int page = editorSession.getCurrentPage();
 		assert page >= 1;
-		List<@NonNull TradingRecipeDraft> recipes = editorSession.getRecipes();
+		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
 		int recipeStartIndex = (page - 1) * TRADES_COLUMNS;
 		for (int column = 0; column < TRADES_COLUMNS; column++) {
 			int recipeIndex = recipeStartIndex + column;
@@ -814,7 +813,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		if (event.isCancelled()) return; // Already cancelled
 
 		InventoryView view = event.getView();
-		Set<@NonNull Integer> slots = Unsafe.castNonNull(event.getRawSlots());
+		Set<Integer> slots = Unsafe.castNonNull(event.getRawSlots());
 		for (Integer rawSlotInteger : slots) {
 			int rawSlot = rawSlotInteger;
 			if (this.isTradesArea(rawSlot)) continue;
@@ -953,7 +952,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		Inventory inventory = editorSession.getInventory();
 		int page = editorSession.getCurrentPage();
 		assert page >= 1;
-		List<@NonNull TradingRecipeDraft> recipes = editorSession.getRecipes();
+		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
 
 		int recipesPerPage = COLUMNS_PER_ROW;
 		int startIndex = (page - 1) * recipesPerPage;

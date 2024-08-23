@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
@@ -16,13 +15,13 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class EditorSession {
 
 	private final UISession uiSession;
-	private final List<@NonNull TradingRecipeDraft> recipes;
+	private final List<TradingRecipeDraft> recipes;
 	private final Inventory inventory;
 	private int currentPage = 1;
 
 	protected EditorSession(
 			UISession uiSession,
-			List<@NonNull TradingRecipeDraft> recipes,
+			List<TradingRecipeDraft> recipes,
 			Inventory inventory
 	) {
 		Validate.notNull(uiSession, "uiSession is null");
@@ -58,7 +57,7 @@ public class EditorSession {
 		this.currentPage = newPage;
 	}
 
-	public final List<@NonNull TradingRecipeDraft> getRecipes() {
+	public final List<TradingRecipeDraft> getRecipes() {
 		return recipes;
 	}
 }

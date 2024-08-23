@@ -1,10 +1,39 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.22.3 (TBA)
-### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+## v2.23.1 (TBA)
+### Supported MC versions: 1.21.1, 1.21, 1.20.6
 
-**Update: Some change in Spigot 1.21 broke this version of the Shopkeepers plugin. This version only works on Spigot versions from before 2024-07-06.**
+* Config: Remove `file-encoding` setting: We use Bukkit to load the save data, which always expects the data to be UTF-8 encoded.
+
+## v2.23.0 (2024-08-11)
+### Supported MC versions: 1.21.1, 1.21, 1.20.6
+
+* Update for MC 1.21.1.
+* Drop support for MC versions below 1.20.6 to update the plugin to use Java 21 and build against a more modern API version.
+  * If you want to run this plugin on an older server version, you need to use an older plugin version.
+  * Internal: Various updates for Bukkit 1.20.6 and Java 21.
+* Item display name and lore data from the language file can be specified as Json text now.
+* Fix: Color codes in text (e.g. from the language file) did not reset formatting.
+* Fix: Item data containing attribute modifiers was not correctly saved to the plugin config and failed to load.
+* Extend the item stack we use for server assumption tests to include newer item data.
+* Update the compatibility mode:
+  * Fix: The compatibility mode periodically set all shopkeepers mobs on fire.
+  * Remove broken reflection-based item NBT matching logic. In compatibility mode, we simply compare items for equality now, which is usually stricter than Minecraft's actual item comparisons (i.e. trades might get blocked that would usually be allowed).
+* Build: Use the Eclipse compiler for null analysis.
+  * Include the Eclipse JDT preference files for use by the ECJ compiler.
+  * Use the JDT `NonNullByDefault` annotation which ECJ interprets as non-null-by-default in more contexts (e.g. for type parameters). Remove various now redundant null annotations.
+  * Add `external-annotations` module for external ECJ null annotations. This reduces the need for various `assertNonNull` calls.
+* Internal: Avoid force-loading entities for chunks whose entities were not yet loaded, e.g. for the `check` command or the spawn blocking feature.
+* Internal: Avoid setting `reset` as color code.
+
+## v2.22.3 (2024-07-27)
+### Supported MC versions: 1.21, 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5
+
+* Fix: Compatibility with the latest versions of Spigot 1.21 (Thanks @DerMistkaefer).
+  * Spigot 1.21 builds from before 2024-07-07 are not supported.
+  * Spigot's `enum-compatibility-mode` is not supported, but also not required for this plugin.
+* Build: Update sonarqube task name and skip for pull request builds.
 
 ## v2.22.2 (2024-07-20)
 ### Supported MC versions: (1.21,) 1.20.6, 1.20.4, 1.20.2, 1.20.1, 1.19.4, 1.18.2, 1.17.1, 1.16.5

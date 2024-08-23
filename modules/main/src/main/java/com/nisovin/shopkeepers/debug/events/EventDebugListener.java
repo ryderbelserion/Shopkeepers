@@ -25,14 +25,14 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * @param <E>
  *            the event type
  */
-public class EventDebugListener<E extends @NonNull Event> implements Listener {
+public class EventDebugListener<E extends Event> implements Listener {
 
-	public interface EventHandler<E extends @NonNull Event> {
+	public interface EventHandler<E extends Event> {
 		public void handleEvent(EventPriority priority, @NonNull E event);
 	}
 
 	private final Class<? extends @NonNull E> eventClass;
-	private final Map<@NonNull EventPriority, @NonNull EventExecutor> executors = new EnumMap<>(EventPriority.class);
+	private final Map<EventPriority, EventExecutor> executors = new EnumMap<>(EventPriority.class);
 
 	public EventDebugListener(
 			Class<? extends @NonNull E> eventClass,

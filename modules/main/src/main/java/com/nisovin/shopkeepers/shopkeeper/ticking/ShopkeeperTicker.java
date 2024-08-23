@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.debug.DebugOptions;
@@ -49,12 +48,12 @@ public class ShopkeeperTicker {
 
 	private static final class TickingGroup {
 
-		private final Set<@NonNull AbstractShopkeeper> shopkeepers = new LinkedHashSet<>();
+		private final Set<AbstractShopkeeper> shopkeepers = new LinkedHashSet<>();
 
 		TickingGroup() {
 		}
 
-		Collection<? extends @NonNull AbstractShopkeeper> getShopkeepers() {
+		Collection<? extends AbstractShopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 
@@ -75,9 +74,9 @@ public class ShopkeeperTicker {
 
 	private final SKShopkeepersPlugin plugin;
 
-	private final List<? extends @NonNull TickingGroup> tickingGroups;
+	private final List<? extends TickingGroup> tickingGroups;
 	{
-		List<@NonNull TickingGroup> tickingGroups = new ArrayList<>(TICKING_GROUPS);
+		List<TickingGroup> tickingGroups = new ArrayList<>(TICKING_GROUPS);
 		for (int i = 0; i < TICKING_GROUPS; i++) {
 			tickingGroups.add(new TickingGroup());
 		}
@@ -93,7 +92,7 @@ public class ShopkeeperTicker {
 	// and only the actual registration change is deferred, because if a shopkeeper changes its
 	// ticking state multiple times during the same tick we would otherwise lose the callbacks for
 	// the intermediate ticking state changes.
-	private final Map<@NonNull AbstractShopkeeper, @NonNull Boolean> pendingTickingChanges = new LinkedHashMap<>();
+	private final Map<AbstractShopkeeper, Boolean> pendingTickingChanges = new LinkedHashMap<>();
 
 	public ShopkeeperTicker(SKShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "plugin is null");

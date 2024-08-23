@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopkeeper.migration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -58,7 +57,7 @@ public class MigrationPhase {
 	 */
 	public static final class ShopkeeperClassMigrationPhase extends MigrationPhase {
 
-		private static final Map<@NonNull Class<? extends Shopkeeper>, @NonNull ShopkeeperClassMigrationPhase> CACHE = new HashMap<>();
+		private static final Map<Class<? extends Shopkeeper>, ShopkeeperClassMigrationPhase> CACHE = new HashMap<>();
 
 		private static ShopkeeperClassMigrationPhase of(
 				Class<? extends Shopkeeper> shopkeeperClass
@@ -135,7 +134,7 @@ public class MigrationPhase {
 	 */
 	public static final class ShopObjectClassMigrationPhase extends MigrationPhase {
 
-		private static final Map<@NonNull Class<? extends ShopObject>, @NonNull ShopObjectClassMigrationPhase> CACHE = new HashMap<>();
+		private static final Map<Class<? extends ShopObject>, ShopObjectClassMigrationPhase> CACHE = new HashMap<>();
 
 		private static ShopObjectClassMigrationPhase of(Class<? extends ShopObject> shopObjectClass) {
 			ShopObjectClassMigrationPhase migrationPhase = CACHE.computeIfAbsent(

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -48,7 +47,7 @@ class CommandSnapshotRemove extends Command {
 		this.setDescription(Messages.commandDescriptionSnapshotRemove);
 
 		// Arguments:
-		CommandArgument<@NonNull Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
+		CommandArgument<Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		);

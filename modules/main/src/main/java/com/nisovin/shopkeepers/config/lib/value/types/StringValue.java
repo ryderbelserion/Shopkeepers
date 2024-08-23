@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
@@ -8,7 +7,7 @@ import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class StringValue extends ValueType<@NonNull String> {
+public class StringValue extends ValueType<String> {
 
 	public static final StringValue INSTANCE = new StringValue();
 

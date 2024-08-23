@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.config.lib.value.types;
 
 import java.util.Locale;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
@@ -14,7 +13,7 @@ import com.nisovin.shopkeepers.util.java.Trilean;
 // We don't use a nullable Boolean here, because we use use null as an indicator for missing values
 // or failed conversions in a few places.
 // We don't use Optional, because Optional becomes verbose to work with.
-public class TrileanValue extends ValueType<@NonNull Trilean> {
+public class TrileanValue extends ValueType<Trilean> {
 
 	public static final TrileanValue INSTANCE = new TrileanValue();
 

@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -22,13 +21,13 @@ public class CommandRegistry {
 	private final Command parent;
 
 	// Sorted by insertion order:
-	private final Set<@NonNull Command> commands = new LinkedHashSet<>();
-	private final Set<@NonNull Command> commandsView = Collections.unmodifiableSet(commands);
+	private final Set<Command> commands = new LinkedHashSet<>();
+	private final Set<Command> commandsView = Collections.unmodifiableSet(commands);
 	// Normalized aliases:
 	// Implementation detail (used by Command): All aliases for the same command are stored in
 	// succession.
-	private final Map<@NonNull String, @NonNull Command> commandsByAlias = new LinkedHashMap<>();
-	private final Map<@NonNull String, @NonNull Command> commandsByAliasView = Collections.unmodifiableMap(commandsByAlias);
+	private final Map<String, Command> commandsByAlias = new LinkedHashMap<>();
+	private final Map<String, Command> commandsByAliasView = Collections.unmodifiableMap(commandsByAlias);
 
 	public CommandRegistry(@UnknownInitialization Command parent) {
 		Validate.notNull(parent, "parent is null");
@@ -97,7 +96,7 @@ public class CommandRegistry {
 	 * 
 	 * @return an unmodifiable view on all registered commands
 	 */
-	public Collection<? extends @NonNull Command> getCommands() {
+	public Collection<? extends Command> getCommands() {
 		return commandsView;
 	}
 
@@ -121,7 +120,7 @@ public class CommandRegistry {
 	 * 
 	 * @return an unmodifiable view on all registered command aliases
 	 */
-	public Set<? extends @NonNull String> getAliases() {
+	public Set<? extends String> getAliases() {
 		return commandsByAliasView.keySet();
 	}
 
@@ -130,7 +129,7 @@ public class CommandRegistry {
 	 * 
 	 * @return an unmodifiable view on all registered aliases and the commands they are mapped to
 	 */
-	public Map<? extends @NonNull String, ? extends @NonNull Command> getAliasesMap() {
+	public Map<? extends String, ? extends Command> getAliasesMap() {
 		return commandsByAliasView;
 	}
 
@@ -142,12 +141,12 @@ public class CommandRegistry {
 	 * @return an unmodifiable view on all registered aliases that are mapped to the specified
 	 *         command
 	 */
-	public List<? extends @NonNull String> getAliases(Command command) {
+	public List<? extends String> getAliases(Command command) {
 		if (commandsByAlias.isEmpty()) {
 			return Collections.emptyList();
 		}
-		List<@NonNull String> aliases = new ArrayList<>();
-		for (Entry<? extends @NonNull String, ? extends @NonNull Command> entry : commandsByAlias.entrySet()) {
+		List<String> aliases = new ArrayList<>();
+		for (Entry<? extends String, ? extends Command> entry : commandsByAlias.entrySet()) {
 			if (entry.getValue() == command) {
 				aliases.add(entry.getKey());
 			}

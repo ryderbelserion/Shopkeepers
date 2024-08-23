@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -23,7 +21,7 @@ public class ActiveChunkQueries {
 	private final ShopkeeperChunkActivator shopkeeperActivator;
 
 	// Note: Already unmodifiable.
-	private final Set<? extends @NonNull AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<@NonNull AbstractShopkeeper>() {
+	private final Set<? extends AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<AbstractShopkeeper>() {
 		@Override
 		public Iterator<AbstractShopkeeper> iterator() {
 			return Unsafe.assertNonNull(shopkeeperChunkMap).getWorldsWithShopkeepers().stream()
@@ -62,18 +60,18 @@ public class ActiveChunkQueries {
 
 	// QUERIES
 
-	public Set<? extends @NonNull AbstractShopkeeper> getShopkeepersInActiveChunks() {
+	public Set<? extends AbstractShopkeeper> getShopkeepersInActiveChunks() {
 		return shopkeepersInActiveChunksView;
 	}
 
 	// TODO Cache these query objects per world?
 
-	public Set<? extends @NonNull ChunkCoords> getActiveChunks(String worldName) {
+	public Set<? extends ChunkCoords> getActiveChunks(String worldName) {
 		WorldShopkeepers worldShopkeepers = shopkeeperChunkMap.getWorldShopkeepers(worldName);
 		if (worldShopkeepers == null) return Collections.emptySet();
 
 		// Note: Already unmodifiable.
-		Set<? extends @NonNull ChunkCoords> activeChunksView = new AbstractSet<@NonNull ChunkCoords>() {
+		Set<? extends ChunkCoords> activeChunksView = new AbstractSet<ChunkCoords>() {
 			@Override
 			public Iterator<ChunkCoords> iterator() {
 				return Unsafe.cast(worldShopkeepers.getShopkeepersByChunk().keySet().stream()
@@ -92,12 +90,12 @@ public class ActiveChunkQueries {
 		return activeChunksView;
 	}
 
-	public Set<? extends @NonNull AbstractShopkeeper> getShopkeepersInActiveChunks(String worldName) {
+	public Set<? extends AbstractShopkeeper> getShopkeepersInActiveChunks(String worldName) {
 		WorldShopkeepers worldShopkeepers = shopkeeperChunkMap.getWorldShopkeepers(worldName);
 		if (worldShopkeepers == null) return Collections.emptySet();
 
 		// Note: Already unmodifiable.
-		Set<? extends @NonNull AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<@NonNull AbstractShopkeeper>() {
+		Set<? extends AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
 				return worldShopkeepers.getShopkeepersByChunk().entrySet().stream()

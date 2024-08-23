@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util.inventory;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -119,8 +120,8 @@ public final class ItemUtils {
 
 	public static boolean isHangingSign(@Nullable Material material) {
 		if (material == null) return false;
-
-		return material.toString().endsWith("HANGING_SIGN");
+		return material.data == org.bukkit.block.data.type.HangingSign.class
+				|| material.data == org.bukkit.block.data.type.WallHangingSign.class;
 	}
 
 	public static boolean isRail(@Nullable Material material) {
@@ -457,7 +458,7 @@ public final class ItemUtils {
 			Material type,
 			int amount,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		assert type != null; // Checked by the ItemStack constructor
 		assert type.isItem();
@@ -471,7 +472,7 @@ public final class ItemUtils {
 			ItemData itemData,
 			int amount,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		Validate.notNull(itemData, "itemData is null");
 		return setDisplayNameAndLore(itemData.createItemStack(amount), displayName, lore);
@@ -482,15 +483,17 @@ public final class ItemUtils {
 	public static ItemStack setDisplayNameAndLore(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		return setItemMeta(itemStack, displayName, lore, null);
 	}
 
-	public static ItemStack setItemMeta(
+	// Replaced in favor of setItemMeta that supports Json text.
+	@Deprecated
+	public static ItemStack setItemMetaLegacy(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore,
+			@ReadOnly @Nullable List<? extends String> lore,
 			@Nullable Integer maxStackSize
 	) {
 		Validate.notNull(itemStack, "itemStack is null");
@@ -503,9 +506,76 @@ public final class ItemUtils {
 				meta.setLore(Unsafe.cast(lore));
 			}
 			if (maxStackSize != null) {
-				NMSManager.getProvider().setMaxStackSize(meta, maxStackSize);
+				meta.setMaxStackSize(maxStackSize);
 			}
 			itemStack.setItemMeta(meta);
+		}
+		return itemStack;
+	}
+
+	// Supports Json display name and lore.
+	public static ItemStack setItemMeta(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String displayName,
+			@ReadOnly @Nullable List<? extends String> lore,
+			@Nullable Integer maxStackSize
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		ItemMeta originalMeta = itemStack.getItemMeta();
+		if (originalMeta != null) {
+			@NonNull ItemMeta newItemMeta = originalMeta;
+			if (displayName != null || lore != null) {
+				// TODO Workaround for missing component API: ItemMeta supports Json text data
+				// during deserialization, so: Serialize the item meta, fill in / replace the text
+				// data, and then deserialize the item meta.
+
+				// Modifiable copy of the serialized item meta:
+				var serializedMeta = new LinkedHashMap<String, Object>(newItemMeta.serialize());
+				if (displayName != null) {
+					serializedMeta.put("display-name", displayName);
+				}
+				if (lore != null) {
+					serializedMeta.put("lore", Unsafe.cast(lore));
+				}
+				var deserializedMeta = ItemSerialization.deserializeItemMeta(serializedMeta);
+				if (deserializedMeta != null) {
+					newItemMeta = deserializedMeta;
+				}
+			}
+
+			if (maxStackSize != null) {
+				newItemMeta.setMaxStackSize(maxStackSize);
+			}
+
+			itemStack.setItemMeta(newItemMeta);
+		}
+		return itemStack;
+	}
+
+	// Supports Json display name and lore.
+	public static ItemStack setItemName(
+			@ReadWrite ItemStack itemStack,
+			@Nullable String itemName
+	) {
+		Validate.notNull(itemStack, "itemStack is null");
+		if (itemName == null) return itemStack;
+
+		ItemMeta originalMeta = itemStack.getItemMeta();
+		if (originalMeta != null) {
+			@NonNull ItemMeta newItemMeta = originalMeta;
+			// TODO Workaround for missing component API: ItemMeta supports Json text data during
+			// deserialization, so: Serialize the item meta, fill in / replace the text data, and
+			// then deserialize the item meta.
+
+			// Modifiable copy of the serialized item meta:
+			var serializedMeta = new LinkedHashMap<String, Object>(newItemMeta.serialize());
+			serializedMeta.put("item-name", itemName);
+			var deserializedMeta = ItemSerialization.deserializeItemMeta(serializedMeta);
+			if (deserializedMeta != null) {
+				newItemMeta = deserializedMeta;
+			}
+
+			itemStack.setItemMeta(newItemMeta);
 		}
 		return itemStack;
 	}
@@ -534,6 +604,7 @@ public final class ItemUtils {
 
 	// Null to remove display name.
 	// The display name is expected to use Minecraft's color codes.
+	// Does not support Json text.
 	public static ItemStack setDisplayName(
 			@ReadWrite ItemStack itemStack,
 			@Nullable String displayName
@@ -807,7 +878,7 @@ public final class ItemUtils {
 			@ReadOnly @Nullable ItemStack item,
 			Material type,
 			@Nullable String displayName,
-			@ReadOnly @Nullable List<? extends @NonNull String> lore
+			@ReadOnly @Nullable List<? extends String> lore
 	) {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
@@ -882,7 +953,7 @@ public final class ItemUtils {
 	public static boolean matchesData(
 			@ReadOnly @Nullable ItemStack item,
 			Material dataType,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		if (item == null) return false;
@@ -894,7 +965,7 @@ public final class ItemUtils {
 	public static boolean matchesData(
 			@Nullable UnmodifiableItemStack item,
 			Material dataType,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		return matchesData(asItemStackOrNull(item), dataType, data, matchPartialLists);
@@ -923,31 +994,25 @@ public final class ItemUtils {
 		if (itemMetaData == null) return false;
 
 		// TODO Maybe there is a better way of doing this in the future..
-		Map<? extends @NonNull String, @NonNull ?> itemMetaDataMap = Unsafe.cast(
-				itemMetaData.serialize()
-		);
-		Map<? extends @NonNull String, @NonNull ?> dataMetaDataMap = Unsafe.cast(
-				dataMetaData.serialize()
-		);
+		Map<? extends String, @NonNull ?> itemMetaDataMap = itemMetaData.serialize();
+		Map<? extends String, @NonNull ?> dataMetaDataMap = dataMetaData.serialize();
 		return matchesData(itemMetaDataMap, dataMetaDataMap, matchPartialLists);
 	}
 
 	public static boolean matchesData(
 			@ReadOnly @Nullable ItemMeta itemMetaData,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		if (data == null || data.isEmpty()) return true;
 		if (itemMetaData == null) return false;
-		Map<? extends @NonNull String, @NonNull ?> itemMetaDataMap = Unsafe.cast(
-				itemMetaData.serialize()
-		);
+		Map<? extends String, @NonNull ?> itemMetaDataMap = itemMetaData.serialize();
 		return matchesData(itemMetaDataMap, data, matchPartialLists);
 	}
 
 	public static boolean matchesData(
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> itemData,
-			@ReadOnly @Nullable Map<? extends @NonNull String, @ReadOnly @NonNull ?> data,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> itemData,
+			@ReadOnly @Nullable Map<? extends String, @ReadOnly @NonNull ?> data,
 			boolean matchPartialLists
 	) {
 		return _matchesData(itemData, data, matchPartialLists);
@@ -1057,7 +1122,7 @@ public final class ItemUtils {
 	 * @return the Predicate
 	 */
 	public static Predicate<@ReadOnly @Nullable ItemStack> matchingItems(
-			@ReadOnly List<? extends @NonNull ItemData> itemDataList
+			@ReadOnly List<? extends ItemData> itemDataList
 	) {
 		Validate.notNull(itemDataList, "itemDataList is null");
 		assert !CollectionUtils.containsNull(itemDataList);

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
@@ -17,10 +16,10 @@ final class ChunkShopkeepers {
 	private final ChunkCoords chunkCoords;
 	// List instead of Set or Map: We don't expect there to be excessive amounts of shopkeepers
 	// inside a single chunk, so removal from the list should be sufficiently fast.
-	private final List<@NonNull AbstractShopkeeper> shopkeepers = new ArrayList<>();
-	private final List<? extends @NonNull AbstractShopkeeper> shopkeepersView = Collections.unmodifiableList(shopkeepers);
+	private final List<AbstractShopkeeper> shopkeepers = new ArrayList<>();
+	private final List<? extends AbstractShopkeeper> shopkeepersView = Collections.unmodifiableList(shopkeepers);
 	// Unmodifiable:
-	private @Nullable List<? extends @NonNull AbstractShopkeeper> shopkeepersSnapshot = null;
+	private @Nullable List<? extends AbstractShopkeeper> shopkeepersSnapshot = null;
 
 	ChunkShopkeepers(ChunkCoords chunkCoords) {
 		Validate.notNull(chunkCoords, "chunkCoords is null");
@@ -52,7 +51,7 @@ final class ChunkShopkeepers {
 
 	// QUERIES
 
-	public List<? extends @NonNull AbstractShopkeeper> getShopkeepers() {
+	public List<? extends AbstractShopkeeper> getShopkeepers() {
 		return shopkeepersView;
 	}
 
@@ -67,7 +66,7 @@ final class ChunkShopkeepers {
 	 * 
 	 * @return an unmodifiable snapshot of the chunk's shopkeepers, not <code>null</code>
 	 */
-	public List<? extends @NonNull AbstractShopkeeper> getShopkeepersSnapshot() {
+	public List<? extends AbstractShopkeeper> getShopkeepersSnapshot() {
 		if (shopkeepersSnapshot == null) {
 			shopkeepersSnapshot = Collections.unmodifiableList(new ArrayList<>(shopkeepers));
 		}

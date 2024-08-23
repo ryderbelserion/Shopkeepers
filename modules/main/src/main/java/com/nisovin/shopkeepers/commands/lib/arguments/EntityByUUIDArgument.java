@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -16,26 +15,26 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 /**
  * Determines an existing entity by the given UUID input.
  */
-public class EntityByUUIDArgument extends ObjectByIdArgument<@NonNull UUID, @NonNull Entity> {
+public class EntityByUUIDArgument extends ObjectByIdArgument<UUID, Entity> {
 
 	public EntityByUUIDArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public EntityByUUIDArgument(String name, ArgumentFilter<? super @NonNull Entity> filter) {
+	public EntityByUUIDArgument(String name, ArgumentFilter<? super Entity> filter) {
 		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public EntityByUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Entity> filter,
+			ArgumentFilter<? super Entity> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull UUID> createIdArgument(
+	protected ObjectIdArgument<UUID> createIdArgument(
 			@UnknownInitialization EntityByUUIDArgument this,
 			String name,
 			IdArgumentArgs args
@@ -46,7 +45,7 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<@NonNull UUID, @Non
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+			protected Iterable<? extends UUID> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -71,7 +70,7 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<@NonNull UUID, @Non
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+	protected Iterable<? extends UUID> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

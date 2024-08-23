@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
 public abstract class AbstractText implements Text {
 
 	// Reused among all Text instances:
-	private static final Map<@NonNull String, @NonNull Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
 	private static final MessageArguments TEMP_ARGUMENTS = MessageArguments.ofMap(TEMP_ARGUMENTS_MAP);
 
 	// TODO Remove parent reference?
@@ -37,7 +37,7 @@ public abstract class AbstractText implements Text {
 	// PARENT
 
 	@Override
-	public <T extends @NonNull Text> @Nullable T getParent() {
+	public <T extends Text> @Nullable T getParent() {
 		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g.
 		// to TextBuilder in a fluently built Text).
 		return Unsafe.cast(parent);
@@ -57,7 +57,7 @@ public abstract class AbstractText implements Text {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends @NonNull Text> @NonNull T getRoot() {
+	public <T extends Text> @NonNull T getRoot() {
 		Text text = this;
 		Text parent;
 		while ((parent = text.getParent()) != null) {
@@ -143,9 +143,7 @@ public abstract class AbstractText implements Text {
 	}
 
 	@Override
-	public final Text setPlaceholderArguments(
-			Map<? extends @NonNull String, @NonNull ?> arguments
-	) {
+	public final Text setPlaceholderArguments(Map<? extends String, @NonNull ?> arguments) {
 		return this.setPlaceholderArguments(MessageArguments.ofMap(arguments));
 	}
 

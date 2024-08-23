@@ -4,11 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.checkerframework.checker.initialization.qual.Initialized;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -20,12 +17,12 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.ShopkeeperNameMatchers;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 
-public class ShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
+public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
 	private final ShopkeeperByUUIDArgument shopUUIDArgument;
 	private final ShopkeeperByIdArgument shopIdArgument;
 	private final ShopkeeperByNameArgument shopNameArgument;
-	private final TypedFirstOfArgument<@NonNull Shopkeeper> firstOfArgument;
+	private final TypedFirstOfArgument<Shopkeeper> firstOfArgument;
 
 	public ShopkeeperArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
@@ -35,14 +32,14 @@ public class ShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
 		this(name, joinRemainingArgs, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperArgument(String name, ArgumentFilter<? super @NonNull Shopkeeper> filter) {
+	public ShopkeeperArgument(String name, ArgumentFilter<? super Shopkeeper> filter) {
 		this(name, false, filter);
 	}
 
 	public ShopkeeperArgument(
 			String name,
 			boolean joinRemainingArgs,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter
+			ArgumentFilter<? super Shopkeeper> filter
 	) {
 		this(
 				name,
@@ -56,7 +53,7 @@ public class ShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
 	public ShopkeeperArgument(
 			String name,
 			boolean joinRemainingArgs,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter,
+			ArgumentFilter<? super Shopkeeper> filter,
 			int minimumNameCompletionInput,
 			int minimumUUIDCompletionInput
 	) {
@@ -79,9 +76,7 @@ public class ShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
 					CommandContextView context,
 					String nameInput
 			) throws ArgumentParseException {
-				@Initialized
-				@NonNull ShopkeeperArgument thiz = Unsafe.cast(ShopkeeperArgument.this);
-				return thiz.getShopkeeper(nameInput);
+				return ShopkeeperArgument.this.getShopkeeper(nameInput);
 			}
 		};
 		this.firstOfArgument = new TypedFirstOfArgument<>(
@@ -105,7 +100,7 @@ public class ShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
 	 *             if the id is ambiguous
 	 */
 	public @Nullable Shopkeeper getShopkeeper(String nameInput) throws IllegalArgumentException {
-		Stream<? extends @NonNull Shopkeeper> shopkeepers = ShopkeeperNameMatchers.DEFAULT.match(nameInput);
+		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperNameMatchers.DEFAULT.match(nameInput);
 		return CollectionUtils.getFirstOrNull(shopkeepers);
 		// TODO deal with ambiguities
 	}
@@ -121,7 +116,7 @@ public class ShopkeeperArgument extends CommandArgument<@NonNull Shopkeeper> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

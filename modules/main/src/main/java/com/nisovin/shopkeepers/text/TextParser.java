@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.text;
 
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -142,7 +141,7 @@ class TextParser {
 		}
 	}
 
-	private <T extends @NonNull TextBuilder> T next(T next) {
+	private <T extends TextBuilder> T next(T next) {
 		assert next != null;
 		// Append any pending text:
 		this.appendCurrentText();

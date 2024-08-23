@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -27,20 +26,20 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
-public class SnowmanShop extends SKLivingShopObject<@NonNull Snowman> {
+public class SnowmanShop extends SKLivingShopObject<Snowman> {
 
-	public static final Property<@NonNull Boolean> PUMPKIN_HEAD = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> PUMPKIN_HEAD = new BasicProperty<Boolean>()
 			.dataKeyAccessor("pumpkinHead", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> pumpkinHeadProperty = new PropertyValue<>(PUMPKIN_HEAD)
+	private final PropertyValue<Boolean> pumpkinHeadProperty = new PropertyValue<>(PUMPKIN_HEAD)
 			.onValueChanged(Unsafe.initialized(this)::applyPumpkinHead)
 			.build(properties);
 
 	public SnowmanShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull SnowmanShop> livingObjectType,
+			SKLivingShopObjectType<SnowmanShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -66,8 +65,8 @@ public class SnowmanShop extends SKLivingShopObject<@NonNull Snowman> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPumpkinHeadEditorButton());
 		return editorButtons;
 	}
@@ -89,6 +88,7 @@ public class SnowmanShop extends SKLivingShopObject<@NonNull Snowman> {
 	private void applyPumpkinHead() {
 		Snowman entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setDerp(!this.hasPumpkinHead());
 	}
 

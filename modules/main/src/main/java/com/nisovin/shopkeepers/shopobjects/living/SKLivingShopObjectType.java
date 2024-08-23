@@ -26,11 +26,11 @@ import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public final class SKLivingShopObjectType<T extends @NonNull SKLivingShopObject<?>>
+public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>>
 		extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
 
 	@FunctionalInterface
-	public static interface ShopObjectConstructor<T extends @NonNull SKLivingShopObject<?>> {
+	public static interface ShopObjectConstructor<T extends SKLivingShopObject<?>> {
 
 		public @NonNull T create(
 				LivingShops livingShops,
@@ -50,7 +50,7 @@ public final class SKLivingShopObjectType<T extends @NonNull SKLivingShopObject<
 			LivingShops livingShops,
 			EntityType entityType,
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			String permission,
 			Class<@NonNull T> shopObjectType,
 			ShopObjectConstructor<T> shopObjectConstructor

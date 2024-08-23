@@ -61,11 +61,11 @@ public abstract class Command {
 			.buildRoot();
 
 	private final String name;
-	private final List<? extends @NonNull String> aliases; // Unmodifiable
+	private final List<? extends String> aliases; // Unmodifiable
 	private Text description = Text.EMPTY;
 	// Null if no permission is required:
 	private @Nullable String permission = null;
-	private final List<@NonNull CommandArgument<?>> arguments = new ArrayList<>();
+	private final List<CommandArgument<?>> arguments = new ArrayList<>();
 	private @Nullable Command parent = null;
 	private final CommandRegistry childCommands = Unsafe.initialized(new CommandRegistry(this));
 
@@ -79,7 +79,7 @@ public abstract class Command {
 	private final MessageArguments commonMessageArgs;
 	{
 		// Dynamically evaluated:
-		Map<@NonNull String, @NonNull Supplier<@NonNull ?>> commonMessageArgs = new HashMap<>();
+		Map<String, Supplier<@NonNull ?>> commonMessageArgs = new HashMap<>();
 		commonMessageArgs.put("name", Unsafe.initialized(this)::getName);
 		commonMessageArgs.put("description", Unsafe.initialized(this)::getDescription);
 		commonMessageArgs.put("command", Unsafe.initialized(this)::getCommandFormat);
@@ -99,7 +99,7 @@ public abstract class Command {
 		this(name, Collections.emptyList());
 	}
 
-	public Command(String name, List<? extends @NonNull String> aliases) {
+	public Command(String name, List<? extends String> aliases) {
 		Validate.notEmpty(name, "name is null or empty");
 		Validate.notNull(aliases, "aliases is null");
 		this.name = name;
@@ -108,7 +108,7 @@ public abstract class Command {
 		if (aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
-			List<@NonNull String> aliasesCopy = new ArrayList<>(aliases);
+			List<String> aliasesCopy = new ArrayList<>(aliases);
 			// Validate aliases:
 			for (String alias : aliasesCopy) {
 				Validate.notEmpty(alias, "aliases contains null or empty alias");
@@ -142,7 +142,7 @@ public abstract class Command {
 	 * 
 	 * @return an unmodifiable view on the aliases, might be empty (but not <code>null</code>)
 	 */
-	public final List<? extends @NonNull String> getAliases() {
+	public final List<? extends String> getAliases() {
 		return aliases;
 	}
 
@@ -332,7 +332,7 @@ public abstract class Command {
 	 * 
 	 * @return an unmodifiable view on the arguments of this command
 	 */
-	public final List<? extends @NonNull CommandArgument<?>> getArguments() {
+	public final List<? extends CommandArgument<?>> getArguments() {
 		return Collections.unmodifiableList(arguments);
 	}
 
@@ -1032,7 +1032,7 @@ public abstract class Command {
 		}
 
 		// Remaining unexpected/unparsed arguments:
-		@NonNull String firstUnparsedArg = argsReader.peek();
+		String firstUnparsedArg = argsReader.peek();
 		if (!this.getChildCommands().getCommands().isEmpty()) {
 			// Has child commands: Throw an 'unknown command' exception.
 			// TODO Only use this exception if no arguments got parsed by this command?
@@ -1042,7 +1042,7 @@ public abstract class Command {
 			// parsed argument:
 			CommandContext context = parsingContext.context;
 			CommandArgument<?> firstUnparsedArgument = null;
-			ListIterator<@NonNull CommandArgument<?>> argumentsIter = arguments.listIterator(arguments.size());
+			ListIterator<CommandArgument<?>> argumentsIter = arguments.listIterator(arguments.size());
 			while (argumentsIter.hasPrevious()) {
 				@Nullable CommandArgument<?> argument = argumentsIter.previous();
 				assert argument != null;
@@ -1098,7 +1098,7 @@ public abstract class Command {
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions'
 	 *         (not <code>null</code> and not containing <code>null</code>)
 	 */
-	public List<? extends @NonNull String> handleTabCompletion(CommandInput input) {
+	public List<? extends String> handleTabCompletion(CommandInput input) {
 		Validate.notNull(input, "input is null");
 		Validate.isTrue(input.getCommand() == this.getRootCommand(),
 				"input is meant for a different command");
@@ -1121,7 +1121,7 @@ public abstract class Command {
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions'
 	 *         (not <code>null</code> and not containing <code>null</code>)
 	 */
-	protected List<? extends @NonNull String> handleTabCompletion(
+	protected List<? extends String> handleTabCompletion(
 			CommandInput input,
 			CommandContext context,
 			ArgumentsReader argsReader
@@ -1153,13 +1153,13 @@ public abstract class Command {
 			return Collections.emptyList();
 		}
 
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		if (argsReader.getRemainingSize() == 1) {
 			String finalArgument = CommandUtils.normalize(argsReader.peek());
 			// Include matching child-command aliases (max one per command):
 			// Asserts that the aliases-map provides all aliases for the same command in succession.
 			Command lastMatchingCommand = null;
-			for (Entry<? extends @NonNull String, ? extends @NonNull Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
+			for (Entry<? extends String, ? extends Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
 				String alias = aliasEntry.getKey(); // Normalized
 				Command aliasCommand = aliasEntry.getValue();
 				if (lastMatchingCommand != null && lastMatchingCommand == aliasCommand) {
@@ -1595,7 +1595,7 @@ public abstract class Command {
 		// permission:
 		if (!this.isHiddenInOwnHelp() && this.testPermission(recipient)) {
 			// Command usage:
-			@NonNull Text usageFormat = this.getHelpUsageFormat();
+			Text usageFormat = this.getHelpUsageFormat();
 			assert usageFormat != null;
 			usageFormat.setPlaceholderArguments(commonMsgArgs);
 
@@ -1663,7 +1663,7 @@ public abstract class Command {
 
 				Text helpEntryFormat = HELP_ENTRY_FORMAT;
 				assert childUsageFormat != null;
-				helpEntryFormat.setPlaceholderArguments(MapUtils.<@NonNull String, @NonNull Object>createMap(
+				helpEntryFormat.setPlaceholderArguments(MapUtils.<String, Object>createMap(
 						"usage", childUsageFormat,
 						"description", childDescriptionFormat
 				));

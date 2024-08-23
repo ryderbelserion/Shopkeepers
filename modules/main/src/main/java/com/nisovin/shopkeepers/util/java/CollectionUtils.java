@@ -87,7 +87,7 @@ public final class CollectionUtils {
 	 * @return the given list sorted
 	 * @see List#sort(Comparator)
 	 */
-	public static <E, L extends @NonNull List<? extends E>> L sort(
+	public static <E, L extends List<? extends E>> L sort(
 			L list,
 			Comparator<? super E> comparator
 	) {
@@ -112,7 +112,7 @@ public final class CollectionUtils {
 	 * @return the given collection with the elements added
 	 * @see Collection#addAll(Collection)
 	 */
-	public static <E, C extends @NonNull Collection<? super E>> C addAll(
+	public static <E, C extends Collection<? super E>> C addAll(
 			C collection,
 			Collection<? extends E> toAdd
 	) {

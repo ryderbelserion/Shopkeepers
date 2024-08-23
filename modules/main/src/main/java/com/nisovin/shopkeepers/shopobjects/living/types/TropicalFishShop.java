@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -30,34 +29,34 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> {
+public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 
-	public static final Property<TropicalFish.@NonNull Pattern> PATTERN = new BasicProperty<TropicalFish.@NonNull Pattern>()
+	public static final Property<TropicalFish.Pattern> PATTERN = new BasicProperty<TropicalFish.Pattern>()
 			.dataKeyAccessor("pattern", EnumSerializers.lenient(TropicalFish.Pattern.class))
 			.defaultValue(TropicalFish.Pattern.KOB)
 			.build();
-	public static final Property<@NonNull DyeColor> BODY_COLOR = new BasicProperty<@NonNull DyeColor>()
+	public static final Property<DyeColor> BODY_COLOR = new BasicProperty<DyeColor>()
 			.dataKeyAccessor("bodyColor", EnumSerializers.lenient(DyeColor.class))
 			.defaultValue(DyeColor.WHITE)
 			.build();
-	public static final Property<@NonNull DyeColor> PATTERN_COLOR = new BasicProperty<@NonNull DyeColor>()
+	public static final Property<DyeColor> PATTERN_COLOR = new BasicProperty<DyeColor>()
 			.dataKeyAccessor("patternColor", EnumSerializers.lenient(DyeColor.class))
 			.defaultValue(DyeColor.WHITE)
 			.build();
 
-	private final PropertyValue<TropicalFish.@NonNull Pattern> patternProperty = new PropertyValue<>(PATTERN)
+	private final PropertyValue<TropicalFish.Pattern> patternProperty = new PropertyValue<>(PATTERN)
 			.onValueChanged(Unsafe.initialized(this)::applyPattern)
 			.build(properties);
-	private final PropertyValue<@NonNull DyeColor> bodyColorProperty = new PropertyValue<>(BODY_COLOR)
+	private final PropertyValue<DyeColor> bodyColorProperty = new PropertyValue<>(BODY_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyBodyColor)
 			.build(properties);
-	private final PropertyValue<@NonNull DyeColor> patternColorProperty = new PropertyValue<>(PATTERN_COLOR)
+	private final PropertyValue<DyeColor> patternColorProperty = new PropertyValue<>(PATTERN_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyPatternColor)
 			.build(properties);
 
 	public TropicalFishShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull TropicalFishShop> livingObjectType,
+			SKLivingShopObjectType<TropicalFishShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -89,8 +88,8 @@ public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> 
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPatternEditorButton());
 		editorButtons.add(this.getBodyColorEditorButton());
 		editorButtons.add(this.getPatternColorEditorButton());
@@ -120,6 +119,7 @@ public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> 
 	private void applyPattern() {
 		TropicalFish entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setPattern(this.getPattern());
 	}
 
@@ -131,7 +131,7 @@ public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> 
 				Messages.buttonTropicalFishPattern,
 				"pattern", patternName
 		);
-		List<@NonNull String> lore = StringUtils.replaceArguments(
+		List<String> lore = StringUtils.replaceArguments(
 				Messages.buttonTropicalFishPatternLore,
 				"pattern", patternName
 		);
@@ -177,6 +177,7 @@ public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> 
 	private void applyBodyColor() {
 		TropicalFish entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setBodyColor(this.getBodyColor());
 	}
 
@@ -227,6 +228,7 @@ public class TropicalFishShop extends SKLivingShopObject<@NonNull TropicalFish> 
 	private void applyPatternColor() {
 		TropicalFish entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setPatternColor(this.getPatternColor());
 	}
 

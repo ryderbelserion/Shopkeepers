@@ -42,7 +42,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.projectiles.ProjectileSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -347,7 +346,7 @@ class LivingEntityShopListener implements Listener {
 
 		// Find nearby monsters that prevent bed entering (see MC EntityHuman):
 		Block bedBlock = event.getBed();
-		Collection<@NonNull Entity> monsters = Unsafe.castNonNull(bedBlock.getWorld().getNearbyEntities(
+		Collection<Entity> monsters = Unsafe.castNonNull(bedBlock.getWorld().getNearbyEntities(
 				bedBlock.getLocation(),
 				8.0D, 5.0D, 8.0D,
 				(entity) -> {

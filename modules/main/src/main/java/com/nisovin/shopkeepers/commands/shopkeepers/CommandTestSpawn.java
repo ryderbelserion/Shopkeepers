@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -62,7 +61,7 @@ class CommandTestSpawn extends PlayerCommand {
 
 		// Get the shopkeepers of the current chunk:
 		ChunkCoords chunkCoords = new ChunkCoords(player.getLocation());
-		Collection<? extends @NonNull AbstractShopkeeper> chunkShopkeepers = plugin.getShopkeeperRegistry().getShopkeepersInChunk(chunkCoords);
+		Collection<? extends AbstractShopkeeper> chunkShopkeepers = plugin.getShopkeeperRegistry().getShopkeepersInChunk(chunkCoords);
 		if (chunkShopkeepers.isEmpty()) {
 			player.sendMessage(ChatColor.RED + "There are no shopkeepers in this chunk ("
 					+ chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ() + ")!");
@@ -70,7 +69,7 @@ class CommandTestSpawn extends PlayerCommand {
 		}
 
 		// We only despawn and spawn the shopkeepers that are currently spawned and active:
-		List<@NonNull AbstractShopkeeper> activeShopkeepers = new ArrayList<>(chunkShopkeepers.size());
+		List<AbstractShopkeeper> activeShopkeepers = new ArrayList<>(chunkShopkeepers.size());
 		chunkShopkeepers.forEach(shopkeeper -> {
 			if (shopkeeper.getShopObject().isActive()) {
 				activeShopkeepers.add(shopkeeper);
@@ -169,7 +168,7 @@ class CommandTestSpawn extends PlayerCommand {
 		int failedToSpawn = 0;
 	}
 
-	private static Result testSpawn(Collection<? extends @NonNull AbstractShopkeeper> shopkeepers) {
+	private static Result testSpawn(Collection<? extends AbstractShopkeeper> shopkeepers) {
 		Result result = new Result();
 
 		// Despawn the shopkeepers:

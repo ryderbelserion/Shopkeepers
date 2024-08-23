@@ -17,7 +17,7 @@ public final class ItemSerialization {
 
 	private static final String ITEM_META_SERIALIZATION_KEY = "ItemMeta";
 
-	public static @Nullable Map<? extends @NonNull String, @NonNull ?> serializeItemMeta(
+	public static @Nullable Map<? extends String, @NonNull ?> serializeItemMeta(
 			@ReadOnly @Nullable ItemMeta itemMeta
 	) {
 		// Check if ItemMeta is empty (equivalent to ItemStack#hasItemMeta):
@@ -29,14 +29,14 @@ public final class ItemSerialization {
 		}
 	}
 
-	public static Map<? extends @NonNull String, @NonNull ?> serializeItemMetaOrEmpty(
+	public static Map<? extends String, @NonNull ?> serializeItemMetaOrEmpty(
 			@ReadOnly @Nullable ItemMeta itemMeta
 	) {
-		Map<? extends @NonNull String, @NonNull ?> serializedItemMeta = serializeItemMeta(itemMeta);
+		Map<? extends String, @NonNull ?> serializedItemMeta = serializeItemMeta(itemMeta);
 		if (serializedItemMeta != null) {
 			return serializedItemMeta;
 		} else {
-			return Collections.<@NonNull String, @NonNull Object>emptyMap();
+			return Collections.<String, Object>emptyMap();
 		}
 	}
 
@@ -46,9 +46,8 @@ public final class ItemSerialization {
 		if (itemMetaData == null) return null;
 
 		// Get the class CraftBukkit internally uses for the deserialization:
-		Class<? extends ConfigurationSerializable> serializableItemMetaClass = ConfigurationSerialization.getClassByAlias(
-				ITEM_META_SERIALIZATION_KEY
-		);
+		Class<? extends ConfigurationSerializable> serializableItemMetaClass
+				= ConfigurationSerialization.getClassByAlias(ITEM_META_SERIALIZATION_KEY);
 		if (serializableItemMetaClass == null) {
 			throw new IllegalStateException(
 					"Missing ItemMeta ConfigurationSerializable class for key/alias '"

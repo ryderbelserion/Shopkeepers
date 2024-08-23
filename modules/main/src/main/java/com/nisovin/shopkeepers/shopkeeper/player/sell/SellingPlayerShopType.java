@@ -3,8 +3,6 @@ package com.nisovin.shopkeepers.shopkeeper.player.sell;
 import java.util.Arrays;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -16,8 +14,7 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public final class SellingPlayerShopType
-		extends AbstractPlayerShopType<@NonNull SKSellingPlayerShopkeeper> {
+public final class SellingPlayerShopType extends AbstractPlayerShopType<SKSellingPlayerShopkeeper> {
 
 	static {
 		// Register shopkeeper data migrations:
@@ -74,7 +71,7 @@ public final class SellingPlayerShopType
 	}
 
 	@Override
-	public List<? extends @NonNull String> getTradeSetupDescription() {
+	public List<? extends String> getTradeSetupDescription() {
 		return Messages.tradeSetupDescSelling;
 	}
 

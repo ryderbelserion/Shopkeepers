@@ -30,7 +30,7 @@ public final class ItemConversion {
 		if (itemStack == null) return null;
 		ItemMeta itemMeta = itemStack.getItemMeta(); // Can be null
 		// Can be null:
-		Map<? extends @NonNull String, @NonNull ?> serializedItemMeta = ItemSerialization.serializeItemMeta(itemMeta);
+		Map<? extends String, @NonNull ?> serializedItemMeta = ItemSerialization.serializeItemMeta(itemMeta);
 		if (serializedItemMeta == null) {
 			// Item has no ItemMeta that could get converted:
 			return itemStack;
@@ -46,7 +46,7 @@ public final class ItemConversion {
 
 	public static int convertItems(
 			@ReadOnly @Nullable ItemStack @ReadWrite [] contents,
-			Predicate<@ReadOnly ? super @NonNull ItemStack> filter
+			Predicate<@ReadOnly ? super ItemStack> filter
 	) {
 		Validate.notNull(contents, "contents is null");
 		Validate.notNull(filter, "filter is null");
@@ -68,7 +68,7 @@ public final class ItemConversion {
 
 	public static int convertItems(
 			Inventory inventory,
-			Predicate<@ReadOnly ? super @NonNull ItemStack> filter,
+			Predicate<@ReadOnly ? super ItemStack> filter,
 			boolean updateViewers
 	) {
 		Validate.notNull(inventory, "inventory is null");

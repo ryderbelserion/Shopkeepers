@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.api.shopobjects.block;
 
 import org.bukkit.block.Block;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -15,7 +14,7 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
  * @param <T>
  *            the type of the shop objects this represents
  */
-public interface BlockShopObjectType<T extends @NonNull BlockShopObject> extends ShopObjectType<T> {
+public interface BlockShopObjectType<T extends BlockShopObject> extends ShopObjectType<T> {
 
 	/**
 	 * Gets the {@link Shopkeeper} that uses a {@link ShopObject} of this type and is currently

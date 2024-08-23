@@ -5,7 +5,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -31,23 +30,22 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * The shopkeeper whose snapshots are considered is derived from the {@link CommandContext} using a
  * given command argument.
  */
-public class ShopkeeperSnapshotIndexByNameArgument
-		extends ObjectByIdArgument<@NonNull String, @NonNull Integer> {
+public class ShopkeeperSnapshotIndexByNameArgument extends ObjectByIdArgument<String, Integer> {
 
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 0;
 
-	private final CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument;
+	private final CommandArgument<? extends Shopkeeper> shopkeeperArgument;
 
 	public ShopkeeperSnapshotIndexByNameArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument
 	) {
 		this(name, shopkeeperArgument, false, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperSnapshotIndexByNameArgument(
 			String name,
-			CommandArgument<? extends @NonNull Shopkeeper> shopkeeperArgument,
+			CommandArgument<? extends Shopkeeper> shopkeeperArgument,
 			boolean joinRemainingArgs,
 			int minimumCompletionInput
 	) {
@@ -61,7 +59,7 @@ public class ShopkeeperSnapshotIndexByNameArgument
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull String> createIdArgument(
+	protected ObjectIdArgument<String> createIdArgument(
 			@UnknownInitialization ShopkeeperSnapshotIndexByNameArgument this,
 			String name,
 			IdArgumentArgs args
@@ -73,7 +71,7 @@ public class ShopkeeperSnapshotIndexByNameArgument
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+			protected Iterable<? extends String> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -117,7 +115,7 @@ public class ShopkeeperSnapshotIndexByNameArgument
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+	protected Iterable<? extends String> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
@@ -132,7 +130,7 @@ public class ShopkeeperSnapshotIndexByNameArgument
 		if (shopkeeper == null) return Collections.emptyList();
 
 		String normalizedNamePrefix = StringUtils.normalize(idPrefix);
-		Iterable<@NonNull String> suggestions = shopkeeper.getSnapshots().stream()
+		Iterable<String> suggestions = shopkeeper.getSnapshots().stream()
 				.<@Nullable String>map(snapshot -> {
 					String normalizedWithCase = StringUtils.normalizeKeepCase(snapshot.getName());
 					String normalized = normalizedWithCase.toLowerCase(Locale.ROOT);
@@ -142,7 +140,7 @@ public class ShopkeeperSnapshotIndexByNameArgument
 						return null;
 					}
 				}).filter(Objects::nonNull)
-				.<@NonNull String>map(Unsafe::assertNonNull)::iterator;
+				.map(Unsafe::assertNonNull)::iterator;
 		return suggestions;
 	}
 }

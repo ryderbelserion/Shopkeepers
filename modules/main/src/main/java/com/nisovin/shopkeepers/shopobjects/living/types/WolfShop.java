@@ -6,11 +6,10 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -23,20 +22,20 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
-import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.serialization.bukkit.NamespacedKeySerializers;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class WolfShop extends SittableShop<@NonNull Wolf> {
+public class WolfShop extends SittableShop<Wolf> {
 
-	public static final Property<@NonNull Boolean> ANGRY = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> ANGRY = new BasicProperty<Boolean>()
 			.dataKeyAccessor("angry", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
@@ -47,26 +46,24 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 			.defaultValue(null)
 			.build();
 
-	// TODO Use correct variant type once we only support Bukkit 1.20.6 upwards. Will then also
-	// validate that the value is a valid wolf variant.
-	public static final Property<@NonNull NamespacedKey> VARIANT = new BasicProperty<@NonNull NamespacedKey>()
-			.dataKeyAccessor("wolfVariant", NamespacedKeySerializers.DEFAULT)
-			.defaultValue(NamespacedKeyUtils.create("minecraft", "pale"))
+	public static final Property<Wolf.Variant> VARIANT = new BasicProperty<Wolf.Variant>()
+			.dataKeyAccessor("wolfVariant", KeyedSerializers.forRegistry(Wolf.Variant.class, Registry.WOLF_VARIANT))
+			.defaultValue(Wolf.Variant.PALE)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> angryProperty = new PropertyValue<>(ANGRY)
+	private final PropertyValue<Boolean> angryProperty = new PropertyValue<>(ANGRY)
 			.onValueChanged(Unsafe.initialized(this)::applyAngry)
 			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
-	private final PropertyValue<@NonNull NamespacedKey> variantProperty = new PropertyValue<>(VARIANT)
+	private final PropertyValue<Wolf.Variant> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(Unsafe.initialized(this)::applyVariant)
 			.build(properties);
 
 	public WolfShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull WolfShop> livingObjectType,
+			SKLivingShopObjectType<WolfShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -98,8 +95,8 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		editorButtons.add(this.getVariantEditorButton());
@@ -131,6 +128,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	private void applyAngry() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		// Only marks the wolf as angry for a random duration. We therefore apply this state again
 		// every shopkeeper tick.
 		entity.setAngry(this.isAngry());
@@ -188,6 +186,7 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 	private void applyCollarColor() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:
@@ -235,24 +234,27 @@ public class WolfShop extends SittableShop<@NonNull Wolf> {
 
 	// VARIANT
 
-	public NamespacedKey getVariant() {
+	public Wolf.Variant getVariant() {
 		return variantProperty.getValue();
 	}
 
-	public void setVariant(NamespacedKey variant) {
+	public void setVariant(Wolf.Variant variant) {
 		variantProperty.setValue(variant);
 	}
 
 	public void cycleVariant(boolean backwards) {
-		this.setVariant(NMSManager.getProvider().cycleWolfVariant(this.getVariant(), backwards));
+		this.setVariant(RegistryUtils.cycleKeyed(
+				Registry.WOLF_VARIANT,
+				this.getVariant(),
+				backwards
+		));
 	}
 
 	private void applyVariant() {
 		Wolf entity = this.getEntity();
 		if (entity == null) return; // Not spawned
 
-		NMSManager.getProvider().setWolfVariant(entity, this.getVariant());
-		// entity.setVariant(this.getVariant());
+		entity.setVariant(this.getVariant());
 	}
 
 	private ItemStack getVariantEditorItem() {

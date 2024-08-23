@@ -13,7 +13,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.MerchantRecipe;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -95,7 +94,7 @@ class CommandReplaceAllWithVanillaVillagers extends Command {
 	}
 
 	private void replaceAllShopsWithVillagers(CommandSender sender) {
-		List<? extends @NonNull AbstractShopkeeper> shopkeepers = new ArrayList<>(shopkeeperRegistry.getAllShopkeepers());
+		List<? extends AbstractShopkeeper> shopkeepers = new ArrayList<>(shopkeeperRegistry.getAllShopkeepers());
 		if (shopkeepers.isEmpty()) {
 			TextUtils.sendMessage(sender, Messages.noShopsFound);
 			return;
@@ -275,8 +274,8 @@ class CommandReplaceAllWithVanillaVillagers extends Command {
 	}
 
 	private void applyTradingRecipes(Villager entity, Shopkeeper shopkeeper) {
-		List<? extends @NonNull TradingRecipe> tradingRecipes = shopkeeper.getTradingRecipes(null);
-		List<@NonNull MerchantRecipe> merchantRecipes = MerchantUtils.createMerchantRecipes(tradingRecipes);
-		entity.setRecipes(Unsafe.cast(merchantRecipes));
+		List<? extends TradingRecipe> tradingRecipes = shopkeeper.getTradingRecipes(null);
+		List<MerchantRecipe> merchantRecipes = MerchantUtils.createMerchantRecipes(tradingRecipes);
+		entity.setRecipes(merchantRecipes);
 	}
 }

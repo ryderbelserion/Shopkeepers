@@ -1,4 +1,35 @@
 .gradle
+#################
+## Eclipse
+#################
+
+.project
+.metadata
+.gradle/
+bin/
+target/
+build/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+/.settings/
+**/.settings/*
+# Include JDT preference files for use by ECJ compiler (null analysis):
+!org.eclipse.jdt.core.prefs
+.loadpath
+.flattened-pom.xml
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+#############
+## IntelliJ
+#############
+
 .idea
 build
 
@@ -12,3 +43,11 @@ api/build
 run
 
 jars
+
+modules/api/.settings
+modules/dist/.settings
+modules/main/.settings
+modules/external-annotations
+modules/v1_20_R5
+modules/v1_21_R1
+modules/v1_21_R2

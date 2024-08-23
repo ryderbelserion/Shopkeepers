@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.PufferFish;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -30,23 +29,23 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class PufferFishShop extends SKLivingShopObject<@NonNull PufferFish> {
+public class PufferFishShop extends SKLivingShopObject<PufferFish> {
 
 	public static final int MIN_PUFF_STATE = 0;
 	public static final int MAX_PUFF_STATE = 2;
-	public static final Property<@NonNull Integer> PUFF_STATE = new BasicProperty<@NonNull Integer>()
+	public static final Property<Integer> PUFF_STATE = new BasicProperty<Integer>()
 			.dataKeyAccessor("puffState", NumberSerializers.INTEGER)
 			.validator(IntegerValidators.bounded(MIN_PUFF_STATE, MAX_PUFF_STATE))
 			.defaultValue(0)
 			.build();
 
-	private final PropertyValue<@NonNull Integer> puffStateProperty = new PropertyValue<>(PUFF_STATE)
+	private final PropertyValue<Integer> puffStateProperty = new PropertyValue<>(PUFF_STATE)
 			.onValueChanged(Unsafe.initialized(this)::applyPuffState)
 			.build(properties);
 
 	public PufferFishShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull PufferFishShop> livingObjectType,
+			SKLivingShopObjectType<PufferFishShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -72,8 +71,8 @@ public class PufferFishShop extends SKLivingShopObject<@NonNull PufferFish> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getPuffStateEditorButton());
 		return editorButtons;
 	}
@@ -97,6 +96,7 @@ public class PufferFishShop extends SKLivingShopObject<@NonNull PufferFish> {
 	private void applyPuffState() {
 		PufferFish entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setPuffState(this.getPuffState());
 	}
 
@@ -119,7 +119,7 @@ public class PufferFishShop extends SKLivingShopObject<@NonNull PufferFish> {
 				Messages.buttonPufferFishPuffState,
 				"puffState", puffState
 		);
-		List<@NonNull String> lore = StringUtils.replaceArguments(
+		List<String> lore = StringUtils.replaceArguments(
 				Messages.buttonPufferFishPuffStateLore,
 				"puffState", puffState
 		);

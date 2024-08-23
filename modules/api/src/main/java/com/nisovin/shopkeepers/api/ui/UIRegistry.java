@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.api.ui;
 import java.util.Collection;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -15,14 +14,14 @@ import com.nisovin.shopkeepers.api.types.TypeRegistry;
  * @param <T>
  *            the internal type of {@link UIType} that is managed by this registry
  */
-public interface UIRegistry<T extends @NonNull UIType> extends TypeRegistry<T> {
+public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 
 	/**
 	 * Gets all currently active {@link UISession}s.
 	 * 
 	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
-	public Collection<? extends @NonNull UISession> getUISessions();
+	public Collection<? extends UISession> getUISessions();
 
 	/**
 	 * Gets all currently active {@link UISession}s that involve the specified {@link Shopkeeper}.
@@ -31,7 +30,7 @@ public interface UIRegistry<T extends @NonNull UIType> extends TypeRegistry<T> {
 	 *            the shopkeeper, not <code>null</code>
 	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
-	public Collection<? extends @NonNull UISession> getUISessions(Shopkeeper shopkeeper);
+	public Collection<? extends UISession> getUISessions(Shopkeeper shopkeeper);
 
 	/**
 	 * Gets all currently active {@link UISession}s of the specified {@link UIType} that involve the
@@ -43,7 +42,7 @@ public interface UIRegistry<T extends @NonNull UIType> extends TypeRegistry<T> {
 	 *            the UI type, not <code>null</code>
 	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
-	public Collection<? extends @NonNull UISession> getUISessions(
+	public Collection<? extends UISession> getUISessions(
 			Shopkeeper shopkeeper,
 			UIType uiType
 	);
@@ -55,7 +54,7 @@ public interface UIRegistry<T extends @NonNull UIType> extends TypeRegistry<T> {
 	 *            the UI type, not <code>null</code>
 	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
-	public Collection<? extends @NonNull UISession> getUISessions(UIType uiType);
+	public Collection<? extends UISession> getUISessions(UIType uiType);
 
 	/**
 	 * Gets the currently active {@link UISession} of the specified player.

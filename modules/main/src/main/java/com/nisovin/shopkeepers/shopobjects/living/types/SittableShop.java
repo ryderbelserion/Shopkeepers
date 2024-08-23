@@ -7,7 +7,6 @@ import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Sittable;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -28,20 +27,20 @@ import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // Using Babyable as common super type of all sittable mobs for now.
-public class SittableShop<E extends @NonNull Ageable & Sittable> extends BabyableShop<E> {
+public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> {
 
-	public static final Property<@NonNull Boolean> SITTING = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> SITTING = new BasicProperty<Boolean>()
 			.dataKeyAccessor("sitting", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> sittingProperty = new PropertyValue<>(SITTING)
+	private final PropertyValue<Boolean> sittingProperty = new PropertyValue<>(SITTING)
 			.onValueChanged(Unsafe.initialized(this)::applySitting)
 			.build(properties);
 
 	public SittableShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<? extends @NonNull SittableShop<E>> livingObjectType,
+			SKLivingShopObjectType<? extends SittableShop<E>> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -67,8 +66,8 @@ public class SittableShop<E extends @NonNull Ageable & Sittable> extends Babyabl
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSittingEditorButton());
 		return editorButtons;
 	}
@@ -90,6 +89,7 @@ public class SittableShop<E extends @NonNull Ageable & Sittable> extends Babyabl
 	private void applySitting() {
 		Sittable entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setSitting(this.isSitting());
 	}
 

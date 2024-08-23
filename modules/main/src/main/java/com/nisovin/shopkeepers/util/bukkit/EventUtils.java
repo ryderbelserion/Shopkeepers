@@ -61,7 +61,7 @@ public final class EventUtils {
 	 * @return the event executor, not <code>null</code>
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E extends @NonNull Event> EventExecutor eventExecutor(
+	public static <E extends Event> EventExecutor eventExecutor(
 			Class<? extends E> eventClass,
 			Consumer<? super @NonNull E> eventConsumer
 	) {
@@ -90,7 +90,7 @@ public final class EventUtils {
 	 *             if we cannot find or retrieve the handler list for the given event class
 	 * @see #getEventRegistrationClass(Class)
 	 */
-	public static HandlerList getHandlerList(Class<? extends @NonNull Event> eventClass) {
+	public static HandlerList getHandlerList(Class<? extends Event> eventClass) {
 		// The following call checks if the event class is null, so this is not required here:
 		Class<? extends Event> eventRegistrationClass = getEventRegistrationClass(eventClass);
 		assert eventRegistrationClass != null;
@@ -128,8 +128,8 @@ public final class EventUtils {
 	 * @throws IllegalArgumentException
 	 *             if the event registration class cannot be found
 	 */
-	public static Class<? extends @NonNull Event> getEventRegistrationClass(
-			Class<? extends @NonNull Event> eventClass
+	public static Class<? extends Event> getEventRegistrationClass(
+			Class<? extends Event> eventClass
 	) {
 		Validate.notNull(eventClass, "eventClass is null");
 		try {
@@ -165,7 +165,7 @@ public final class EventUtils {
 	 * @see #enforceExecuteFirst(Class, EventPriority, Predicate)
 	 */
 	public static void enforceExecuteFirst(
-			Class<? extends @NonNull Event> eventClass,
+			Class<? extends Event> eventClass,
 			EventPriority eventPriority,
 			Listener listener
 	) {
@@ -192,7 +192,7 @@ public final class EventUtils {
 	 * @see #enforceExecuteFirst(Class, EventPriority, Predicate)
 	 */
 	public static void enforceExecuteFirst(
-			Class<? extends @NonNull Event> eventClass,
+			Class<? extends Event> eventClass,
 			EventPriority eventPriority,
 			Plugin plugin
 	) {
@@ -223,9 +223,9 @@ public final class EventUtils {
 	 *             if we cannot find or retrieve the handler list for the given event class
 	 */
 	public static void enforceExecuteFirst(
-			Class<? extends @NonNull Event> eventClass,
+			Class<? extends Event> eventClass,
 			EventPriority eventPriority,
-			Predicate<? super @NonNull RegisteredListener> affectedEventHandlers
+			Predicate<? super RegisteredListener> affectedEventHandlers
 	) {
 		Validate.notNull(eventClass, "eventClass is null");
 
@@ -260,9 +260,9 @@ public final class EventUtils {
 	 */
 	public static void enforceExecuteFirst(
 			HandlerList handlerList,
-			@Nullable Class<? extends @NonNull Event> eventClass,
+			@Nullable Class<? extends Event> eventClass,
 			EventPriority eventPriority,
-			Predicate<? super @NonNull RegisteredListener> affectedEventHandlers,
+			Predicate<? super RegisteredListener> affectedEventHandlers,
 			boolean verbose
 	) {
 		Validate.notNull(handlerList, "handlerList is null");
@@ -355,7 +355,7 @@ public final class EventUtils {
 	// eventClass can be null.
 	private static void inspectHandlerListInternals(
 			HandlerList handlerList,
-			@Nullable Class<? extends @NonNull Event> eventClass,
+			@Nullable Class<? extends Event> eventClass,
 			EventPriority eventPriority,
 			RegisteredListener targetListener
 	) {

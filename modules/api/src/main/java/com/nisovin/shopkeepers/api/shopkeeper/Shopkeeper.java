@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
@@ -242,7 +241,7 @@ public interface Shopkeeper {
 	 * 
 	 * @return an unmodifiable view on the snapshots, not <code>null</code>, can be empty
 	 */
-	public List<? extends @NonNull ShopkeeperSnapshot> getSnapshots();
+	public List<? extends ShopkeeperSnapshot> getSnapshots();
 
 	/**
 	 * Gets the {@link ShopkeeperSnapshot snapshot} at the specified index.
@@ -375,7 +374,7 @@ public interface Shopkeeper {
 	 * @return an unmodifiable view on the current trading recipes of this shopkeeper for the given
 	 *         player
 	 */
-	public List<? extends @NonNull TradingRecipe> getTradingRecipes(@Nullable Player player);
+	public List<? extends TradingRecipe> getTradingRecipes(@Nullable Player player);
 
 	// SHOPKEEPER UIs
 
@@ -385,7 +384,7 @@ public interface Shopkeeper {
 	 * @return an unmodifiable view on the current UI sessions
 	 * @see UIRegistry#getUISessions(Shopkeeper)
 	 */
-	public Collection<? extends @NonNull UISession> getUISessions();
+	public Collection<? extends UISession> getUISessions();
 
 	/**
 	 * Gets all currently active {@link UISession UI sessions} involving this shopkeeper and the
@@ -396,7 +395,7 @@ public interface Shopkeeper {
 	 * @return an unmodifiable view on the current UI sessions
 	 * @see UIRegistry#getUISessions(Shopkeeper, UIType)
 	 */
-	public Collection<? extends @NonNull UISession> getUISessions(UIType uiType);
+	public Collection<? extends UISession> getUISessions(UIType uiType);
 
 	/**
 	 * {@link UISession#deactivateUI() Deactivates} all currently active UIs (trading, editing,

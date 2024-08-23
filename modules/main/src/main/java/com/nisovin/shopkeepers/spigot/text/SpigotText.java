@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -69,6 +68,7 @@ public final class SpigotText {
 
 		private static final class TextStyle {
 
+			// Must be an actual color:
 			private net.md_5.bungee.api.@Nullable ChatColor color = null;
 			private @Nullable Boolean bold = null;
 			private @Nullable Boolean italic = null;
@@ -79,6 +79,8 @@ public final class SpigotText {
 			public void setFormatting(net.md_5.bungee.api.ChatColor formatting) {
 				assert formatting != null;
 				if (formatting.getColor() != null) {
+					// Color resets formatting:
+					this.reset();
 					this.color = formatting;
 				} else if (formatting == net.md_5.bungee.api.ChatColor.BOLD) {
 					bold = true;
@@ -92,7 +94,6 @@ public final class SpigotText {
 					obfuscated = true;
 				} else if (formatting == net.md_5.bungee.api.ChatColor.RESET) {
 					this.reset();
-					this.color = formatting;
 				} else {
 					Log.warning("Unexpected Text formatting: " + formatting);
 				}
@@ -107,7 +108,7 @@ public final class SpigotText {
 				obfuscated = null;
 			}
 
-			public void apply(BaseComponent component) {
+			public void applyTo(BaseComponent component) {
 				assert component != null;
 				component.setColor(Unsafe.nullableAsNonNull(color));
 				component.setBold(Unsafe.nullableAsNonNull(bold));
@@ -154,7 +155,7 @@ public final class SpigotText {
 							|| chatColor == net.md_5.bungee.api.ChatColor.RESET) {
 						current = newTextComponent(parent, textStyle);
 					} else {
-						textStyle.apply(current);
+						textStyle.applyTo(current);
 					}
 					component = current;
 				}
@@ -203,7 +204,7 @@ public final class SpigotText {
 				assert translationKey != null;
 
 				// Convert translation arguments:
-				List<? extends @NonNull Text> translationArgs = translatableText.getTranslationArguments();
+				List<? extends Text> translationArgs = translatableText.getTranslationArguments();
 				assert translationArgs != null;
 				Object[] spigotTranslationArgs = new Object[translationArgs.size()];
 				for (int i = 0; i < translationArgs.size(); ++i) {
@@ -212,7 +213,7 @@ public final class SpigotText {
 
 				component = new TranslatableComponent(translationKey, spigotTranslationArgs);
 				parent.addExtra(component);
-				textStyle.apply(component);
+				textStyle.applyTo(component);
 				current = null;
 				ignoreChild = true;
 			} else {
@@ -241,7 +242,7 @@ public final class SpigotText {
 			assert parent != null && textStyle != null;
 			TextComponent component = new TextComponent();
 			parent.addExtra(component);
-			textStyle.apply(component);
+			textStyle.applyTo(component);
 			return component;
 		}
 
@@ -252,7 +253,7 @@ public final class SpigotText {
 
 		private static boolean hasExtra(BaseComponent component) {
 			assert component != null;
-			List<BaseComponent> extra = component.getExtra();
+			@Nullable List<BaseComponent> extra = Unsafe.cast(component.getExtra());
 			return (extra != null && !extra.isEmpty());
 		}
 
@@ -282,6 +283,9 @@ public final class SpigotText {
 			assert hoverEvent != null;
 			net.md_5.bungee.api.chat.HoverEvent.Action action = toSpigot(hoverEvent.getAction());
 			BaseComponent[] value = new BaseComponent[] { toSpigot(hoverEvent.getValue()) };
+			// TODO https://github.com/SpigotMC/BungeeCord/issues/3688: There is currently no API
+			// that correctly serializes the item data as Content. However, serializing the item NBT
+			// text works.
 			return new net.md_5.bungee.api.chat.HoverEvent(action, value);
 		}
 

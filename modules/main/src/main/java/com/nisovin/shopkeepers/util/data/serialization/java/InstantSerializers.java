@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
@@ -21,7 +20,7 @@ public final class InstantSerializers {
 	 * <p>
 	 * This uses {@link DateTimeFormatter#ISO_INSTANT} to represent and reconstruct the instant.
 	 */
-	public static final DataSerializer<@NonNull Instant> ISO = new DataSerializer<@NonNull Instant>() {
+	public static final DataSerializer<Instant> ISO = new DataSerializer<Instant>() {
 		@Override
 		public @Nullable Object serialize(Instant value) {
 			Validate.notNull(value, "value is null");

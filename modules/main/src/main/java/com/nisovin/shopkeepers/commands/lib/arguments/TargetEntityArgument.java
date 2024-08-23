@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
@@ -26,9 +25,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * targeted or the targeted entity is not accepted, the filter's corresponding error message is
  * used.
  */
-public class TargetEntityArgument extends CommandArgument<@NonNull Entity> {
+public class TargetEntityArgument extends CommandArgument<Entity> {
 
-	public interface TargetEntityFilter extends Predicate<@NonNull Entity> {
+	public interface TargetEntityFilter extends Predicate<Entity> {
 
 		public static final TargetEntityFilter ANY = new TargetEntityFilter() {
 			@Override
@@ -90,7 +89,7 @@ public class TargetEntityArgument extends CommandArgument<@NonNull Entity> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

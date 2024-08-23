@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.shopkeepers.snapshot;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -38,7 +37,7 @@ class CommandSnapshotRestore extends Command {
 		this.setDescription(Messages.commandDescriptionSnapshotRestore);
 
 		// Arguments:
-		CommandArgument<@NonNull Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
+		CommandArgument<Shopkeeper> shopkeeperArgument = new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		);

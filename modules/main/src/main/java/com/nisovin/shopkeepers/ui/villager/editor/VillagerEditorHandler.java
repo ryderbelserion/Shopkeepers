@@ -2,7 +2,12 @@ package com.nisovin.shopkeepers.ui.villager.editor;
 
 import java.util.List;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -15,9 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -62,7 +65,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	// TODO The trades may change during the editor session, in which case the comparison between
 	// new and old recipes no longer works (trades may get reverted to the editor state).
 	private static class TradingRecipesAdapter
-			extends DefaultTradingRecipesAdapter<@NonNull MerchantRecipe> {
+			extends DefaultTradingRecipesAdapter<MerchantRecipe> {
 
 		private final AbstractVillager villager;
 
@@ -72,23 +75,21 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		}
 
 		@Override
-		public List<@NonNull TradingRecipeDraft> getTradingRecipes() {
+		public List<TradingRecipeDraft> getTradingRecipes() {
 			assert villager.isValid();
-			@NonNull List<@NonNull MerchantRecipe> merchantRecipes = Unsafe.cast(villager.getRecipes());
-			List<@NonNull TradingRecipeDraft> recipes = MerchantUtils.createTradingRecipeDrafts(
-					merchantRecipes
-			);
+			List<MerchantRecipe> merchantRecipes = villager.getRecipes();
+			var recipes = MerchantUtils.createTradingRecipeDrafts(merchantRecipes);
 			return recipes;
 		}
 
 		@Override
-		protected List<? extends @NonNull MerchantRecipe> getOffers() {
+		protected List<? extends MerchantRecipe> getOffers() {
 			assert villager.isValid();
-			return Unsafe.cast(villager.getRecipes());
+			return villager.getRecipes();
 		}
 
 		@Override
-		protected void setOffers(List<? extends @NonNull MerchantRecipe> newOffers) {
+		protected void setOffers(List<? extends MerchantRecipe> newOffers) {
 			assert villager.isValid();
 
 			// Stop any current trading with the villager:
@@ -100,7 +101,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			// Apply the new trading recipes:
-			villager.setRecipes(Unsafe.cast(newOffers));
+			villager.setRecipes(Unsafe.castNonNull(newOffers));
 		}
 
 		@Override
@@ -124,7 +125,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		}
 
 		@Override
-		public @Nullable List<? extends @NonNull String> getConfirmationLore() {
+		public @Nullable List<? extends String> getConfirmationLore() {
 			return Messages.confirmationUiDeleteVillagerConfirmLore;
 		}
 	};
@@ -538,6 +539,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 						iconItem = new ItemStack(Material.BARRIER);
 						break;
 				}
+
 				assert iconItem != null;
 				ItemUtils.setDisplayNameAndLore(iconItem,
 						Messages.buttonVillagerProfession,
@@ -560,7 +562,11 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				// replace the new trades with the old ones from the editor. But we try to preserve
 				// the old trades with their original data:
 				List<MerchantRecipe> previousRecipes = villager.getRecipes();
-				profession = RegistryUtils.cycleKeyedConstant(Registry.VILLAGER_PROFESSION, profession, backwards);
+				profession = RegistryUtils.cycleKeyed(
+						Registry.VILLAGER_PROFESSION,
+						profession,
+						backwards
+				);
 				regularVillager.setProfession(profession);
 				// Restore previous trades with their original data:
 				villager.setRecipes(previousRecipes);
@@ -588,29 +594,30 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			public @Nullable ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 				switch (villagerType.getKey().getKey()) {
-				default:
-				case "plains":
-					// Default brown color:
-					break;
-				case "desert":
-					ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
-					break;
-				case "jungle":
-					ItemUtils.setLeatherColor(iconItem, Color.YELLOW.mixColors(Color.ORANGE));
-					break;
-				case "savanna":
-					ItemUtils.setLeatherColor(iconItem, Color.RED);
-					break;
-				case "snow":
-					ItemUtils.setLeatherColor(iconItem, DyeColor.CYAN.getColor());
-					break;
-				case "swamp":
-					ItemUtils.setLeatherColor(iconItem, DyeColor.PURPLE.getColor());
-					break;
-				case "taiga":
-					ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
-					break;
+					case "desert":
+						ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
+						break;
+					case "jungle":
+						ItemUtils.setLeatherColor(iconItem, Color.YELLOW.mixColors(Color.ORANGE));
+						break;
+					case "savanna":
+						ItemUtils.setLeatherColor(iconItem, Color.RED);
+						break;
+					case "snow":
+						ItemUtils.setLeatherColor(iconItem, DyeColor.CYAN.getColor());
+						break;
+					case "swamp":
+						ItemUtils.setLeatherColor(iconItem, DyeColor.PURPLE.getColor());
+						break;
+					case "taiga":
+						ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
+						break;
+					case "plains":
+					default:
+						// Default brown color:
+						break;
 				}
+
 				ItemUtils.setDisplayNameAndLore(iconItem,
 						Messages.buttonVillagerVariant,
 						Messages.buttonVillagerVariantLore
@@ -628,7 +635,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				}
 
 				boolean backwards = clickEvent.isRightClick();
-				villagerType = RegistryUtils.cycleKeyedConstant(
+				villagerType = RegistryUtils.cycleKeyed(
 						Registry.VILLAGER_TYPE,
 						villagerType,
 						backwards
@@ -747,7 +754,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				if (invulnerable) {
 					iconItem = new ItemStack(Material.POTION);
 					PotionMeta potionMeta = Unsafe.castNonNull(iconItem.getItemMeta());
-					potionMeta.setBasePotionData(new PotionData(PotionType.HEALING));
+					potionMeta.setBasePotionType(PotionType.HEALING);
 					iconItem.setItemMeta(potionMeta);
 				} else {
 					iconItem = new ItemStack(Material.GLASS_BOTTLE);
@@ -784,7 +791,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		String itemName = StringUtils.replaceArguments(Messages.villagerEditorDescriptionHeader,
 				"villagerName", villagerName
 		);
-		List<? extends @NonNull String> itemLore = Messages.villagerEditorDescription;
+		List<? extends String> itemLore = Messages.villagerEditorDescription;
 		return ItemUtils.setDisplayNameAndLore(
 				Settings.tradeSetupItem.createItemStack(),
 				itemName,

@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.api.shopobjects;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectTypes;
@@ -20,7 +18,7 @@ public interface DefaultShopObjectTypes {
 	 * 
 	 * @return all default shop objects types
 	 */
-	public List<? extends @NonNull ShopObjectType<?>> getAll();
+	public List<? extends ShopObjectType<?>> getAll();
 
 	/**
 	 * Gets the {@link LivingShopObjectTypes}, which provides access to the default shop object

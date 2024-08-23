@@ -13,7 +13,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -32,6 +31,7 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.bukkit.SignUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
@@ -47,7 +47,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class SKSignShopObject extends BaseBlockShopObject implements SignShopObject {
 
 	private static final String DATA_KEY_SIGN_TYPE = "signType";
-	public static final Property<@NonNull SignType> SIGN_TYPE = new BasicProperty<@NonNull SignType>()
+	public static final Property<SignType> SIGN_TYPE = new BasicProperty<SignType>()
 			.dataKeyAccessor(DATA_KEY_SIGN_TYPE, EnumSerializers.lenient(SignType.class))
 			.validator(value -> {
 				Validate.isTrue(value.isSupported(),
@@ -56,12 +56,12 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 			.defaultValue(SignType.OAK)
 			.build();
 
-	public static final Property<@NonNull Boolean> WALL_SIGN = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> WALL_SIGN = new BasicProperty<Boolean>()
 			.dataKeyAccessor("wallSign", BooleanSerializers.LENIENT)
 			.defaultValue(true)
 			.build();
 
-	public static final Property<@NonNull Boolean> GLOWING_TEXT = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> GLOWING_TEXT = new BasicProperty<Boolean>()
 			.dataKeyAccessor("glowingText", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
@@ -152,13 +152,13 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 		});
 	}
 
-	private final PropertyValue<@NonNull SignType> signTypeProperty = new PropertyValue<>(SIGN_TYPE)
+	private final PropertyValue<SignType> signTypeProperty = new PropertyValue<>(SIGN_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applySignType)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> wallSignProperty = new PropertyValue<>(WALL_SIGN)
+	private final PropertyValue<Boolean> wallSignProperty = new PropertyValue<>(WALL_SIGN)
 			.onValueChanged(Unsafe.initialized(this)::respawn)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> glowingTextProperty = new PropertyValue<>(GLOWING_TEXT)
+	private final PropertyValue<Boolean> glowingTextProperty = new PropertyValue<>(GLOWING_TEXT)
 			.onValueChanged(Unsafe.initialized(this)::applyGlowingText)
 			.build(properties);
 
@@ -246,9 +246,8 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 		// Common sign setup (e.g. sign content):
 		SignShops.updateShopSign(sign, shopkeeper);
 
-		// Glowing text, on both sides:
-		NMSManager.getProvider().setGlowingText(sign, this.isGlowingText());
-		NMSManager.getProvider().setSignBackGlowingText(sign, this.isGlowingText());
+		// Glowing text:
+		this.applyGlowingText(sign);
 
 		// Apply sign changes:
 		sign.update(false, false);
@@ -272,8 +271,8 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 	// EDITOR ACTIONS
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
 		editorButtons.add(this.getGlowingTextEditorButton());
 		return editorButtons;
@@ -389,12 +388,15 @@ public class SKSignShopObject extends BaseBlockShopObject implements SignShopObj
 		Sign sign = this.getSign();
 		if (sign == null) return; // Not spawned or no longer a sign
 
-		// Apply the glowing text to both sign sides:
-		NMSManager.getProvider().setGlowingText(sign, this.isGlowingText());
-		NMSManager.getProvider().setSignBackGlowingText(sign, this.isGlowingText());
+		this.applyGlowingText(sign);
 
 		// Sign block type is still the same (no force required), and we want to skip physics:
 		sign.update(false, false);
+	}
+
+	private void applyGlowingText(Sign sign) {
+		// Apply the glowing text to both sign sides:
+		SignUtils.setBothSidesGlowingText(sign, this.isGlowingText());
 	}
 
 	public void cycleGlowingText(boolean backwards) {

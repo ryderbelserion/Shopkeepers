@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -24,18 +23,18 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * Accepts a player specified by either name (might not have to be exact, depending on the used
  * matching function) or UUID.
  */
-public class PlayerArgument extends CommandArgument<@NonNull Player> {
+public class PlayerArgument extends CommandArgument<Player> {
 
-	protected final ArgumentFilter<? super @NonNull Player> filter; // Not null
+	protected final ArgumentFilter<? super Player> filter; // Not null
 	private final PlayerByNameArgument playerNameArgument;
 	private final PlayerByUUIDArgument playerUUIDArgument;
-	private final TypedFirstOfArgument<@NonNull Player> firstOfArgument;
+	private final TypedFirstOfArgument<Player> firstOfArgument;
 
 	public PlayerArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public PlayerArgument(String name, ArgumentFilter<? super @NonNull Player> filter) {
+	public PlayerArgument(String name, ArgumentFilter<? super Player> filter) {
 		this(
 				name,
 				filter,
@@ -46,7 +45,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 
 	public PlayerArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Player> filter,
+			ArgumentFilter<? super Player> filter,
 			int minimalNameCompletionInput,
 			int minimumUUIDCompletionInput
 	) {
@@ -68,7 +67,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 			}
 
 			@Override
-			protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+			protected Iterable<? extends String> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					int minimumCompletionInput,
@@ -88,7 +87,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 				minimumUUIDCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+			protected Iterable<? extends UUID> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					int minimumCompletionInput,
@@ -122,7 +121,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -145,8 +144,8 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 	 */
 	public @Nullable Player getPlayerByName(String nameInput) throws IllegalArgumentException {
 		// Name input may be both player name or display name:
-		Stream<@NonNull Player> players = PlayerNameMatcher.EXACT.match(nameInput);
-		Optional<@NonNull Player> player = players.findFirst();
+		Stream<Player> players = PlayerNameMatcher.EXACT.match(nameInput);
+		Optional<Player> player = players.findFirst();
 		return player.orElse(null);
 		// TODO deal with ambiguities
 	}
@@ -166,7 +165,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<? extends @NonNull String> getNameCompletionSuggestions(
+	protected Iterable<? extends String> getNameCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
@@ -193,7 +192,7 @@ public class PlayerArgument extends CommandArgument<@NonNull Player> {
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<? extends @NonNull UUID> getUUIDCompletionSuggestions(
+	protected Iterable<? extends UUID> getUUIDCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

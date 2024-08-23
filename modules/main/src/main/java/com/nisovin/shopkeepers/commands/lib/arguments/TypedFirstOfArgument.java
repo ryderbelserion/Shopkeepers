@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -31,14 +30,14 @@ public class TypedFirstOfArgument<T> extends FallbackArgument<T> {
 
 	public TypedFirstOfArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<T>> arguments
+			List<? extends CommandArgument<T>> arguments
 	) {
 		this(name, arguments, true, false);
 	}
 
 	public TypedFirstOfArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<T>> arguments,
+			List<? extends CommandArgument<T>> arguments,
 			boolean joinFormats
 	) {
 		this(name, arguments, joinFormats, false);
@@ -46,7 +45,7 @@ public class TypedFirstOfArgument<T> extends FallbackArgument<T> {
 
 	public TypedFirstOfArgument(
 			String name,
-			List<? extends @NonNull CommandArgument<T>> arguments,
+			List<? extends CommandArgument<T>> arguments,
 			boolean joinFormats,
 			boolean reverseFormat
 	) {
@@ -102,7 +101,7 @@ public class TypedFirstOfArgument<T> extends FallbackArgument<T> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -39,7 +38,7 @@ public final class DataPath {
 	 */
 	public static final DataPath EMPTY = new DataPath();
 
-	private final List<? extends @NonNull String> segments; // Not null, can be empty, immutable
+	private final List<? extends String> segments; // Not null, can be empty, immutable
 
 	private DataPath() {
 		this(Collections.emptyList(), true);
@@ -66,11 +65,11 @@ public final class DataPath {
 	 * @param segments
 	 *            the segments, not <code>null</code>
 	 */
-	public DataPath(List<? extends @NonNull String> segments) {
+	public DataPath(List<? extends String> segments) {
 		this(segments, false);
 	}
 
-	private DataPath(List<? extends @NonNull String> segments, boolean assumeSafe) {
+	private DataPath(List<? extends String> segments, boolean assumeSafe) {
 		if (assumeSafe) {
 			this.segments = segments;
 		} else {
@@ -87,7 +86,7 @@ public final class DataPath {
 	 * 
 	 * @return the segments, not <code>null</code>, can be empty
 	 */
-	public List<? extends @NonNull String> getSegments() {
+	public List<? extends String> getSegments() {
 		return segments;
 	}
 
@@ -172,7 +171,7 @@ public final class DataPath {
 	 */
 	public DataPath append(String segment) {
 		Validate.notEmpty(segment, "segment is null or empty");
-		List<? extends @NonNull String> newSegments = CollectionUtils.unmodifiableCopyAndAdd(
+		List<? extends String> newSegments = CollectionUtils.unmodifiableCopyAndAdd(
 				segments, segment
 		);
 		return new DataPath(newSegments, true);
@@ -189,7 +188,7 @@ public final class DataPath {
 		Validate.notNull(path, "path is null");
 		if (this.isEmpty()) return path;
 		if (path.isEmpty()) return this;
-		List<? extends @NonNull String> newSegments = CollectionUtils.unmodifiableCopyAndAddAll(
+		List<? extends String> newSegments = CollectionUtils.unmodifiableCopyAndAddAll(
 				segments, path.getSegments()
 		);
 		return new DataPath(newSegments, true);

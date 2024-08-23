@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Fox;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -29,36 +28,36 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class FoxShop extends SittableShop<@NonNull Fox> {
+public class FoxShop extends SittableShop<Fox> {
 
-	public static final Property<Fox.@NonNull Type> FOX_TYPE = new BasicProperty<Fox.@NonNull Type>()
+	public static final Property<Fox.Type> FOX_TYPE = new BasicProperty<Fox.Type>()
 			.dataKeyAccessor("foxType", EnumSerializers.lenient(Fox.Type.class))
 			.defaultValue(Fox.Type.RED)
 			.build();
 
-	public static final Property<@NonNull Boolean> SLEEPING = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> SLEEPING = new BasicProperty<Boolean>()
 			.dataKeyAccessor("sleeping", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	public static final Property<@NonNull Boolean> CROUCHING = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> CROUCHING = new BasicProperty<Boolean>()
 			.dataKeyAccessor("crouching", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<Fox.@NonNull Type> foxTypeProperty = new PropertyValue<>(FOX_TYPE)
+	private final PropertyValue<Fox.Type> foxTypeProperty = new PropertyValue<>(FOX_TYPE)
 			.onValueChanged(Unsafe.initialized(this)::applyFoxType)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> sleepingProperty = new PropertyValue<>(SLEEPING)
+	private final PropertyValue<Boolean> sleepingProperty = new PropertyValue<>(SLEEPING)
 			.onValueChanged(Unsafe.initialized(this)::applySleeping)
 			.build(properties);
-	private final PropertyValue<@NonNull Boolean> crouchingProperty = new PropertyValue<>(CROUCHING)
+	private final PropertyValue<Boolean> crouchingProperty = new PropertyValue<>(CROUCHING)
 			.onValueChanged(Unsafe.initialized(this)::applyCrouching)
 			.build(properties);
 
 	public FoxShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull FoxShop> livingObjectType,
+			SKLivingShopObjectType<FoxShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -94,8 +93,8 @@ public class FoxShop extends SittableShop<@NonNull Fox> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getFoxTypeEditorButton());
 		editorButtons.add(this.getSleepingEditorButton());
 		editorButtons.add(this.getCrouchingEditorButton());
@@ -119,6 +118,7 @@ public class FoxShop extends SittableShop<@NonNull Fox> {
 	private void applyFoxType() {
 		Fox entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setFoxType(this.getFoxType());
 	}
 
@@ -180,6 +180,7 @@ public class FoxShop extends SittableShop<@NonNull Fox> {
 	private void applySleeping() {
 		Fox entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setSleeping(this.isSleeping());
 	}
 
@@ -233,6 +234,7 @@ public class FoxShop extends SittableShop<@NonNull Fox> {
 	private void applyCrouching() {
 		Fox entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		entity.setCrouching(this.isCrouching());
 	}
 

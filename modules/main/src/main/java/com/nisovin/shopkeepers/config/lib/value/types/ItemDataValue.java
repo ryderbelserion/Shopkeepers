@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
@@ -13,7 +12,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.java.ThrowableUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class ItemDataValue extends ValueType<@NonNull ItemData> {
+public class ItemDataValue extends ValueType<ItemData> {
 
 	public static final ItemDataValue INSTANCE = new ItemDataValue();
 

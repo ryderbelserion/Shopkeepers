@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.api.shopobjects;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.types.SelectableType;
@@ -13,7 +12,7 @@ import com.nisovin.shopkeepers.api.types.SelectableType;
  * @param <T>
  *            the type of the shop objects this represents
  */
-public interface ShopObjectType<T extends @NonNull ShopObject> extends SelectableType {
+public interface ShopObjectType<T extends ShopObject> extends SelectableType {
 
 	// Override to enforce that each subtype actually specifies a non-default display name
 	@Override

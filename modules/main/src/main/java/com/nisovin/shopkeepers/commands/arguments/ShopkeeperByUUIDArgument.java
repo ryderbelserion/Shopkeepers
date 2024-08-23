@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.UUID;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -20,8 +19,7 @@ import com.nisovin.shopkeepers.text.Text;
 /**
  * Determines a shopkeeper by the given UUID input.
  */
-public class ShopkeeperByUUIDArgument
-		extends ObjectByIdArgument<@NonNull UUID, @NonNull Shopkeeper> {
+public class ShopkeeperByUUIDArgument extends ObjectByIdArgument<UUID, Shopkeeper> {
 
 	public ShopkeeperByUUIDArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
@@ -29,21 +27,21 @@ public class ShopkeeperByUUIDArgument
 
 	public ShopkeeperByUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter
+			ArgumentFilter<? super Shopkeeper> filter
 	) {
 		this(name, filter, ShopkeeperUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperByUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Shopkeeper> filter,
+			ArgumentFilter<? super Shopkeeper> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull UUID> createIdArgument(
+	protected ObjectIdArgument<UUID> createIdArgument(
 			@UnknownInitialization ShopkeeperByUUIDArgument this,
 			String name,
 			IdArgumentArgs args
@@ -54,7 +52,7 @@ public class ShopkeeperByUUIDArgument
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+			protected Iterable<? extends UUID> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -84,7 +82,7 @@ public class ShopkeeperByUUIDArgument
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+	protected Iterable<? extends UUID> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

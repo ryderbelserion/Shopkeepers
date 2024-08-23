@@ -11,9 +11,9 @@ final class CommonMessageArguments {
 
 	static class MapMessageArguments implements MessageArguments {
 
-		private final Map<? extends @NonNull String, @NonNull ?> arguments;
+		private final Map<? extends String, @NonNull ?> arguments;
 
-		public MapMessageArguments(Map<? extends @NonNull String, @NonNull ?> arguments) {
+		public MapMessageArguments(Map<? extends String, @NonNull ?> arguments) {
 			Validate.notNull(arguments, "arguments is null");
 			this.arguments = arguments;
 		}

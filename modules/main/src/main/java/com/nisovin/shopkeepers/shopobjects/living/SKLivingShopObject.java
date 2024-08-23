@@ -68,10 +68,10 @@ import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class SKLivingShopObject<E extends @NonNull LivingEntity>
+public class SKLivingShopObject<E extends LivingEntity>
 		extends AbstractEntityShopObject implements LivingShopObject {
 
-	public static final Property<@NonNull LivingShopEquipment> EQUIPMENT = new BasicProperty<@NonNull LivingShopEquipment>()
+	public static final Property<LivingShopEquipment> EQUIPMENT = new BasicProperty<LivingShopEquipment>()
 			.dataKeyAccessor("equipment", SKLivingShopEquipment.SERIALIZER)
 			.defaultValueSupplier(SKLivingShopEquipment::new)
 			.omitIfDefault()
@@ -100,7 +100,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
 
-	private final PropertyValue<@NonNull LivingShopEquipment> equipmentProperty = new PropertyValue<>(EQUIPMENT)
+	private final PropertyValue<LivingShopEquipment> equipmentProperty = new PropertyValue<>(EQUIPMENT)
 			.onValueChanged(Unsafe.initialized(this)::onEquipmentPropertyChanged)
 			.build(properties);
 
@@ -187,7 +187,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	// ground in those cases.
 	private void adjustSpawnLocation(Location spawnLocation) {
 		// The entity may be able to stand on certain types of fluids:
-		Set<? extends @NonNull Material> collidableFluids = EntityUtils.getCollidableFluids(
+		Set<? extends Material> collidableFluids = EntityUtils.getCollidableFluids(
 				this.getEntityType()
 		);
 		// However, if the spawn location is inside a fluid (i.e. underwater or inside of lava), we
@@ -413,7 +413,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 				DebugListener debugListener = DebugListener.register(true, true);
 
 				// Log creature spawn handling:
-				EventDebugListener<@NonNull CreatureSpawnEvent> spawnListener = new EventDebugListener<>(
+				EventDebugListener<CreatureSpawnEvent> spawnListener = new EventDebugListener<>(
 						CreatureSpawnEvent.class,
 						(priority, event) -> {
 							LivingEntity spawnedEntity = event.getEntity();
@@ -774,7 +774,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	 * 
 	 * @return an unmodifiable view on the entity's default potion effects, not <code>null</code>
 	 */
-	protected Collection<? extends @NonNull PotionEffect> getDefaultPotionEffects() {
+	protected Collection<? extends PotionEffect> getDefaultPotionEffects() {
 		// None by default:
 		return Collections.emptySet();
 	}
@@ -783,14 +783,14 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return;
 
-		Collection<? extends @NonNull PotionEffect> defaultPotionEffects = this.getDefaultPotionEffects();
-		Collection<@NonNull PotionEffect> activePotionEffects = Unsafe.castNonNull(entity.getActivePotionEffects());
+		Collection<? extends PotionEffect> defaultPotionEffects = this.getDefaultPotionEffects();
+		Collection<PotionEffect> activePotionEffects = Unsafe.castNonNull(entity.getActivePotionEffects());
 
 		// Re-add missing and nearly expired default potion effects:
 		defaultPotionEffects.forEach(effect -> {
 			@Nullable PotionEffect activeEffect = PotionUtils.findIgnoreDuration(activePotionEffects, effect);
 			if (activeEffect != null
-					&& (activeEffect.getDuration() == PotionUtils.INFINITE_DURATION
+					&& (activeEffect.getDuration() == PotionEffect.INFINITE_DURATION
 							|| activeEffect.getDuration() > CHECK_PERIOD_TICKS)) {
 				return;
 			}
@@ -820,8 +820,8 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	// EDITOR ACTIONS
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		if (!this.getEditableEquipmentSlots().isEmpty()) {
 			editorButtons.add(this.getEquipmentEditorButton());
 		}
@@ -844,7 +844,7 @@ public class SKLivingShopObject<E extends @NonNull LivingEntity>
 	 * @return An unmodifiable view on the editable equipment slots. Not <code>null</code>, but can
 	 *         be empty. The order of the returned slots defines the order in the editor.
 	 */
-	protected List<? extends @NonNull EquipmentSlot> getEditableEquipmentSlots() {
+	protected List<? extends EquipmentSlot> getEditableEquipmentSlots() {
 		if (Settings.enableAllEquipmentEditorSlots) {
 			return EquipmentUtils.EQUIPMENT_SLOTS;
 		}

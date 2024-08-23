@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -49,7 +48,7 @@ public class RemoveShopOnContainerBreak {
 	// clients beforehand.
 	// Does not check whether the block is still a valid container type.
 	public boolean handleBlockBreakage(Block block) {
-		List<? extends @NonNull PlayerShopkeeper> shopkeepers = protectedContainers.getShopkeepers(block);
+		List<? extends PlayerShopkeeper> shopkeepers = protectedContainers.getShopkeepers(block);
 		if (shopkeepers.isEmpty()) return false;
 
 		// Copy to deal with concurrent modifications:
@@ -68,7 +67,7 @@ public class RemoveShopOnContainerBreak {
 		return true;
 	}
 
-	public void handleBlocksBreakage(List<? extends @NonNull Block> blockList) {
+	public void handleBlocksBreakage(List<? extends Block> blockList) {
 		boolean dirty = false;
 		for (Block block : blockList) {
 			if (!ShopContainers.isSupportedContainer(block.getType())) continue;

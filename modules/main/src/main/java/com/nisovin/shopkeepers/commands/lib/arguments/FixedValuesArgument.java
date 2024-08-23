@@ -16,11 +16,11 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class FixedValuesArgument extends CommandArgument<@NonNull Object> {
+public class FixedValuesArgument extends CommandArgument<Object> {
 
-	private final Map<? extends @NonNull String, @NonNull ?> values;
+	private final Map<? extends String, @NonNull ?> values;
 
-	public FixedValuesArgument(String name, Map<? extends @NonNull String, @NonNull ?> values) {
+	public FixedValuesArgument(String name, Map<? extends String, @NonNull ?> values) {
 		super(name);
 		Validate.notNull(values, "values is null");
 		Validate.isTrue(!CollectionUtils.containsNull(values.keySet()),
@@ -55,7 +55,7 @@ public class FixedValuesArgument extends CommandArgument<@NonNull Object> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -64,7 +64,7 @@ public class FixedValuesArgument extends CommandArgument<@NonNull Object> {
 			return Collections.emptyList();
 		}
 
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		for (String valueKey : values.keySet()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;

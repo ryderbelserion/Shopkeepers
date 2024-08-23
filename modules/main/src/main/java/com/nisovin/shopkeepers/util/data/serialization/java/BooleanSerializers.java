@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.util.data.serialization.java;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
@@ -13,7 +12,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class BooleanSerializers {
 
-	private static abstract class BooleanSerializer implements DataSerializer<@NonNull Boolean> {
+	private static abstract class BooleanSerializer implements DataSerializer<Boolean> {
 		@Override
 		public @Nullable Object serialize(Boolean value) {
 			Validate.notNull(value, "value is null");
@@ -27,7 +26,7 @@ public final class BooleanSerializers {
 	 * During {@link DataSerializer#deserialize(Object) deserialization}, this
 	 * {@link DataSerializer} considers any data that is not of type {@link Boolean} to be invalid.
 	 */
-	public static final DataSerializer<@NonNull Boolean> STRICT = new BooleanSerializer() {
+	public static final DataSerializer<Boolean> STRICT = new BooleanSerializer() {
 		@Override
 		public Boolean deserialize(Object data) throws InvalidDataException {
 			Validate.notNull(data, "data is null");
@@ -46,7 +45,7 @@ public final class BooleanSerializers {
 	 * {@link DataSerializer} accounts for various alternative representations when trying to
 	 * convert the given data to a {@link Boolean} value.
 	 */
-	public static final DataSerializer<@NonNull Boolean> LENIENT = new BooleanSerializer() {
+	public static final DataSerializer<Boolean> LENIENT = new BooleanSerializer() {
 		@Override
 		public Boolean deserialize(Object data) throws InvalidDataException {
 			Validate.notNull(data, "data is null");

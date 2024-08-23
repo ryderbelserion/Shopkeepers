@@ -127,8 +127,8 @@ public final class StringUtils {
 		return normalized.toLowerCase(Locale.ROOT);
 	}
 
-	public static List<@NonNull String> normalize(List<? extends @NonNull String> identifiers) {
-		List<@NonNull String> normalized = new ArrayList<>(identifiers.size());
+	public static List<String> normalize(List<? extends String> identifiers) {
+		List<String> normalized = new ArrayList<>(identifiers.size());
 		for (String identifier : identifiers) {
 			normalized.add(normalize(identifier));
 		}
@@ -321,14 +321,14 @@ public final class StringUtils {
 
 	// Singleton for reuse:
 	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer();
-	private static final Map<@NonNull String, @NonNull Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
 	private static final MessageArguments TEMP_ARGUMENTS = MessageArguments.ofMap(TEMP_ARGUMENTS_MAP);
 
 	// Arguments format: [key1, value1, key2, value2, ...]
 	// The keys are expected to be of type String.
 	// The replaced keys use the format {key} (braces are not specified in the argument keys).
 	public static <T> void addArgumentsToMap(
-			Map<@NonNull String, @NonNull Object> argumentsMap,
+			Map<String, Object> argumentsMap,
 			@NonNull Object... argumentPairs
 	) {
 		Validate.notNull(argumentsMap, "argumentsMap is null");
@@ -358,7 +358,7 @@ public final class StringUtils {
 	// If an argument is a Supplier, it gets invoked to obtain the actual argument.
 	public static String replaceArguments(
 			String source,
-			Map<? extends @NonNull String, @NonNull ?> arguments
+			Map<? extends String, @NonNull ?> arguments
 	) {
 		return replaceArguments(source, MessageArguments.ofMap(arguments));
 	}
@@ -368,8 +368,8 @@ public final class StringUtils {
 	}
 
 	// Creates and returns a new List:
-	public static List<@NonNull String> replaceArguments(
-			Collection<? extends @NonNull String> messages,
+	public static List<String> replaceArguments(
+			Collection<? extends String> messages,
 			@NonNull Object... argumentPairs
 	) {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
@@ -382,20 +382,20 @@ public final class StringUtils {
 	}
 
 	// Creates and returns a new List:
-	public static List<@NonNull String> replaceArguments(
-			Collection<? extends @NonNull String> sources,
-			Map<? extends @NonNull String, @NonNull ?> arguments
+	public static List<String> replaceArguments(
+			Collection<? extends String> sources,
+			Map<? extends String, @NonNull ?> arguments
 	) {
 		return replaceArguments(sources, MessageArguments.ofMap(arguments));
 	}
 
 	// Creates and returns a new List:
-	public static List<@NonNull String> replaceArguments(
-			Collection<? extends @NonNull String> sources,
+	public static List<String> replaceArguments(
+			Collection<? extends String> sources,
 			MessageArguments arguments
 	) {
 		Validate.notNull(sources, "sources is null");
-		List<@NonNull String> replaced = new ArrayList<>(sources.size());
+		List<String> replaced = new ArrayList<>(sources.size());
 		for (String source : sources) {
 			replaced.add(replaceArguments(source, arguments)); // Checks arguments
 		}

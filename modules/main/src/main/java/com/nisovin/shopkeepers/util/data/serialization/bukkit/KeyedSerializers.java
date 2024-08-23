@@ -21,7 +21,7 @@ public final class KeyedSerializers {
 	 * @param <E>
 	 *            the {@link Keyed} type that is being resolved
 	 */
-	public interface KeyedResolver<E extends @NonNull Keyed> {
+	public interface KeyedResolver<E extends Keyed> {
 
 		/**
 		 * Resolves the an object by its namespaced key.
@@ -33,7 +33,7 @@ public final class KeyedSerializers {
 		public @Nullable E resolve(NamespacedKey key);
 	}
 
-	private static class KeyedSerializer<E extends @NonNull Keyed> implements DataSerializer<@NonNull E> {
+	private static class KeyedSerializer<E extends Keyed> implements DataSerializer<@NonNull E> {
 
 		private final Class<@NonNull E> keyedType;
 		private final KeyedResolver<@NonNull E> resolver;
@@ -78,7 +78,7 @@ public final class KeyedSerializers {
 	 *            the {@link KeyedResolver} to use during deserialization
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends @NonNull Keyed> DataSerializer<@NonNull E> forResolver(
+	public static <E extends Keyed> DataSerializer<@NonNull E> forResolver(
 			Class<@NonNull E> keyedType,
 			KeyedResolver<@NonNull E> resolver
 	) {
@@ -98,7 +98,7 @@ public final class KeyedSerializers {
 	 *            the {@link Registry} to use during deserialization
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends @NonNull Keyed> DataSerializer<@NonNull E> forRegistry(
+	public static <E extends Keyed> DataSerializer<@NonNull E> forRegistry(
 			Class<@NonNull E> keyedType,
 			Registry<@NonNull E> registry
 	) {

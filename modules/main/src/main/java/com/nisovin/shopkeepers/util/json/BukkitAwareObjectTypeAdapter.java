@@ -54,7 +54,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class BukkitAwareObjectTypeAdapter extends YamlLikeObjectTypeAdapter {
 
 	public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-		@SuppressWarnings({ "unchecked", "override.return" })
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> @Nullable TypeAdapter<T> create(
 				@Nullable Gson gson,
@@ -164,7 +164,7 @@ public class BukkitAwareObjectTypeAdapter extends YamlLikeObjectTypeAdapter {
 		super(gson);
 	}
 
-	@SuppressWarnings({ "unchecked", "override.return" })
+	@SuppressWarnings("unchecked")
 	@Override
 	public @Nullable Object read(@Nullable JsonReader in) throws IOException {
 		assert in != null;

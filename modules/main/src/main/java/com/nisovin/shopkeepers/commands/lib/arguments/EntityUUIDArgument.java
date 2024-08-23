@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
@@ -33,13 +32,13 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public EntityUUIDArgument(String name, ArgumentFilter<? super @NonNull UUID> filter) {
+	public EntityUUIDArgument(String name, ArgumentFilter<? super UUID> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public EntityUUIDArgument(
 			String name,
-			ArgumentFilter<? super @NonNull UUID> filter,
+			ArgumentFilter<? super UUID> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, minimumCompletionInput);
@@ -68,12 +67,12 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 	 *            <code>null</code>
 	 * @return the entity uuid completion suggestions
 	 */
-	public static Iterable<? extends @NonNull UUID> getDefaultCompletionSuggestions(
+	public static Iterable<? extends UUID> getDefaultCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
 			String uuidPrefix,
-			Predicate<? super @NonNull Entity> filter
+			Predicate<? super Entity> filter
 	) {
 		// Suggestion for the unique id of the targeted entity:
 		CommandSender sender = input.getSender();
@@ -91,7 +90,7 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull UUID> getCompletionSuggestions(
+	protected Iterable<? extends UUID> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix

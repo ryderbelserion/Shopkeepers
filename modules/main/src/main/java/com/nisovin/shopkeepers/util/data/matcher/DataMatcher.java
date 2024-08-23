@@ -327,15 +327,15 @@ public class DataMatcher {
 			DataContainer rightDataContainer
 	) {
 		assert path != null && leftDataContainer != null && rightDataContainer != null;
-		Map<? extends @NonNull String, @NonNull ?> leftValues = leftDataContainer.getValues();
-		Map<? extends @NonNull String, @NonNull ?> rightValues = rightDataContainer.getValues();
+		Map<? extends String, @NonNull ?> leftValues = leftDataContainer.getValues();
+		Map<? extends String, @NonNull ?> rightValues = rightDataContainer.getValues();
 		if (leftValues.size() != rightValues.size()) {
 			return Result.mismatch(path, leftValues, rightValues);
 		}
 
-		Iterator<? extends @NonNull Entry<? extends @NonNull String, @NonNull ?>> leftValuesIterator = leftValues.entrySet().iterator();
+		Iterator<? extends Entry<? extends String, @NonNull ?>> leftValuesIterator = leftValues.entrySet().iterator();
 		while (leftValuesIterator.hasNext()) {
-			Entry<? extends @NonNull String, @NonNull ?> entry = leftValuesIterator.next();
+			Entry<? extends String, @NonNull ?> entry = leftValuesIterator.next();
 			String key = entry.getKey();
 			Object leftValue = entry.getValue();
 			assert key != null && leftValue != null;

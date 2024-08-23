@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class EnumArgument<T extends @NonNull Enum<T>> extends CommandArgument<@NonNull T> {
+public class EnumArgument<T extends Enum<T>> extends CommandArgument<@NonNull T> {
 
 	private final Class<@NonNull T> clazz;
 
@@ -44,7 +44,7 @@ public class EnumArgument<T extends @NonNull Enum<T>> extends CommandArgument<@N
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -53,7 +53,7 @@ public class EnumArgument<T extends @NonNull Enum<T>> extends CommandArgument<@N
 			return Collections.emptyList();
 		}
 
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toUpperCase();
 		@NonNull T[] enumValues = Unsafe.assertNonNull(clazz.getEnumConstants());
 		for (T value : enumValues) {

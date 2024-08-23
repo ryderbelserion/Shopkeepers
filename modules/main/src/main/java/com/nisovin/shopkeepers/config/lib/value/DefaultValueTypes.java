@@ -7,7 +7,6 @@ import java.util.function.Function;
 
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -71,7 +70,7 @@ public class DefaultValueTypes {
 						return this.newEnumValueType(enumClass);
 					}
 
-					private <E extends @NonNull Enum<E>> EnumValue<E> newEnumValueType(
+					private <E extends Enum<E>> EnumValue<E> newEnumValueType(
 							Class<? extends Enum<?>> enumClass
 					) {
 						return new EnumValue<>(Unsafe.cast(enumClass));

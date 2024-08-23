@@ -78,7 +78,7 @@ public class TypePatterns {
 			typePatterns[i] = TypePatterns.forClass(typeParameter);
 		}
 		// This results in an IllegalArgumentException if typeParameters/typePatterns is null:
-		return parameterized(clazz, Unsafe.<@NonNull TypePattern @NonNull []>cast(typePatterns));
+		return parameterized(clazz, Unsafe.<@NonNull TypePattern[]>cast(typePatterns));
 	}
 
 	private static class ParameterizedTypePattern extends ClassTypePattern {

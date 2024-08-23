@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
  * the {@link #getChild() child} reference, allowing them to encompass a series of {@link Text}s.
  * The next {@link Text} in the chain only inherits the formatting features from the previous
  * {@link Text}s (including the previous child {@link Text}s). The formatting can be reset by
- * inserting a {@link FormattingText} with {@link ChatColor#RESET}.
+ * inserting a {@link FormattingText} with a color code or {@link ChatColor#RESET}.
  * <p>
  * The structure and semantics of this text representation are closely oriented on plain text with
  * color codes, but still supports advanced text features such as {@link HoverEventText hover
@@ -113,8 +113,8 @@ public interface Text {
 	 * @return the parsed Texts
 	 * @see #parse(String)
 	 */
-	public static List<@NonNull Text> parse(Collection<? extends @NonNull String> inputs) {
-		List<@NonNull Text> texts = new ArrayList<>(inputs.size());
+	public static List<Text> parse(Collection<? extends String> inputs) {
+		List<Text> texts = new ArrayList<>(inputs.size());
 		for (String input : inputs) {
 			texts.add(parse(input));
 		}
@@ -395,7 +395,7 @@ public interface Text {
 	 *            a mapping between placeholder keys and their arguments, not <code>null</code>
 	 * @return this Text
 	 */
-	public Text setPlaceholderArguments(Map<? extends @NonNull String, @NonNull ?> arguments);
+	public Text setPlaceholderArguments(Map<? extends String, @NonNull ?> arguments);
 
 	/**
 	 * Assigns the given arguments to their corresponding {@link PlaceholderText placeholders} used

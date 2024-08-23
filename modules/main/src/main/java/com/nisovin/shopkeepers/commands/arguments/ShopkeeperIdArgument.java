@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -26,7 +25,7 @@ import com.nisovin.shopkeepers.util.java.PredicateUtils;
  * <p>
  * By default this accepts any id regardless of whether it corresponds to an existing shopkeeper.
  */
-public class ShopkeeperIdArgument extends ObjectIdArgument<@NonNull Integer> {
+public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 
 	// We don't show suggestions for empty input (would simply list a bunch of random ids).
 	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 1;
@@ -39,13 +38,13 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<@NonNull Integer> {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public ShopkeeperIdArgument(String name, ArgumentFilter<? super @NonNull Integer> filter) {
+	public ShopkeeperIdArgument(String name, ArgumentFilter<? super Integer> filter) {
 		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public ShopkeeperIdArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Integer> filter,
+			ArgumentFilter<? super Integer> filter,
 			int minimumCompletionInput
 	) {
 		super(name, new IntegerArgument(name + ":id"), filter, minimumCompletionInput);
@@ -79,12 +78,12 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<@NonNull Integer> {
 	 *            <code>null</code>
 	 * @return the shopkeeper id completion suggestions
 	 */
-	public static Iterable<? extends @NonNull Integer> getDefaultCompletionSuggestions(
+	public static Iterable<? extends Integer> getDefaultCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,
 			String idPrefix,
-			Predicate<? super @NonNull Shopkeeper> filter
+			Predicate<? super Shopkeeper> filter
 	) {
 		// If idPrefix is not empty but not a valid number, we can skip checking for completions:
 		if (!idPrefix.isEmpty() && ConversionUtils.parseInt(idPrefix) == null) {
@@ -93,13 +92,13 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<@NonNull Integer> {
 
 		// Suggestion for the id(s) of the targeted shopkeeper(s):
 		CommandSender sender = input.getSender();
-		List<? extends @NonNull Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(
+		List<? extends Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(
 				sender,
 				TargetShopkeeperFilter.ANY
 		);
 
 		// Only provide other suggestions if there is a minimum length input:
-		Stream<@NonNull Shopkeeper> shopkeepersStream;
+		Stream<Shopkeeper> shopkeepersStream;
 		if (idPrefix.length() >= minimumCompletionInput) {
 			shopkeepersStream = Stream.concat(
 					targetedShopkeepers.stream(),
@@ -121,7 +120,7 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<@NonNull Integer> {
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull Integer> getCompletionSuggestions(
+	protected Iterable<? extends Integer> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			String idPrefix

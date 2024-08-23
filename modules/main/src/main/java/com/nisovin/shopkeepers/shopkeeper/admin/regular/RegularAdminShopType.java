@@ -3,14 +3,12 @@ package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 import java.util.Collections;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
 public final class RegularAdminShopType
-		extends AbstractAdminShopType<@NonNull SKRegularAdminShopkeeper> {
+		extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
 
 	public RegularAdminShopType() {
 		super(
@@ -37,7 +35,7 @@ public final class RegularAdminShopType
 	}
 
 	@Override
-	public List<? extends @NonNull String> getTradeSetupDescription() {
+	public List<? extends String> getTradeSetupDescription() {
 		return Messages.tradeSetupDescAdminRegular;
 	}
 

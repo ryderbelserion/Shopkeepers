@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -204,9 +203,10 @@ class CitizensListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTraitAdded(NPCAddTraitEvent event) {
 		NPC npc = event.getNPC();
+		assert npc != null;
 		Trait eventTrait = event.getTrait();
 		Class<? extends Trait> traitClass = eventTrait.getClass();
-		Trait trait = npc.getTraitNullable(traitClass);
+		@Nullable Trait trait = Unsafe.nullable(npc.getTraitNullable(traitClass));
 		if (trait == null) {
 			// The trait got not removed again, probably by some other event handler:
 			return;
@@ -227,10 +227,10 @@ class CitizensListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTraitAddedByPlayer(NPCTraitCommandAttachEvent event) {
 		if (!(event.getCommandSender() instanceof Player)) return;
-		@NonNull Player player = Unsafe.cast(event.getCommandSender());
+		Player player = Unsafe.castNonNull(event.getCommandSender());
 		NPC npc = event.getNPC();
-		Class<? extends Trait> traitClass = event.getTraitClass();
-		Trait trait = npc.getTraitNullable(traitClass);
+		Class<? extends Trait> traitClass = Unsafe.castNonNull(event.getTraitClass());
+		@Nullable Trait trait = Unsafe.nullable(npc.getTraitNullable(traitClass));
 		if (trait == null) {
 			// The trait got not removed again, probably by some other event handler:
 			return;
@@ -276,7 +276,7 @@ class CitizensListener implements Listener {
 		} else {
 			// Delete the corresponding shopkeeper(s):
 			// If there are multiple associated shopkeepers, we delete all of them.
-			List<? extends @NonNull Shopkeeper> shopkeepers = citizensShops.getShopkeepers(npc);
+			List<? extends Shopkeeper> shopkeepers = citizensShops.getShopkeepers(npc);
 			if (!shopkeepers.isEmpty()) {
 				new ArrayList<>(shopkeepers).forEach(shopkeeper -> {
 					assert shopkeeper.getShopObject() instanceof SKCitizensShopObject;

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.bukkit.inventory.EquipmentSlot;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -21,9 +20,9 @@ public class ShopkeeperEquipmentEditorHandler extends AbstractEquipmentEditorHan
 
 	ShopkeeperEquipmentEditorHandler(
 			AbstractShopkeeper shopkeeper,
-			List<? extends @NonNull EquipmentSlot> supportedSlots,
-			Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> currentEquipment,
-			BiConsumer<@NonNull EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged
+			List<? extends EquipmentSlot> supportedSlots,
+			Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> currentEquipment,
+			BiConsumer<EquipmentSlot, @Nullable UnmodifiableItemStack> onEquipmentChanged
 	) {
 		super(
 				SKDefaultUITypes.EQUIPMENT_EDITOR(),

@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
@@ -8,7 +7,7 @@ import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
-public class BooleanValue extends ValueType<@NonNull Boolean> {
+public class BooleanValue extends ValueType<Boolean> {
 
 	public static final BooleanValue INSTANCE = new BooleanValue();
 

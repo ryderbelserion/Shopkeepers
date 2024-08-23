@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.naming;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -17,7 +16,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ShopkeeperNaming {
 
-	private class ShopkeeperNameRequest implements InputRequest<@NonNull String> {
+	private class ShopkeeperNameRequest implements InputRequest<String> {
 
 		private final Player player;
 		private final Shopkeeper shopkeeper;
@@ -55,7 +54,7 @@ public class ShopkeeperNaming {
 
 	public void abortNaming(Player player) {
 		Validate.notNull(player, "player is null");
-		InputRequest<@NonNull String> request = chatInput.getRequest(player);
+		InputRequest<String> request = chatInput.getRequest(player);
 		if (request instanceof ShopkeeperNameRequest) {
 			chatInput.abortRequest(player, request);
 		}

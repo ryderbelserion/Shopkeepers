@@ -28,14 +28,14 @@ import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public abstract class AbstractShopType<T extends @NonNull AbstractShopkeeper>
+public abstract class AbstractShopType<T extends AbstractShopkeeper>
 		extends AbstractSelectableType implements ShopType<T> {
 
 	private final Class<T> shopkeeperClass;
 
 	protected AbstractShopType(
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			@Nullable String permission,
 			Class<T> shopkeeperClass
 	) {

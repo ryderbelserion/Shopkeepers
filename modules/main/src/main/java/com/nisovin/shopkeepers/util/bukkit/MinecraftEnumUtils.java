@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.util.bukkit;
 import java.util.Locale;
 
 import org.bukkit.NamespacedKey;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -53,7 +52,7 @@ public final class MinecraftEnumUtils {
 	 *            the enum value name to parse, can be <code>null</code>
 	 * @return the parsed enum value, or <code>null</code> if the enum value cannot be parsed
 	 */
-	public static <E extends @NonNull Enum<E>> @Nullable E parseEnum(
+	public static <E extends Enum<E>> @Nullable E parseEnum(
 			Class<E> enumType,
 			@Nullable String enumName
 	) {

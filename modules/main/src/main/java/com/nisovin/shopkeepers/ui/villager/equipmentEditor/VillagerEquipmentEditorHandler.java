@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -24,7 +23,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public class VillagerEquipmentEditorHandler extends AbstractEquipmentEditorHandler {
 
-	private static Map<? extends @NonNull EquipmentSlot, ? extends @NonNull UnmodifiableItemStack> getEquipmentMap(
+	private static Map<? extends EquipmentSlot, ? extends UnmodifiableItemStack> getEquipmentMap(
 			LivingEntity entity
 	) {
 		Validate.notNull(entity, "entity is null");
@@ -32,7 +31,7 @@ public class VillagerEquipmentEditorHandler extends AbstractEquipmentEditorHandl
 		@Nullable EntityEquipment equipment = entity.getEquipment();
 		if (equipment == null) return Collections.emptyMap(); // Unexpected
 
-		Map<@NonNull EquipmentSlot, @NonNull UnmodifiableItemStack> equipmentMap = new EnumMap<>(EquipmentSlot.class);
+		Map<EquipmentSlot, UnmodifiableItemStack> equipmentMap = new EnumMap<>(EquipmentSlot.class);
 		for (EquipmentSlot slot : EquipmentUtils.EQUIPMENT_SLOTS) {
 			@Nullable ItemStack item = equipment.getItem(slot);
 			if (ItemUtils.isEmpty(item)) continue;

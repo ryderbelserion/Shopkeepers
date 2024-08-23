@@ -5,7 +5,6 @@ import java.util.Collection;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -18,7 +17,7 @@ import com.nisovin.shopkeepers.api.user.User;
 public class PlayerInactiveEvent extends Event implements Cancellable {
 
 	private final User user;
-	private final Collection<? extends @NonNull PlayerShopkeeper> shopkeepers;
+	private final Collection<? extends PlayerShopkeeper> shopkeepers;
 	private boolean cancelled = false;
 
 	/**
@@ -30,7 +29,7 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	 *            the user's owned shopkeepers that are about to be deleted, not <code>null</code>
 	 *            but can be empty
 	 */
-	public PlayerInactiveEvent(User user, Collection<? extends @NonNull PlayerShopkeeper> shopkeepers) {
+	public PlayerInactiveEvent(User user, Collection<? extends PlayerShopkeeper> shopkeepers) {
 		Preconditions.checkNotNull(user, "user is null");
 		Preconditions.checkNotNull(shopkeepers, "shopkeepers is null");
 		this.user = user;
@@ -54,7 +53,7 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	 * 
 	 * @return the shopkeepers that are about to be deleted, not <code>null</code> but may be empty
 	 */
-	public Collection<? extends @NonNull PlayerShopkeeper> getShopkeepers() {
+	public Collection<? extends PlayerShopkeeper> getShopkeepers() {
 		return shopkeepers;
 	}
 

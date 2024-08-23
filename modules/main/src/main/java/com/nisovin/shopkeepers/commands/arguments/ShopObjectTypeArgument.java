@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -20,7 +19,7 @@ import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.ObjectUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class ShopObjectTypeArgument extends CommandArgument<@NonNull ShopObjectType<?>> {
+public class ShopObjectTypeArgument extends CommandArgument<ShopObjectType<?>> {
 
 	public ShopObjectTypeArgument(String name) {
 		super(name);
@@ -49,7 +48,7 @@ public class ShopObjectTypeArgument extends CommandArgument<@NonNull ShopObjectT
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader
@@ -59,7 +58,7 @@ public class ShopObjectTypeArgument extends CommandArgument<@NonNull ShopObjectT
 		}
 
 		Player senderPlayer = ObjectUtils.castOrNull(input.getSender(), Player.class);
-		List<@NonNull String> suggestions = new ArrayList<>();
+		List<String> suggestions = new ArrayList<>();
 		String partialArg = StringUtils.normalize(argsReader.next());
 		for (ShopObjectType<?> shopObjectType : ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().getRegisteredTypes()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;

@@ -231,9 +231,9 @@ public final class TextUtils {
 		return translateColorCodesToAlternative(COLOR_CHAR_ALTERNATIVE, text);
 	}
 
-	public static List<@NonNull String> decolorize(List<? extends @NonNull String> list) {
+	public static List<String> decolorize(List<? extends String> list) {
 		Validate.notNull(list, "list is null");
-		List<@NonNull String> decolored = new ArrayList<>(list.size());
+		List<String> decolored = new ArrayList<>(list.size());
 		for (String string : list) {
 			decolored.add(translateColorCodesToAlternative(COLOR_CHAR_ALTERNATIVE, string));
 		}
@@ -277,9 +277,9 @@ public final class TextUtils {
 	 *            the texts with {@code &}-based color codes, not <code>null</code>
 	 * @return a new list containing the corresponding texts with Minecraft's color codes
 	 */
-	public static List<@NonNull String> colorize(List<? extends @NonNull String> list) {
+	public static List<String> colorize(List<? extends String> list) {
 		Validate.notNull(list, "list is null");
-		List<@NonNull String> colored = new ArrayList<>(list.size());
+		List<String> colored = new ArrayList<>(list.size());
 		for (String text : list) {
 			colored.add(colorize(text));
 		}
@@ -401,7 +401,7 @@ public final class TextUtils {
 	public static void sendMessage(
 			CommandSender recipient,
 			String message,
-			Map<? extends @NonNull String, @NonNull ?> arguments
+			Map<? extends String, @NonNull ?> arguments
 	) {
 		// Replace message arguments and then send:
 		sendMessage(recipient, StringUtils.replaceArguments(message, arguments));
@@ -486,14 +486,12 @@ public final class TextUtils {
 	public static Text getMaterialNameForDisplay(@Nullable Material material) {
 		if (material == null) return Text.EMPTY;
 		Text formattedName = Text.of(ItemUtils.formatMaterialName(material));
-		String translationKey = NMSManager.getProvider().getItemTypeTranslationKey(material);
-		if (translationKey == null) {
-			// Item translation keys are not supported.
-			return formattedName;
-		} else {
-			// We use the formatted name as fallback.
-			return Text.translatable(translationKey).child(formattedName).getRoot();
-		}
+		// Note: This might not necessarily match the name that is usually displayed for an
+		// ItemStack, but rather the translated item type name (for example for items such as
+		// different types of potions, skulls, etc.).
+		String translationKey = material.getTranslationKey();
+		// We use the formatted name as fallback.
+		return Text.translatable(translationKey).child(formattedName).getRoot();
 	}
 
 	/**
@@ -532,7 +530,7 @@ public final class TextUtils {
 	public static void sendMessage(
 			CommandSender recipient,
 			Text message,
-			Map<? extends @NonNull String, @NonNull ?> arguments
+			Map<? extends String, @NonNull ?> arguments
 	) {
 		Validate.notNull(recipient, "recipient is null");
 		Validate.notNull(message, "message is null");

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandSourceRejectedException;
@@ -21,7 +20,7 @@ public abstract class PlayerCommand extends Command {
 		this(name, Collections.emptyList());
 	}
 
-	public PlayerCommand(String name, List<@NonNull String> aliases) {
+	public PlayerCommand(String name, List<String> aliases) {
 		super(name, aliases);
 	}
 

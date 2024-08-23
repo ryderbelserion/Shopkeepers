@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.List;
 
 import org.bukkit.entity.WanderingTrader;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -20,13 +19,13 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 
-public class WanderingTraderShop extends BabyableShop<@NonNull WanderingTrader> {
+public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
 
 	private final WanderingTraderSounds wanderingTraderSounds;
 
 	public WanderingTraderShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull WanderingTraderShop> livingObjectType,
+			SKLivingShopObjectType<WanderingTraderShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -84,8 +83,8 @@ public class WanderingTraderShop extends BabyableShop<@NonNull WanderingTrader> 
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		return editorButtons;
 	}
 }

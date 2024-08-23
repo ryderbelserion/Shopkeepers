@@ -60,7 +60,7 @@ public class CommandContextView implements CommandContext {
 	}
 
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getMapView() {
+	public Map<? extends String, @NonNull ?> getMapView() {
 		return context.getMapView();
 	}
 

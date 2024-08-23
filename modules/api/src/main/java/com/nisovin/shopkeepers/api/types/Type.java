@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.api.types;
 import java.util.Collection;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -25,7 +24,7 @@ public interface Type {
 	 *
 	 * @return the aliases, not <code>null</code>, can be empty
 	 */
-	public Collection<? extends @NonNull String> getAliases();
+	public Collection<? extends String> getAliases();
 
 	/**
 	 * Gets the display name of this type.

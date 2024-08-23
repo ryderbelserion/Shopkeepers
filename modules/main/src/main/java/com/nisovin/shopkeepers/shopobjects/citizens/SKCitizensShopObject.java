@@ -85,7 +85,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			.nullable()
 			.defaultValue(null)
 			.build();
-	public static final Property<DataContainer> NPC_DATA = new BasicProperty<DataContainer>()
+	public static final Property<@Nullable DataContainer> NPC_DATA = new BasicProperty<@Nullable DataContainer>()
 			.dataKeyAccessor("npc-data", DataContainerSerializers.DEFAULT)
 			.nullable() // Saving of NPC data is optional
 			.defaultValue(null)

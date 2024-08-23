@@ -3,10 +3,14 @@ package com.nisovin.shopkeepers.storage;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -27,7 +31,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
@@ -74,9 +77,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private static final String DATA_VERSION_KEY = "data-version";
 
-	private static final String HEADER = "This file is not intended to be manually modified! If you"
-			+ " want to manually edit this file anyway, ensure that the server is not running"
-			+ " currently and that you have prepared a backup of this file.";
+	private static final List<@Nullable String> HEADER = Collections.unmodifiableList(Arrays.asList(
+			"This file is not intended to be manually modified! If you want to manually edit this"
+					+ " file anyway, ensure that the server is not running currently and that you"
+					+ " have prepared a backup of this file."
+	));
 
 	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
 
@@ -109,17 +114,17 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// These shopkeepers may no longer be loaded. This does not include shopkeepers that were
 	// deleted. This Set is swapped with another, empty Set when the shopkeepers are saved, so that
 	// we can track the shopkeepers that are marked as dirty in the meantime.
-	private Set<@NonNull AbstractShopkeeper> dirtyShopkeepers = new LinkedHashSet<>();
+	private Set<AbstractShopkeeper> dirtyShopkeepers = new LinkedHashSet<>();
 	// Shopkeepers (their ids) whose data we transferred to the storage, but which we were not yet
 	// able to save to disk.
 	// This Set is not modified while a save is in progress.
-	private final Set<@NonNull Integer> unsavedShopkeepers = new HashSet<>();
+	private final Set<Integer> unsavedShopkeepers = new HashSet<>();
 	// Shopkeepers (their ids) that got deleted since the last save. The next save will remove their
 	// data from the save file. This Set is not modified while a save is in progress.
-	private final Set<@NonNull Integer> unsavedDeletedShopkeepers = new HashSet<>();
+	private final Set<Integer> unsavedDeletedShopkeepers = new HashSet<>();
 	// Shopkeepers that got deleted during the last async save. Their data is removed from memory
 	// after the current save completes, and removed from the save file by the subsequent save.
-	private final Set<@NonNull AbstractShopkeeper> shopkeepersToDelete = new LinkedHashSet<>();
+	private final Set<AbstractShopkeeper> shopkeepersToDelete = new LinkedHashSet<>();
 
 	/* Loading */
 	private boolean currentlyLoading = false;
@@ -449,8 +454,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 		}
 
-		// Load the save data with the specified encoding:
-		try (Reader reader = Files.newBufferedReader(saveFile, DerivedSettings.fileCharset)) {
+		// Load the save data:
+		try (Reader reader = Files.newBufferedReader(saveFile, StandardCharsets.UTF_8)) {
 			// Since Bukkit 1.16.5, this automatically clears the save data before loading the new
 			// entries.
 			saveData.load(reader);
@@ -468,7 +473,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// will be the first entry in the save file, even if it is missing in the save file
 		// currently. If a data version is present in the loaded data, the 'missing' data version
 		// value is replaced with the actual data version afterwards.
-		Map<? extends @NonNull String, @NonNull ?> saveDataEntries = saveData.getValuesCopy();
+		Map<? extends String, @NonNull ?> saveDataEntries = saveData.getValuesCopy();
 		saveData.clear();
 		saveData.set(DATA_VERSION_KEY, DataVersion.MISSING.toString());
 		saveData.setAll(saveDataEntries);
@@ -519,7 +524,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			return false; // Disable without save
 		}
 
-		Set<? extends @NonNull String> keys = saveData.getKeys();
+		Set<? extends String> keys = saveData.getKeys();
 		// Contains at least the data-version entry:
 		assert keys.contains(DATA_VERSION_KEY);
 		int shopkeepersCount = (keys.size() - 1);
@@ -870,9 +875,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		// Previously dirty shopkeepers that we currently attempt to save. This Set is only modified
 		// synchronously, so it is safe to be accessed at any time by the storage.
-		Set<@NonNull AbstractShopkeeper> savingDirtyShopkeepers = new LinkedHashSet<>();
+		Set<AbstractShopkeeper> savingDirtyShopkeepers = new LinkedHashSet<>();
 		// The shopkeepers that we were not able to save for some reason:
-		private final Set<@NonNull AbstractShopkeeper> failedToSave = new LinkedHashSet<>();
+		private final Set<AbstractShopkeeper> failedToSave = new LinkedHashSet<>();
 
 		/* Last save */
 		// These variables get replaced during the next save.
@@ -918,7 +923,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Set up the file header:
 			// This replaces any previously existing and loaded header and thereby ensures that it
 			// is always up-to-date after we have saved the file.
-			saveData.getConfig().options().header(HEADER);
+			saveData.getConfig().options().setHeader(HEADER);
 
 			// Reset the pendingSaveRequest flag here (and not just after a successful save), so
 			// that we can track any save requests that occur in the meantime, which require another
@@ -928,7 +933,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			// Swap the dirty shopkeepers sets:
 			assert savingDirtyShopkeepers.isEmpty();
-			Set<@NonNull AbstractShopkeeper> newDirtyShopkeepers = savingDirtyShopkeepers;
+			Set<AbstractShopkeeper> newDirtyShopkeepers = savingDirtyShopkeepers;
 			savingDirtyShopkeepers = dirtyShopkeepers;
 			dirtyShopkeepers = newDirtyShopkeepers;
 
@@ -1073,8 +1078,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				this.wrapException(() -> FileUtils.checkIsDirectoryWritable(saveFileDirectory));
 			}
 
-			// Create new temporary save file and write data to it, using the specified encoding:
-			try (Writer writer = Files.newBufferedWriter(tempSaveFile, DerivedSettings.fileCharset)) {
+			// Create new temporary save file and write data to it:
+			try (Writer writer = Files.newBufferedWriter(tempSaveFile, StandardCharsets.UTF_8)) {
 				writer.write(data);
 			} catch (IOException e) {
 				throw new ShopkeeperStorageSaveException(
@@ -1157,7 +1162,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		private void wrapException(VoidCallable callable) throws ShopkeeperStorageSaveException {
-			this.wrapException((Callable<Void>) callable);
+			this.wrapException((Callable<@Nullable Void>) callable);
 		}
 
 		@Override

@@ -71,12 +71,12 @@ public final class BufferedCommandContext extends SimpleCommandContext {
 	// Note: This is relatively costly for the buffered command context, compared to the regular
 	// command context!
 	@Override
-	public Map<? extends @NonNull String, @NonNull ?> getMapView() {
+	public Map<? extends String, @NonNull ?> getMapView() {
 		if (values.isEmpty()) {
 			return context.getMapView();
 		} else {
 			// Combine maps:
-			Map<@NonNull String, @NonNull Object> combined = new LinkedHashMap<>(context.getMapView());
+			Map<String, Object> combined = new LinkedHashMap<>(context.getMapView());
 			combined.putAll(super.values); // Replaces existing entries for duplicate keys
 			return Collections.unmodifiableMap(combined);
 		}

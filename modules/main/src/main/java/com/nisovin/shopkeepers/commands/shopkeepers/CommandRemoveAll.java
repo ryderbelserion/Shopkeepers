@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
@@ -150,10 +149,10 @@ class CommandRemoveAll extends Command {
 		// Note: Doing this before prompting the command executor for confirmation allows us to
 		// detect ambiguous player names and missing player information (the player name/uuid if
 		// only the uuid/name is specified).
-		List<? extends @NonNull Shopkeeper> affectedShops;
+		List<? extends Shopkeeper> affectedShops;
 		if (allAdmin) {
 			// Search all admin shops:
-			List<@NonNull Shopkeeper> adminShops = new ArrayList<>();
+			List<Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof AdminShopkeeper) {
 					adminShops.add(shopkeeper);
@@ -162,7 +161,7 @@ class CommandRemoveAll extends Command {
 			affectedShops = adminShops;
 		} else if (allPlayers) {
 			// Search all player shops:
-			List<@NonNull Shopkeeper> playerShops = new ArrayList<>();
+			List<Shopkeeper> playerShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					playerShops.add(shopkeeper);
@@ -180,7 +179,7 @@ class CommandRemoveAll extends Command {
 
 			// If the input name is ambiguous, we print an error and require the player to be
 			// specified by uuid:
-			Map<? extends @NonNull UUID, ? extends @NonNull String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
+			Map<? extends UUID, ? extends String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
 			if (matchingShopOwners.size() > 1) {
 				assert targetPlayerName != null;

@@ -4,6 +4,10 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.entity.Cat;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -20,15 +24,22 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
-public class CatShop extends SittableShop<@NonNull Cat> {
+public class CatShop extends SittableShop<Cat> {
+
+	public static final Property<Cat.Type> CAT_TYPE = new BasicProperty<Cat.Type>()
+			.dataKeyAccessor("catType", KeyedSerializers.forRegistry(Cat.Type.class, Registry.CAT_VARIANT))
+			.defaultValue(Cat.Type.TABBY)
+			.build();
 
 	public static final Property<@Nullable DyeColor> COLLAR_COLOR = new BasicProperty<@Nullable DyeColor>()
 			.dataKeyAccessor("collarColor", EnumSerializers.lenient(DyeColor.class))
@@ -36,14 +47,16 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 			.defaultValue(null)
 			.build();
 
-	private PropertyValue<Cat.@NonNull Type> catTypeProperty;
+	private final PropertyValue<Cat.Type> catTypeProperty = new PropertyValue<>(CAT_TYPE)
+			.onValueChanged(Unsafe.initialized(this)::applyCatType)
+			.build(properties);
 	private final PropertyValue<@Nullable DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(Unsafe.initialized(this)::applyCollarColor)
 			.build(properties);
 
 	public CatShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<@NonNull CatShop> livingObjectType,
+			SKLivingShopObjectType<CatShop> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -53,15 +66,6 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	@Override
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
-		if (catTypeProperty == null) {
-			Property<Cat.@NonNull Type> catType = new BasicProperty<Cat.@NonNull Type>()
-					.dataKeyAccessor("catType", NMSManager.getProvider().getCatTypeSerializer())
-					.defaultValue(Cat.Type.TABBY)
-					.build();
-			catTypeProperty = new PropertyValue<>(catType)
-					.onValueChanged(Unsafe.initialized(this)::applyCatType)
-					.build(properties);
-		}
 		catTypeProperty.load(shopObjectData);
 		collarColorProperty.load(shopObjectData);
 	}
@@ -81,8 +85,8 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getCatTypeEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
@@ -99,7 +103,11 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	}
 
 	public void cycleCatType(boolean backwards) {
-		this.setCatType(NMSManager.getProvider().cycleCatType(this.getCatType(), backwards));
+		this.setCatType(RegistryUtils.cycleKeyed(
+				Registry.CAT_VARIANT,
+				this.getCatType(),
+				backwards
+		));
 	}
 
 	private void applyCatType() {
@@ -198,6 +206,7 @@ public class CatShop extends SittableShop<@NonNull Cat> {
 	private void applyCollarColor() {
 		Cat entity = this.getEntity();
 		if (entity == null) return; // Not spawned
+
 		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:

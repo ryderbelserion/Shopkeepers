@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -19,26 +18,26 @@ import com.nisovin.shopkeepers.text.Text;
 /**
  * Determines an online player by the given name input.
  */
-public class PlayerByNameArgument extends ObjectByIdArgument<@NonNull String, @NonNull Player> {
+public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 
 	public PlayerByNameArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
-	public PlayerByNameArgument(String name, ArgumentFilter<? super @NonNull Player> filter) {
+	public PlayerByNameArgument(String name, ArgumentFilter<? super Player> filter) {
 		this(name, filter, PlayerNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	public PlayerByNameArgument(
 			String name,
-			ArgumentFilter<? super @NonNull Player> filter,
+			ArgumentFilter<? super Player> filter,
 			int minimumCompletionInput
 	) {
 		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<@NonNull String> createIdArgument(
+	protected ObjectIdArgument<String> createIdArgument(
 			@UnknownInitialization PlayerByNameArgument this,
 			String name,
 			IdArgumentArgs args
@@ -49,7 +48,7 @@ public class PlayerByNameArgument extends ObjectByIdArgument<@NonNull String, @N
 				args.minimumCompletionInput
 		) {
 			@Override
-			protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+			protected Iterable<? extends String> getCompletionSuggestions(
 					CommandInput input,
 					CommandContextView context,
 					String idPrefix
@@ -76,14 +75,14 @@ public class PlayerByNameArgument extends ObjectByIdArgument<@NonNull String, @N
 			String nameInput
 	) throws ArgumentParseException {
 		// Name input may be both player name or display name:
-		Stream<@NonNull Player> players = PlayerNameMatcher.EXACT.match(nameInput);
-		Optional<@NonNull Player> player = players.findFirst();
+		Stream<Player> players = PlayerNameMatcher.EXACT.match(nameInput);
+		Optional<Player> player = players.findFirst();
 		return player.orElse(null);
 		// TODO deal with ambiguities
 	}
 
 	@Override
-	protected Iterable<? extends @NonNull String> getCompletionSuggestions(
+	protected Iterable<? extends String> getCompletionSuggestions(
 			CommandInput input,
 			CommandContextView context,
 			int minimumCompletionInput,

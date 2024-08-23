@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
@@ -34,12 +33,12 @@ public class PlayerShopsLimit {
 	 *            <code>null</code>
 	 */
 	public static void updateMaxShopsPermissions(
-			Consumer<? super @NonNull String> invalidPermissionOptionCallback
+			Consumer<? super String> invalidPermissionOptionCallback
 	) {
 		Validate.notNull(invalidPermissionOptionCallback,
 				"invalidPermissionOptionCallback is null");
 		String maxShopsPermissionOptions = Settings.maxShopsPermOptions;
-		List<@NonNull MaxShopsPermission> maxShopsPermissions = DerivedSettings.maxShopsPermissions;
+		List<MaxShopsPermission> maxShopsPermissions = DerivedSettings.maxShopsPermissions;
 
 		// Clear the list of previous max shops permissions:
 		maxShopsPermissions.clear();

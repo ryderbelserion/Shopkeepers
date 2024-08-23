@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.Callable;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ThrowableUtils {
@@ -92,7 +91,7 @@ public final class ThrowableUtils {
 	 */
 	// https://stackoverflow.com/questions/4554230/rethrowing-checked-exceptions/4555351#4555351
 	@SuppressWarnings("unchecked")
-	public static <T extends @NonNull Throwable> Error rethrow(Throwable throwable) throws T {
+	public static <T extends Throwable> Error rethrow(Throwable throwable) throws T {
 		// This cast is erased at runtime and therefore never actually performed / checked:
 		throw (T) throwable;
 	}

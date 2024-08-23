@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -28,20 +27,20 @@ import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use BabyableShop as base once there is a common interface for this inside Bukkit.
-public class ZombieShop<E extends @NonNull Zombie> extends SKLivingShopObject<E> {
+public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 
-	public static final Property<@NonNull Boolean> BABY = new BasicProperty<@NonNull Boolean>()
+	public static final Property<Boolean> BABY = new BasicProperty<Boolean>()
 			.dataKeyAccessor("baby", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
 
-	private final PropertyValue<@NonNull Boolean> babyProperty = new PropertyValue<>(BABY)
+	private final PropertyValue<Boolean> babyProperty = new PropertyValue<>(BABY)
 			.onValueChanged(Unsafe.initialized(this)::applyBaby)
 			.build(properties);
 
 	public ZombieShop(
 			LivingShops livingShops,
-			SKLivingShopObjectType<? extends @NonNull ZombieShop<E>> livingObjectType,
+			SKLivingShopObjectType<? extends ZombieShop<E>> livingObjectType,
 			AbstractShopkeeper shopkeeper,
 			@Nullable ShopCreationData creationData
 	) {
@@ -67,8 +66,8 @@ public class ZombieShop<E extends @NonNull Zombie> extends SKLivingShopObject<E>
 	}
 
 	@Override
-	public List<@NonNull Button> createEditorButtons() {
-		List<@NonNull Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getBabyEditorButton());
 		return editorButtons;
 	}
@@ -90,7 +89,14 @@ public class ZombieShop<E extends @NonNull Zombie> extends SKLivingShopObject<E>
 	private void applyBaby() {
 		@Nullable E entity = this.getEntity();
 		if (entity == null) return; // Not spawned
-		entity.setBaby(this.isBaby());
+
+		if (this.isBaby()) {
+			entity.setBaby();
+		} else {
+			entity.setAdult();
+			// TODO: MC-9568: Growing up mobs get moved. Might be fixed.
+			this.teleportBack();
+		}
 	}
 
 	private ItemStack getBabyEditorItem() {

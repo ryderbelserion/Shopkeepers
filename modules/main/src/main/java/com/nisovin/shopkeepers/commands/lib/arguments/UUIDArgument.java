@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
@@ -18,7 +16,7 @@ import com.nisovin.shopkeepers.util.java.ConversionUtils;
  * <p>
  * Provides no completions.
  */
-public class UUIDArgument extends CommandArgument<@NonNull UUID> {
+public class UUIDArgument extends CommandArgument<UUID> {
 
 	public UUIDArgument(String name) {
 		super(name);
@@ -46,7 +44,7 @@ public class UUIDArgument extends CommandArgument<@NonNull UUID> {
 	}
 
 	@Override
-	public List<? extends @NonNull String> complete(
+	public List<? extends String> complete(
 			CommandInput input,
 			CommandContextView context,
 			ArgumentsReader argsReader

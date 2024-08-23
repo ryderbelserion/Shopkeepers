@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.lang.Messages;
@@ -26,7 +25,7 @@ class ShopCreationItemSelectionTask implements Runnable {
 	private static final long DELAY_TICKS = 5L; // 0.25 seconds
 
 	// By player UUID:
-	private static final Map<@NonNull UUID, @NonNull ShopCreationItemSelectionTask> activeTasks = new HashMap<>();
+	private static final Map<UUID, ShopCreationItemSelectionTask> activeTasks = new HashMap<>();
 
 	/**
 	 * Starts this task for the given player.

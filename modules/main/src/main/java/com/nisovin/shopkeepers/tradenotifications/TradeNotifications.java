@@ -11,7 +11,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -51,9 +50,9 @@ public class TradeNotifications implements Listener {
 		// settings (e.g. the currency items) are therefore not expected to occur while this
 		// TradeContext is in use, and can therefore not affect the outcome of these lazily
 		// calculated properties.
-		private final Lazy<@NonNull MessageArguments> shopMessageArguments;
-		private final Lazy<@NonNull Map<@NonNull String, @NonNull Object>> tradeMessageArguments;
-		private final Lazy<@NonNull Boolean> isResultItemCurrency;
+		private final Lazy<MessageArguments> shopMessageArguments;
+		private final Lazy<Map<String, Object>> tradeMessageArguments;
+		private final Lazy<Boolean> isResultItemCurrency;
 
 		TradeContext(MergedTrades mergedTrades) {
 			this.mergedTrades = mergedTrades;
@@ -125,50 +124,46 @@ public class TradeNotifications implements Listener {
 		}
 
 		// Returns a modifiable map.
-		public Map<@NonNull String, @NonNull Object> getTradeMessageArguments() {
+		public Map<String, Object> getTradeMessageArguments() {
 			return tradeMessageArguments.get();
 		}
 	}
 
-	private static Map<@NonNull String, @NonNull Object> createTradeMessageArguments(
+	private static Map<String, Object> createTradeMessageArguments(
 			TradeContext tradeContext
 	) {
 		Player player = tradeContext.getTradingPlayer();
-		Map<@NonNull String, @NonNull Object> msgArgs = new HashMap<>();
+		Map<String, Object> msgArgs = new HashMap<>();
 		msgArgs.put("player", Unsafe.assertNonNull(player.getName()));
 		msgArgs.put(
 				"playerId",
-				(Supplier<@NonNull Object>) () -> player.getUniqueId().toString()
+				(Supplier<Object>) () -> player.getUniqueId().toString()
 		);
 		msgArgs.put(
 				"resultItem",
-				(Supplier<@NonNull Object>) () -> {
-					return TextUtils.getItemText(tradeContext.getResultItem());
-				}
+				(Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getResultItem())
 		);
 		msgArgs.put(
 				"resultItemAmount",
-				(Supplier<@NonNull Object>) () -> tradeContext.getResultItem().getAmount()
+				(Supplier<Object>) () -> tradeContext.getResultItem().getAmount()
 		);
 		msgArgs.put(
 				"item1",
-				(Supplier<@NonNull Object>) () -> {
+				(Supplier<Object>) () -> {
 					return TextUtils.getItemText(tradeContext.getOfferedItem1());
 				}
 		);
 		msgArgs.put(
 				"item1Amount",
-				(Supplier<@NonNull Object>) () -> tradeContext.getOfferedItem1().getAmount()
+				(Supplier<Object>) () -> tradeContext.getOfferedItem1().getAmount()
 		);
 		msgArgs.put(
 				"item2",
-				(Supplier<@NonNull Object>) () -> {
-					return TextUtils.getItemText(tradeContext.getOfferedItem2());
-				}
+				(Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getOfferedItem2())
 		);
 		msgArgs.put(
 				"item2Amount",
-				(Supplier<@NonNull Object>) () -> {
+				(Supplier<Object>) () -> {
 					return ItemUtils.getItemStackAmount(tradeContext.getOfferedItem2());
 				}
 		);
@@ -240,7 +235,7 @@ public class TradeNotifications implements Listener {
 			shopOwner = ((PlayerShopkeeper) tradeContext.getShopkeeper()).getOwner();
 		}
 
-		Lazy<@NonNull Text> tradeNotification = new Lazy<>(
+		Lazy<Text> tradeNotification = new Lazy<>(
 				() -> this.getTradeNotificationMessage(tradeContext)
 		);
 		for (Player player : Bukkit.getOnlinePlayers()) {
@@ -312,7 +307,7 @@ public class TradeNotifications implements Listener {
 			Text tradeCountText
 	) {
 		MessageArguments shopMsgArgs = tradeContext.getShopMessageArguments();
-		Map<@NonNull String, @NonNull Object> tradeMsgArgs = tradeContext.getTradeMessageArguments();
+		Map<String, Object> tradeMsgArgs = tradeContext.getTradeMessageArguments();
 
 		shopText.setPlaceholderArguments(shopMsgArgs);
 		// TODO Display more shop information as hover text? Add a click event or insertion text to

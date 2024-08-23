@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -43,7 +42,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		}
 
 		@Override
-		public @Nullable List<? extends @NonNull String> getConfirmationLore() {
+		public @Nullable List<? extends String> getConfirmationLore() {
 			return Messages.confirmationUiDeleteShopConfirmLore;
 		}
 	};
@@ -79,7 +78,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		String itemName = StringUtils.replaceArguments(Messages.tradeSetupDescHeader,
 				"shopType", shopType.getDisplayName()
 		);
-		List<? extends @NonNull String> itemLore = shopType.getTradeSetupDescription();
+		List<? extends String> itemLore = shopType.getTradeSetupDescription();
 		return ItemUtils.setDisplayNameAndLore(
 				Settings.tradeSetupItem.createItemStack(),
 				itemName,

@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -33,12 +32,12 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public abstract class AbstractPlayerShopType<T extends @NonNull AbstractPlayerShopkeeper>
+public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		extends AbstractShopType<T> implements PlayerShopType<T> {
 
 	protected AbstractPlayerShopType(
 			String identifier,
-			List<? extends @NonNull String> aliases,
+			List<? extends String> aliases,
 			@Nullable String permission,
 			Class<T> shopkeeperType
 	) {

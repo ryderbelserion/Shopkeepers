@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers.Enum
  */
 public final class MinecraftEnumSerializers {
 
-	private static class LenientMinecraftEnumSerializer<E extends @NonNull Enum<E>>
+	private static class LenientMinecraftEnumSerializer<E extends Enum<E>>
 			extends EnumSerializer<@NonNull E> {
 
 		/**
@@ -56,7 +56,7 @@ public final class MinecraftEnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> strict(
+	public static <E extends Enum<E>> DataSerializer<@NonNull E> strict(
 			Class<@NonNull E> enumType
 	) {
 		return EnumSerializers.strict(enumType);
@@ -77,7 +77,7 @@ public final class MinecraftEnumSerializers {
 	 *            the enum class, not <code>null</code>
 	 * @return the data serializer, not <code>null</code>
 	 */
-	public static <E extends @NonNull Enum<E>> DataSerializer<@NonNull E> lenient(
+	public static <E extends Enum<E>> DataSerializer<@NonNull E> lenient(
 			Class<@NonNull E> enumType
 	) {
 		return new LenientMinecraftEnumSerializer<@NonNull E>(enumType);
@@ -100,7 +100,7 @@ public final class MinecraftEnumSerializers {
 		 * throws an {@link UnknownMaterialException} instead of a normal
 		 * {@link InvalidDataException}.
 		 */
-		public static final DataSerializer<@NonNull Material> LENIENT = new LenientMinecraftEnumSerializer<@NonNull Material>(
+		public static final DataSerializer<Material> LENIENT = new LenientMinecraftEnumSerializer<Material>(
 				Material.class
 		) {
 			@Override
@@ -122,7 +122,7 @@ public final class MinecraftEnumSerializers {
 		 * A {@link MinecraftEnumSerializers#lenient(Class) lenient} {@link DataSerializer} for
 		 * {@link EquipmentSlot} values.
 		 */
-		public static final DataSerializer<@NonNull EquipmentSlot> LENIENT = lenient(EquipmentSlot.class);
+		public static final DataSerializer<EquipmentSlot> LENIENT = lenient(EquipmentSlot.class);
 	}
 
 	private MinecraftEnumSerializers() {

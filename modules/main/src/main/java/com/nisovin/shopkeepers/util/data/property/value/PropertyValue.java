@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
@@ -55,7 +54,7 @@ public class PropertyValue<T> {
 	 * An unmodifiable set of the {@link UpdateFlag}s that are used by {@link #setValue(Object)},
 	 * i.e. when no update flags were specified.
 	 */
-	public static final Set<? extends @NonNull UpdateFlag> DEFAULT_UPDATE_FLAGS = Collections.singleton(
+	public static final Set<? extends UpdateFlag> DEFAULT_UPDATE_FLAGS = Collections.singleton(
 			DefaultUpdateFlag.MARK_DIRTY
 	);
 
@@ -208,7 +207,7 @@ public class PropertyValue<T> {
 	 * @param updateFlags
 	 *            the update flags
 	 */
-	public final void setValue(T value, Set<? extends @NonNull UpdateFlag> updateFlags) {
+	public final void setValue(T value, Set<? extends UpdateFlag> updateFlags) {
 		this.validateBuilt();
 		Validate.notNull(updateFlags, "updateFlags is null");
 
@@ -316,7 +315,7 @@ public class PropertyValue<T> {
 		this.validateBuilt();
 		// TODO Allow callers to pass UpdateFlags to this method?
 		// Does not mark the holder as dirty:
-		Set<? extends @NonNull UpdateFlag> updateFlags = Collections.emptySet();
+		Set<? extends UpdateFlag> updateFlags = Collections.emptySet();
 		T value;
 		try {
 			value = property.load(dataContainer); // Can load null
