@@ -63,7 +63,10 @@ public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 	private void resetQueued(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		ShopkeeperSpawnState spawnState = shopkeeper.getComponents().getOrAdd(ShopkeeperSpawnState.class);
-		assert spawnState.getState() == State.QUEUED;
+		// If this assertion throws: Make sure that the shopkeeper is getting removed from the queue
+		// when the spawn state changes in the meantime, e.g. by calling
+		// ShopkeeperSpawner#updateSpawnState instead of setting the spawn state directly.
+		assert spawnState.getState() == State.QUEUED : "spawnState != QUEUED";
 		spawnState.setState(State.DESPAWNED);
 	}
 

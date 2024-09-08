@@ -11,6 +11,7 @@ Date format: (YYYY-MM-DD)
   * Only one storage type can be selected: Logging trades to both CSV and the SQLite is not supported.
   * Internal: Refactors to share most of the logic between the old CSV and the new SQLite trade loggers.
 * Config: Remove `file-encoding` setting: We use Bukkit to load the save data, which always expects the data to be UTF-8 encoded.
+* Fix: Remove shopkeepers from the spawn queue again when their chunk is unloaded. This can for example occasionally be observed during server startup on MC 1.21.1.
 
 ## v2.23.0 (2024-08-11)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6
