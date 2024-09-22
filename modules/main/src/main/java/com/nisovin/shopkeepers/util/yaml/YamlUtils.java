@@ -24,7 +24,15 @@ public final class YamlUtils {
 		Representer yamlRepresenter = new CompactYamlRepresenter();
 		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
 		yamlRepresenter.setDefaultScalarStyle(ScalarStyle.PLAIN);
-		BaseConstructor yamlConstructor = new YamlConstructor(new LoaderOptions());
+		LoaderOptions yamlLoaderOptions = new LoaderOptions();
+		// Similar settings as in Bukkit:
+		yamlLoaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE);
+		yamlLoaderOptions.setCodePointLimit(Integer.MAX_VALUE);
+		// Increase the default nesting limit (50), because this limit can easily be reached for
+		// nested bundles, which can be nested up to 16 levels deep, each adding 3 levels of nesting
+		// inside the serialized Yaml. See Spigot-7906.
+		yamlLoaderOptions.setNestingDepthLimit(100);
+		BaseConstructor yamlConstructor = new YamlConstructor(yamlLoaderOptions);
 		return new Yaml(yamlConstructor, yamlRepresenter, yamlDumperOptions);
 	});
 
