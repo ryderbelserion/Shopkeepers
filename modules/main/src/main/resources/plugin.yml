@@ -81,6 +81,9 @@ permissions:
     shopkeeper.convertitems.others:
         description: Convert items of other players via command
         default: op
+    shopkeeper.updateitems:
+        description: Update third-party items
+        default: op
     shopkeeper.remote:
         description: Remotely open shops via command
         default: op
@@ -206,6 +209,7 @@ permissions:
             shopkeeper.givecurrency: true
             shopkeeper.convertitems.own: true
             shopkeeper.convertitems.others: true
+            shopkeeper.updateitems: true
             shopkeeper.remote: true
             shopkeeper.remote.otherplayers: true
             shopkeeper.remoteedit: true

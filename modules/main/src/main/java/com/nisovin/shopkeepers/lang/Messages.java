@@ -402,6 +402,7 @@ public class Messages extends Config {
 	public static Text mustHoldItemInMainHand = Text.parse("&7You must hold an item in your main hand.");
 	public static Text currencyItemSetToMainHandItem = Text.parse("&aThe currency item '&e{currencyId}&a' has been set to the &eitem in your main hand&a!");
 	public static Text itemsConverted = Text.parse("&aConverted &e{count}&a item stack(s)!");
+	public static Text itemsUpdated = Text.parse("&aUpdated &e{count}&a item(s)!");
 	public static String unknownBookAuthor = c("Unknown");
 
 	public static Text tradePermSet = Text.parse("&aThe shop's trading permission has been set to '&e{perm}&a'!");
@@ -790,6 +791,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");
 	public static Text commandDescriptionSetCurrency = Text.parse("Changes the currency item to the item held in hand.");
 	public static Text commandDescriptionConvertItems = Text.parse("Converts the held (or all) items to conform to Spigot's data format.");
+	public static Text commandDescriptionUpdateItems = Text.parse("Updates third-party items (if they support it).");
 	public static Text commandDescriptionRemote = Text.parse("Remotely opens a shop (Optionally: For another player).");
 	public static Text commandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
 	public static Text commandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");

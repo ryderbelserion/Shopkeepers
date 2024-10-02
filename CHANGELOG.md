@@ -12,7 +12,14 @@ Date format: (YYYY-MM-DD)
   * Internal: Refactors to share most of the logic between the old CSV and the new SQLite trade loggers.
 * Config: Remove `file-encoding` setting: We use Bukkit to load the save data, which always expects the data to be UTF-8 encoded.
 * Fix: Remove shopkeepers from the spawn queue again when their chunk is unloaded. This can for example occasionally be observed during server startup on MC 1.21.1.
+* API: Add `UpdateItemEvent` and the methods `ShopkeepersAPI#updateItems` and `Shopkeeper#updateItems` that can be used by third-party plugins to automatically update their custom items stored by the Shopkeepers plugin.
+  * Add utility command `/shopkeeper updateItems` (permission `shopkeeper.updateitems`, default: `op`) to trigger the item updates via command.
+  * Add debug option `item-updates` to log whenever items are updated.
 * Internal: Use similar loading options for our compact Yaml as are used in Bukkit and increase the default nesting limit to handle nested bundles.
+
+**Message changes:**  
+* Added `items-updated`.
+* Added `command-description-update-items`.
 
 ## v2.23.0 (2024-08-11)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6

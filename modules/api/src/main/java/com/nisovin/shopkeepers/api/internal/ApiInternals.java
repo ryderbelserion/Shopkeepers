@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.internal;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
@@ -145,4 +146,18 @@ public interface ApiInternals {
 	 * @see ShopkeeperSnapshot#isNameValid(String)
 	 */
 	public boolean isShopkeeperSnapshotNameValid(String name);
+
+	// UTILITIES
+
+	/**
+	 * Checks if the given {@link UnmodifiableItemStack} is empty.
+	 * <p>
+	 * The item stack is considered 'empty' if it is <code>null</code>, is of type
+	 * {@link Material#AIR}, or its amount is less than or equal to zero.
+	 * 
+	 * @param itemStack
+	 *            the item stack, can be <code>null</code>
+	 * @return <code>true</code> if the item stack is empty
+	 */
+	public boolean isEmpty(@Nullable UnmodifiableItemStack itemStack);
 }

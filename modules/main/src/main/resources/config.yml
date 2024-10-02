@@ -26,6 +26,7 @@ debug: false
 #    names.
 # - 'item-migrations': Logs whenever a shopkeeper performs item migrations
 #    (e.g. for trade offers).
+# - 'item-updates': Logs whenever items are updated via the UpdateItemEvent.
 # - 'item-conversions': Logs whenever we explicitly convert items to Spigot's
 #    data format. Note that this does not log when items get implicitly
 #    converted, which may happen under various circumstances.

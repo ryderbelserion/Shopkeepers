@@ -13,8 +13,10 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.items.ItemUpdates;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -334,5 +336,79 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			}
 		}
 		return (migratedOffers == null) ? offers : migratedOffers;
+	}
+
+	// Note: Modifies the given list. Returns the number of items that were updated.
+	public static int updateItems(@ReadWrite List<TradeOffer> offers, String logPrefix) {
+		Validate.notNull(logPrefix, "logPrefix is null");
+		Validate.notNull(offers, "offers is null");
+		assert !CollectionUtils.containsNull(offers);
+
+		int updatedItems = 0;
+
+		final int size = offers.size();
+		for (int i = 0; i < size; ++i) {
+			TradeOffer offer = offers.get(i);
+			assert offer != null;
+
+			int offerItemsUpdated = 0;
+			boolean updateFailed = false;
+
+			// These items are assumed to be immutable.
+			UnmodifiableItemStack resultItem = offer.getResultItem();
+			assert !ItemUtils.isEmpty(resultItem);
+			UnmodifiableItemStack item1 = offer.getItem1();
+			assert !ItemUtils.isEmpty(item1);
+			@Nullable UnmodifiableItemStack item2 = offer.getItem2();
+
+			UnmodifiableItemStack updatedResultItem = ItemUpdates.updateItem(resultItem);
+			if (updatedResultItem != resultItem) {
+				assert updatedResultItem != null && !ItemUtils.isEmpty(updatedResultItem);
+				if (ItemUtils.isEmpty(updatedResultItem)) {
+					updateFailed = true;
+				} else {
+					resultItem = updatedResultItem;
+					offerItemsUpdated += 1;
+				}
+			}
+			UnmodifiableItemStack updatedItem1 = ItemUpdates.updateItem(item1);
+			if (updatedItem1 != item1) {
+				assert updatedItem1 != null && !ItemUtils.isEmpty(updatedItem1);
+				if (ItemUtils.isEmpty(updatedItem1)) {
+					updateFailed = true;
+				} else {
+					item1 = updatedItem1;
+					offerItemsUpdated += 1;
+				}
+			}
+			@Nullable UnmodifiableItemStack updatedItem2 = ItemUpdates.updateItem(item2);
+			if (updatedItem2 != item2) {
+				assert updatedItem2 != null && !ItemUtils.isEmpty(updatedItem2);
+				if (ItemUtils.isEmpty(updatedItem2) && !ItemUtils.isEmpty(item2)) {
+					updateFailed = true;
+				} else {
+					item2 = updatedItem2;
+					offerItemsUpdated += 1;
+				}
+			}
+
+			if (updateFailed) {
+				Log.warning(logPrefix + "Item update failed for trade offer " + (i + 1) + ": "
+						+ offer);
+				continue;
+			}
+
+			if (offerItemsUpdated > 0) {
+				Log.debug(DebugOptions.itemUpdates, logPrefix + "Updated item(s) for trade offer "
+						+ (i + 1));
+				updatedItems += offerItemsUpdated;
+
+				// Replace the offer using the updated items:
+				assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(item1);
+				offers.set(i, new SKTradeOffer(resultItem, item1, item2));
+			}
+		}
+
+		return updatedItems;
 	}
 }

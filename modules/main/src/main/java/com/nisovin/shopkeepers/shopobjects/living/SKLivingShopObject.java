@@ -42,6 +42,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.debug.events.DebugListener;
 import com.nisovin.shopkeepers.debug.events.EventDebugListener;
+import com.nisovin.shopkeepers.items.ItemUpdates;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -52,6 +53,7 @@ import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.ui.equipmentEditor.EquipmentEditorUI;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.EquipmentUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
@@ -151,6 +153,49 @@ public class SKLivingShopObject<E extends LivingEntity>
 	public void save(ShopObjectData shopObjectData, boolean saveAll) {
 		super.save(shopObjectData, saveAll);
 		equipmentProperty.save(shopObjectData);
+	}
+
+	// ITEM UPDATES
+
+	@Override
+	public int updateItems(String logPrefix, @ReadWrite ShopObjectData shopObjectData) {
+		int updatedItems = super.updateItems(logPrefix, shopObjectData);
+		updatedItems += updateEquipmentItems(logPrefix, shopObjectData);
+		return updatedItems;
+	}
+
+	private static int updateEquipmentItems(
+			String logPrefix,
+			@ReadWrite ShopObjectData shopObjectData
+	) {
+		LivingShopEquipment shopEquipment;
+		try {
+			shopEquipment = shopObjectData.get(EQUIPMENT);
+		} catch (InvalidDataException e) {
+			Log.warning(logPrefix + "Failed to load '" + EQUIPMENT.getName() + "'!", e);
+			return 0;
+		}
+
+		int updatedItems = 0;
+
+		for (EquipmentSlot slot : EquipmentUtils.EQUIPMENT_SLOTS) {
+			var item = shopEquipment.getItem(slot);
+			if (item == null) continue;
+
+			var newItem = ItemUpdates.updateItem(item);
+			if (newItem == item) continue; // Not changed
+
+			Log.debug(DebugOptions.itemUpdates, logPrefix + "Updated equipment item for slot "
+					+ slot.name());
+			shopEquipment.setItem(slot, newItem);
+			updatedItems += 1;
+		}
+
+		if (updatedItems > 0) {
+			shopObjectData.set(EQUIPMENT, shopEquipment);
+		}
+
+		return updatedItems;
 	}
 
 	// ACTIVATION

@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperSnapshot;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack;
 
 /**
@@ -75,5 +76,12 @@ public class SKApiInternals implements ApiInternals {
 	@Override
 	public boolean isShopkeeperSnapshotNameValid(String name) {
 		return SKShopkeeperSnapshot.isNameValid(name);
+	}
+
+	// UTILITIES
+
+	@Override
+	public boolean isEmpty(@Nullable UnmodifiableItemStack itemStack) {
+		return ItemUtils.isEmpty(itemStack);
 	}
 }

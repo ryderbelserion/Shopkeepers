@@ -193,11 +193,11 @@ public final class ItemUtils {
 	/**
 	 * Checks if the given {@link ItemStack} is empty.
 	 * <p>
-	 * The item stack is considered 'empty' if it is <code>null</code>, it is of type
+	 * The item stack is considered 'empty' if it is <code>null</code>, is of type
 	 * {@link Material#AIR}, or its amount is less than or equal to zero.
 	 * 
 	 * @param itemStack
-	 *            the item stack
+	 *            the item stack, can be <code>null</code>
 	 * @return <code>true</code> if the item stack is empty
 	 */
 	public static boolean isEmpty(@ReadOnly @Nullable ItemStack itemStack) {
@@ -206,6 +206,16 @@ public final class ItemUtils {
 				|| itemStack.getAmount() <= 0;
 	}
 
+	/**
+	 * Checks if the given {@link UnmodifiableItemStack} is empty.
+	 * <p>
+	 * The item stack is considered 'empty' if it is <code>null</code>, is of type
+	 * {@link Material#AIR}, or its amount is less than or equal to zero.
+	 * 
+	 * @param itemStack
+	 *            the item stack, can be <code>null</code>
+	 * @return <code>true</code> if the item stack is empty
+	 */
 	public static boolean isEmpty(@Nullable UnmodifiableItemStack itemStack) {
 		return isEmpty(asItemStackOrNull(itemStack));
 	}

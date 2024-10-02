@@ -32,6 +32,14 @@ public class ListValue<E> extends ValueType<List<E>> {
 		this.nullElementsAllowed = nullElementsAllowed;
 	}
 
+	public final ValueType<E> getElementValueType() {
+		return elementValueType;
+	}
+
+	public final boolean isNullElementsAllowed() {
+		return nullElementsAllowed;
+	}
+
 	@Override
 	public @Nullable List<E> load(@Nullable Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
