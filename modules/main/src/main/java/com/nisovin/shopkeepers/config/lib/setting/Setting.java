@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.config.lib.setting;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
@@ -38,7 +40,7 @@ public interface Setting<T> {
 	 * 
 	 * @return the current value
 	 */
-	public T getValue();
+	public @Nullable T getValue();
 
 	/**
 	 * Sets the value of this setting.
@@ -48,5 +50,5 @@ public interface Setting<T> {
 	 * @throws ValueLoadException
 	 *             if the value could not be set
 	 */
-	public void setValue(T value) throws ValueLoadException;
+	public void setValue(@Nullable T value) throws ValueLoadException;
 }

@@ -319,7 +319,7 @@ public abstract class Config {
 		assert setting.getConfig() == this;
 		String configKey = setting.getConfigKey();
 		ValueType<T> valueType = setting.getValueType();
-		T value = setting.getValue();
+		@Nullable T value = setting.getValue();
 		valueType.save(dataContainer, configKey, value);
 	}
 
