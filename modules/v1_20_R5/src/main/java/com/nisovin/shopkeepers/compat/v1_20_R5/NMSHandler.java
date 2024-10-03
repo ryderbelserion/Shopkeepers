@@ -17,6 +17,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -234,5 +236,17 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.world.item.ItemStack nmsItem = asNMSItemStack(itemStack);
 		Tag itemNBT = nmsItem.saveOptional(MinecraftServer.getDefaultRegistryAccess());
 		return itemNBT.toString();
+	}
+
+	// MC 1.21+ TODO Can be removed once we only support Bukkit 1.21+
+
+	@Override
+	public boolean isDestroyingBlocks(EntityExplodeEvent event) {
+		return true; // Pre 1.21 behavior
+	}
+
+	@Override
+	public boolean isDestroyingBlocks(BlockExplodeEvent event) {
+		return true; // Pre 1.21 behavior
 	}
 }
