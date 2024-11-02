@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.23.1 (TBA)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6
 
+* Fix: Error "IncompatibleClassChangeError: Found interface org.bukkit.craftbukkit.inventory.CraftMerchant, but class was expected" when a player shop becomes out of stock. This version is built against the latest version of Spigot 1.21.1 and might not be compatible with Spigot 1.21.1 builds from before 2024-09-07.
 * Add SQLite based trade log storage. (Thanks @akshualy)
   * In the future, this can be used for additional features, such as offline trade notifications.
   * Config: Add new setting `trade-log-storage`. Available values: `DISABLED` (default), `SQLITE` (recommended), `CSV`.
