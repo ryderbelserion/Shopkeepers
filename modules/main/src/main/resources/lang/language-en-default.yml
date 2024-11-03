@@ -237,6 +237,10 @@ button-puffer-fish-puff-state-lore:
 - "Changes the puff state"
 - "of the puffer fish."
 - "Currently: &e{puffState}"
+button-salmon-variant: "&aChoose variant"
+button-salmon-variant-lore:
+- "Changes the size"
+- "of the salmon."
 button-frog-variant: "&aChoose frog variant"
 button-frog-variant-lore:
 - "Changes the frog's look"

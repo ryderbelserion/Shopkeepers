@@ -102,7 +102,7 @@ public class TestItemStacks {
 		itemMeta.setRarity(ItemRarity.EPIC);
 		itemMeta.setHideTooltip(true);
 		itemMeta.setCustomModelData(1);
-		itemMeta.setFireResistant(true);
+		itemMeta.setFireResistant(true); // TODO Replaced with damage resistance in MC 1.21.2/3
 		itemMeta.setUnbreakable(true);
 		((Damageable) itemMeta).setDamage(2);
 		((Damageable) itemMeta).setMaxDamage(10);
@@ -150,9 +150,16 @@ public class TestItemStacks {
 		food.setNutrition(2);
 		food.setSaturation(2.5f);
 		food.setCanAlwaysEat(true);
-		food.setEatSeconds(5.5f);
+		food.setEatSeconds(5.5f); // TODO Removed in MC 1.21.2/3
+		// TODO Removed in MC 1.21.2/3
 		food.addEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 1), 0.5f);
 		itemMeta.setFood(food);
+		// TODO MC 1.21.2/3:
+		// - EquippableComponent
+		// - UseCooldownComponent
+		// - enchantable, tooltip style, item model, is glider, damage resistance /replaces fire
+		// resistance), use remainder, equippable
+		// - PotionMeta: custom name
 
 		// Note: This data ends up getting stored in an arbitrary order internally.
 		PersistentDataContainer customTags = itemMeta.getPersistentDataContainer();

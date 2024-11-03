@@ -67,4 +67,7 @@ buildSpigotIfMissing 1.21 remapped 4289
 
 buildSpigotIfMissing 1.21.1 remapped
 
+# Note: 1.21.2 was immediately replaced and is not supported. BuildTools will automatically build 1.21.3 instead.
+buildSpigotIfMissing 1.21.3 remapped
+
 popd

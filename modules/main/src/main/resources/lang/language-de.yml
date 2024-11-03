@@ -239,6 +239,10 @@ button-puffer-fish-puff-state-lore:
 - "Ändert den Aufgeblasen-Zustand"
 - "des Kugelfisches."
 - "Aktuell: &e{puffState}"
+button-salmon-variant: "&aVariante ändern"
+button-salmon-variant-lore:
+- "Ändert die Größe"
+- "des Lachses."
 button-frog-variant: "&aFrosch-Variante ändern"
 button-frog-variant-lore:
 - "Ändert das Aussehen"

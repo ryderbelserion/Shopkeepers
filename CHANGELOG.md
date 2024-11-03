@@ -2,8 +2,13 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.23.1 (TBA)
-### Supported MC versions: 1.21.1, 1.21, 1.20.6
+### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
 
+* Update for MC 1.21.3.
+  * MC 1.21.2 was immediately replaced and is not supported.
+  * Squids and dolphins support a baby variant now.
+  * Salmons support size variants now.
+  * Experimental features (creaking and pale oak sign shops) are not yet supported.
 * Fix: Error "IncompatibleClassChangeError: Found interface org.bukkit.craftbukkit.inventory.CraftMerchant, but class was expected" when a player shop becomes out of stock. This version is built against the latest version of Spigot 1.21.1 and might not be compatible with Spigot 1.21.1 builds from before 2024-09-07.
 * Add SQLite based trade log storage. (Thanks @akshualy)
   * In the future, this can be used for additional features, such as offline trade notifications.
@@ -23,6 +28,8 @@ Date format: (YYYY-MM-DD)
 **Message changes:**  
 * Added `items-updated`.
 * Added `command-description-update-items`.
+* Added `button-salmon-variant`.
+* Added `button-salmon-variant-lore`.
 
 ## v2.23.0 (2024-08-11)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6

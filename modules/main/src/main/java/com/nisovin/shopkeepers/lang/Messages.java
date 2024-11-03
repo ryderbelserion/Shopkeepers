@@ -306,6 +306,11 @@ public class Messages extends Config {
 			"of the puffer fish.",
 			"Currently: &e{puffState}"
 	));
+	public static String buttonSalmonVariant = c("&aChoose variant");
+	public static List<String> buttonSalmonVariantLore = c(Arrays.asList(
+			"Changes the size",
+			"of the salmon."
+	));
 	public static String buttonFrogVariant = c("&aChoose frog variant");
 	public static List<String> buttonFrogVariantLore = c(Arrays.asList(
 			"Changes the frog's look"
