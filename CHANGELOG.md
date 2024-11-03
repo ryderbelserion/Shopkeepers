@@ -31,6 +31,7 @@ Date format: (YYYY-MM-DD)
 * Added `command-description-update-items`.
 * Added `button-salmon-variant`.
 * Added `button-salmon-variant-lore`.
+* Minor changes to the default german translation ("Items" -> "Gegenstände").
 
 ## v2.23.0 (2024-08-11)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6
