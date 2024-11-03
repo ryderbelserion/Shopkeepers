@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent.Action;
@@ -429,6 +430,14 @@ class LivingEntityShopListener implements Listener {
 
 		Entity entity = event.getEntity();
 		if (shopkeeperRegistry.isShopkeeper(entity)) {
+			event.setCancelled(true);
+		}
+	}
+
+	// Prevent shopkeeper entities (e.g. allays) from picking up items.
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onEntityPickupItemEvent(EntityPickupItemEvent event) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}

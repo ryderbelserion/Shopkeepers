@@ -14,6 +14,7 @@ Date format: (YYYY-MM-DD)
 * Config: Remove `file-encoding` setting: We use Bukkit to load the save data, which always expects the data to be UTF-8 encoded.
 * Fix: Remove shopkeepers from the spawn queue again when their chunk is unloaded. This can for example occasionally be observed during server startup on MC 1.21.1.
 * Fix: Player shops got deleted when their container is hit by a wind charge and `protect-containers` is disabled and `delete-shopkeeper-on-break-container` is enabled: We need to ignore explosions if they don't actually delete the affected blocks.
+* Fix: Allay shopkeepers were able to pick up items matching the item in their hand.
 * API: Add `UpdateItemEvent` and the methods `ShopkeepersAPI#updateItems` and `Shopkeeper#updateItems` that can be used by third-party plugins to automatically update their custom items stored by the Shopkeepers plugin.
   * Add utility command `/shopkeeper updateItems` (permission `shopkeeper.updateitems`, default: `op`) to trigger the item updates via command.
   * Add debug option `item-updates` to log whenever items are updated.
