@@ -23,6 +23,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Tracks the location of players to optimize operations such as finding nearby players.
@@ -154,9 +155,16 @@ public final class PlayerMap {
 	private void removePlayer(World world, Player player) {
 		String worldName = world.getName();
 		@Nullable WorldData worldData = this.getWorldData(worldName);
-		if (worldData == null) return;
+		if (worldData == null) {
+			Log.debug("PlayerMap: Failed to remove player '" + player.getName()
+					+ "': Data for world '" + worldName + "' not found.");
+			return;
+		}
 
-		worldData.players.remove(player);
+		if (!worldData.players.remove(player)) {
+			Log.debug("PlayerMap: Failed to remove player '" + player.getName()
+					+ "': Player not found in data for world '" + worldName + "'.");
+		}
 	}
 
 	private void updatePlayer(Player player, World oldWorld, World newWorld) {
