@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.util.bukkit;
 import java.util.Objects;
 
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -90,7 +92,7 @@ public final class SoundEffect {
 			Float volume = value.getVolume();
 
 			// Sound and sound name are both serialized as String:
-			String serializedSound = (sound != null) ? sound.name() : soundName;
+			String serializedSound = (sound != null) ? sound.getKey().toString() : soundName;
 
 			// Use a compact representation if only the sound / sound name is specified:
 			if (category == null && pitch == null && volume == null) {
@@ -125,7 +127,8 @@ public final class SoundEffect {
 			}
 
 			// Check if the sound name matches a known Sound:
-			Sound sound = MinecraftEnumUtils.parseEnum(Sound.class, soundName); // Can be null
+			NamespacedKey soundKey = NamespacedKeyUtils.parse(soundName);
+			Sound sound = soundKey != null ? Registry.SOUNDS.get(soundKey) : null;
 			if (sound != null) {
 				// We use the Sound instead of the sound name.
 				soundName = null;

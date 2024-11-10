@@ -5,7 +5,7 @@
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Determines the required config migrations. Do not edit manually!
-config-version: 8
+config-version: 9
 # The initial debugging state of the plugin.
 debug: false
 # Additional debugging options.
@@ -622,13 +622,13 @@ simulate-trading-sounds-only-for-the-trading-player: true
 
 # This sound effect is played to players when they trigger a successful trade.
 trade-succeeded-sound:
-  sound: UI_BUTTON_CLICK
+  sound: 'minecraft:ui.button.click'
   pitch: 2.0
   volume: 0.3
 # This sound effect is played to players when their trade attempt fails for any
 # reason.
 trade-failed-sound:
-  sound: BLOCK_BARREL_CLOSE
+  sound: 'minecraft:block.barrel.close'
   pitch: 2.0
   volume: 0.5
 
@@ -661,7 +661,7 @@ notify-shop-owners-about-trades: true
 # This sound effect is played when a shop owner receives a trade notification.
 # Set this to an empty String to disable the sound effect.
 shop-owner-trade-notification-sound:
-  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  sound: 'minecraft:entity.experience_orb.pickup'
   volume: 0.25
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
