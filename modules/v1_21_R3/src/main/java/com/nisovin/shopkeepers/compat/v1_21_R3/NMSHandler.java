@@ -37,6 +37,7 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -175,7 +176,10 @@ public final class NMSHandler implements NMSCallProvider {
 		if (provided.getType() != required.getType()) return false;
 		net.minecraft.world.item.ItemStack nmsProvided = asNMSItemStack(provided);
 		net.minecraft.world.item.ItemStack nmsRequired = asNMSItemStack(required);
-		DataComponentMap requiredComponents = nmsRequired.getComponents();
+		DataComponentMap requiredComponents = PatchedDataComponentMap.fromPatch(
+				DataComponentMap.EMPTY,
+				nmsRequired.getComponentsPatch()
+		);
 		// Compare the components according to Minecraft's matching rules (imprecise):
 		return DataComponentPredicate.allOf(requiredComponents).test(nmsProvided);
 	}

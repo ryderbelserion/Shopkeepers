@@ -4,6 +4,10 @@ Date format: (YYYY-MM-DD)
 ## v2.23.2 (TBA)
 ### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
 
+* Fix: Partially matching items were no longer accepted in trades.
+  * The server's trading recipe matching logic changed in MC 1.20.5 to be more strict for trading recipes created via the Bukkit API. This change was partially reverted in late 1.21.1.
+  * Adapt the Shopkeepers trading recipe matching logic for MC 1.21.1+ to match the server's trading recipe matching logic again and thereby accept partially matching items again.
+  * For versions 1.20.5 - 1.21 the partial item matching behavior cannot be restored because the server itself does not support it for trading recipes created via the Bukkit API.
 * Fix: Config sound effects fail to play on Spigot 1.21.3. Add config migration from sound enum names to namespaced keys.
 
 ## v2.23.1 (2024-11-03)
