@@ -11,10 +11,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class RegularAdminShopEditorHandler extends EditorHandler {
@@ -105,7 +107,17 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
 		if (!super.canOpen(player, silent)) return false;
-		return this.getShopkeeper().getType().hasPermission(player);
+
+		// Check the shopkeeper permission:
+		if (!this.getShopkeeper().getType().hasPermission(player)) {
+			if (!silent) {
+				this.debugNotOpeningUI(player,
+						"Player is missing the permission to edit this type of shopkeeper.");
+				TextUtils.sendMessage(player, Messages.noPermission);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	// The admin shop editor does not restrict the interactions with the trade slots. If we were to

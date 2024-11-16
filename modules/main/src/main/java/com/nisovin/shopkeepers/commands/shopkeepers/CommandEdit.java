@@ -40,7 +40,8 @@ class CommandEdit extends PlayerCommand {
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 
-		// Open shop trading window:
+		// Try to open the shop editor window:
+		// Fails if the user does not have the permission to edit the shop.
 		shopkeeper.openEditorWindow(player);
 	}
 }
