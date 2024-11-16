@@ -67,7 +67,7 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	public boolean isOwner(Player player);
 
 	/**
-	 * Gets the owner of this shop IF he is online.
+	 * Gets the owner of this shop IF they are online.
 	 * 
 	 * @return the owner of this shop, or <code>null</code> if the owner is offline
 	 */

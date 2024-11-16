@@ -64,7 +64,7 @@ public final class ShopkeepersAPI {
 	 * 
 	 * @param player
 	 *            the player
-	 * @return <code>false</code> if he cannot create shops at all, <code>true</code> otherwise
+	 * @return <code>false</code> if they cannot create shops at all, <code>true</code> otherwise
 	 * @see ShopkeepersPlugin#hasCreatePermission(Player)
 	 */
 	public static boolean hasCreatePermission(Player player) {

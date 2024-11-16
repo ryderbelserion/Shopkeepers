@@ -1317,7 +1317,7 @@ Other changes:
 * Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]`.
   * This command can be used to create and give the currency items which have been specified inside the config.
   * Added corresponding permission node `shopkeeper.givecurrency` (default: op).
-* Added: When giving items via command to another player we now also inform the target player that he has received items. These newly added messages are also used now when giving items to yourself.
+* Added: When giving items via command to another player we now also inform the target player that they have received items. These newly added messages are also used now when giving items to yourself.
 * Added: New command `/shopkeeper convertItems [player] ['all']`.
   * This command can be used to convert the held (or all) items to conform to Spigot's internal data format. I.e. this runs the items through Spigot's item serialization and deserialization in the same way as it would happen when these items are used inside shopkeeper trades and the plugin gets reloaded.
   * Added corresponding permission node `shopkeeper.convertitems.own` (default: op). This allows converting own items.
@@ -2545,7 +2545,7 @@ Thanks.
 * Improved / Fixed hiring behavior:
 * Changed: The hiring window can now always be open, regardless of if the player has the permission to hire this type of shopkeeper.
 * Added: Message 'msg-missing-hire-perm' if the player doesn't have the permission to hire shopkeepers at all.
-* Added: Message 'msg-cant-hire-shop-type' if the player cannot hire a certain type of shopkeeper (because he is missing the corresponding creation permissions).
+* Added: Message 'msg-cant-hire-shop-type' if the player cannot hire a certain type of shopkeeper (because they are missing the corresponding creation permissions).
 * Changed: Message 'msg-cant-hire' now uses a different color.
 * Added: Config setting 'hire-require-creation-permission' (default: true) to allow enabling of hiring of shops the player would usually not be able to create himself.
 * Added some warning and debug messages when noticing something wrong with the config.
