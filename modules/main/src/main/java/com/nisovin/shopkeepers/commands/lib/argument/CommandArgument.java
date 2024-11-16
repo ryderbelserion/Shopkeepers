@@ -375,7 +375,7 @@ public abstract class CommandArgument<T> {
 	 * @param context
 	 *            the context which stores the parsed argument values, not <code>null</code>
 	 * @param argsReader
-	 *            the ArgumentsReader, not <code>null</code>
+	 *            the {@link ArgumentsReader}, not <code>null</code>
 	 * @return the parsed value, or <code>null</code> if nothing was parsed (e.g. for optional
 	 *         command arguments)
 	 * @throws ArgumentParseException

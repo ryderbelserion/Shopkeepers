@@ -4,9 +4,11 @@ import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Entity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityArgument.TargetEntityFilter;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
@@ -19,7 +21,11 @@ public final class EntityFilter {
 
 	public static final ArgumentFilter<@Nullable Entity> VILLAGER = new ArgumentFilter<@Nullable Entity>() {
 		@Override
-		public boolean test(@Nullable Entity value) {
+		public boolean test(
+				CommandInput input,
+				CommandContextView context,
+				@Nullable Entity value
+		) {
 			return isRegularVillager(value);
 		}
 

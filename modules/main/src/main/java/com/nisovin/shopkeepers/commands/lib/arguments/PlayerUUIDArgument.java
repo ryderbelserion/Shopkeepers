@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
@@ -15,7 +14,6 @@ import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 
 /**
  * Provides suggestions for the UUIDs of online players.
@@ -67,7 +65,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param playerFilter
-	 *            only suggestions for players accepted by this predicate get included
+	 *            only suggestions for players accepted by this filter are included
 	 * @return the player uuid completion suggestions
 	 */
 	public static Iterable<? extends UUID> getDefaultCompletionSuggestions(
@@ -75,7 +73,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 			CommandContextView context,
 			int minimumCompletionInput,
 			String uuidPrefix,
-			Predicate<? super Player> playerFilter
+			ArgumentFilter<? super Player> playerFilter
 	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (uuidPrefix.length() < minimumCompletionInput) {
@@ -86,7 +84,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 		// TODO Cast: Workaround for a limitation of CheckerFramework
 		Stream<Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
 		return onlinePlayers
-				.filter(playerFilter)
+				.filter(player -> playerFilter.test(input, context, player))
 				.map(Player::getUniqueId)
 				.filter(uuid -> {
 					// Assumption: UUID#toString is already lowercase (normalized).
@@ -105,7 +103,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 				context,
 				minimumCompletionInput,
 				idPrefix,
-				PredicateUtils.alwaysTrue()
+				ArgumentFilter.acceptAny()
 		);
 	}
 }

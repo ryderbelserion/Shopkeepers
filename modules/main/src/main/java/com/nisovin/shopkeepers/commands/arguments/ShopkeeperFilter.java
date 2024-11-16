@@ -7,8 +7,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -19,7 +21,11 @@ public final class ShopkeeperFilter {
 
 	public static final ArgumentFilter<@Nullable Shopkeeper> ADMIN = new ArgumentFilter<@Nullable Shopkeeper>() {
 		@Override
-		public boolean test(@Nullable Shopkeeper shopkeeper) {
+		public boolean test(
+				CommandInput input,
+				CommandContextView context,
+				@Nullable Shopkeeper shopkeeper
+		) {
 			return (shopkeeper instanceof AdminShopkeeper);
 		}
 
@@ -39,7 +45,11 @@ public final class ShopkeeperFilter {
 
 	public static final ArgumentFilter<@Nullable Shopkeeper> PLAYER = new ArgumentFilter<@Nullable Shopkeeper>() {
 		@Override
-		public boolean test(@Nullable Shopkeeper shopkeeper) {
+		public boolean test(
+				CommandInput input,
+				CommandContextView context,
+				@Nullable Shopkeeper shopkeeper
+		) {
 			return (shopkeeper instanceof PlayerShopkeeper);
 		}
 

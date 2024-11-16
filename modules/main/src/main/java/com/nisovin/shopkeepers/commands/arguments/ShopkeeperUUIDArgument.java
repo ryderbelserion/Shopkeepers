@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.command.CommandSender;
@@ -17,7 +16,6 @@ import com.nisovin.shopkeepers.commands.lib.arguments.ObjectUUIDArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 
 /**
  * Provides suggestions for the UUIDs of existing shopkeepers.
@@ -67,7 +65,7 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param filter
-	 *            only suggestions for shopkeepers accepted by this predicate are included, not
+	 *            only suggestions for shopkeepers accepted by this filter are included, not
 	 *            <code>null</code>
 	 * @return the shopkeeper uuid completion suggestions
 	 */
@@ -76,7 +74,7 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 			CommandContextView context,
 			int minimumCompletionInput,
 			String uuidPrefix,
-			Predicate<? super Shopkeeper> filter
+			ArgumentFilter<? super Shopkeeper> filter
 	) {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		// Suggestion for the unique id(s) of the targeted shopkeeper(s):
@@ -101,7 +99,7 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		}
 
 		return shopkeepersStream
-				.filter(filter)
+				.filter(shopkeeper -> filter.test(input, context, shopkeeper))
 				.map(Shopkeeper::getUniqueId)
 				.filter(uuid -> {
 					// Assumption: UUID#toString is already lowercase (normalized)
@@ -120,7 +118,7 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 				context,
 				minimumCompletionInput,
 				idPrefix,
-				PredicateUtils.alwaysTrue()
+				ArgumentFilter.acceptAny()
 		);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -16,6 +17,8 @@ public class ArgumentsReader {
 	// Directly references to the underlying (unmodifiable) input arguments:
 	private final List<? extends String> args;
 	private int cursor = -1; // 0 points to the first argument
+
+	private final ArgumentsReaderView view = new ArgumentsReaderView(Unsafe.initialized(this));
 
 	public ArgumentsReader(CommandInput commandInput) {
 		Validate.notNull(commandInput, "commandInput is null");
@@ -229,6 +232,15 @@ public class ArgumentsReader {
 		// only applicable if the readers reference the same arguments:
 		Validate.isTrue(otherReader.args == this.args, "otherReader references different arguments");
 		this.internalSetCursor(otherReader.cursor);
+	}
+
+	/**
+	 * Gets an unmodifiable view on this arguments reader.
+	 * 
+	 * @return an unmodifiable view on this arguments reader
+	 */
+	public ArgumentsReaderView getView() {
+		return view;
 	}
 
 	@Override

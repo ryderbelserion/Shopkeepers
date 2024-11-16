@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
   * Adapt the Shopkeepers trading recipe matching logic for MC 1.21.1+ to match the server's trading recipe matching logic again and thereby accept partially matching items again.
   * For versions 1.20.5 - 1.21 the partial item matching behavior cannot be restored because the server itself does not support it for trading recipes created via the Bukkit API.
 * Fix: Config sound effects fail to play on Spigot 1.21.3. Add config migration from sound enum names to namespaced keys.
+* Internal: Command argument filters have access to the input parameters and command context now.
 
 ## v2.23.1 (2024-11-03)
 ### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
