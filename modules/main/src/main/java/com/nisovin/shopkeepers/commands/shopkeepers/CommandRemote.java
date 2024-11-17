@@ -7,7 +7,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
@@ -33,8 +35,13 @@ class CommandRemote extends Command {
 		this.setDescription(Messages.commandDescriptionRemote);
 
 		// Arguments:
+		// Shopkeeper filter: Ignored for non-player command senders. Also, when opening the trading
+		// UI for another player, the command only lists the shops that the executing player has
+		// access to as well, i.e. the executing player may require the bypass permission to see the
+		// shops owned by other players.
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
+						ShopkeeperFilter.withAccess(DefaultUITypes.TRADING())),
 				TargetShopkeeperFilter.ANY
 		));
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
@@ -51,7 +58,8 @@ class CommandRemote extends Command {
 			this.checkPermission(sender, ShopkeepersPlugin.REMOTE_OTHER_PLAYERS_PERMISSION);
 		}
 
-		// Open shop trading window:
+		// Try to open the shop trading window:
+		// Fails if the user does not have the permission to trade with the shop.
 		shopkeeper.openTradingWindow(targetPlayer);
 	}
 }

@@ -10,7 +10,18 @@ Date format: (YYYY-MM-DD)
   * For versions 1.20.5 - 1.21 the partial item matching behavior cannot be restored because the server itself does not support it for trading recipes created via the Bukkit API.
 * Fix: Config sound effects fail to play on Spigot 1.21.3. Add config migration from sound enum names to namespaced keys.
 * Add "no permission" message feedback when a user tries to edit a shopkeeper which they don't have access to.
+* Commands: In addition to the command permission itself, various commands require the player to have editing access for the involved shopkeeper now, and hide command completions for shopkeepers that the executing player has no access to. Affected commands:
+  * `edit` (already required editing access before)
+  * `remote/open` (already required trading access before)
+  * `remove`
+  * `setForHire`
+  * `setTradePerm`
+  * `transfer` (already required editing access before)
+  * All snapshot commands.
 * Internal: Command argument filters have access to the input parameters and command context now.
+
+**Message changes:**  
+* Added `command-shopkeeper-argument-no-access`.
 
 ## v2.23.1 (2024-11-03)
 ### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6

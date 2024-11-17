@@ -774,6 +774,7 @@ public class Messages extends Config {
 	public static Text commandShopkeeperArgumentInvalid = Text.parse("&cNo shopkeeper found for '&e{argument}&c'.");
 	public static Text commandShopkeeperArgumentNoAdminShop = Text.parse("&cShopkeeper '&e{argument}&c' is no admin shopkeeper.");
 	public static Text commandShopkeeperArgumentNoPlayerShop = Text.parse("&cShopkeeper '&e{argument}&c' is no player shopkeeper.");
+	public static Text commandShopkeeperArgumentNoAccess = Text.parse("&cYou do not have access to shopkeeper '&e{argument}&c'.");
 	public static Text commandEntityArgumentNoVillager = Text.parse("&cEntity '&e{argument}&c' is no regular villager.");
 
 	public static Text ambiguousPlayerName = Text.parse("&cThere are multiple matches for the name '&e{name}&c'!");
