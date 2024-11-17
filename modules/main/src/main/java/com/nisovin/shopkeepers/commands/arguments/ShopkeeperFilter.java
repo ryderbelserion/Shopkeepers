@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class ShopkeeperFilter {
@@ -79,9 +80,12 @@ public final class ShopkeeperFilter {
 			) {
 				if (shopkeeper == null) return false;
 
-				// If the sender is not a player, it requires the bypass permission (usually the
-				// case for the console and block command senders):
-				return ((AbstractShopkeeper) shopkeeper).canEdit(input.getSender(), true);
+				// Avoid spamming the log with permission check notifications in debug mode:
+				return PermissionUtils.runWithoutPermissionCheckLogging(() -> {
+					// If the sender is not a player, it requires the bypass permission (usually the
+					// case for the console and block command senders):
+					return ((AbstractShopkeeper) shopkeeper).canEdit(input.getSender(), true);
+				});
 			}
 
 			@Override
