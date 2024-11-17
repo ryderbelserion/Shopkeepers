@@ -18,6 +18,9 @@ Date format: (YYYY-MM-DD)
   * `setTradePerm`
   * `transfer` (already required editing access before)
   * All snapshot commands.
+* Config: Add `check-spawn-location-interaction-result` (default: `false`). If enabled, players are only able to place shopkeepers in places where no other plugin denies them to interact with blocks.
+  * We check for this by calling a dummy block interaction event for other plugins to react to.
+  * If the spawn location is currently empty (i.e. of type air), we temporarily place a dummy block to get better interaction results from other plugins.
 * Internal: Command argument filters have access to the input parameters and command context now.
 
 **Message changes:**  

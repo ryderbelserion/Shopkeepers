@@ -128,7 +128,7 @@ class CreateListener implements Listener {
 		ShopCreationItemSelectionTask.start(plugin, player);
 	}
 
-	// See LivingEntityShopListener for a reasoning on why we handle this the event the way we do:
+	// See LivingEntityShopListener for a reasoning on why we handle this event the way we do:
 	// We handle and cancel this event on LOWEST priority so that other plugins (e.g. protection
 	// plugins) can ignore it.
 	// This event handler might check container access by calling another dummy interaction event.

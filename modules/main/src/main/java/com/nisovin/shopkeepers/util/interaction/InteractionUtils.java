@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.interaction;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -20,6 +21,11 @@ public final class InteractionUtils {
 	 * This works by clearing the items in the player's main and off hand, calling a dummy
 	 * {@link PlayerInteractEvent} for plugins to react to, and then restoring the items in the
 	 * player's main and off hand.
+	 * <p>
+	 * We may also want to invoke this for block locations that are currently empty (i.e.
+	 * {@link Material#isAir()}), e.g. to check access to the location. But since some region
+	 * protection plugins ignore interactions with empty blocks, we temporarily place a dummy
+	 * non-empty block if the location is currently empty.
 	 * <p>
 	 * Since this involves calling a dummy {@link PlayerInteractEvent}, plugins reacting to the
 	 * event might cause all kinds of side effects. Therefore, this should only be used in very
@@ -41,6 +47,13 @@ public final class InteractionUtils {
 		playerInventory.setItemInMainHand(null);
 		playerInventory.setItemInOffHand(null);
 
+		// Temporarily place a non-empty block if the block location is empty:
+		Material blockType = block.getType();
+		if (blockType.isAir()) {
+			// Skip physics to not accidentally affect neighboring blocks:
+			block.setType(Material.STONE, false);
+		}
+
 		TestPlayerInteractEvent dummyInteractEvent = new TestPlayerInteractEvent(
 				player,
 				Action.RIGHT_CLICK_BLOCK,
@@ -50,6 +63,11 @@ public final class InteractionUtils {
 		);
 		Bukkit.getPluginManager().callEvent(dummyInteractEvent);
 		boolean canAccessBlock = (dummyInteractEvent.useInteractedBlock() != Result.DENY);
+
+		// Reset the block type again (without physics):
+		if (blockType.isAir()) {
+			block.setType(blockType, false);
+		}
 
 		// Resetting items in main and off hand:
 		playerInventory.setItemInMainHand(itemInMainHand);

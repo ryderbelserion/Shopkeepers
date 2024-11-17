@@ -28,6 +28,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -158,6 +159,15 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 				if (player != null) {
 					TextUtils.sendMessage(player, Messages.restrictedArea);
 				}
+				return false;
+			}
+		}
+
+		// Check if the player can interact with the spawn location block:
+		if (Settings.checkSpawnLocationInteractionResult && player != null) {
+			var spawnLocationBlock = spawnLocation.getBlock();
+			if (!InteractionUtils.checkBlockInteract(player, spawnLocationBlock)) {
+				TextUtils.sendMessage(player, Messages.restrictedArea);
 				return false;
 			}
 		}

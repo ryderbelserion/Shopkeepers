@@ -139,6 +139,10 @@ register-world-guard-allow-shop-flag: true
 # have been designated as commercial areas by Towny.
 enable-towny-restrictions: false
 
+# If enabled, players are only able to place shopkeepers in places where no
+# other plugin denies them to interact with blocks.
+check-spawn-location-interaction-result: false
+
 # In order to guard against unnoticed changes to a player's currently open
 # inventory, the Shopkeepers plugin verifies that the open inventory still
 # matches the expected type of inventory before it handles inventory
