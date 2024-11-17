@@ -46,7 +46,6 @@ import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
 import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
-import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.user.SKUser;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.annotations.ReadWrite;
@@ -252,8 +251,7 @@ public abstract class AbstractPlayerShopkeeper
 		if (Settings.namingOfPlayerShopsViaItem
 				&& DerivedSettings.namingItemData.matches(itemInMainHand)) {
 			// Check if player can edit this shopkeeper:
-			UIHandler editorHandler = Unsafe.assertNonNull(this.getUIHandler(DefaultUITypes.EDITOR()));
-			if (editorHandler.canOpen(player, false)) {
+			if (this.canEdit(player, false)) {
 				// Rename with the player's item in hand:
 				String newName = ItemUtils.getDisplayNameOrEmpty(itemInMainHand);
 

@@ -16,6 +16,7 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -60,6 +61,7 @@ import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.ColorUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -1568,6 +1570,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public final boolean openEditorWindow(Player player) {
 		return this.openWindow(DefaultUITypes.EDITOR(), player);
+	}
+
+	// Shortcut to check if the sender can access the editor:
+	public final boolean canEdit(CommandSender sender, boolean silent) {
+		if (sender instanceof Player player) {
+			var uiHandler = Unsafe.assertNonNull(this.getUIHandler(DefaultUITypes.EDITOR()));
+			return uiHandler.canOpen(player, silent);
+		} else {
+			// Check if the command sender has the bypass permission (e.g. the case for the console
+			// and block command senders, but might not be the case for other unexpected types of
+			// command senders):
+			return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION);
+		}
 	}
 
 	@Override
