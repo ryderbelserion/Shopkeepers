@@ -2,11 +2,13 @@ package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Collections;
 
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
@@ -82,9 +84,21 @@ public final class ShopkeeperFilter {
 
 				// Avoid spamming the log with permission check notifications in debug mode:
 				return PermissionUtils.runWithoutPermissionCheckLogging(() -> {
-					// If the sender is not a player, it requires the bypass permission (usually the
-					// case for the console and block command senders):
-					return ((AbstractShopkeeper) shopkeeper).canEdit(input.getSender(), true);
+					if (uiType == DefaultUITypes.EDITOR()) {
+						// Call the special "canEdit" check that takes non-player command senders
+						// into account: If the sender is not a player, it requires the bypass
+						// permission (usually the case for the console and block command senders).
+						return ((AbstractShopkeeper) shopkeeper).canEdit(input.getSender(), true);
+					}
+
+					// For any other UI type / access check: We only support player senders since we
+					// cannot decide what to return here in general for non-player senders.
+					if (!(input.getSender() instanceof Player player)) return false;
+
+					var uiHandler = ((AbstractShopkeeper) shopkeeper).getUIHandler(uiType);
+					if (uiHandler == null) return false;
+
+					return uiHandler.canOpen(player, true);
 				});
 			}
 
