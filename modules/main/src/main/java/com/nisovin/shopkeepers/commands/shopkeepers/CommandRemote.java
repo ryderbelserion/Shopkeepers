@@ -37,8 +37,7 @@ class CommandRemote extends Command {
 		// Arguments:
 		// Shopkeeper filter: Ignored for non-player command senders. Also, when opening the trading
 		// UI for another player, the command only lists the shops that the executing player has
-		// access to as well, i.e. the executing player may require the bypass permission to see the
-		// shops owned by other players.
+		// access to as well.
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
 						ShopkeeperFilter.withAccess(DefaultUITypes.TRADING())),
