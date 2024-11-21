@@ -1,7 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.23.2 (TBA)
+## v2.23.3 (TBA)
+### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
+
+
+## v2.23.2 (2024-11-21)
 ### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
 
 * Fix: Partially matching items were no longer accepted in trades.
