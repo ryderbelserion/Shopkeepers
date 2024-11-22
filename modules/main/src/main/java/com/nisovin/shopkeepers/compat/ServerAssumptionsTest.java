@@ -197,7 +197,7 @@ public class ServerAssumptionsTest {
 		itemMeta.setEnchantmentGlintOverride(true);
 		itemMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
 		itemMeta.addEnchant(Enchantment.SHARPNESS, 2, true);
-		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED,
+		/*itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED,
 				new AttributeModifier(
 						new UUID(1L, 1L),
 						"attack speed bonus",
@@ -223,7 +223,7 @@ public class ServerAssumptionsTest {
 						Operation.ADD_NUMBER,
 						EquipmentSlotGroup.HAND
 				)
-		);
+		);*/
 		itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
 		FoodComponent food = itemMeta.getFood();

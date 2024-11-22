@@ -1,20 +1,14 @@
 package com.nisovin.shopkeepers;
 
 import java.lang.reflect.Field;
+
+import org.bukkit.ExplosionResult;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import java.util.List;
-import java.util.Objects;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
-import org.bukkit.block.sign.SignSide;
 import org.bukkit.craftbukkit.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftLivingEntity;
@@ -23,9 +17,8 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.entity.CraftVillager;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.inventory.CraftMerchant;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.entity.*;
-import org.bukkit.entity.Wolf.Variant;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -34,10 +27,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
-import com.nisovin.shopkeepers.util.annotations.ReadWrite;
-import com.nisovin.shopkeepers.util.bukkit.RegistryUtils;
-import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
-import com.nisovin.shopkeepers.util.data.serialization.bukkit.KeyedSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -232,13 +221,10 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public @Nullable String getItemSNBT(@Nullable ItemStack itemStack) {
 		Validate.notNull(itemStack, "itemStack is null");
-		assert itemStack != null;
 		net.minecraft.world.item.ItemStack nmsItem = asNMSItemStack(itemStack);
 		Tag itemNBT = nmsItem.saveOptional(MinecraftServer.getDefaultRegistryAccess());
 		return itemNBT.toString();
 	}
-
-	// MC 1.21+ TODO Can be removed once we only support Bukkit 1.21+
 
 	@Override
 	public boolean isDestroyingBlocks(EntityExplodeEvent event) {
@@ -254,4 +240,21 @@ public final class NMSHandler implements NMSCallProvider {
 		return explosionResult == ExplosionResult.DESTROY
 				|| explosionResult == ExplosionResult.DESTROY_WITH_DECAY;
 	}
+
+	// MC 1.21+ TODO Can be removed once we only support Bukkit 1.21+
+
+	/*@Override
+	public boolean isDestroyingBlocks(EntityExplodeEvent event) {
+		return isDestroyingBlocks(event.getExplosionResult());
+	}
+
+	@Override
+	public boolean isDestroyingBlocks(BlockExplodeEvent event) {
+		return isDestroyingBlocks(event.getExplosionResult());
+	}
+
+	private static boolean isDestroyingBlocks(ExplosionResult explosionResult) {
+		return explosionResult == ExplosionResult.DESTROY
+				|| explosionResult == ExplosionResult.DESTROY_WITH_DECAY;
+	}*/
 }

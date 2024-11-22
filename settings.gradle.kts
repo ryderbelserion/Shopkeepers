@@ -8,10 +8,6 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("com.ryderbelserion.feather-settings") version "0.0.4"
-}
-
 include("modules")
 
 listOf(

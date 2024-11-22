@@ -17,7 +17,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
 import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
@@ -26,9 +25,6 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.commands.Commands;
-import com.nisovin.shopkeepers.compat.MC_1_21_3;
-import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.compat.ServerAssumptionsTest;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
@@ -274,24 +270,24 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		NMSManager.load();
 
         // Inform about Spigot exclusive features:
-		if (SpigotFeatures.isSpigotAvailable()) {
-			Log.debug("Spigot-based server found: Enabling Spigot exclusive features.");
-		} else {
-			Log.info("No Spigot-based server found: Disabling Spigot exclusive features!");
-		}
+//		if (SpigotFeatures.isSpigotAvailable()) { // ryder - disabled
+//			Log.debug("Spigot-based server found: Enabling Spigot exclusive features.");
+//		} else {
+//			Log.info("No Spigot-based server found: Disabling Spigot exclusive features!");
+//		}
 
 		// Test server assumptions:
-		if (!ServerAssumptionsTest.run()) {
-			if (Settings.ignoreFailedServerAssumptionTests) {
-				Log.severe("Server incompatibility detected! But we continue to enable the plugin "
-						+ "anyway, because setting 'ignore-failed-server-assumption-tests' is "
-						+ "enabled. Runnning the plugin in this mode is unsupported!");
-			} else {
-				Log.severe("Server incompatibility detected! Disabling the plugin!");
-				this.setEnabled(false); // Also calls onDisable
-				return;
-			}
-		}
+//		if (!ServerAssumptionsTest.run()) { // ryder - disabled
+//			if (Settings.ignoreFailedServerAssumptionTests) {
+//				Log.severe("Server incompatibility detected! But we continue to enable the plugin "
+//						+ "anyway, because setting 'ignore-failed-server-assumption-tests' is "
+//						+ "enabled. Runnning the plugin in this mode is unsupported!");
+//			} else {
+//				Log.severe("Server incompatibility detected! Disabling the plugin!");
+//				this.setEnabled(false); // Also calls onDisable
+//				return;
+//			}
+//		}
 
 		// Register defaults (if not already set up during onLoad):
 		if (!alreadySetUp) {

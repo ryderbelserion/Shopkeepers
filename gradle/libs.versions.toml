@@ -1,7 +1,21 @@
+[plugins]
+paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+hangar = { id = "io.papermc.hangar-publish-plugin", version.ref = "hangar" }
+runPaper = { id = "xyz.jpenilla.run-paper", version.ref = "runPaper" }
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+
 [versions]
 # Minecraft
-paper = "1.21-R0.1-SNAPSHOT"
-minecraft = "1.21"
+paper = "1.21.3-R0.1-SNAPSHOT"
+minecraft = "1.21.3"
+
+# Gradle Plugins
+paperweight = "1.7.5"
+runPaper = "2.3.1"
+minotaur = "2.8.7"
+hangar = "0.1.2"
+shadow = "8.3.0"
 
 jdtannotations = "2.3.0"
 nonpe = "1.0.3"
@@ -12,18 +26,6 @@ towny = "0.98.1.0"
 citizens = "2.0.30-SNAPSHOT"
 vault = "1.7.1"
 bstats = "1.5"
-
-# Paper
-paperweight = "1.7.1"
-runPaper = "2.3.0"
-
-# Other
-shadowJar = "8.1.7"
-
-[plugins]
-paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
-shadowJar = { id = "io.github.goooler.shadow", version.ref = "shadowJar" }
-runPaper = { id = "xyz.jpenilla.run-paper", version.ref = "runPaper" }
 
 [libraries]
 paper = { module = "io.papermc.paper:paper-api", version.ref = "paper" }

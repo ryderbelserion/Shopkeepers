@@ -1,9 +1,7 @@
 plugins {
     alias(libs.plugins.paperweight)
-    alias(libs.plugins.shadowJar)
     alias(libs.plugins.runPaper)
-
-    `paper-plugin`
+    alias(libs.plugins.shadow)
 }
 
 base {
@@ -11,6 +9,16 @@ base {
 }
 
 repositories {
+    maven("https://repo.papermc.io/repository/maven-public")
+
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi")
+
+    maven("https://repo.triumphteam.dev/snapshots")
+
+    maven("https://repo.fancyplugins.de/releases")
+
+    maven("https://repo.oraxen.com/releases")
+
     maven("https://repo.glaremasters.me/repository/towny")
 
     maven("https://maven.citizensnpcs.co/repo")
@@ -21,7 +29,7 @@ repositories {
 dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
 
-    implementation(project(":Shopkeepers-api"))
+    implementation(project(":shopkeepers-api"))
 
     implementation(libs.bstats.bukkit) {
         exclude("org.bukkit")

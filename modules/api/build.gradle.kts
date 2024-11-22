@@ -1,5 +1,5 @@
-plugins {
-    `paper-plugin`
+repositories {
+    maven("https://repo.papermc.io/repository/maven-public")
 }
 
 dependencies {
