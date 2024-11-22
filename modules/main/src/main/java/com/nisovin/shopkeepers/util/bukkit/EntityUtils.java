@@ -97,13 +97,12 @@ public final class EntityUtils {
 	 */
 	public static boolean isRemovedOnPeacefulDifficulty(EntityType entityType) {
 		assert entityType != null;
-		// TODO Replace with enum constants once we only support MC 1.16+
-		switch (entityType.name()) {
-		case "PIGLIN":
+		switch (entityType) {
+		case EntityType.PIGLIN:
 			return false;
-		case "SLIME":
-		case "GHAST":
-		case "PHANTOM":
+		case EntityType.SLIME:
+		case EntityType.GHAST:
+		case EntityType.PHANTOM:
 			return true;
 		default:
 			Class<?> entityClass = entityType.getEntityClass();

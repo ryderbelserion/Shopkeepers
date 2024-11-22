@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +15,22 @@ import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public final class PermissionUtils {
+
+	private static boolean LOG_PERMISSION_CHECKS = true;
+
+	public static <T> T runWithoutPermissionCheckLogging(Supplier<T> action) {
+		if (!LOG_PERMISSION_CHECKS) {
+			// Already in a scope with disabled logging:
+			return action.get();
+		}
+
+		try {
+			LOG_PERMISSION_CHECKS = false;
+			return action.get();
+		} finally {
+			LOG_PERMISSION_CHECKS = true;
+		}
+	}
 
 	/**
 	 * Performs a permissions check and logs debug information about it.
@@ -30,8 +47,10 @@ public final class PermissionUtils {
 		Validate.notEmpty(permission, "permission is null or empty");
 		boolean hasPermission = permissible.hasPermission(permission);
 		if (!hasPermission && (permissible instanceof Player)) {
-			Log.debug(() -> "Player '" + ((Player) permissible).getName()
-					+ "' does not have permission '" + permission + "'.");
+			if (LOG_PERMISSION_CHECKS) {
+				Log.debug(() -> "Player '" + ((Player) permissible).getName()
+						+ "' does not have permission '" + permission + "'.");
+			}
 		}
 		return hasPermission;
 	}

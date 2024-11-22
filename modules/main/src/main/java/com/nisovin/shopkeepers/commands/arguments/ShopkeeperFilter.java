@@ -2,15 +2,22 @@ package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Collections;
 
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class ShopkeeperFilter {
@@ -19,7 +26,11 @@ public final class ShopkeeperFilter {
 
 	public static final ArgumentFilter<@Nullable Shopkeeper> ADMIN = new ArgumentFilter<@Nullable Shopkeeper>() {
 		@Override
-		public boolean test(@Nullable Shopkeeper shopkeeper) {
+		public boolean test(
+				CommandInput input,
+				CommandContextView context,
+				@Nullable Shopkeeper shopkeeper
+		) {
 			return (shopkeeper instanceof AdminShopkeeper);
 		}
 
@@ -39,7 +50,11 @@ public final class ShopkeeperFilter {
 
 	public static final ArgumentFilter<@Nullable Shopkeeper> PLAYER = new ArgumentFilter<@Nullable Shopkeeper>() {
 		@Override
-		public boolean test(@Nullable Shopkeeper shopkeeper) {
+		public boolean test(
+				CommandInput input,
+				CommandContextView context,
+				@Nullable Shopkeeper shopkeeper
+		) {
 			return (shopkeeper instanceof PlayerShopkeeper);
 		}
 
@@ -56,6 +71,51 @@ public final class ShopkeeperFilter {
 			return text;
 		}
 	};
+
+	public static ArgumentFilter<@Nullable Shopkeeper> withAccess(UIType uiType) {
+		return new ArgumentFilter<@Nullable Shopkeeper>() {
+			@Override
+			public boolean test(
+					CommandInput input,
+					CommandContextView context,
+					@Nullable Shopkeeper shopkeeper
+			) {
+				if (shopkeeper == null) return false;
+
+				// Avoid spamming the log with permission check notifications in debug mode:
+				return PermissionUtils.runWithoutPermissionCheckLogging(() -> {
+					if (uiType == DefaultUITypes.EDITOR()) {
+						// Call the special "canEdit" check that takes non-player command senders
+						// into account: If the sender is not a player, it requires the bypass
+						// permission (usually the case for the console and block command senders).
+						return ((AbstractShopkeeper) shopkeeper).canEdit(input.getSender(), true);
+					}
+
+					// For any other UI type / access check: We only support player senders since we
+					// cannot decide what to return here in general for non-player senders.
+					if (!(input.getSender() instanceof Player player)) return false;
+
+					var uiHandler = ((AbstractShopkeeper) shopkeeper).getUIHandler(uiType);
+					if (uiHandler == null) return false;
+
+					return uiHandler.canOpen(player, true);
+				});
+			}
+
+			@Override
+			public Text getInvalidArgumentErrorMsg(
+					CommandArgument<?> argument,
+					String argumentInput,
+					@Nullable Shopkeeper value
+			) {
+				Validate.notNull(argumentInput, "argumentInput is null");
+				Text text = Messages.commandShopkeeperArgumentNoAccess;
+				text.setPlaceholderArguments(argument.getDefaultErrorMsgArgs());
+				text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
+				return text;
+			}
+		};
+	}
 
 	private ShopkeeperFilter() {
 	}

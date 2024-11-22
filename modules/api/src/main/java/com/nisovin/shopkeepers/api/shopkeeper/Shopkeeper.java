@@ -8,6 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.events.UpdateItemEvent;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
@@ -35,6 +37,25 @@ public interface Shopkeeper {
 	 * @see ShopkeeperStorage#saveDelayed()
 	 */
 	public void saveDelayed();
+
+	// ITEM UPDATES
+
+	/**
+	 * Calls an {@link UpdateItemEvent} for each item stored by this shopkeeper, i.e. the items in
+	 * trade offers, the {@link PlayerShopkeeper#getHireCost()} of player shopkeepers, the shop
+	 * object equipment items, items stored inside {@link #getSnapshots() snapshots}, etc.
+	 * <p>
+	 * This may {@link UIRegistry#abortUISessions(Shopkeeper) abort} any currently open UI sessions
+	 * (trading, editor, etc.), because they might be affected by changes to the item data.
+	 * <p>
+	 * Note: This does not update items stored in the containers linked to the shopkeeper, e.g. for
+	 * player shops.
+	 * <p>
+	 * This modifies but does not automatically {@link #save() save} the shopkeeper.
+	 * 
+	 * @return the number of updated items
+	 */
+	public int updateItems();
 
 	// LIFE CYCLE
 

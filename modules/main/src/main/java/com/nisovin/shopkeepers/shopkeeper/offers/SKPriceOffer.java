@@ -12,7 +12,9 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.items.ItemUpdates;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.container.value.DataValue;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -283,5 +285,49 @@ public class SKPriceOffer implements PriceOffer {
 			}
 		}
 		return (migratedOffers == null) ? offers : migratedOffers;
+	}
+
+	// Note: Modifies the given list. Returns the number of items that were updated.
+	public static int updateItems(@ReadWrite List<PriceOffer> offers, String logPrefix) {
+		Validate.notNull(logPrefix, "logPrefix is null");
+		Validate.notNull(offers, "offers is null");
+		assert !CollectionUtils.containsNull(offers);
+
+		int updatedItems = 0;
+
+		final int size = offers.size();
+		for (int i = 0; i < size; ++i) {
+			PriceOffer offer = offers.get(i);
+			assert offer != null;
+
+			boolean itemsUpdated = false;
+
+			UnmodifiableItemStack item = offer.getItem();
+			assert !ItemUtils.isEmpty(item);
+			@Nullable UnmodifiableItemStack updatedItem = ItemUpdates.updateItem(item);
+			if (updatedItem != item) {
+				assert updatedItem != null && !ItemUtils.isEmpty(updatedItem);
+				if (ItemUtils.isEmpty(updatedItem)) {
+					Log.warning(logPrefix + "Item update failed for price offer " + (i + 1) + ": "
+							+ offer);
+					continue;
+				} else {
+					item = updatedItem;
+					itemsUpdated = true;
+					updatedItems += 1;
+				}
+			}
+
+			if (itemsUpdated) {
+				Log.debug(DebugOptions.itemUpdates, logPrefix + "Updated item for price offer "
+						+ (i + 1));
+
+				// Replace the offer using the updated item:
+				assert !ItemUtils.isEmpty(item);
+				offers.set(i, new SKPriceOffer(item, offer.getPrice()));
+			}
+		}
+
+		return updatedItems;
 	}
 }

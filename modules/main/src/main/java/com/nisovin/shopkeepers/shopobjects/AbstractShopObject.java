@@ -11,12 +11,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
+import com.nisovin.shopkeepers.api.events.UpdateItemEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -25,6 +27,7 @@ import com.nisovin.shopkeepers.shopkeeper.registry.ShopObjectRegistry;
 import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -197,6 +200,26 @@ public abstract class AbstractShopObject implements ShopObject {
 	public void setup() {
 	}
 
+	// ITEM UPDATES
+
+	/**
+	 * Calls an {@link UpdateItemEvent} and updates each item stored by this shop object in the
+	 * given {@link ShopObjectData}, such as {@link LivingShopObject#getEquipment() equipment}
+	 * items, etc. This modifies the given {@link ShopObjectData}.
+	 * <p>
+	 * This is usually called automatically as part of {@link Shopkeeper#updateItems()}.
+	 * <p>
+	 * Data that fails to load is logged but otherwise ignored.
+	 * 
+	 * @param logPrefix
+	 *            a prefix for log messages, not <code>null</code>
+	 * @param shopObjectData
+	 *            the {@link ShopObjectData} to update, not <code>null</code>
+	 * @return the number of updated items
+	 */
+	public int updateItems(String logPrefix, @ReadWrite ShopObjectData shopObjectData) {
+		return 0;
+	}
 	// LIFE CYCLE
 
 	/**

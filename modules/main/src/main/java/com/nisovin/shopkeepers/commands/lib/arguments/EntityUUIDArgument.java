@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -13,7 +12,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 
 /**
  * Argument for entity UUIDs.
@@ -63,7 +61,7 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param filter
-	 *            only suggestions for entities accepted by this predicate are included, not
+	 *            only suggestions for entities accepted by this filter are included, not
 	 *            <code>null</code>
 	 * @return the entity uuid completion suggestions
 	 */
@@ -72,13 +70,16 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 			CommandContextView context,
 			int minimumCompletionInput,
 			String uuidPrefix,
-			Predicate<? super Entity> filter
+			ArgumentFilter<? super Entity> filter
 	) {
 		// Suggestion for the unique id of the targeted entity:
 		CommandSender sender = input.getSender();
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			Entity targetEntity = EntityUtils.getTargetedEntity(player, filter);
+			Entity targetEntity = EntityUtils.getTargetedEntity(
+					player,
+					entity -> filter.test(input, context, entity)
+			);
 			if (targetEntity != null) {
 				String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 				if (targetEntity.getUniqueId().toString().startsWith(normalizedUUIDPrefix)) {
@@ -100,7 +101,7 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 				context,
 				minimumCompletionInput,
 				idPrefix,
-				PredicateUtils.alwaysTrue()
+				ArgumentFilter.acceptAny()
 		);
 	}
 }

@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.ui.editor.TradingRecipesAdapter;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -54,8 +55,17 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
 		if (!super.canOpen(player, silent)) return false;
-		return this.getShopkeeper().isOwner(player)
-				|| PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
+
+		// Check the owner:
+		if (!this.getShopkeeper().isOwner(player)
+				&& !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+			if (!silent) {
+				this.debugNotOpeningUI(player, "Player is not owning this shop.");
+				TextUtils.sendMessage(player, Messages.notOwner);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	@Override

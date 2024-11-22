@@ -2,7 +2,8 @@ package com.nisovin.shopkeepers.config.lib.setting;
 
 import java.lang.reflect.Field;
 
-import com.nisovin.shopkeepers.api.internal.util.Unsafe;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
@@ -65,17 +66,17 @@ public class FieldSetting<T> implements Setting<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T getValue() {
+	public @Nullable T getValue() {
 		try {
 			// Note: The config instance is ignored if the field is static.
-			return (T) field.get(config);
+			return (@Nullable T) field.get(config);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException("Could not get the value from the setting's field!", e);
 		}
 	}
 
 	@Override
-	public void setValue(T value) throws ValueLoadException {
+	public void setValue(@Nullable T value) throws ValueLoadException {
 		Class<?> fieldType = field.getType();
 		if (!ClassUtils.isAssignableFrom(fieldType, value)) {
 			throw new ValueLoadException("Value is of wrong type: Got "
@@ -85,7 +86,7 @@ public class FieldSetting<T> implements Setting<T> {
 
 		try {
 			// Note: The config instance is ignored if the field is static.
-			field.set(config, Unsafe.nullableAsNonNull(value));
+			field.set(config, value);
 		} catch (Exception e) {
 			throw new ValueLoadException("Could not set the value of the setting's field!", e);
 		}

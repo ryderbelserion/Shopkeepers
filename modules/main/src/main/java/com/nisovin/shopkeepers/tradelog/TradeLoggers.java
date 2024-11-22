@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.tradelog.csv.CsvTradeLogger;
 import com.nisovin.shopkeepers.tradelog.data.TradeRecord;
+import com.nisovin.shopkeepers.tradelog.sqlite.SQLiteTradeLogger;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.trading.MergedTrades;
 import com.nisovin.shopkeepers.util.trading.TradeMerger;
@@ -55,9 +56,19 @@ public class TradeLoggers implements Listener {
 		assert tradeMerger != null;
 		tradeMerger.onEnable();
 
-		if (Settings.logTradesToCsv) {
+		switch (Settings.tradeLogStorage) {
+		case CSV:
 			loggers.add(new CsvTradeLogger(plugin));
+			break;
+		case SQLITE:
+			loggers.add(new SQLiteTradeLogger(plugin));
+			break;
+		case DISABLED:
+		default:
+			break;
 		}
+
+		loggers.forEach(TradeLogger::setup);
 
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}

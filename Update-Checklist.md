@@ -65,6 +65,9 @@ To support the latest mappings version:
 	* Update the comparator in MerchantUtils.
 	* Check the MerchantRecipe constructions in MerchantUtils.
 
+* New explosion result enum values:
+	* Check FailedHandler and NMSHandlers and map destroying explosion results correctly.
+
 * If there are major differences, consider dropping support for older Minecraft versions.
 	* Remove the corresponding modules:
 		* Folders.

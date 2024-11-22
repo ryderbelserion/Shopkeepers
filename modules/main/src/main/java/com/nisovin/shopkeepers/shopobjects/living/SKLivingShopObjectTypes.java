@@ -43,6 +43,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PufferFishShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.RabbitShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.SalmonShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ShulkerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SlimeShop;
@@ -92,7 +93,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>SLIME: okay, would usually spawn with random size
  * <li>SNOWMAN: okay, renamed to SNOW_GOLEM in Spigot 1.20.5
  * <li>SPIDER: okay
- * <li>SQUID: seems okay, slightly weird movement in water
+ * <li>SQUID: seems okay, slightly weird movement in water, MC 1.21.2: ageable (baby variant)
  * <li>WITCH: okay
  * <li>WITHER: experimental: requires NoAI, shows boss bar
  * <li>WOLF: okay, variants (1.20.5), armor (1.20.5; via equipment editor)
@@ -132,11 +133,11 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <li>PHANTOM: burns in sun, can be pushed around (probably client-sided) before it teleports back,
  * does not rotate towards nearby players
  * <li>COD: okay
- * <li>SALMON: okay
+ * <li>SALMON: okay, MC 1.21.2: size variant
  * <li>PUFFERFISH: okay
  * <li>TROPICAL_FISH: okay
  * <li>DROWNED: okay
- * <li>DOLPHIN: okay, slightly gliding inside water # 1.14
+ * <li>DOLPHIN: okay, slightly gliding inside water, MC 1.21.2: ageable (baby variant) # 1.14
  * <li>CAT: okay
  * <li>PANDA: okay
  * <li>PILLAGER: okay
@@ -619,6 +620,17 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					permission,
 					FrogShop.class,
 					FrogShop::new
+			);
+			break;
+		case SALMON:
+			objectType = new SKLivingShopObjectType<>(
+					livingShops,
+					entityType,
+					identifier,
+					aliases,
+					permission,
+					SalmonShop.class,
+					SalmonShop::new
 			);
 			break;
 		default:

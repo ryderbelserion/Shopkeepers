@@ -7,7 +7,9 @@ import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
@@ -38,7 +40,8 @@ class CommandSnapshotList extends Command {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
+						ShopkeeperFilter.withAccess(DefaultUITypes.EDITOR())),
 				TargetShopkeeperFilter.ANY
 		));
 		this.addArgument(new PositiveIntegerArgument(ARGUMENT_PAGE).orDefaultValue(1));
@@ -49,6 +52,10 @@ class CommandSnapshotList extends Command {
 		CommandSender sender = input.getSender();
 		AbstractShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		int page = context.get(ARGUMENT_PAGE);
+
+		if (!shopkeeper.canEdit(sender, false)) {
+			return;
+		}
 
 		List<? extends ShopkeeperSnapshot> snapshots = shopkeeper.getSnapshots();
 		int snapshotsCount = snapshots.size();

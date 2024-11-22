@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 class CommandSetTradePerm extends Command {
@@ -38,7 +39,9 @@ class CommandSetTradePerm extends Command {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.ADMIN),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
+						ShopkeeperFilter.ADMIN
+								.and(ShopkeeperFilter.withAccess(DefaultUITypes.EDITOR()))),
 				TargetShopkeeperFilter.ADMIN
 		));
 		this.addArgument(new FirstOfArgument("permArg", Arrays.asList(
@@ -53,7 +56,12 @@ class CommandSetTradePerm extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
-		AdminShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
+		AbstractAdminShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
+
+		// Check that the sender can edit this shop:
+		if (!shopkeeper.canEdit(sender, false)) {
+			return;
+		}
 
 		String newTradePerm = context.getOrNull(ARGUMENT_NEW_PERMISSION);
 		boolean removePerm = context.has(ARGUMENT_REMOVE_PERMISSION);

@@ -16,6 +16,7 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -24,6 +25,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.events.UpdateItemEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -55,9 +57,11 @@ import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.ColorUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -600,6 +604,127 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// This may not be called if the shopkeeper was deleted.
 	public final void onSave() {
 		dirty = false;
+	}
+
+	// ITEM UPDATES
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Note for sub-types: This method cannot be overridden. Override
+	 * {@link #updateItems(String, ShopkeeperData)} instead.
+	 */
+	@Override
+	public final int updateItems() {
+		this.abortUISessionsDelayed();
+
+		// We also need to update the item data inside snapshots. To only implement the item update
+		// logic once, we save the current shopkeeper state, perform the item updates on the saved
+		// state, and then re-apply the updated state.
+		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.ofNonNull(DataContainer.create());
+		this.saveDynamicState(dynamicShopkeeperData, false); // saveAll: Not needed here.
+
+		int updatedItems = this.updateItems(this.getLogPrefix(), dynamicShopkeeperData);
+		if (updatedItems > 0) {
+			try {
+				this.loadDynamicState(dynamicShopkeeperData);
+			} catch (InvalidDataException e) {
+				Log.warning(this.getLogPrefix() + "Failed re-apply the updated shopkeeper data!", e);
+				return 0;
+			}
+		}
+
+		int snapshotId = 0;
+		var snapshotIterator = snapshots.listIterator();
+		while (snapshotIterator.hasNext()) {
+			var snapshot = Unsafe.assertNonNull(snapshotIterator.next());
+			snapshotId++;
+			String snapshotLogPrefix = this.getLogPrefix(snapshotId, snapshot);
+
+			// Copy to avoid modifying the original snapshot data:
+			var updatedSnaphotShopkeeperData = ShopkeeperData.ofNonNull(DataContainer.ofNonNull(
+					snapshot.getShopkeeperData().getValuesCopy()
+			));
+
+			int snapshotUpdatedItems = this.updateItems(snapshotLogPrefix, updatedSnaphotShopkeeperData);
+			if (snapshotUpdatedItems > 0) {
+				// Replace the snapshot with a snapshot with the new item data:
+				var updatedSnapshot = new SKShopkeeperSnapshot(
+						snapshot.getName(),
+						snapshot.getTimestamp(),
+						updatedSnaphotShopkeeperData
+				);
+				snapshotIterator.set(updatedSnapshot);
+				updatedItems += snapshotUpdatedItems;
+			}
+		}
+
+		if (updatedItems > 0) {
+			this.markDirty();
+		}
+
+		return updatedItems;
+	}
+
+	/**
+	 * Calls an {@link UpdateItemEvent} and updates each item stored by this shopkeeper in the given
+	 * {@link ShopkeeperData}, such as trade offer items, hire cost items, items stored by the shop
+	 * object, etc. This modifies the given {@link ShopkeeperData}.
+	 * <p>
+	 * Data that fails to load is logged but otherwise ignored.
+	 * 
+	 * @param logPrefix
+	 *            a prefix for log messages, not <code>null</code>
+	 * @param shopkeeperData
+	 *            the {@link ShopkeeperData} to update, not <code>null</code>
+	 * @return the number of updated items
+	 */
+	protected int updateItems(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		int updatedItems = 0;
+		updatedItems += this.updateShopObjectItems(logPrefix, shopkeeperData);
+		return updatedItems;
+	}
+
+	private int updateShopObjectItems(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		ShopObjectData shopObjectData;
+		try {
+			shopObjectData = shopkeeperData.getOrNullIfMissing(SHOP_OBJECT_DATA);
+		} catch (InvalidDataException e) {
+			Log.warning(logPrefix + "Failed to load '" + SHOP_OBJECT_DATA.getName() + "'!", e);
+			return 0;
+		}
+		if (shopObjectData == null) return 0;
+
+		AbstractShopObjectType<?> objectType;
+		try {
+			objectType = shopObjectData.get(AbstractShopObject.SHOP_OBJECT_TYPE);
+			assert objectType != null;
+		} catch (InvalidDataException e) {
+			Log.warning(logPrefix + "Failed to load '"
+					+ AbstractShopObject.SHOP_OBJECT_TYPE.getName() + "'!", e);
+			return 0;
+		}
+
+		// Skip incompatible shop object data:
+		if (objectType != shopObject.getType()) {
+			Log.debug(() -> this.getLogPrefix()
+					+ "Ignoring shop object data of different type (expected: "
+					+ shopObject.getType().getIdentifier() + ", got: "
+					+ objectType.getIdentifier() + ")!");
+			return 0;
+		}
+
+		// A modifiable copy of the shop object data:
+		var updatedShopObjectData = ShopObjectData.ofNonNull(DataContainer.ofNonNull(
+				shopObjectData.getValuesCopy()
+		));
+
+		int updatedItems = shopObject.updateItems(logPrefix, updatedShopObjectData);
+		if (updatedItems > 0) {
+			shopkeeperData.set(SHOP_OBJECT_DATA, updatedShopObjectData);
+		}
+
+		return updatedItems;
 	}
 
 	// COMPONENTS
@@ -1232,14 +1357,25 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				boolean migrated = false;
 				int snapshotId = 1;
 				for (SKShopkeeperSnapshot snapshot : snapshots) {
-					String snapshotLogPrefix = shopkeeperPrefix + "Snapshot " + snapshotId
-							+ " ('" + snapshot.getName() + "'): ";
+					String snapshotLogPrefix = getLogPrefix(shopkeeperPrefix, snapshotId, snapshot);
 					migrated |= snapshot.getShopkeeperData().migrate(snapshotLogPrefix);
 					snapshotId++;
 				}
 				return migrated;
 			}
 		});
+	}
+
+	public static String getLogPrefix(
+			String shopkeeperPrefix,
+			int snapshotId,
+			ShopkeeperSnapshot snapshot
+	) {
+		return shopkeeperPrefix + "Snapshot " + snapshotId + " ('" + snapshot.getName() + "'): ";
+	}
+
+	public final String getLogPrefix(int snapshotId, ShopkeeperSnapshot snapshot) {
+		return getLogPrefix(this.getLogPrefix(), snapshotId, snapshot);
 	}
 
 	private void loadSnapshots(ShopkeeperData shopkeeperData) throws InvalidDataException {
@@ -1273,12 +1409,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public final List<? extends ShopkeeperSnapshot> getSnapshots() {
+	public final List<? extends SKShopkeeperSnapshot> getSnapshots() {
 		return snapshotsView;
 	}
 
 	@Override
-	public final ShopkeeperSnapshot getSnapshot(int index) {
+	public final SKShopkeeperSnapshot getSnapshot(int index) {
 		return snapshotsView.get(index);
 	}
 
@@ -1297,13 +1433,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public final @Nullable ShopkeeperSnapshot getSnapshot(String name) {
+	public final @Nullable SKShopkeeperSnapshot getSnapshot(String name) {
 		int index = this.getSnapshotIndex(name);
 		return (index != -1) ? this.getSnapshot(index) : null;
 	}
 
 	@Override
-	public final ShopkeeperSnapshot createSnapshot(String name) {
+	public final SKShopkeeperSnapshot createSnapshot(String name) {
 		// The name is validated during the creation of the snapshot.
 		Instant timestamp = Instant.now();
 		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.ofNonNull(DataContainer.create());
@@ -1339,8 +1475,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public final ShopkeeperSnapshot removeSnapshot(int index) {
-		ShopkeeperSnapshot snapshot = snapshots.remove(index);
+	public final SKShopkeeperSnapshot removeSnapshot(int index) {
+		SKShopkeeperSnapshot snapshot = snapshots.remove(index);
 		this.markDirty();
 		return snapshot;
 	}
@@ -1354,6 +1490,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public final void applySnapshot(ShopkeeperSnapshot snapshot) throws ShopkeeperLoadException {
 		Validate.notNull(snapshot, "snapshot is null");
+		Validate.isTrue(snapshot instanceof SKShopkeeperSnapshot, () -> "snapshot is not of type "
+				+ SKShopkeeperSnapshot.class.getName() + ", but " + snapshot.getClass().getName());
 		// Note: The given snapshot is not necessarily stored by or based on this shopkeeper. Its
 		// application may fail if it is not compatible with this shopkeeper.
 		// TODO Inform players.
@@ -1376,9 +1514,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public abstract boolean hasTradingRecipes(@Nullable Player player);
 
 	@Override
-	public abstract List<? extends TradingRecipe> getTradingRecipes(
-			@Nullable Player player
-	);
+	public abstract List<? extends TradingRecipe> getTradingRecipes(@Nullable Player player);
 
 	// USER INTERFACES
 
@@ -1434,6 +1570,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public final boolean openEditorWindow(Player player) {
 		return this.openWindow(DefaultUITypes.EDITOR(), player);
+	}
+
+	// Shortcut to check if the sender can access the editor:
+	public final boolean canEdit(CommandSender sender, boolean silent) {
+		if (sender instanceof Player player) {
+			var uiHandler = Unsafe.assertNonNull(this.getUIHandler(DefaultUITypes.EDITOR()));
+			return uiHandler.canOpen(player, silent);
+		} else {
+			// Check if the command sender has the bypass permission (e.g. the case for the console
+			// and block command senders, but might not be the case for other unexpected types of
+			// command senders):
+			return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION);
+		}
 	}
 
 	@Override

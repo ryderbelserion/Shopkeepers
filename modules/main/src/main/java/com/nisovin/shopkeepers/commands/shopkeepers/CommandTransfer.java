@@ -4,7 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 class CommandTransfer extends Command {
@@ -34,7 +34,9 @@ class CommandTransfer extends Command {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
+						ShopkeeperFilter.PLAYER
+								.and(ShopkeeperFilter.withAccess(DefaultUITypes.EDITOR()))),
 				TargetShopkeeperFilter.PLAYER
 		));
 		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER)); // New owner has to be online
@@ -45,14 +47,11 @@ class CommandTransfer extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
-		PlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
+		AbstractPlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		Player newOwner = context.get(ARGUMENT_NEW_OWNER);
 
-		// Check that the shop is owned by the executing player:
-		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
-		if ((senderPlayer == null || !shopkeeper.isOwner(senderPlayer))
-				&& !PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			TextUtils.sendMessage(sender, Messages.notOwner);
+		// Check that the sender can edit this shopkeeper:
+		if (!shopkeeper.canEdit(sender, false)) {
 			return;
 		}
 

@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
@@ -33,7 +33,9 @@ class CommandSetForHire extends PlayerCommand {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
+						ShopkeeperFilter.PLAYER
+								.and(ShopkeeperFilter.withAccess(DefaultUITypes.EDITOR()))),
 				TargetShopkeeperFilter.PLAYER
 		));
 	}
@@ -43,7 +45,7 @@ class CommandSetForHire extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		PlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
+		var shopkeeper = (AbstractPlayerShopkeeper) context.get(ARGUMENT_SHOPKEEPER);
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
@@ -53,15 +55,13 @@ class CommandSetForHire extends PlayerCommand {
 			return;
 		}
 
-		// Check that the shop is owned by the executing player:
-		if (!shopkeeper.isOwner(player)
-				&& !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			TextUtils.sendMessage(player, Messages.notOwner);
+		// Check that the executing player can edit this shop:
+		if (!shopkeeper.canEdit(player, false)) {
 			return;
-		} else {
-			// Set for hire:
-			shopkeeper.setForHire(hireCost);
 		}
+
+		// Set for hire:
+		shopkeeper.setForHire(hireCost);
 
 		// Success:
 		TextUtils.sendMessage(player, Messages.setForHire);

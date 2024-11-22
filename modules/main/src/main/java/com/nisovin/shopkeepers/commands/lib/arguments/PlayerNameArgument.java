@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
@@ -17,7 +16,6 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
@@ -71,7 +69,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 * @param namePrefix
 	 *            the name prefix, may be empty, not <code>null</code>
 	 * @param playerFilter
-	 *            only suggestions for players accepted by this predicate get included
+	 *            only suggestions for players accepted by this filter are included
 	 * @param includeDisplayNames
 	 *            <code>true</code> to include display name suggestions
 	 * @return the player name completion suggestions
@@ -81,7 +79,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 			CommandContextView context,
 			int minimumCompletionInput,
 			String namePrefix,
-			Predicate<? super Player> playerFilter,
+			ArgumentFilter<? super Player> playerFilter,
 			boolean includeDisplayNames
 	) {
 		// Only provide suggestions if there is a minimum length input:
@@ -96,7 +94,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		// TODO Cast: Workaround for a limitation of CheckerFramework
 		Stream<Player> onlinePlayers = Unsafe.castNonNull(Bukkit.getOnlinePlayers().stream());
 		Iterable<String> suggestions = onlinePlayers
-				.filter(playerFilter)
+				.filter(player -> playerFilter.test(input, context, player))
 				.<@Nullable String>map(player -> {
 					// Note: Not suggesting both the name and display name for the same player.
 					// Assumption: Player names don't contain whitespace or color codes
@@ -128,7 +126,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 				context,
 				minimumCompletionInput,
 				idPrefix,
-				PredicateUtils.alwaysTrue(),
+				ArgumentFilter.acceptAny(),
 				true
 		);
 	}

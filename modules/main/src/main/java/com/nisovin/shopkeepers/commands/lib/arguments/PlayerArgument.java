@@ -173,8 +173,14 @@ public class PlayerArgument extends CommandArgument<Player> {
 	) {
 		// Note: Whether to include display name suggestions usually depends on whether the used
 		// matching function considers display names.
-		return PlayerNameArgument.getDefaultCompletionSuggestions(input, context,
-				minimumCompletionInput, idPrefix, filter, true);
+		return PlayerNameArgument.getDefaultCompletionSuggestions(
+				input,
+				context,
+				minimumCompletionInput,
+				idPrefix,
+				filter,
+				true
+		);
 	}
 
 	/**

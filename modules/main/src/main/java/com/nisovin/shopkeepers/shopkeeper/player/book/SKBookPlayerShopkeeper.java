@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
@@ -77,6 +78,16 @@ public class SKBookPlayerShopkeeper
 		super.saveDynamicState(shopkeeperData, saveAll);
 		this.saveOffers(shopkeeperData);
 	}
+
+	// ITEM UPDATES
+
+	@Override
+	protected int updateItems(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		// Note: Book offers have no items to update.
+		return super.updateItems(logPrefix, shopkeeperData);
+	}
+
+	//
 
 	@Override
 	public BookPlayerShopType getType() {

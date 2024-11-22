@@ -1,11 +1,12 @@
 package com.nisovin.shopkeepers.commands.lib.argument.filter;
 
-import java.util.function.Predicate;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A filter that tests parsed arguments.
@@ -13,11 +14,15 @@ import com.nisovin.shopkeepers.text.Text;
  * @param <T>
  *            the type of the filtered parsed arguments
  */
-public abstract class ArgumentFilter<T> implements Predicate<T> {
+public abstract class ArgumentFilter<T> {
 
 	private static final ArgumentFilter<@Nullable Object> ACCEPT_ANY = new ArgumentFilter<@Nullable Object>() {
 		@Override
-		public boolean test(@Nullable Object value) {
+		public boolean test(
+				CommandInput input,
+				CommandContextView context,
+				@Nullable Object value
+		) {
 			return true;
 		}
 	};
@@ -33,6 +38,23 @@ public abstract class ArgumentFilter<T> implements Predicate<T> {
 	public static <T> ArgumentFilter<T> acceptAny() {
 		return (ArgumentFilter<T>) ACCEPT_ANY;
 	}
+
+	/**
+	 * Evaluates this filter on the given argument.
+	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the context which stores the parsed argument values, not <code>null</code>
+	 * @param value
+	 *            the parsed argument value
+	 * @return {@code true} if the argument value is accepted by this filter
+	 */
+	public abstract boolean test(
+			CommandInput input,
+			CommandContextView context,
+			T value
+	);
 
 	/**
 	 * Gets the 'invalid argument' error message for the given parsed but declined value.
@@ -81,5 +103,25 @@ public abstract class ArgumentFilter<T> implements Predicate<T> {
 				argument,
 				this.getInvalidArgumentErrorMsg(argument, argumentInput, value)
 		);
+	}
+
+	/**
+	 * Returns a composed {@link ArgumentFilter} that filters by both this and the given other
+	 * filter. The composed filter is short-circuiting: If an argument value is rejected by this
+	 * filter, the given other filter is not invoked.
+	 * 
+	 * @param other
+	 *            the other filter to AND-compose with this filter, not <code>null</code>
+	 * @return the composed filter
+	 */
+	public ArgumentFilter<T> and(ArgumentFilter<? super T> other) {
+		Validate.notNull(other, "other");
+		return new ArgumentFilter<T>() {
+			@Override
+			public boolean test(CommandInput input, CommandContextView context, T value) {
+				return ArgumentFilter.this.test(input, context, value)
+						&& other.test(input, context, value);
+			}
+		};
 	}
 }

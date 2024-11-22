@@ -4,7 +4,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -28,7 +30,8 @@ class CommandEdit extends PlayerCommand {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER,
+						ShopkeeperFilter.withAccess(DefaultUITypes.EDITOR())),
 				TargetShopkeeperFilter.ANY
 		));
 	}
@@ -40,7 +43,8 @@ class CommandEdit extends PlayerCommand {
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 
-		// Open shop trading window:
+		// Try to open the shop editor window:
+		// Fails if the user does not have the permission to edit the shop.
 		shopkeeper.openEditorWindow(player);
 	}
 }

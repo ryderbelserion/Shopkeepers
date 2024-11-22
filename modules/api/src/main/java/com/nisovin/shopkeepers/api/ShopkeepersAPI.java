@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import com.nisovin.shopkeepers.api.events.UpdateItemEvent;
 import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -63,7 +64,7 @@ public final class ShopkeepersAPI {
 	 * 
 	 * @param player
 	 *            the player
-	 * @return <code>false</code> if he cannot create shops at all, <code>true</code> otherwise
+	 * @return <code>false</code> if they cannot create shops at all, <code>true</code> otherwise
 	 * @see ShopkeepersPlugin#hasCreatePermission(Player)
 	 */
 	public static boolean hasCreatePermission(Player player) {
@@ -158,6 +159,31 @@ public final class ShopkeepersAPI {
 	 */
 	public static ShopkeeperStorage getShopkeeperStorage() {
 		return getPlugin().getShopkeeperStorage();
+	}
+
+	// ITEM UPDATES
+
+	/**
+	 * Calls an {@link UpdateItemEvent} for each item stored by the Shopkeepers plugin.
+	 * <p>
+	 * This includes calling {@link Shopkeeper#updateItems()} for each loaded shopkeeper, but also
+	 * calls the event for items stored in other contexts, such as inside the configuration.
+	 * <p>
+	 * This does not call an {@link UpdateItemEvent} for items stored in the trading history. See
+	 * also {@link Shopkeeper#updateItems()} for other examples of items for which no event is being
+	 * called.
+	 * <p>
+	 * This may {@link UIRegistry#abortUISessions() abort} any currently open UI sessions (trading,
+	 * editor, etc.), because they might be affected by changes to the item data.
+	 * <p>
+	 * This automatically saves the config and triggers a {@link ShopkeeperStorage#save()} if any
+	 * items were updated.
+	 * 
+	 * @return the number of updated items
+	 * @see ShopkeepersPlugin#updateItems()
+	 */
+	public static int updateItems() {
+		return getPlugin().updateItems();
 	}
 
 	//

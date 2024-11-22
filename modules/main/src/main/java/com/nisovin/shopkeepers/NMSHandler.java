@@ -237,4 +237,21 @@ public final class NMSHandler implements NMSCallProvider {
 		Tag itemNBT = nmsItem.saveOptional(MinecraftServer.getDefaultRegistryAccess());
 		return itemNBT.toString();
 	}
+
+	// MC 1.21+ TODO Can be removed once we only support Bukkit 1.21+
+
+	@Override
+	public boolean isDestroyingBlocks(EntityExplodeEvent event) {
+		return isDestroyingBlocks(event.getExplosionResult());
+	}
+
+	@Override
+	public boolean isDestroyingBlocks(BlockExplodeEvent event) {
+		return isDestroyingBlocks(event.getExplosionResult());
+	}
+
+	private static boolean isDestroyingBlocks(ExplosionResult explosionResult) {
+		return explosionResult == ExplosionResult.DESTROY
+				|| explosionResult == ExplosionResult.DESTROY_WITH_DECAY;
+	}
 }

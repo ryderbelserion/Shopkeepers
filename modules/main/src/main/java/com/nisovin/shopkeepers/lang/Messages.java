@@ -306,6 +306,11 @@ public class Messages extends Config {
 			"of the puffer fish.",
 			"Currently: &e{puffState}"
 	));
+	public static String buttonSalmonVariant = c("&aChoose variant");
+	public static List<String> buttonSalmonVariantLore = c(Arrays.asList(
+			"Changes the size",
+			"of the salmon."
+	));
 	public static String buttonFrogVariant = c("&aChoose frog variant");
 	public static List<String> buttonFrogVariantLore = c(Arrays.asList(
 			"Changes the frog's look"
@@ -402,6 +407,7 @@ public class Messages extends Config {
 	public static Text mustHoldItemInMainHand = Text.parse("&7You must hold an item in your main hand.");
 	public static Text currencyItemSetToMainHandItem = Text.parse("&aThe currency item '&e{currencyId}&a' has been set to the &eitem in your main hand&a!");
 	public static Text itemsConverted = Text.parse("&aConverted &e{count}&a item stack(s)!");
+	public static Text itemsUpdated = Text.parse("&aUpdated &e{count}&a item(s)!");
 	public static String unknownBookAuthor = c("Unknown");
 
 	public static Text tradePermSet = Text.parse("&aThe shop's trading permission has been set to '&e{perm}&a'!");
@@ -768,6 +774,7 @@ public class Messages extends Config {
 	public static Text commandShopkeeperArgumentInvalid = Text.parse("&cNo shopkeeper found for '&e{argument}&c'.");
 	public static Text commandShopkeeperArgumentNoAdminShop = Text.parse("&cShopkeeper '&e{argument}&c' is no admin shopkeeper.");
 	public static Text commandShopkeeperArgumentNoPlayerShop = Text.parse("&cShopkeeper '&e{argument}&c' is no player shopkeeper.");
+	public static Text commandShopkeeperArgumentNoAccess = Text.parse("&cYou do not have access to shopkeeper '&e{argument}&c'.");
 	public static Text commandEntityArgumentNoVillager = Text.parse("&cEntity '&e{argument}&c' is no regular villager.");
 
 	public static Text ambiguousPlayerName = Text.parse("&cThere are multiple matches for the name '&e{name}&c'!");
@@ -790,6 +797,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");
 	public static Text commandDescriptionSetCurrency = Text.parse("Changes the currency item to the item held in hand.");
 	public static Text commandDescriptionConvertItems = Text.parse("Converts the held (or all) items to conform to Spigot's data format.");
+	public static Text commandDescriptionUpdateItems = Text.parse("Updates third-party items (if they support it).");
 	public static Text commandDescriptionRemote = Text.parse("Remotely opens a shop (Optionally: For another player).");
 	public static Text commandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
 	public static Text commandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");

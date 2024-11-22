@@ -26,6 +26,7 @@ import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.commands.Commands;
+import com.nisovin.shopkeepers.compat.MC_1_21_3;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.compat.ServerAssumptionsTest;
 import com.nisovin.shopkeepers.config.Settings;
@@ -33,6 +34,7 @@ import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
 import com.nisovin.shopkeepers.debug.Debug;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
 import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
@@ -552,6 +554,29 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	@Override
 	public SKShopkeeperStorage getShopkeeperStorage() {
 		return shopkeeperStorage;
+	}
+
+	// ITEM UPDATES
+
+	@Override
+	public int updateItems() {
+		Log.debug(DebugOptions.itemUpdates, "Updating all items.");
+
+		// Note: Not safe to be called from inside inventory events!
+		uiRegistry.abortUISessions();
+
+		int updatedItems = Settings.getInstance().updateItems();
+
+		int shopkeeperUpdatedItems = 0;
+		for (AbstractShopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
+			shopkeeperUpdatedItems += shopkeeper.updateItems();
+		}
+		if (shopkeeperUpdatedItems > 0) {
+			updatedItems += shopkeeperUpdatedItems;
+			shopkeeperStorage.save();
+		}
+
+		return updatedItems;
 	}
 
 	// COMMANDS

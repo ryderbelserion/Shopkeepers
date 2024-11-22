@@ -486,13 +486,11 @@ public class ShopkeeperSpawner {
 			if (!objectType.mustBeSpawned()) return;
 
 			// Ignore shopkeepers that are not affected by this spawn request:
-			// TODO Cast is required due to a limitation of CheckerFramework
-			if (!filter.test(Unsafe.cast(shopkeeper))) return;
+			if (!filter.test(shopkeeper)) return;
 
-			ShopkeeperSpawnState spawnState = shopkeeper.getComponents().getOrAdd(ShopkeeperSpawnState.class);
 			// This has no noticeable effect if the shopkeeper was already in the spawning state.
 			// This aborts any currently pending despawning.
-			spawnState.setState(State.SPAWNING);
+			this.updateSpawnState(shopkeeper, State.SPAWNING);
 		});
 
 		int spawned = 0;
@@ -603,13 +601,11 @@ public class ShopkeeperSpawner {
 			if (!objectType.mustBeSpawned()) return;
 
 			// Ignore shopkeepers that are not affected by this despawn request:
-			// TODO Cast is required due to a limitation of CheckerFramework
-			if (!filter.test(Unsafe.cast(shopkeeper))) return;
+			if (!filter.test(shopkeeper)) return;
 
-			ShopkeeperSpawnState spawnState = shopkeeper.getComponents().getOrAdd(ShopkeeperSpawnState.class);
 			// This has no noticeable effect if the shopkeeper was already in the despawning state.
 			// This aborts any currently pending spawning.
-			spawnState.setState(State.DESPAWNING);
+			this.updateSpawnState(shopkeeper, State.DESPAWNING);
 		});
 
 		boolean initialChunkActivationState = shopkeeperRegistry.isChunkActive(chunkCoords);
@@ -698,8 +694,8 @@ public class ShopkeeperSpawner {
 
 			Collection<? extends AbstractShopkeeper> chunkShopkeepers = shopkeeperRegistry.getShopkeepersInChunk(chunkCoords);
 			chunkShopkeepers.forEach(shopkeeper -> {
-				// TODO Cast is required due to a limitation of CheckerFramework
-				if (!shopkeeperFilter.test(Unsafe.cast(shopkeeper))) return;
+				if (!shopkeeperFilter.test(shopkeeper)) return;
+
 				this.updateSpawnState(shopkeeper, State.SPAWNING);
 			});
 		});
@@ -753,8 +749,8 @@ public class ShopkeeperSpawner {
 
 			Collection<? extends AbstractShopkeeper> chunkShopkeepers = shopkeeperRegistry.getShopkeepersInChunk(chunkCoords);
 			chunkShopkeepers.forEach(shopkeeper -> {
-				// TODO Cast is required due to a limitation of CheckerFramework
-				if (!shopkeeperFilter.test(Unsafe.cast(shopkeeper))) return;
+				if (!shopkeeperFilter.test(shopkeeper)) return;
+
 				this.updateSpawnState(shopkeeper, State.DESPAWNING);
 			});
 		});

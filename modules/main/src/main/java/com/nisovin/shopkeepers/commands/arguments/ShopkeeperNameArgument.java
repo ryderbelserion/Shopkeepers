@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -17,7 +16,6 @@ import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectNameArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
@@ -64,7 +62,7 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 	 * @param namePrefix
 	 *            the name prefix, may be empty, not <code>null</code>
 	 * @param shopkeeperFilter
-	 *            only suggestions for shopkeepers accepted by this predicate get included
+	 *            only suggestions for shopkeepers accepted by this filter are included
 	 * @return the shopkeeper name completion suggestions
 	 */
 	public static Iterable<? extends String> getDefaultCompletionSuggestions(
@@ -72,7 +70,7 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 			CommandContextView context,
 			int minimumCompletionInput,
 			String namePrefix,
-			Predicate<? super Shopkeeper> shopkeeperFilter
+			ArgumentFilter<? super Shopkeeper> shopkeeperFilter
 	) {
 		// Only provide suggestions if there is a minimum length input:
 		if (namePrefix.length() < minimumCompletionInput) {
@@ -86,7 +84,7 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 		// TODO CheckerFramework complains when using a wildcard Stream here.
 		Stream<Shopkeeper> shopkeepers = Unsafe.castNonNull(shopkeeperRegistry.getAllShopkeepers().stream());
 		Iterable<String> suggestions = shopkeepers
-				.filter(shopkeeperFilter)
+				.filter(shopkeeper -> shopkeeperFilter.test(input, context, shopkeeper))
 				.<@Nullable String>map(shopkeeper -> {
 					String name = TextUtils.stripColor(shopkeeper.getName());
 					if (name.isEmpty()) return null;
@@ -112,7 +110,7 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 				context,
 				minimumCompletionInput,
 				idPrefix,
-				PredicateUtils.alwaysTrue()
+				ArgumentFilter.acceptAny()
 		);
 	}
 }

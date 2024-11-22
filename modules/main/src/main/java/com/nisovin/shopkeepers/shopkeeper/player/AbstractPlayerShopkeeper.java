@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.items.ItemUpdates;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
@@ -45,9 +46,9 @@ import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
 import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
-import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.user.SKUser;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
@@ -146,6 +147,35 @@ public abstract class AbstractPlayerShopkeeper
 		this.saveForHire(shopkeeperData);
 	}
 
+	// ITEM UPDATES
+
+	@Override
+	protected int updateItems(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		int updatedItems = super.updateItems(logPrefix, shopkeeperData);
+		updatedItems += updateHireCost(logPrefix, shopkeeperData);
+		return updatedItems;
+	}
+
+	private static int updateHireCost(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		try {
+			var hireCost = shopkeeperData.get(HIRE_COST_ITEM);
+			// Does nothing if hireCost is null:
+			var updatedHireCost = ItemUpdates.updateItem(hireCost);
+			if (updatedHireCost != hireCost) {
+				assert !ItemUtils.isEmpty(updatedHireCost);
+				shopkeeperData.set(HIRE_COST_ITEM, updatedHireCost);
+
+				Log.debug(DebugOptions.itemUpdates, logPrefix + "Updated hire cost item.");
+				return 1;
+			}
+		} catch (InvalidDataException e) {
+			Log.warning(logPrefix + "Failed to load '" + HIRE_COST_ITEM.getName() + "'!", e);
+		}
+		return 0;
+	}
+
+	//
+
 	@Override
 	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
 		super.onAdded(cause);
@@ -221,8 +251,7 @@ public abstract class AbstractPlayerShopkeeper
 		if (Settings.namingOfPlayerShopsViaItem
 				&& DerivedSettings.namingItemData.matches(itemInMainHand)) {
 			// Check if player can edit this shopkeeper:
-			UIHandler editorHandler = Unsafe.assertNonNull(this.getUIHandler(DefaultUITypes.EDITOR()));
-			if (editorHandler.canOpen(player, false)) {
+			if (this.canEdit(player, false)) {
 				// Rename with the player's item in hand:
 				String newName = ItemUtils.getDisplayNameOrEmpty(itemInMainHand);
 

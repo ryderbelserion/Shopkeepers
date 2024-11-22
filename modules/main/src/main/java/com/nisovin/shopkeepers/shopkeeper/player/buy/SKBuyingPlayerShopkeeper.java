@@ -23,12 +23,14 @@ import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKBuyingPlayerShopkeeper
 		extends AbstractPlayerShopkeeper implements BuyingPlayerShopkeeper {
@@ -67,6 +69,31 @@ public class SKBuyingPlayerShopkeeper
 		super.saveDynamicState(shopkeeperData, saveAll);
 		this.saveOffers(shopkeeperData);
 	}
+
+	// ITEM UPDATES
+
+	@Override
+	protected int updateItems(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		int updatedItems = super.updateItems(logPrefix, shopkeeperData);
+		updatedItems += updateOfferItems(logPrefix, shopkeeperData);
+		return updatedItems;
+	}
+
+	private static int updateOfferItems(String logPrefix, @ReadWrite ShopkeeperData shopkeeperData) {
+		try {
+			var updatedOffers = new ArrayList<PriceOffer>(shopkeeperData.get(OFFERS));
+			var updatedItems = SKPriceOffer.updateItems(updatedOffers, logPrefix);
+			if (updatedItems > 0) {
+				shopkeeperData.set(OFFERS, updatedOffers);
+				return updatedItems;
+			}
+		} catch (InvalidDataException e) {
+			Log.warning(logPrefix + "Failed to load '" + OFFERS.getName() + "'!", e);
+		}
+		return 0;
+	}
+
+	//
 
 	@Override
 	public BuyingPlayerShopType getType() {

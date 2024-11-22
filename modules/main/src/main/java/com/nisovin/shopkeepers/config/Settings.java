@@ -21,18 +21,26 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.UpdateItemEvent;
 import com.nisovin.shopkeepers.api.internal.util.Unsafe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.ConfigData;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
+import com.nisovin.shopkeepers.config.lib.setting.Setting;
+import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
+import com.nisovin.shopkeepers.config.lib.value.types.ItemDataValue;
+import com.nisovin.shopkeepers.config.lib.value.types.ListValue;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.items.ItemUpdates;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.shopcreation.ShopCreationItem;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.tradelog.TradeLogStorageType;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
@@ -47,7 +55,7 @@ public class Settings extends Config {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 7;
+	public static int configVersion = 9;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
@@ -80,6 +88,8 @@ public class Settings extends Config {
 	public static boolean registerWorldGuardAllowShopFlag = true;
 
 	public static boolean enableTownyRestrictions = false;
+
+	public static boolean checkSpawnLocationInteractionResult = false;
 
 	public static boolean disableInventoryVerification = false;
 
@@ -347,10 +357,10 @@ public class Settings extends Config {
 	/*
 	 * Trade Log
 	 */
+	public static TradeLogStorageType tradeLogStorage = TradeLogStorageType.DISABLED;
+
 	public static int tradeLogMergeDurationTicks = 300; // 15 seconds
 	public static int tradeLogNextMergeTimeoutTicks = 100; // 5 seconds
-
-	public static boolean logTradesToCsv = false;
 
 	public static boolean logItemMetadata = false;
 
@@ -918,5 +928,89 @@ public class Settings extends Config {
 				disableInventoryVerification = true;
 			}
 		}
+	}
+
+	/**
+	 * Calls an {@link UpdateItemEvent} for each item stored by the config.
+	 * 
+	 * @return the number of updated items
+	 */
+	public int updateItems() {
+		int updatedItems = 0;
+
+		for (var setting : this.getSettings()) {
+			var valueType = setting.getValueType();
+
+			if (valueType instanceof ItemDataValue) {
+				if (this.updateItemDataSetting(Unsafe.cast(setting))) {
+					updatedItems += 1;
+				}
+			} else if (valueType instanceof ListValue<?> listValueType) {
+				if (listValueType.getElementValueType() instanceof ItemDataValue) {
+					updatedItems += this.updateItemDataListSetting(Unsafe.cast(setting));
+				}
+			}
+
+			// No event is called for Material settings: There is no item data based on which
+			// plugins can reasonable decide whether or not to change the material without not also
+			// affecting all items of the same type in other contexts. Plugins that want to update
+			// specific Material settings need to do so explicitly.
+		}
+
+		if (updatedItems > 0) {
+			this.validateSettings();
+			onSettingsChanged();
+			saveConfig();
+		}
+
+		return updatedItems;
+	}
+
+	private boolean updateItemDataSetting(Setting<ItemData> setting) {
+		var value = setting.getValue(); // Can be null
+		var newItemData = ItemUpdates.updateItemData(value);
+		if (newItemData == value) return false; // Not changed
+		assert newItemData != null;
+
+		String configKey = setting.getConfigKey();
+		try {
+			setting.setValue(newItemData);
+			Log.debug(DebugOptions.itemUpdates, this.getLogPrefix() + "Updated item for setting '"
+					+ configKey + "'.");
+			return true;
+		} catch (ValueLoadException e) {
+			Log.warning(this.getLogPrefix() + "Could not update item for setting '" + configKey
+					+ "': " + e.getMessage());
+			for (String extraMessage : e.getExtraMessages()) {
+				Log.warning(this.getLogPrefix() + extraMessage);
+			}
+			return false;
+		}
+	}
+
+	private int updateItemDataListSetting(Setting<List<ItemData>> setting) {
+		var value = setting.getValue();
+		if (value == null) return 0; // Nothing to update
+
+		int updatedItems = 0;
+
+		int index = -1;
+		var iterator = value.listIterator();
+		while (iterator.hasNext()) {
+			index += 1;
+			@Nullable ItemData itemData = iterator.next(); // Can be null
+			var newItemData = ItemUpdates.updateItemData(itemData);
+			if (newItemData == itemData) continue; // Not changed
+			assert newItemData != null;
+
+			String configKey = setting.getConfigKey();
+			Log.debug(DebugOptions.itemUpdates, this.getLogPrefix() + "Updated item " + index
+					+ " for setting '" + configKey + "'.");
+
+			updatedItems += 1;
+			iterator.set(newItemData);
+		}
+
+		return updatedItems;
 	}
 }

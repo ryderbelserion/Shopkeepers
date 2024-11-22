@@ -91,7 +91,7 @@ public class BaseBlockShops {
 	 * @param blockY
 	 *            the block's y coordinate
 	 * @param blockZ
-	 *            he block's z coordinate
+	 *            the block's z coordinate
 	 * @return <code>true</code> if the block is a shopkeeper that uses the default
 	 *         {@link BaseBlockShopObject} behaviors
 	 */

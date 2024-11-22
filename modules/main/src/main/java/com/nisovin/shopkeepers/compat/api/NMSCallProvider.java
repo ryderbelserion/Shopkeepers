@@ -7,6 +7,9 @@ import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Salmon;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -85,4 +88,16 @@ public interface NMSCallProvider {
 	// not correctly serialize the data currently
 	// (https://github.com/SpigotMC/BungeeCord/issues/3688).
 	public @Nullable String getItemSNBT(@ReadOnly ItemStack itemStack);
+
+	// MC 1.21+ TODO Can be removed once we only support Bukkit 1.21+
+
+	public boolean isDestroyingBlocks(EntityExplodeEvent event);
+
+	public boolean isDestroyingBlocks(BlockExplodeEvent event);
+
+	// MC 1.21.3+ TODO Can be removed once we only support Bukkit 1.21.3+
+
+	public default void setSalmonVariant(Salmon salmon, String variant) {
+		// Not supported by default.
+	}
 }

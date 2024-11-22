@@ -1,10 +1,67 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.23.1 (TBA)
-### Supported MC versions: 1.21.1, 1.21, 1.20.6
+## v2.23.3 (TBA)
+### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
 
+
+## v2.23.2 (2024-11-21)
+### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
+
+* Fix: Partially matching items were no longer accepted in trades.
+  * The server's trading recipe matching logic changed in MC 1.20.5 to be more strict for trading recipes created via the Bukkit API. This change was partially reverted in late 1.21.1.
+  * Adapt the Shopkeepers trading recipe matching logic for MC 1.21.1+ to match the server's trading recipe matching logic again and thereby accept partially matching items again.
+  * For versions 1.20.5 - 1.21 the partial item matching behavior cannot be restored because the server itself does not support it for trading recipes created via the Bukkit API.
+  * The partial matching only applies to item components as a whole now. Any data inside a component (including the "custom data" component used for plugin data) is always fully matched now due to the changes in Minecraft 1.20.5+.
+* Fix: Config sound effects fail to play on Spigot 1.21.3. Add config migration from sound enum names to namespaced keys. This also resolves an issue with shift trading not working.
+* Add "no permission" message feedback when a user tries to edit a shopkeeper which they don't have access to.
+* Commands: In addition to the command permission itself, various commands require the player to have editing access for the involved shopkeeper now, and hide command completions for shopkeepers that the executing player has no access to. Affected commands:
+  * `edit` (already required editing access before)
+  * `remote/open` (already required trading access before)
+  * `remove`
+  * `setForHire`
+  * `setTradePerm`
+  * `transfer` (already required editing access before)
+  * All snapshot commands.
+* Config: Add `check-spawn-location-interaction-result` (default: `false`). If enabled, players are only able to place shopkeepers in places where no other plugin denies them to interact with blocks.
+  * We check for this by calling a dummy block interaction event for other plugins to react to.
+  * If the spawn location is currently empty (i.e. of type air), we temporarily place a dummy block to get better interaction results from other plugins.
+* Internal: Command argument filters have access to the input parameters and command context now.
+
+**Message changes:**  
+* Added `command-shopkeeper-argument-no-access`.
+
+## v2.23.1 (2024-11-03)
+### Supported MC versions: 1.21.3, 1.21.1, 1.21, 1.20.6
+
+* Update for MC 1.21.3.
+  * MC 1.21.2 was immediately replaced and is not supported.
+  * Squids and dolphins support a baby variant now.
+  * Salmons support size variants now.
+  * Experimental features (creaking and pale oak sign shops) are not yet supported.
+* Fix: Error "IncompatibleClassChangeError: Found interface org.bukkit.craftbukkit.inventory.CraftMerchant, but class was expected" when a player shop becomes out of stock. This version is built against the latest version of Spigot 1.21.1 and might not be compatible with Spigot 1.21.1 builds from before 2024-09-07.
+* Add SQLite based trade log storage. (Thanks @akshualy)
+  * In the future, this can be used for additional features, such as offline trade notifications.
+  * Config: Add new setting `trade-log-storage`. Available values: `DISABLED` (default), `SQLITE` (recommended), `CSV`.
+  * Config: Add migration from the old `log-trades-to-csv` to the new `trade-log-storage` setting.
+  * Only one storage type can be selected: Logging trades to both CSV and the SQLite is not supported.
+  * Internal: Refactors to share most of the logic between the old CSV and the new SQLite trade loggers.
 * Config: Remove `file-encoding` setting: We use Bukkit to load the save data, which always expects the data to be UTF-8 encoded.
+* Fix: Remove shopkeepers from the spawn queue again when their chunk is unloaded. This can for example occasionally be observed during server startup on MC 1.21.1.
+* Fix: Player shops got deleted when their container is hit by a wind charge and `protect-containers` is disabled and `delete-shopkeeper-on-break-container` is enabled: We need to ignore explosions if they don't actually delete the affected blocks.
+* Fix: Allay shopkeepers were able to pick up items matching the item in their hand.
+* Debug: Add debug output if we fail to remove players from our PlayerMap, which would indicate some issue with the player instances or events provided by the server.
+* API: Add `UpdateItemEvent` and the methods `ShopkeepersAPI#updateItems` and `Shopkeeper#updateItems` that can be used by third-party plugins to automatically update their custom items stored by the Shopkeepers plugin.
+  * Add utility command `/shopkeeper updateItems` (permission `shopkeeper.updateitems`, default: `op`) to trigger the item updates via command.
+  * Add debug option `item-updates` to log whenever items are updated.
+* Internal: Use similar loading options for our compact Yaml as are used in Bukkit and increase the default nesting limit to handle nested bundles.
+
+**Message changes:**  
+* Added `items-updated`.
+* Added `command-description-update-items`.
+* Added `button-salmon-variant`.
+* Added `button-salmon-variant-lore`.
+* Minor changes to the default german translation ("Items" -> "Gegenstände").
 
 ## v2.23.0 (2024-08-11)
 ### Supported MC versions: 1.21.1, 1.21, 1.20.6
@@ -1279,7 +1336,7 @@ Other changes:
 * Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]`.
   * This command can be used to create and give the currency items which have been specified inside the config.
   * Added corresponding permission node `shopkeeper.givecurrency` (default: op).
-* Added: When giving items via command to another player we now also inform the target player that he has received items. These newly added messages are also used now when giving items to yourself.
+* Added: When giving items via command to another player we now also inform the target player that they have received items. These newly added messages are also used now when giving items to yourself.
 * Added: New command `/shopkeeper convertItems [player] ['all']`.
   * This command can be used to convert the held (or all) items to conform to Spigot's internal data format. I.e. this runs the items through Spigot's item serialization and deserialization in the same way as it would happen when these items are used inside shopkeeper trades and the plugin gets reloaded.
   * Added corresponding permission node `shopkeeper.convertitems.own` (default: op). This allows converting own items.
@@ -2507,7 +2564,7 @@ Thanks.
 * Improved / Fixed hiring behavior:
 * Changed: The hiring window can now always be open, regardless of if the player has the permission to hire this type of shopkeeper.
 * Added: Message 'msg-missing-hire-perm' if the player doesn't have the permission to hire shopkeepers at all.
-* Added: Message 'msg-cant-hire-shop-type' if the player cannot hire a certain type of shopkeeper (because he is missing the corresponding creation permissions).
+* Added: Message 'msg-cant-hire-shop-type' if the player cannot hire a certain type of shopkeeper (because they are missing the corresponding creation permissions).
 * Changed: Message 'msg-cant-hire' now uses a different color.
 * Added: Config setting 'hire-require-creation-permission' (default: true) to allow enabling of hiring of shops the player would usually not be able to create himself.
 * Added some warning and debug messages when noticing something wrong with the config.

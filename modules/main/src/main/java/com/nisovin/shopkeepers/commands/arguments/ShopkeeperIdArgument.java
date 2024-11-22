@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.bukkit.command.CommandSender;
@@ -18,7 +17,6 @@ import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
-import com.nisovin.shopkeepers.util.java.PredicateUtils;
 
 /**
  * Provides suggestions for the ids of existing shopkeepers.
@@ -74,7 +72,7 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @param filter
-	 *            only suggestions for shopkeepers accepted by this predicate are included, not
+	 *            only suggestions for shopkeepers accepted by this filter are included, not
 	 *            <code>null</code>
 	 * @return the shopkeeper id completion suggestions
 	 */
@@ -83,7 +81,7 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 			CommandContextView context,
 			int minimumCompletionInput,
 			String idPrefix,
-			Predicate<? super Shopkeeper> filter
+			ArgumentFilter<? super Shopkeeper> filter
 	) {
 		// If idPrefix is not empty but not a valid number, we can skip checking for completions:
 		if (!idPrefix.isEmpty() && ConversionUtils.parseInt(idPrefix) == null) {
@@ -114,7 +112,7 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 		// TODO Prefer short ids (e.g. input "2", suggest "20", "21", "22",.. instead of "200",
 		// "201", "202",..)
 		return shopkeepersStream
-				.filter(filter)
+				.filter(shopkeeper -> filter.test(input, context, shopkeeper))
 				.mapToInt(Shopkeeper::getId)
 				.filter(id -> String.valueOf(id).startsWith(idPrefix))::iterator;
 	}
@@ -130,7 +128,7 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 				context,
 				minimumCompletionInput,
 				idPrefix,
-				PredicateUtils.alwaysTrue()
+				ArgumentFilter.acceptAny()
 		);
 	}
 }

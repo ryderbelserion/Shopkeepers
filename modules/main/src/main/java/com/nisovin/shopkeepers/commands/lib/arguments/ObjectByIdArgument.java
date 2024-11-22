@@ -112,7 +112,7 @@ public abstract class ObjectByIdArgument<@NonNull I, @NonNull O>
 			// No corresponding object found:
 			throw this.invalidArgumentError(idArgument.toString(id));
 		}
-		if (!filter.test(object)) {
+		if (!filter.test(input, context, object)) {
 			// Rejected by the filter:
 			throw filter.rejectedArgumentException(this, idArgument.toString(id), object);
 		}

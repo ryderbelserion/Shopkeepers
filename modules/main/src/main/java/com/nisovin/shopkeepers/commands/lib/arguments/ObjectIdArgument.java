@@ -80,7 +80,7 @@ public abstract class ObjectIdArgument<@NonNull I> extends CommandArgument<@NonN
 		I id = idArgument.parseValue(input, context, argsReader);
 
 		// Check if id is accepted:
-		if (!filter.test(id)) {
+		if (!filter.test(input, context, id)) {
 			int endIndex = argsReader.getCursor();
 			List<? extends String> parsedArgs = argsReader.getArgs().subList(startIndex + 1, endIndex + 1);
 			String parsedArgsString = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
@@ -147,7 +147,7 @@ public abstract class ObjectIdArgument<@NonNull I> extends CommandArgument<@NonN
 		List<String> suggestions = new ArrayList<>();
 		for (I id : this.getCompletionSuggestions(input, context, idPrefix)) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
-			if (!filter.test(id)) continue; // Skip rejected ids
+			if (!filter.test(input, context, id)) continue; // Skip rejected ids
 
 			String idString = this.toString(id);
 			if (StringUtils.isEmpty(idString)) continue; // Skip invalid id string

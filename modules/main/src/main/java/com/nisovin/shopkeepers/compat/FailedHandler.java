@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -23,6 +25,12 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Class<?> obcCraftEntityClass;
 	private final Method obcGetHandleMethod;
 
+	// Bukkit
+
+	// null if not supported yet (e.g. pre 1.21):
+	private @Nullable Method b_EntityExplodeEvent_GetExplosionResultMethod = null;
+	private @Nullable Method b_BlockExplodeEvent_GetExplosionResultMethod = null;
+
 	public FailedHandler() throws Exception {
 		String cbPackage = ServerUtils.getCraftBukkitPackage();
 
@@ -38,6 +46,15 @@ public final class FailedHandler implements NMSCallProvider {
 
 		obcCraftEntityClass = Class.forName(cbPackage + ".entity.CraftEntity");
 		obcGetHandleMethod = obcCraftEntityClass.getDeclaredMethod("getHandle");
+
+		// Bukkit
+
+		try {
+			b_EntityExplodeEvent_GetExplosionResultMethod = EntityExplodeEvent.class.getMethod("getExplosionResult");
+			b_BlockExplodeEvent_GetExplosionResultMethod = BlockExplodeEvent.class.getMethod("getExplosionResult");
+		} catch (NoSuchMethodException e) {
+			// Not found, e.g. pre 1.21.
+		}
 	}
 
 	@Override
@@ -97,5 +114,45 @@ public final class FailedHandler implements NMSCallProvider {
 	@Override
 	public @Nullable String getItemSNBT(ItemStack itemStack) {
 		return null; // Not supported.
+	}
+
+	// MC 1.21+ TODO Can be removed once we only support Bukkit 1.21+
+
+	@Override
+	public boolean isDestroyingBlocks(EntityExplodeEvent event) {
+		if (b_EntityExplodeEvent_GetExplosionResultMethod == null) return true;
+
+		try {
+			assert b_EntityExplodeEvent_GetExplosionResultMethod != null;
+			var explosionResult = b_EntityExplodeEvent_GetExplosionResultMethod.invoke(event);
+			assert explosionResult != null;
+			return isDestroyingBlocks(explosionResult);
+		} catch (Exception e) {
+			// Something unexpected went wrong. Assume pre 1.21 behavior. Wind charges may break
+			// player shops when container protection is disabled (#921).
+			return true;
+		}
+	}
+
+	@Override
+	public boolean isDestroyingBlocks(BlockExplodeEvent event) {
+		if (b_BlockExplodeEvent_GetExplosionResultMethod == null) return true;
+
+		try {
+			assert b_BlockExplodeEvent_GetExplosionResultMethod != null;
+			var explosionResult = b_BlockExplodeEvent_GetExplosionResultMethod.invoke(event);
+			assert explosionResult != null;
+			return isDestroyingBlocks(explosionResult);
+		} catch (Exception e) {
+			// Something unexpected went wrong. Assume pre 1.21 behavior. Wind charges may break
+			// player shops when container protection is disabled (#921).
+			return true;
+		}
+	}
+
+	private static boolean isDestroyingBlocks(Object explosionResult) {
+		var explosionResultString = explosionResult.toString();
+		return explosionResultString.equals("DESTROY")
+				|| explosionResultString.equals("DESTROY_WITH_DECAY");
 	}
 }
